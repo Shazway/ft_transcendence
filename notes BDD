@@ -1,0 +1,52 @@
+users
+	id
+	mdp
+	username
+	nickname
+	profile pic
+	friends (pointeur sur user)
+	matchs passes (pointeur sur matchs)
+	rank
+	status
+	achievements
+	blacklist
+	channels
+
+
+matchs
+	id
+	userA
+	userB
+	scoreA
+	scoreB
+	time
+	ranked
+	currently spectating
+	settings (map, level ...)
+
+
+channel
+	id
+	name
+	profile pic
+	visibility
+	password
+	owner
+	admins
+	members
+	messages
+	banned users
+	muted users
+
+
+messages
+	id
+	author
+	channel
+	date, hour
+	content
+
+muted users
+	user
+	time of end
+
