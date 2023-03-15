@@ -16,9 +16,11 @@ import { CreateUserDto } from 'src/users/controllers/dtos/CreateUser.dto';
 @Controller('users')
 export class UsersController {
 	constructor(private usersService: UsersService) {}
-	@Get()
-	getUsers() {
-		return { username: 'tmoragli', email: 'tmoragli@student.42.fr' };
+	@Get('')
+	getUsers(@Req() req: Request, @Res() res: Response) {
+		const userList = this.usersService.getAllUsers();
+		if (userList) res.send(userList);
+		else res.status(HttpStatus.NOT_FOUND).send({ msg: 'User not found!' });
 	}
 
 	@Get('posts')

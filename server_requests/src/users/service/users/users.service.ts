@@ -34,6 +34,11 @@ export class UsersService {
 	}
 
 	createUser(userDto: CreateUserDto) {
+		userDto.createdAt = new Date();
 		this.users.push(userDto);
+	}
+
+	getAllUsers() {
+		return this.users;
 	}
 }
