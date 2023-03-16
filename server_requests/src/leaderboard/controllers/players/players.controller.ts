@@ -3,8 +3,7 @@ import { Controller, Get } from '@nestjs/common';
 @Controller('players')
 export class PlayersController {
 	@Get()
-	getUsers()
-	{
+	getUsers() {
 		return { username: 'Telli', rank: '1' };
 	}
 }

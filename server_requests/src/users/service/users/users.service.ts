@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from 'src/users/controllers/dtos/CreateUser.dto';
+import { plainToClass } from 'class-transformer';
+import { CreateUserDto, SerializedUserDto } from 'src/users/controllers/dtos/CreateUser.dto';
 
 @Injectable()
 export class UsersService {
@@ -39,6 +40,6 @@ export class UsersService {
 	}
 
 	getAllUsers() {
-		return this.users;
+		return this.users.map((user) => plainToClass(SerializedUserDto, user));
 	}
 }
