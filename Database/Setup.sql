@@ -1,9 +1,19 @@
 CREATE DATABASE moumoune_db;
 USE moumoune_db;
 
-CREATE TYPE match_settings AS (
-	MapAppearance INT DEFAULT 0,
-	Timer
+CREATE TYPE match_setting AS (
+	map_appearance INT DEFAULT 0 CHECK (VALUE >= 0),
+	timer INT DEFAULT 300 CHECK (VALUE <= 1200),
+	is_ranked BOOLEAN DEFAULT false,
+	score_to_win INT DEFAULT 5 CHECK (VALUE <= 50),
+	max_players INT DEFAULT 2 CHECK (VALUE <= 2),
+	round_to_win INT DEFAULT 2 CHECK (VALUE <= 10)
+)
+
+CREATE TYPE played_match AS (
+	FOREIGN KEY (match) REFERENCES match (match_id) ON DELETE CASCADE,
+	score INT DEFAULT 0,
+	round_won INT DEFAULT 0
 )
 
 CREATE TABLE users (
@@ -14,6 +24,7 @@ CREATE TABLE users (
 	img_url VARCHAR(255) DEFAULT NULL,
 	rank_score INT DEFAULT 0,
 	activity_status int DEFAULT 0,
+	match_history played_match[],
 	FOREIGN KEY (achievement_list) REFERENCES achievements (achievement_id) ON DELETE CASCADE,
 	FOREIGN KEY (friends) REFERENCES users (user_id) ON DELETE CASCADE,
 	FOREIGN KEY (blacklist) REFERENCES users (user_id) ON DELETE CASCADE,
@@ -30,6 +41,7 @@ CREATE TABLE achievements (
 CREATE TABLE match (
 	match_id SERIAL NOT NULL UNIQUE PRIMARY KEY,
 	match_is_ranked BOOLEAN DEFAULT false,
-	match_settings 
+	match_settings match_setting,
 	FOREIGN KEY (spectators) REFERENCES users (user_id) ON DELETE CASCADE,
+	FOREIGN KEY (player) REFERENCES users (user_id) ON DELETE CASCADE
 );
