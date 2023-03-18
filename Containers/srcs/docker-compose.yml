@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      dockerfile: ./requirements/backend/Dockerfile
+    ports:
+      - 3001:3001
+    networks:
+      - backend
+    volumes:
+      - ../../Backend:/app
+    restart: unless-stopped
+
+volumes:
+  data:
+
+networks:
+  backend:

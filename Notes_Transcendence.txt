@@ -1,3 +1,4 @@
+Notes Structures BDD:
 users
 	id
 	mdp
@@ -50,3 +51,12 @@ muted users
 	user
 	time of end
 
+To install:
+npm install @nestjs/cli
+npm install class-transformer --save
+npm install --save dotenv
+npm install --save @nestjs/typeorm typeorm pg
+
+BDD links:
+https://hub.docker.com/_/postgres
+https://suedbroecker.net/2020/06/23/run-a-postgressql-container-as-a-non-root-user-in-openshift/
