@@ -52,9 +52,9 @@ muted users
 	time of end
 
 To install:
-npm install @nestjs/cli
-npm install class-transformer --save
-npm install --save dotenv
+npm install @nestjs/cli && \
+npm install class-transformer --save && \
+npm install --save dotenv && \
 npm install --save @nestjs/typeorm typeorm pg
 
 BDD links:
