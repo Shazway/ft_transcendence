@@ -5,6 +5,7 @@ import { ProfileController } from './profile/profile.controller';
 import { PlayController } from './play/play.controller';
 import { LoginController } from './login/login.controller';
 import { LeaderboardController } from './leaderboard/leaderboard.controller';
+import { ShopController } from './shop/shop.controller';
 
 @Module({
 	controllers: [
@@ -14,6 +15,7 @@ import { LeaderboardController } from './leaderboard/leaderboard.controller';
 		PlayController,
 		LoginController,
 		LeaderboardController,
+		ShopController,
 	],
 })
 export class HomepageModule {}
