@@ -1,13 +1,17 @@
 import { Module } from '@nestjs/common';
-import { ChannelsController } from './channels/channels.controller';
-import { RootController } from './root/root.controller';
-import { ProfileController } from './profile/profile.controller';
-import { PlayController } from './play/play.controller';
-import { LoginController } from './login/login.controller';
-import { LeaderboardController } from './leaderboard/leaderboard.controller';
-import { ShopController } from './shop/shop.controller';
+import { ChannelsController } from './controllers/channels/channels.controller';
+import { RootController } from './controllers/root/root.controller';
+import { ProfileController } from './controllers/profile/profile.controller';
+import { PlayController } from './controllers/play/play.controller';
+import { LoginController } from './controllers/login/login.controller';
+import { LeaderboardController } from './controllers/leaderboard/leaderboard.controller';
+import { ShopController } from './controllers/shop/shop.controller';
+import { UsersController } from './controllers/users/users.controller';
+import { UsersService } from './services/users/users.service';
+
 
 @Module({
+	imports: [],
 	controllers: [
 		ChannelsController,
 		RootController,
@@ -16,6 +20,13 @@ import { ShopController } from './shop/shop.controller';
 		LoginController,
 		LeaderboardController,
 		ShopController,
+		UsersController,
+	],
+	providers: [
+		{
+			provide: UsersService,
+			useClass: UsersService,
+		},
 	],
 })
 export class HomepageModule {}

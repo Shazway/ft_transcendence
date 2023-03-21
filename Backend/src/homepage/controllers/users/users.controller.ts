@@ -10,8 +10,8 @@ import {
 	Res,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { UsersService } from 'src/users/service/users/users.service';
-import { CreateUserDto } from 'src/users/controllers/dtos/CreateUser.dto';
+import { UsersService } from '../../services/users/users.service';
+import { CreateUserDto } from '../../dtos/CreateUser.dto';
 
 @Controller('users')
 export class UsersController {
@@ -36,12 +36,18 @@ export class UsersController {
 	) {
 		const user = this.usersService.findUser(us);
 		if (user) res.send(user);
-		else res.status(HttpStatus.NOT_FOUND).send({ msg: 'User not found!' });
+		else res.status(HttpStatus.NOT_FOUND).send({ msg: 'User not found' });
 	}
 
 	@Post('create')
-	createCustomer(@Req() req: Request, @Body() createUsersDto: CreateUserDto) {
+	createCustomer(@Req() req: Request, @Res() res: Response,@Body() createUsersDto: CreateUserDto) {
 		console.log(createUsersDto);
-		this.usersService.createUser(createUsersDto);
+		if (this.usersService.findUser(createUsersDto.username))
+			res.status(HttpStatus.CONFLICT).send({msg: 'User already exists'});
+		else
+		{
+			this.usersService.createUser(createUsersDto);
+			res.status(HttpStatus.OK).send({msg: 'User created'});
+		}
 	}
 }
