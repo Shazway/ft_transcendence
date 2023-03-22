@@ -15,6 +15,14 @@ export class UsersService {
 		this.users.push(userDto);
 	}
 
+	//Might be useful later ?
+	/*deleteUser(us: CreateUserDto) {
+		if (!this.findUser(us.username))
+			return false;
+		this.users.splice(this.users.indexOf(us), 1);
+		return true;
+	}*/
+
 	getAllUsers() {
 		return this.users.map((user) => plainToClass(SerializedUserDto, user));
 	}

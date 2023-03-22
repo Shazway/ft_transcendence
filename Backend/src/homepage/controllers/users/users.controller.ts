@@ -23,11 +23,6 @@ export class UsersController {
 		else res.status(HttpStatus.NOT_FOUND).send({ msg: 'User not found!' });
 	}
 
-	@Get('posts')
-	getUsersPosts() {
-		return this.usersService.findUser('tmoragli');
-	}
-
 	@Get(':username')
 	getMatchHistory(
 		@Param('username') us: string,
@@ -50,4 +45,14 @@ export class UsersController {
 			res.status(HttpStatus.OK).send({msg: 'User created'});
 		}
 	}
+	
+	//Might be useful later ?
+	/*@Post('delete')
+	deleteUser(@Req() req: Request, @Res() res: Response, @Body() us: CreateUserDto) {
+		console.log(CreateUserDto);
+		if (this.usersService.deleteUser(us))
+			res.status(HttpStatus.ACCEPTED).send('User deleted');
+		else
+			res.status(HttpStatus.NOT_FOUND).send('User not found');
+	}*/
 }
