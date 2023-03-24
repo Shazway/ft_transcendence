@@ -1,10 +1,6 @@
-FROM debian:buster
+FROM postgres:15.2
 
-RUN apt-get update && \
-	apt-get install mariadb-server -y && \
-	apt-get clean
-
-COPY docker-entrypoint.sh /
+COPY 
 COPY 50-server.cnf /etc/mysql/mariadb.conf.d/
 
 ENTRYPOINT ["bash", "docker-entrypoint.sh"]
