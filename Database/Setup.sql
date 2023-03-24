@@ -1,14 +1,15 @@
-CREATE DATABASE IF NOT EXISTS moumoune_db;
-USE moumoune_db;
+/*CREATE DATABASE IF NOT EXISTS moumoune_db;
+USE moumoune_db;*/
 
-CREATE TYPE match_setting AS (
-	map_appearance INT DEFAULT 0 CHECK (VALUE >= 0),
-	timer INT DEFAULT 300 CHECK (VALUE <= 1200),
+CREATE TABLE match_setting (
+	match_setting_id SERIAL NOT NULL UNIQUE PRIMARY KEY,
+	map_appearance INT DEFAULT 0 CHECK (map_appearance >= 0),
+	timer INT DEFAULT 300 CHECK (timer <= 1200),
 	is_ranked BOOLEAN DEFAULT false,
-	score_to_win INT DEFAULT 5 CHECK (VALUE <= 50),
-	max_players INT DEFAULT 2 CHECK (VALUE <= 2),
-	round_to_win INT DEFAULT 2 CHECK (VALUE <= 10)
-)
+	score_to_win INT DEFAULT 5 CHECK (score_to_win <= 50),
+	max_players INT DEFAULT 2 CHECK (max_players <= 2),
+	round_to_win INT DEFAULT 2 CHECK (round_to_win <= 10)
+);
 
 CREATE TABLE users (
 	user_id SERIAL NOT NULL UNIQUE PRIMARY KEY,
@@ -17,8 +18,7 @@ CREATE TABLE users (
 	nickname VARCHAR(10) NOT NULL UNIQUE,
 	img_url VARCHAR(255) DEFAULT NULL,
 	rank_score INT DEFAULT 0,
-	activity_status int DEFAULT 0,
-	FOREIGN KEY (channels) REFERENCES channels (channel_id) ON DELETE CASCADE
+	activity_status int DEFAULT 0
 );
 
 /* Relational table to express friends and blacklisted of a user */
@@ -48,7 +48,7 @@ CREATE TABLE user_achievements (
 CREATE TABLE matchs (
 	match_id SERIAL NOT NULL UNIQUE PRIMARY KEY,
 	match_is_ranked BOOLEAN DEFAULT false,
-	match_settings match_setting,
+	match_setting INTEGER REFERENCES match_setting (match_setting_id) ON DELETE CASCADE
 );
 
 /* Relational table to express the match history of a user */
@@ -87,8 +87,8 @@ CREATE TABLE messages (
 	message_id SERIAL NOT NULL UNIQUE PRIMARY KEY,
 	message_content VARCHAR(255) NOT NULL,
 	message_timestamp TIMESTAMP NOT NULL,
-	FOREIGN KEY (message_author) REFERENCES users (user_id) ON DELETE CASCADE,
-	FOREIGN KEY (channel_id) REFERENCES channels (channel_id) ON DELETE CASCADE,
+	message_author INTEGER REFERENCES users (user_id) ON DELETE CASCADE,
+	channel_id INTEGER REFERENCES channels (channel_id) ON DELETE CASCADE
 );
 
 /* Notifications type:
@@ -97,7 +97,7 @@ CREATE TABLE messages (
  * - "Get Achievement"
  * - "Channel Notif"
  * - "Message Ping"
- */
+ *
 
 CREATE TABLE notification (
 	notif_id SERIAL NOT NULL UNIQUE PRIMARY KEY,
@@ -106,4 +106,4 @@ CREATE TABLE notification (
 	FOREIGN KEY (link_to_match) REFERENCES matchs (match_id) DEFAULT NULL ON DELETE SET DEFAULT,
 	FOREIGN KEY (link_to_friend) REFERENCES users (user_id) DEFAULT NULL ON DELETE SET DEFAULT,
 	FOREIGN KEY (link_to_channel) REFERENCES channels (channel_id) DEFAULT NULL ON DELETE SET DEFAULT
-)
+);*/
