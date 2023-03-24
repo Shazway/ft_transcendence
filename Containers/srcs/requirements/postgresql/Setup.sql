@@ -1,6 +1,3 @@
-/*CREATE DATABASE IF NOT EXISTS moumoune_db;
-USE moumoune_db;*/
-
 CREATE TABLE match_setting (
 	match_setting_id SERIAL NOT NULL UNIQUE PRIMARY KEY,
 	map_appearance INT DEFAULT 0 CHECK (map_appearance >= 0),

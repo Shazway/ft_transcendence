@@ -1,10 +1,16 @@
 FROM postgres:15.2
 
-COPY 
-COPY 50-server.cnf /etc/mysql/mariadb.conf.d/
 
-ENTRYPOINT ["bash", "docker-entrypoint.sh"]
+RUN apt-get update && \
+	apt-get install postgresql && \
+	apt-get clean
 
-CMD ["mysqld_safe"]
+RUN mkdir inoxdb
 
-EXPOSE 3306
+COPY Setup.sql /inoxdb/docker-entrypoint-initdb.d/
+
+WORKDIR /inoxdb
+
+ENTRYPOINT [ "/bin/bash", "-c", "psql -a -f ./docker-entrypoint-initdb.d/Setup.sql" ]
+
+EXPOSE 5432

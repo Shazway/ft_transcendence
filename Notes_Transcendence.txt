@@ -60,3 +60,11 @@ npm install --save @nestjs/typeorm typeorm pg
 BDD links:
 https://hub.docker.com/_/postgres
 https://suedbroecker.net/2020/06/23/run-a-postgressql-container-as-a-non-root-user-in-openshift/
+
+Connexion BDD:
+docker exec -it postgresql bash
+psql -U root -W
+psql -a -f ./docker-entrypoint-initdb.d/Setup.sql
+
+in sql mode:
+\d to see all tables
