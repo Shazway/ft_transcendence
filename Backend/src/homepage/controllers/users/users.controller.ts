@@ -35,24 +35,32 @@ export class UsersController {
 	}
 
 	@Post('create')
-	createCustomer(@Req() req: Request, @Res() res: Response,@Body() createUsersDto: CreateUserDto) {
+	createCustomer(
+		@Req() req: Request,
+		@Res() res: Response,
+		@Body() createUsersDto: CreateUserDto,
+	) {
 		console.log(createUsersDto);
 		if (this.usersService.findUser(createUsersDto.username))
-			res.status(HttpStatus.CONFLICT).send({msg: 'User already exists'});
-		else
-		{
+			res.status(HttpStatus.CONFLICT).send({
+				msg: 'User already exists',
+			});
+		else {
 			this.usersService.createUser(createUsersDto);
-			res.status(HttpStatus.OK).send({msg: 'User created'});
+			res.status(HttpStatus.OK).send({ msg: 'User created' });
 		}
 	}
-	
+
 	//Might be useful later ?
-	/*@Post('delete')
-	deleteUser(@Req() req: Request, @Res() res: Response, @Body() us: CreateUserDto) {
+	@Post('delete')
+	deleteUser(
+		@Req() req: Request,
+		@Res() res: Response,
+		@Body() us: CreateUserDto,
+	) {
 		console.log(CreateUserDto);
 		if (this.usersService.deleteUser(us))
 			res.status(HttpStatus.ACCEPTED).send('User deleted');
-		else
-			res.status(HttpStatus.NOT_FOUND).send('User not found');
-	}*/
+		else res.status(HttpStatus.NOT_FOUND).send('User not found');
+	}
 }
