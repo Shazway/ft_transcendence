@@ -64,6 +64,7 @@ https://suedbroecker.net/2020/06/23/run-a-postgressql-container-as-a-non-root-us
 Connexion BDD:
 docker exec -it postgresql bash
 psql -U root -W
+psql -U inox -d inox_db -W
 psql -a -f ./docker-entrypoint-initdb.d/Setup.sql
 
 in sql mode:
