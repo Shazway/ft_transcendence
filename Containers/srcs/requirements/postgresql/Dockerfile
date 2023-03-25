@@ -8,9 +8,10 @@ RUN apt-get update && \
 RUN mkdir inoxdb
 
 COPY Setup.sql /inoxdb/docker-entrypoint-initdb.d/
+COPY init_db.sh /inoxdb/docker-entrypoint-initdb.d/
 
 WORKDIR /inoxdb
 
-ENTRYPOINT [ "/bin/bash", "-c", "psql -a -f ./docker-entrypoint-initdb.d/Setup.sql" ]
+ENTRYPOINT psql -a -f ./docker-entrypoint-initdb.d/init_db.sh
 
 EXPOSE 5432

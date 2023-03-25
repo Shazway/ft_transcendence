@@ -4,8 +4,8 @@ services:
   postgres:
     healthcheck:
         test: "PGPASSWORD=${POSTGRES_PASSWORD} psql -U ${POSTGRES_USER} -w -d ${DB_NAME} -c 'select 1;'"
-        interval: 2s
-        retries: 120
+        interval: 20s
+        retries: 12
         timeout: 10s
     container_name: postgresql
     build: ./requirements/postgresql
