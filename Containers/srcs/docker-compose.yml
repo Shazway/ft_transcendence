@@ -14,9 +14,8 @@ services:
       
 
   backend:
-    build:
     container_name: backend
-      dockerfile: ./requirements/backend/Dockerfile
+    build: ./requirements/backend
     ports:
       - 3001:3001
     networks:
