@@ -16,4 +16,4 @@ RUN npm install @nestjs/cli && \
 
 EXPOSE 3001
 
-ENTRYPOINT [ "/bin/bash", "-c", "npm run start" ]
+ENTRYPOINT [ "/bin/bash", "-c", "npm run start:dev" ]

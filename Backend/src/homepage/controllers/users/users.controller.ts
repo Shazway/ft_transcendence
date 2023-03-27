@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { UsersService } from '../../services/users/users.service';
-import { CreateUserDto } from '../../dtos/CreateUser.dto';
+import { CreateUserDto, NewUserDto } from '../../dtos/CreateUser.dto';
 
 @Controller('users')
 export class UsersController {
@@ -38,17 +38,18 @@ export class UsersController {
 	createCustomer(
 		@Req() req: Request,
 		@Res() res: Response,
-		@Body() createUsersDto: CreateUserDto,
+		@Body() newUserDto: NewUserDto,
 	) {
-		console.log(createUsersDto);
-		if (this.usersService.findUser(createUsersDto.username))
-			res.status(HttpStatus.CONFLICT).send({
-				msg: 'User already exists',
-			});
-		else {
-			this.usersService.createUser(createUsersDto);
-			res.status(HttpStatus.OK).send({ msg: 'User created' });
-		}
+		this.usersService.createUserNew(newUserDto);
+		console.log(newUserDto);
+		res.status(HttpStatus.OK).send({ msg: 'User created' });
+		// if (this.usersService.findUser(createUsersDto.username))
+		// 	res.status(HttpStatus.CONFLICT).send({
+		// 		msg: 'User already exists',
+		// 	});
+		// else {
+		// 	res.status(HttpStatus.OK).send({ msg: 'User created' });
+		// }
 	}
 
 	//Might be useful later ?

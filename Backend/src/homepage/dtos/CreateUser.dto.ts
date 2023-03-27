@@ -21,3 +21,7 @@ export class SerializedUserDto {
 	@Exclude()
 	matchsHistory: MatchHistory[];
 }
+
+export class NewUserDto {
+	username: string;
+}

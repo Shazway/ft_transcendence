@@ -12,7 +12,7 @@ services:
       - .env
     restart: unless-stopped
 
-  #backend:
+  # backend:
   #  container_name: backend
   #  build: ./requirements/backend
   #  ports:

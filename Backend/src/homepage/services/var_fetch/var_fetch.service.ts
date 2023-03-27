@@ -41,6 +41,7 @@ export class VarFetchService {
 			database: this.getValue('POSTGRES_DATABASE'),
 			entities: entities,
 			synchronize: true, // <---- TURN OFF IN PROD
+			autoLoadEntities: true,
 
 			// migrationsTableName: 'migration',
 
