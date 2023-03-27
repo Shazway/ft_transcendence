@@ -51,11 +51,14 @@ muted users
 	user
 	time of end
 
-To install (you have to be in the Backend file.):
+Backend dependencies: (you have to be in the Backend file):
 npm install @nestjs/cli && \
 npm install class-transformer --save && \
 npm install --save dotenv && \
 npm install --save @nestjs/typeorm typeorm pg
+
+Frontend dependencies: (you have to be in the Frontend file): 
+npm install <-- execute this if you do not have node_modules file locally in your Frontend file
 
 BDD links:
 https://hub.docker.com/_/postgres

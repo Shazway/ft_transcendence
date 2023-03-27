@@ -1,5 +1,4 @@
 all:
-#	mkdir -p /home/ncaba/inception/data/frontend
 	mkdir -p $(HOME)/sgoinfre/data_transcendence
 	docker compose -f srcs/docker-compose.yml up -d --build
 
