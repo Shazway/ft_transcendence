@@ -1,11 +1,18 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
+import { Repository } from 'typeorm';
 import { CreateUserDto, SerializedUserDto } from '../../dtos/CreateUser.dto';
+import { User as UserEntity } from '../../../entities/users.entity';
 
 @Injectable()
 export class UsersService {
-	users = new Array<CreateUserDto>();
+	constructor(
+		@InjectRepository(UserEntity)
+		private userRepository: Repository<UserEntity>,
+	) {}
 
+	users = new Array<CreateUserDto>();
 	findUser(username: string) {
 		return this.users.find((user) => user.username === username);
 	}
@@ -13,6 +20,8 @@ export class UsersService {
 	createUser(userDto: CreateUserDto) {
 		userDto.createdAt = new Date();
 		this.users.push(userDto);
+		const newUser = this.userRepository.create(userDto);
+		return this.userRepository.save(newUser);
 	}
 
 	//Might be useful later ?

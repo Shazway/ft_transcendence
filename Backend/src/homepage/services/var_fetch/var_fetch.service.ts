@@ -1,4 +1,5 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import entities from '../../../entities/index';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
@@ -38,8 +39,8 @@ export class VarFetchService {
 			username: this.getValue('POSTGRES_USER'),
 			password: this.getValue('POSTGRES_PASSWORD'),
 			database: this.getValue('POSTGRES_DATABASE'),
-
-			entities: ['src/entity/*.entity{.ts,.js}'],
+			entities: entities,
+			synchronize: true, // <---- TURN OFF IN PROD
 
 			// migrationsTableName: 'migration',
 

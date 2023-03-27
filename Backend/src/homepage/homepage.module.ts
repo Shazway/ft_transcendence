@@ -9,10 +9,11 @@ import { ShopController } from './controllers/shop/shop.controller';
 import { UsersController } from './controllers/users/users.controller';
 import { UsersService } from './services/users/users.service';
 import { VarFetchService } from './services/var_fetch/var_fetch.service';
-
+import { TypeOrmModule } from '@nestjs/typeorm';
+import entities from '../entities/index';
 
 @Module({
-	imports: [],
+	imports: [TypeOrmModule.forFeature(entities)],
 	controllers: [
 		ChannelsController,
 		RootController,

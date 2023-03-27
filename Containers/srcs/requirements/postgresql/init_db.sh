@@ -14,4 +14,4 @@ psql -v ON_ERROR_STOP=1 -U $POSTGRES_USER -d $DB_NAME <<-EOSQL
 	DROP DATABASE $POSTGRES_DB;
 EOSQL
 
-psql -a -f /inoxdb/Setup.sql -U $DB_USER -d $DB_NAME
+# psql -a -f /inoxdb/Setup.sql -U $DB_USER -d $DB_NAME
