@@ -8,6 +8,7 @@ import { LeaderboardController } from './controllers/leaderboard/leaderboard.con
 import { ShopController } from './controllers/shop/shop.controller';
 import { UsersController } from './controllers/users/users.controller';
 import { UsersService } from './services/users/users.service';
+import { VarFetchService } from './services/var_fetch/var_fetch.service';
 
 
 @Module({
@@ -27,6 +28,7 @@ import { UsersService } from './services/users/users.service';
 			provide: UsersService,
 			useClass: UsersService,
 		},
+		VarFetchService,
 	],
 })
 export class HomepageModule {}

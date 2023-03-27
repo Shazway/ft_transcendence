@@ -51,7 +51,7 @@ muted users
 	user
 	time of end
 
-To install:
+To install (you have to be in the Backend file.):
 npm install @nestjs/cli && \
 npm install class-transformer --save && \
 npm install --save dotenv && \
