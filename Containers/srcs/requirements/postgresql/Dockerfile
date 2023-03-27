@@ -14,6 +14,4 @@ RUN chmod 755 /docker-entrypoint-initdb.d/init_db.sh
 
 WORKDIR /inoxdb
 
-# RUN psql -a -f /docker-entrypoint-initdb.d/init_db.sh
-
 EXPOSE 5432
