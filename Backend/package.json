@@ -21,7 +21,8 @@
     "gen": "nest g",
     "gen_help": "nest g --help",
     "psql": "postgresql",
-	"typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js" 
+    "typeorm": "typeorm",
+    "ts-node": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js"
   },
   "dependencies": {
     "@nestjs/common": "^9.0.0",

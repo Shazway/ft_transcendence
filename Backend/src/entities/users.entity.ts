@@ -7,6 +7,8 @@ import {
 	OneToMany,
 	ManyToOne,
 } from 'typeorm';
+import { Achievements } from './achievements.entity';
+import { Friendrequest } from './friend_request.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -31,6 +33,9 @@ export class User {
 	@Column({ default: 1 })
 	activity_status!: number;
 
+	@Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
+	createdAt!: Date;
+
 	// ---------------------- Friendship ----------------------------------
 
 	@OneToMany(() => Friendrequest, (friendrequest) => friendrequest.sender)
@@ -48,6 +53,11 @@ export class User {
 	@OneToMany(() => User, (user) => user.user_id)
 	blacklistEntries: User[];
 
+	// ---------------------- Achievements -------------------------------
+
+	@OneToMany(() => Achievements, (achievements) => achievements.achievement_id)
+	achievementsEntries: Achievements[];
+
 	// static findByUsername(username: string) {
 	// 	return this.createQueryBuilder('user')
 	// 		.where('user.username = :username', { username })
@@ -63,16 +73,4 @@ export class User {
 	// 		.where('people.id = :id', { id })
 	// 		.execute();
 	// }
-}
-
-@Entity()
-export class Friendrequest {
-	@PrimaryGeneratedColumn()
-	id: number;
-
-	@ManyToOne(() => User, (user) => user.sentFriendRequests)
-	sender: User;
-
-	@ManyToOne(() => User, (user) => user.receivedFriendRequests)
-	receiver: User;
 }
