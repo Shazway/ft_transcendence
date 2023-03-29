@@ -1,5 +1,4 @@
 all:
-	mkdir -p $(HOME)/sgoinfre/data_transcendence
 	docker compose -f srcs/docker-compose.yml up -d --build
 
 stop:
