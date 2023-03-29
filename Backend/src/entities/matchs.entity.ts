@@ -9,6 +9,9 @@ export class Match {
 	@Column({ nullable: false })
 	match_timer!: number;
 
-	@OneToOne(() => MatchSetting, (matchSetting) => matchSetting.match_setting_id)
+	@OneToOne(
+		() => MatchSetting,
+		(matchSetting) => matchSetting.match_setting_id,
+	)
 	matchSetting: MatchSetting;
 }

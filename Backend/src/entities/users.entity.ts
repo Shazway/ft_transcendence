@@ -5,6 +5,7 @@ import {
 	JoinTable,
 	ManyToMany,
 	OneToMany,
+	CreateDateColumn,
 } from 'typeorm';
 import { Achievements } from './achievements.entity';
 import { Friendrequest } from './friend_request.entity';
@@ -32,7 +33,7 @@ export class User {
 	@Column({ default: 1 })
 	activity_status!: number;
 
-	@Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
+	@CreateDateColumn()
 	createdAt!: Date;
 
 	// ---------------------- Friendship ----------------------------------

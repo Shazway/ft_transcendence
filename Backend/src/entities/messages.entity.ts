@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import {
+	Entity,
+	PrimaryGeneratedColumn,
+	Column,
+	ManyToOne,
+	CreateDateColumn,
+} from 'typeorm';
 import { Channel } from './channels.entity';
 import { User } from './users.entity';
 
@@ -10,7 +16,7 @@ export class Message {
 	@Column({ nullable: false, length: 255 })
 	message_content!: string;
 
-	@Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
+	@CreateDateColumn()
 	createdAt!: Date;
 
 	@ManyToOne(() => User, (user) => user.user_id)

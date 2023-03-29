@@ -19,7 +19,7 @@ export class ChannelUser {
 	@Column({ default: false })
 	is_banned!: boolean;
 
-	@Column({ default: 0 })
+	@Column({ default: null })
 	remaining_mute_time!: Date; // <--- Mute in milisecond
 
 	@ManyToOne(() => User, (user) => user.user_id)

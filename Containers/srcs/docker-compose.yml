@@ -12,18 +12,18 @@ services:
       - .env
     restart: unless-stopped
 
-  # backend:
-  #  container_name: backend
-  #  build: ./requirements/backend
-  #  ports:
-  #    - 3001:3001
-  #  networks:
-  #    - transcend
-  #  volumes:
-  #    - ../../Backend:/app
-  #  restart: unless-stopped
-  #  depends_on:
-  #    - postgres
+  backend:
+   container_name: backend
+   build: ./requirements/backend
+   ports:
+     - 3001:3001
+   networks:
+     - transcend
+   volumes:
+     - ../../Backend:/app
+   restart: unless-stopped
+   depends_on:
+     - postgres
 
 
 volumes:
@@ -31,3 +31,4 @@ volumes:
 
 networks:
   transcend:
+    # driver: bridge
