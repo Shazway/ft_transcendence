@@ -7,13 +7,8 @@ RUN apt-get update && \
 
 WORKDIR /app
 
-RUN rm -rf node_modules dist
-
-RUN npm install @nestjs/cli && \
+CMD npm install @nestjs/cli && \
 	npm install class-transformer --save && \
 	npm install --save dotenv && \
-	npm install --save @nestjs/typeorm typeorm pg
-
-EXPOSE 3001
-
-ENTRYPOINT [ "/bin/bash", "-c", "npm run start:dev" ]
+	npm install --save @nestjs/typeorm typeorm pg && \
+	npm run start:dev
