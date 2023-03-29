@@ -31,10 +31,13 @@ export class VarFetchService {
 	}
 
 	public getTypeOrmConfig(): TypeOrmModuleOptions {
+		const host =
+			process.env.NODE_ENV === 'production'
+				? this.getValue('POSTGRES_HOST')
+				: this.getValue('POSTGRES_HOST_DEV');
 		return {
 			type: 'postgres',
-
-			host: this.getValue('POSTGRES_HOST'),
+			host,
 			port: parseInt(this.getValue('POSTGRES_PORT')),
 			username: this.getValue('POSTGRES_USER'),
 			password: this.getValue('POSTGRES_PASSWORD'),
