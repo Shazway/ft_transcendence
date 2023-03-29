@@ -13,4 +13,7 @@ fclean: clean
 
 re: stop all
 
+BDD:
+	docker compose -f srcs/docker-compose_only_bdd.yml up -d --build
+
 .PHONY: all stop clean fclean re

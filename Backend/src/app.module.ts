@@ -6,7 +6,7 @@ import { varFetchService } from './homepage/services/var_fetch/var_fetch.service
 @Module({
 	imports: [
 		HomepageModule,
-		TypeOrmModule.forRoot(varFetchService.getTypeOrmConfig()),
+		TypeOrmModule.forRootAsync(varFetchService.typeOrmAsyncConfig),
 	],
 	controllers: [],
 	providers: [],

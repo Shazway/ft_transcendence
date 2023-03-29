@@ -1,4 +1,7 @@
-import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import {
+	TypeOrmModuleAsyncOptions,
+	TypeOrmModuleOptions,
+} from '@nestjs/typeorm';
 import entities from '../../../entities/index';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -22,7 +25,7 @@ export class VarFetchService {
 	}
 
 	public getPort() {
-		return this.getValue('PORT', true);
+		return parseInt(this.getValue('POSTGRES_PORT'));
 	}
 
 	public isProduction() {
@@ -30,29 +33,30 @@ export class VarFetchService {
 		return mode != 'DEV';
 	}
 
+	public typeOrmAsyncConfig: TypeOrmModuleAsyncOptions = {
+		useFactory: async (): Promise<TypeOrmModuleOptions> => {
+			return this.getTypeOrmConfig();
+		},
+	};
+
 	public getTypeOrmConfig(): TypeOrmModuleOptions {
-		const host =
-			process.env.NODE_ENV === 'production'
-				? this.getValue('POSTGRES_HOST')
-				: this.getValue('POSTGRES_HOST_DEV');
+		const host = this.isProduction()
+			? this.getValue('POSTGRES_HOST')
+			: this.getValue('POSTGRES_HOST_DEV');
+		const synchronize = this.isProduction() ? false : true;
 		return {
 			type: 'postgres',
 			host,
-			port: parseInt(this.getValue('POSTGRES_PORT')),
+			port: this.getPort(),
 			username: this.getValue('POSTGRES_USER'),
 			password: this.getValue('POSTGRES_PASSWORD'),
 			database: this.getValue('POSTGRES_DATABASE'),
 			entities: entities,
-			synchronize: true, // <---- TURN OFF IN PROD
-			autoLoadEntities: true,
+			synchronize,
 
 			// migrationsTableName: 'migration',
 
-			// migrations: ['src/migration/*.ts'],
-
-			// cli: {
-			// 	migrationsDir: 'src/migration',
-			// },
+			migrations: [__dirname + '/../migrations/*.ts'],
 		};
 	}
 }
