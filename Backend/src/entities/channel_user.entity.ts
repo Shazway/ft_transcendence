@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Channel } from './channels.entity';
 import { User } from './users.entity';
 
@@ -22,9 +22,9 @@ export class ChannelUser {
 	@Column({ default: 0 })
 	remaining_mute_time!: Date; // <--- Mute in milisecond
 
-	@ManyToOne(() => User, user => user.user_id)
+	@ManyToOne(() => User, (user) => user.user_id)
 	user: User;
-  
-	@ManyToOne(() => Channel, channel => channel.channel_id)
+
+	@ManyToOne(() => Channel, (channel) => channel.channel_id)
 	channel: Channel;
 }

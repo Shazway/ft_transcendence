@@ -8,8 +8,28 @@ import { Channel as ChannelEntity } from './channels.entity';
 import { ChannelUser as ChannelUserEntity } from './channel_user.entity';
 import { Message as MessageEntity } from './messages.entity';
 
-const entities = [UserEntity, FriendrequestRelation, MatchSettingEntity, AchievementsEntity, MatchEntity, MatchHistoryEntity, ChannelEntity, ChannelUserEntity, MessageEntity];
+const entities = [
+	UserEntity,
+	FriendrequestRelation,
+	MatchSettingEntity,
+	AchievementsEntity,
+	MatchEntity,
+	MatchHistoryEntity,
+	ChannelEntity,
+	ChannelUserEntity,
+	MessageEntity,
+];
 
-export { UserEntity, FriendrequestRelation, MatchSettingEntity, AchievementsEntity, MatchEntity, MatchHistoryEntity, ChannelEntity, ChannelUserEntity, MessageEntity };
+export {
+	UserEntity,
+	FriendrequestRelation,
+	MatchSettingEntity,
+	AchievementsEntity,
+	MatchEntity,
+	MatchHistoryEntity,
+	ChannelEntity,
+	ChannelUserEntity,
+	MessageEntity,
+};
 
 export default entities;

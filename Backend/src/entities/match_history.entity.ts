@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Match } from './matchs.entity';
 import { User } from './users.entity';
 
@@ -19,9 +19,9 @@ export class MatchHistory {
 	@Column({ default: false })
 	is_victory!: boolean;
 
-	@ManyToOne(() => User, user => user.user_id)
+	@ManyToOne(() => User, (user) => user.user_id)
 	user: User;
-  
-	@ManyToOne(() => Match, match => match.match_id)
+
+	@ManyToOne(() => Match, (match) => match.match_id)
 	match: Match;
 }

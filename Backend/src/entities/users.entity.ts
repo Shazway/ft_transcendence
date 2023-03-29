@@ -5,7 +5,6 @@ import {
 	JoinTable,
 	ManyToMany,
 	OneToMany,
-	ManyToOne,
 } from 'typeorm';
 import { Achievements } from './achievements.entity';
 import { Friendrequest } from './friend_request.entity';
@@ -55,7 +54,10 @@ export class User {
 
 	// ---------------------- Achievements -------------------------------
 
-	@OneToMany(() => Achievements, (achievements) => achievements.achievement_id)
+	@OneToMany(
+		() => Achievements,
+		(achievements) => achievements.achievement_id,
+	)
 	achievementsEntries: Achievements[];
 
 	// static findByUsername(username: string) {
