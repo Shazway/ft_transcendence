@@ -7,9 +7,6 @@ export class LeaderboardController {
 	constructor(private serv: ItemsService) {}
 	@Get('')
 	public async getLeaderboard(@Req() req: Request, @Res() res: Response) {
-		const userList = this.serv.getAllUsers();
-
-		if (userList) res.status(HttpStatus.ACCEPTED).send(userList);
-		else res.status(HttpStatus.NO_CONTENT).send('No users');
+		res.status(HttpStatus.ACCEPTED).send(this.serv.getAllUsers());
 	}
 }

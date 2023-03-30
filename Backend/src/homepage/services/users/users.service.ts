@@ -17,6 +17,7 @@ export class UsersService {
 	) {}
 
 	users = new Array<CreateUserDto>();
+
 	findUser(username: string) {
 		return this.users.find((user) => user.username === username);
 	}
