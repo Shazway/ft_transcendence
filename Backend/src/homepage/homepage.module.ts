@@ -10,6 +10,7 @@ import { UsersController } from './controllers/users/users.controller';
 import { UsersService } from './services/users/users.service';
 import { VarFetchService } from './services/var_fetch/var_fetch.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ItemsService } from './services/items/items.service';
 import entities from '../entities/index';
 
 @Module({
@@ -30,6 +31,7 @@ import entities from '../entities/index';
 			useClass: UsersService,
 		},
 		VarFetchService,
+		ItemsService,
 	],
 })
 export class HomepageModule {}

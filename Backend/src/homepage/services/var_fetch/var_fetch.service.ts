@@ -43,7 +43,7 @@ export class VarFetchService {
 		const host = this.isProduction()
 			? this.getValue('POSTGRES_HOST')
 			: this.getValue('POSTGRES_HOST_DEV');
-		const synchronize = this.isProduction() ? false : true;
+		const synchronize = this.isProduction() ? true : false;
 		return {
 			type: 'postgres',
 			host,
