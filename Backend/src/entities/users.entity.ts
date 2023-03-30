@@ -27,7 +27,7 @@ export class User {
 	@Column({ default: null, length: 255 })
 	img_url!: string;
 
-	@Column({ default: 0 })
+	@Column({ default: 1 })
 	rank_score!: number;
 
 	@Column({ default: 1 })
