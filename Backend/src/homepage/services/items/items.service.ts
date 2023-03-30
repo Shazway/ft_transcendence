@@ -11,6 +11,7 @@ export class ItemsService {
 	) {}
 
 	public async getAllUsers() {
-		return await this.repo.find();
+		const users = await this.repo.find();
+		return users;
 	}
 }
