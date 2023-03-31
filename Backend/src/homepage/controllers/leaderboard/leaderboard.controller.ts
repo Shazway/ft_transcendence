@@ -20,9 +20,7 @@ export class LeaderboardController {
 		);
 		leaderboard.sort((a, b) => a.rank_score - b.rank_score);
 		res.status(HttpStatus.ACCEPTED).send(leaderboard);
-		for (const val of await repo) {
-			leaderboard.pop();
-			this.userList.pop();
-		}
+		leaderboard.splice(0);
+		this.userList.splice(0);
 	}
 }
