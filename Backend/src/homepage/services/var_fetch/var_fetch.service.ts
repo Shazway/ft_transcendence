@@ -41,8 +41,8 @@ export class VarFetchService {
 
 	public getTypeOrmConfig(): TypeOrmModuleOptions {
 		const host = this.isProduction()
-			? this.getValue('POSTGRES_HOST')
-			: this.getValue('POSTGRES_HOST_DEV');
+			? this.getValue('POSTGRES_HOST_DEV')
+			: this.getValue('POSTGRES_HOST');
 		const synchronize = this.isProduction() ? true : false;
 		return {
 			type: 'postgres',

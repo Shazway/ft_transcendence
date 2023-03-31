@@ -11,7 +11,18 @@ export class ItemsService {
 	) {}
 
 	public async getAllUsers() {
-		const users = await this.repo.find();
-		return users;
+		const user = await this.repo
+			.createQueryBuilder('user')
+			.orderBy('username')
+			.getMany();
+		return user;
+	}
+
+	public async getLeaderboard() {
+		const user = await this.repo
+			.createQueryBuilder('user')
+			.orderBy('rank_score')
+			.getMany();
+		return user;
 	}
 }

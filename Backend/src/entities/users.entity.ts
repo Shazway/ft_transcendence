@@ -21,14 +21,17 @@ export class User {
 	@Column({ nullable: false, length: 20, unique: true })
 	username: string;
 
-	@Column({ default: null, length: 20 })
+	@Column({ default: null, length: 20, unique: true })
 	nickname!: string;
 
 	@Column({ default: null, length: 255 })
 	img_url!: string;
 
-	@Column({ default: 1 })
+	@Column({ default: 0, unsigned: true })
 	rank_score!: number;
+
+	@Column({ default: 0, unsigned: true })
+	currency!: number;
 
 	@Column({ default: 1 })
 	activity_status!: number;
