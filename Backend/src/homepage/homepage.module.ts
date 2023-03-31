@@ -8,13 +8,21 @@ import { LeaderboardController } from './controllers/leaderboard/leaderboard.con
 import { ShopController } from './controllers/shop/shop.controller';
 import { UsersController } from './controllers/users/users.controller';
 import { UsersService } from './services/users/users.service';
-import { VarFetchService } from './services/var_fetch/var_fetch.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ItemsService } from './services/items/items.service';
+import { AuthService } from './services/auth/auth.service';
 import entities from '../entities/index';
+import { JwtModule } from '@nestjs/jwt';
+import {
+	VarFetchService,
+	varFetchService,
+} from './services/var_fetch/var_fetch.service';
 
 @Module({
-	imports: [TypeOrmModule.forFeature(entities)],
+	imports: [
+		TypeOrmModule.forFeature(entities),
+		JwtModule.register(varFetchService.getJwt()),
+	],
 	controllers: [
 		ChannelsController,
 		RootController,
@@ -32,6 +40,7 @@ import entities from '../entities/index';
 		},
 		VarFetchService,
 		ItemsService,
+		AuthService,
 	],
 })
 export class HomepageModule {}

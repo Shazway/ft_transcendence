@@ -11,4 +11,7 @@ CMD npm install @nestjs/cli && \
 	npm install class-transformer --save && \
 	npm install --save dotenv && \
 	npm install --save @nestjs/typeorm typeorm pg && \
+	npm install --save @nestjs/passport passport passport-local && \
+	npm install --save-dev @types/passport-local && \
+	npm install --save @nestjs/jwt passport-jwt && \
 	npm run start:dev

@@ -3,6 +3,7 @@ import {
 	TypeOrmModuleOptions,
 } from '@nestjs/typeorm';
 import entities from '../../../entities/index';
+import { JwtModuleOptions } from '@nestjs/jwt';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
@@ -57,6 +58,13 @@ export class VarFetchService {
 			// migrationsTableName: 'migration',
 
 			migrations: [__dirname + '/../migrations/*.ts'],
+		};
+	}
+
+	public getJwt(): JwtModuleOptions {
+		return {
+			secret: this.getValue('JWT_SECRET'),
+			signOptions: { expiresIn: this.getValue('JWT_TIMEOUT') },
 		};
 	}
 }

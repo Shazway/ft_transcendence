@@ -12,10 +12,14 @@ import {
 import { Request, Response } from 'express';
 import { UsersService } from '../../services/users/users.service';
 import { CreateUserDto, NewUserDto } from '../../dtos/CreateUser.dto';
+import { AuthService } from 'src/homepage/services/auth/auth.service';
 
 @Controller('users')
 export class UsersController {
-	constructor(private usersService: UsersService) {}
+	constructor(
+		private usersService: UsersService,
+		private authService: AuthService,
+	) {}
 	@Get('')
 	getUsers(@Req() req: Request, @Res() res: Response) {
 		const userList = this.usersService.getAllUsers();
@@ -35,14 +39,17 @@ export class UsersController {
 	}
 
 	@Post('create')
-	createCustomer(
+	async createCustomer(
 		@Req() req: Request,
 		@Res() res: Response,
 		@Body() newUserDto: NewUserDto,
 	) {
-		this.usersService.createUserNew(newUserDto);
+		const userEntity = await this.usersService.createUserNew(newUserDto);
 		console.log(newUserDto);
-		res.status(HttpStatus.OK).send({ msg: 'User created' });
+		res.status(HttpStatus.OK).send({
+			msg: 'User created',
+			token: await this.authService.login(userEntity),
+		});
 		// if (this.usersService.findUser(createUsersDto.username))
 		// 	res.status(HttpStatus.CONFLICT).send({
 		// 		msg: 'User already exists',
