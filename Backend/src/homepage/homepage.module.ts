@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { ChannelsController } from './controllers/channels/channels.controller';
 import { RootController } from './controllers/root/root.controller';
 import { ProfileController } from './controllers/profile/profile.controller';
@@ -17,6 +17,7 @@ import {
 	VarFetchService,
 	varFetchService,
 } from './services/var_fetch/var_fetch.service';
+import { AuthVerifMiddleware } from './middleware/auth-verif/auth-verif.middleware';
 
 @Module({
 	imports: [
@@ -43,4 +44,11 @@ import {
 		AuthService,
 	],
 })
-export class HomepageModule {}
+export class HomepageModule {
+	configure(auth: MiddlewareConsumer) {
+		auth.apply(AuthVerifMiddleware).forRoutes({
+			path: 'login/test',
+			method: RequestMethod.ALL,
+		});
+	}
+}
