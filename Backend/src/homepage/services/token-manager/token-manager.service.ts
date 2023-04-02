@@ -1,0 +1,31 @@
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { Request } from 'express';
+
+@Injectable()
+export class TokenManagerService {
+	constructor(private jwtService: JwtService) {}
+
+	public extractTokenFromHeader(request: Request): string | undefined {
+		const [type, token] = request.headers.authorization?.split(' ') ?? [];
+		return type === 'Bearer' ? token : undefined;
+	}
+
+	public getUsernameFromToken(token: string) {
+		let keyClean;
+		if (!token)
+			throw new HttpException(
+				'No authentication token provided',
+				HttpStatus.UNPROCESSABLE_ENTITY,
+			);
+		try {
+			keyClean = this.jwtService.verify(token);
+		} catch (error) {
+			throw new HttpException(
+				'No authentication token provided',
+				HttpStatus.UNAUTHORIZED,
+			);
+		}
+		return keyClean.sub;
+	}
+}

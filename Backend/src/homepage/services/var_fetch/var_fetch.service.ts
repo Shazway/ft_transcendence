@@ -41,7 +41,6 @@ export class VarFetchService {
 	};
 
 	public getTypeOrmConfig(): TypeOrmModuleOptions {
-		console.log(this.isProduction());
 		const host = this.isProduction()
 			? this.getValue('POSTGRES_HOST')
 			: this.getValue('POSTGRES_HOST_DEV');
@@ -62,7 +61,7 @@ export class VarFetchService {
 	public getDatasourceConfig(): DataSourceOptions {
 		return {
 			type: 'postgres',
-			host: this.getValue('POSTGRES_HOST'),
+			host: this.getValue('POSTGRES_HOST_DEV'),
 			port: this.getPort(),
 			username: this.getValue('POSTGRES_USER'),
 			password: this.getValue('POSTGRES_PASSWORD'),

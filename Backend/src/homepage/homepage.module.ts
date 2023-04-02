@@ -19,6 +19,7 @@ import { AuthVerifMiddleware } from './middleware/auth-verif/auth-verif.middlewa
 import { TypeOrmModule } from '@nestjs/typeorm';
 import entities from 'src/entities';
 import { DataSourceOptions } from 'typeorm';
+import { TokenManagerService } from './services/token-manager/token-manager.service';
 
 @Module({
 	imports: [
@@ -44,6 +45,7 @@ import { DataSourceOptions } from 'typeorm';
 		VarFetchService,
 		ItemsService,
 		AuthService,
+		TokenManagerService,
 	],
 })
 export class HomepageModule {

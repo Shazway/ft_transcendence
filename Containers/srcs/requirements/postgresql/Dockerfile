@@ -7,7 +7,6 @@ RUN apt-get update && \
 
 RUN mkdir inoxdb
 
-COPY Setup.sql /inoxdb/
 COPY init_db.sh /docker-entrypoint-initdb.d/
 
 RUN chmod 755 /docker-entrypoint-initdb.d/init_db.sh

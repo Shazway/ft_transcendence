@@ -6,6 +6,7 @@ import {
 	ManyToMany,
 	OneToMany,
 	CreateDateColumn,
+	JoinColumn,
 } from 'typeorm';
 import { Achievements } from './achievements.entity';
 import { Friendrequest } from './friend_request.entity';
@@ -57,12 +58,11 @@ export class User {
 	blacklistEntries: User[];
 
 	// ---------------------- Achievements -------------------------------
+	// Ce code est le desespoir
 
-	@OneToMany(
-		() => Achievements,
-		(achievements) => achievements.achievement_id,
-	)
-	achievementsEntries: Achievements[];
+	@ManyToMany(() => Achievements, (achievement) => achievement.achievement_id)
+	@JoinTable()
+	achievements: Achievements[];
 
 	// static findByUsername(username: string) {
 	// 	return this.createQueryBuilder('user')

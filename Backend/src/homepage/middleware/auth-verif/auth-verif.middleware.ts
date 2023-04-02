@@ -1,38 +1,18 @@
-import {
-	HttpException,
-	HttpStatus,
-	Injectable,
-	NestMiddleware,
-	Req,
-	Res,
-} from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { Injectable, NestMiddleware, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
 
 @Injectable()
 export class AuthVerifMiddleware implements NestMiddleware {
-	constructor(private jwtService: JwtService) {}
+	constructor(private tokenManager: TokenManagerService) {}
 
 	use(@Req() req: Request, @Res() res: Response, next: () => void) {
-		const authKey = this.extractTokenFromHeader(req);
-		let keyClean;
-		if (!authKey)
-			throw new HttpException(
-				'No authentication token provided',
-				HttpStatus.UNPROCESSABLE_ENTITY,
-			);
-		try {
-			keyClean = this.jwtService.verify(authKey);
-		} catch (error) {
-			res.status(HttpStatus.UNAUTHORIZED).send({
-				msg: 'Invalid authentication token provided',
-			});
-		}
-		console.log(keyClean);
+		const token = this.tokenManager.extractTokenFromHeader(req);
+		const keyClean = this.tokenManager.getUsernameFromToken(token);
 		next();
 	}
 
-	private extractTokenFromHeader(request: Request): string | undefined {
+	public extractTokenFromHeader(request: Request): string | undefined {
 		const [type, token] = request.headers.authorization?.split(' ') ?? [];
 		return type === 'Bearer' ? token : undefined;
 	}

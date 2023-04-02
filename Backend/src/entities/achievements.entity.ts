@@ -1,5 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
-
+import {
+	Entity,
+	PrimaryGeneratedColumn,
+	Column,
+	ManyToOne,
+	JoinTable,
+	OneToOne,
+} from 'typeorm';
+import { User } from './users.entity';
 @Entity({ name: 'achievements' })
 export class Achievements {
 	@PrimaryGeneratedColumn()
@@ -11,6 +18,6 @@ export class Achievements {
 	@Column({ default: null, length: 1024 })
 	achievement_description!: string;
 
-	@Column({ default: null, length: 1024 })
-	achievement_condition!: string;
+	@Column({ default: null, length: 30 })
+	achievement_reward!: string;
 }
