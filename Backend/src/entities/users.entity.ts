@@ -58,11 +58,8 @@ export class User {
 	blacklistEntries: User[];
 
 	// ---------------------- Achievements -------------------------------
-	// Ce code est le desespoir
 
-	@ManyToMany(() => Achievements, (achievement) => achievement.achievement_id)
-	@JoinTable()
-	achievements: Achievements[];
+	@OneToMany(type => Achievements, achievement => achievement.user) achievements: Achievements[];
 
 	// static findByUsername(username: string) {
 	// 	return this.createQueryBuilder('user')

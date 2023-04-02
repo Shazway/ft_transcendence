@@ -41,6 +41,6 @@ export class ItemsService {
 			.leftJoinAndSelect('users.achievements', 'achievement')
 			.where('users.user_id = :id', { id })
 			.getOne();
-		return user_achieve;
+		return user_achieve.achievements;
 	}
 }

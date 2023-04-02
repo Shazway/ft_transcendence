@@ -20,4 +20,6 @@ export class Achievements {
 
 	@Column({ default: null, length: 30 })
 	achievement_reward!: string;
+
+	@ManyToOne(type => User, user => user.achievements) user: User;
 }
