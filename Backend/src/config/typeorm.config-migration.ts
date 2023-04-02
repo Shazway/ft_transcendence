@@ -1,3 +1,6 @@
-import { varFetchService } from '../homepage/services/var_fetch/var_fetch.service';
+import { varFetchService } from 'src/homepage/services/var_fetch/var_fetch.service';
+import { DataSource } from 'typeorm';
 
-export = varFetchService.getTypeOrmConfig();
+export const connectionSource = new DataSource(
+	varFetchService.getDatasourceConfig(),
+);

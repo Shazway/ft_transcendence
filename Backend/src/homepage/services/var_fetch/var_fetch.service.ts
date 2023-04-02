@@ -2,8 +2,9 @@ import {
 	TypeOrmModuleAsyncOptions,
 	TypeOrmModuleOptions,
 } from '@nestjs/typeorm';
-import entities from '../../../entities/index';
+import entities from 'src/entities/index';
 import { JwtModuleOptions } from '@nestjs/jwt';
+import { DataSourceOptions } from 'typeorm';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
@@ -30,8 +31,7 @@ export class VarFetchService {
 	}
 
 	public isProduction() {
-		const mode = this.getValue('MODE', false);
-		return mode != 'DEV';
+		return process.env.NODE_ENV === 'production';
 	}
 
 	public typeOrmAsyncConfig: TypeOrmModuleAsyncOptions = {
@@ -41,10 +41,11 @@ export class VarFetchService {
 	};
 
 	public getTypeOrmConfig(): TypeOrmModuleOptions {
+		console.log(this.isProduction());
 		const host = this.isProduction()
-			? this.getValue('POSTGRES_HOST_DEV')
-			: this.getValue('POSTGRES_HOST');
-		const synchronize = this.isProduction() ? true : false;
+			? this.getValue('POSTGRES_HOST')
+			: this.getValue('POSTGRES_HOST_DEV');
+		const synchronize = this.isProduction() ? false : true;
 		return {
 			type: 'postgres',
 			host,
@@ -54,10 +55,20 @@ export class VarFetchService {
 			database: this.getValue('POSTGRES_DATABASE'),
 			entities: entities,
 			synchronize,
-
-			// migrationsTableName: 'migration',
-
 			migrations: [__dirname + '/../migrations/*.ts'],
+		};
+	}
+
+	public getDatasourceConfig(): DataSourceOptions {
+		return {
+			type: 'postgres',
+			host: this.getValue('POSTGRES_HOST'),
+			port: this.getPort(),
+			username: this.getValue('POSTGRES_USER'),
+			password: this.getValue('POSTGRES_PASSWORD'),
+			database: this.getValue('POSTGRES_DATABASE'),
+			entities: entities,
+			migrations: ['src/migrations/*.ts'],
 		};
 	}
 

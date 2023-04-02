@@ -14,4 +14,5 @@ CMD npm install @nestjs/cli && \
 	npm install --save @nestjs/passport passport passport-local && \
 	npm install --save-dev @types/passport-local && \
 	npm install --save @nestjs/jwt passport-jwt && \
-	npm run start:dev
+	npm run migration:run && \
+	npm run start

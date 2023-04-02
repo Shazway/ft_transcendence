@@ -7,7 +7,7 @@ import {
 	SerializedUserDto,
 	NewUserDto,
 } from '../../dtos/CreateUser.dto';
-import { User as UserEntity } from '../../../entities/users.entity';
+import { UserEntity } from 'src/entities';
 
 @Injectable()
 export class UsersService {

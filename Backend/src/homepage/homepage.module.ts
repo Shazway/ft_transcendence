@@ -8,21 +8,23 @@ import { LeaderboardController } from './controllers/leaderboard/leaderboard.con
 import { ShopController } from './controllers/shop/shop.controller';
 import { UsersController } from './controllers/users/users.controller';
 import { UsersService } from './services/users/users.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { ItemsService } from './services/items/items.service';
 import { AuthService } from './services/auth/auth.service';
-import entities from '../entities/index';
 import { JwtModule } from '@nestjs/jwt';
 import {
 	VarFetchService,
 	varFetchService,
 } from './services/var_fetch/var_fetch.service';
 import { AuthVerifMiddleware } from './middleware/auth-verif/auth-verif.middleware';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import entities from 'src/entities';
+import { DataSourceOptions } from 'typeorm';
 
 @Module({
 	imports: [
-		TypeOrmModule.forFeature(entities),
 		JwtModule.register(varFetchService.getJwt()),
+		TypeOrmModule.forRootAsync(varFetchService.typeOrmAsyncConfig),
+		TypeOrmModule.forFeature(entities),
 	],
 	controllers: [
 		ChannelsController,
@@ -45,6 +47,7 @@ import { AuthVerifMiddleware } from './middleware/auth-verif/auth-verif.middlewa
 	],
 })
 export class HomepageModule {
+	public readonly connectionSource: DataSourceOptions;
 	configure(auth: MiddlewareConsumer) {
 		auth.apply(AuthVerifMiddleware).forRoutes({
 			path: 'login/test',
