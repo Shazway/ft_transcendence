@@ -1,4 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+/* eslint-disable prettier/prettier */
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { ChannelUser } from './channel_user.entity';
+import { Message } from './messages.entity';
 
 @Entity({ name: 'channels' })
 export class Channel {
@@ -13,4 +16,10 @@ export class Channel {
 
 	@Column({ default: false })
 	is_channel_private: boolean;
+
+	@OneToMany(() => ChannelUser, (us_channel) => us_channel.channel)
+	us_channels: ChannelUser[];
+
+	@OneToMany(() => Message, (message) => message.channel)
+	messages: Message[];
 }

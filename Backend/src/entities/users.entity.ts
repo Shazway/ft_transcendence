@@ -6,9 +6,12 @@ import {
 	ManyToMany,
 	OneToMany,
 	CreateDateColumn,
+	ManyToOne,
 } from 'typeorm';
 import Achievements from './achievements.entity';
 import { Friendrequest } from './friend_request.entity';
+import { ChannelUser } from './channel_user.entity';
+import { Match } from './matchs.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -39,6 +42,11 @@ export class User {
 	@CreateDateColumn()
 	createdAt!: Date;
 
+	@Column({ default: 0, unsigned: true })
+	wins!: number;
+
+	@Column({ default: 0, unsigned: true })
+	losses!: number;
 	// ---------------------- Friendship ----------------------------------
 
 	@OneToMany(() => Friendrequest, (friendrequest) => friendrequest.sender)
@@ -53,27 +61,22 @@ export class User {
 
 	// ---------------------- Blacklist ----------------------------------
 
-	@OneToMany(() => User, (user) => user.user_id)
+	@OneToMany(() => User, (user) => user.blacklistedBy)
 	blacklistEntries: User[];
 
-	// ---------------------- Achievements -------------------------------
+	@ManyToOne(() => User, (user) => user.blacklistEntries)
+	blacklistedBy: User;
 
+	// ---------------------- Achievements -------------------------------
 	@OneToMany(() => Achievements, (achievement) => achievement.user)
 	achievements: Achievements[];
 
-	// static findByUsername(username: string) {
-	// 	return this.createQueryBuilder('user')
-	// 		.where('user.username = :username', { username })
-	// 		.getOne();
-	// }
+	// ---------------------- Channels -------------------------------
+	@OneToMany(() => ChannelUser, (chan_user) => chan_user.user)
+	channels: ChannelUser[];
 
-	// updateName(fullname: string) {
-	// 	const id = this.id;
-
-	// 	return Person.createQueryBuilder('people')
-	// 		.update()
-	// 		.set({ fullname: fullname })
-	// 		.where('people.id = :id', { id })
-	// 		.execute();
-	// }
+	// ---------------------- Matchs -------------------------------
+	@ManyToMany(() => Match, (match) => match.users)
+	@JoinTable()
+	match_history: Match[];
 }

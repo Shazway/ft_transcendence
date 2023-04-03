@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne } from 'typeorm';
+import { Match } from './matchs.entity';
 
 @Entity({ name: 'match settings' })
 export class MatchSetting {
@@ -22,4 +23,7 @@ export class MatchSetting {
 
 	@Column({ default: 2 })
 	round_to_win!: number;
+
+	@OneToOne(() => Match, (match) => match.matchSetting)
+	match: Match;
 }

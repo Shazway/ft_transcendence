@@ -16,15 +16,21 @@ export class ProfileController {
 
 	@Get('achievements')
 	async getAchievement(@Req() req: Request, @Res() res: Response) {
-		const user_token = this.tokenManager.extractTokenFromHeader(req);
-		const user_id = this.tokenManager.getUsernameFromToken(user_token);
+		const user_id = this.tokenManager.getIdFromToken(req);
 		// eslint-disable-next-line prettier/prettier
 		const achievements = await this.itemService.getAchievementsFromUser(user_id);
 		// const userList = this.itemService.getAchievementsFromUser();
-		if (!achievements)
-			res.status(HttpStatus.BAD_REQUEST).send({ msg: 'User not found' });
 		if (achievements.length === 0)
-			res.status(HttpStatus.NOT_FOUND).send({ msg: 'No achievements' });
+		res.status(HttpStatus.NO_CONTENT).send({ msg: 'No achievements' });
 		else res.status(HttpStatus.OK).send(achievements);
 	}
+
+	@Get('add_achievement')
+	async addAchievement(@Req() req: Request, @Res() res: Response) {
+		const user_id = this.tokenManager.getIdFromToken(req);
+
+		res.status(HttpStatus.OK).send('Achievement added');
+	}
+
+
 }

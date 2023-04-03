@@ -11,7 +11,7 @@ export class TokenManagerService {
 		return type === 'Bearer' ? token : undefined;
 	}
 
-	public getUsernameFromToken(token: string) {
+	public getToken(token: string) {
 		let keyClean;
 		if (!token)
 			throw new HttpException(
@@ -23,6 +23,13 @@ export class TokenManagerService {
 		} catch (error) {
 			throw new HttpException('Wrong token', HttpStatus.UNAUTHORIZED);
 		}
-		return keyClean.sub;
+		return keyClean;
+	}
+
+	public getUsernameFromToken(request: Request) {
+		return this.getToken(this.extractTokenFromHeader(request)).name;
+	}
+	public getIdFromToken(request: Request) {
+		return this.getToken(this.extractTokenFromHeader(request)).sub;
 	}
 }

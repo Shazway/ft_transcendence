@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
 	Entity,
 	PrimaryGeneratedColumn,
@@ -6,7 +7,7 @@ import {
 	CreateDateColumn,
 } from 'typeorm';
 import { Channel } from './channels.entity';
-import { User } from './users.entity';
+import { ChannelUser } from './channel_user.entity';
 
 @Entity({ name: 'messages' })
 export class Message {
@@ -19,8 +20,8 @@ export class Message {
 	@CreateDateColumn()
 	createdAt!: Date;
 
-	@ManyToOne(() => User, (user) => user.user_id)
-	author: User;
+	@ManyToOne(() => ChannelUser, (us_channel) => us_channel.messages)
+	author: ChannelUser;
 
 	@ManyToOne(() => Channel, (channel) => channel.channel_id)
 	channel: Channel;
