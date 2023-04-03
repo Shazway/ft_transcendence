@@ -6,9 +6,8 @@ import {
 	ManyToMany,
 	OneToMany,
 	CreateDateColumn,
-	JoinColumn,
 } from 'typeorm';
-import { Achievements } from './achievements.entity';
+import Achievements from './achievements.entity';
 import { Friendrequest } from './friend_request.entity';
 
 @Entity({ name: 'users' })
@@ -59,7 +58,8 @@ export class User {
 
 	// ---------------------- Achievements -------------------------------
 
-	@OneToMany(type => Achievements, achievement => achievement.user) achievements: Achievements[];
+	@OneToMany(() => Achievements, (achievement) => achievement.user)
+	achievements: Achievements[];
 
 	// static findByUsername(username: string) {
 	// 	return this.createQueryBuilder('user')

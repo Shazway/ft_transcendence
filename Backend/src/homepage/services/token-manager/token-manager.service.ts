@@ -21,10 +21,7 @@ export class TokenManagerService {
 		try {
 			keyClean = this.jwtService.verify(token);
 		} catch (error) {
-			throw new HttpException(
-				'No authentication token provided',
-				HttpStatus.UNAUTHORIZED,
-			);
+			throw new HttpException('Wrong token', HttpStatus.UNAUTHORIZED);
 		}
 		return keyClean.sub;
 	}

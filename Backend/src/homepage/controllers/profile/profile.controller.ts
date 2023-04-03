@@ -20,9 +20,11 @@ export class ProfileController {
 		const user_id = this.tokenManager.getUsernameFromToken(user_token);
 		// eslint-disable-next-line prettier/prettier
 		const achievements = await this.itemService.getAchievementsFromUser(user_id);
-		console.log(achievements);
 		// const userList = this.itemService.getAchievementsFromUser();
-		if (achievements) res.send(achievements);
-		else res.status(HttpStatus.NOT_FOUND).send({ msg: 'User not found!' });
+		if (!achievements)
+			res.status(HttpStatus.BAD_REQUEST).send({ msg: 'User not found' });
+		if (achievements.length === 0)
+			res.status(HttpStatus.NOT_FOUND).send({ msg: 'No achievements' });
+		else res.status(HttpStatus.OK).send(achievements);
 	}
 }

@@ -1,14 +1,14 @@
+/* eslint-disable prettier/prettier */
 import {
 	Entity,
 	PrimaryGeneratedColumn,
 	Column,
 	ManyToOne,
-	JoinTable,
-	OneToOne,
 } from 'typeorm';
+
 import { User } from './users.entity';
 @Entity({ name: 'achievements' })
-export class Achievements {
+export default class Achievements {
 	@PrimaryGeneratedColumn()
 	achievement_id!: number;
 
@@ -21,5 +21,5 @@ export class Achievements {
 	@Column({ default: null, length: 30 })
 	achievement_reward!: string;
 
-	@ManyToOne(type => User, user => user.achievements) user: User;
+	@ManyToOne(() => User, (user) => user.achievements) user: User;
 }
