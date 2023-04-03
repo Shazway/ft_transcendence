@@ -7,8 +7,8 @@ import {
 } from 'typeorm';
 
 import { User } from './users.entity';
-@Entity({ name: 'achievements' })
-export default class Achievements {
+@Entity({ name: 'achievement' })
+export default class Achievement {
 	@PrimaryGeneratedColumn()
 	achievement_id!: number;
 
@@ -21,5 +21,5 @@ export default class Achievements {
 	@Column({ default: null, length: 30 })
 	achievement_reward!: string;
 
-	@ManyToOne(() => User, (user) => user.achievements) user: User;
+	@ManyToOne(() => User, (user) => user.achievement) user: User;
 }

@@ -9,7 +9,7 @@ import {
 import { Channel } from './channels.entity';
 import { ChannelUser } from './channel_user.entity';
 
-@Entity({ name: 'messages' })
+@Entity({ name: 'message' })
 export class Message {
 	@PrimaryGeneratedColumn()
 	message_id!: number;
@@ -20,7 +20,7 @@ export class Message {
 	@CreateDateColumn()
 	createdAt!: Date;
 
-	@ManyToOne(() => ChannelUser, (us_channel) => us_channel.messages)
+	@ManyToOne(() => ChannelUser, (us_channel) => us_channel.message)
 	author: ChannelUser;
 
 	@ManyToOne(() => Channel, (channel) => channel.channel_id)

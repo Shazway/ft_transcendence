@@ -24,7 +24,7 @@ export class Match {
 	is_victory!: boolean[];
 
 	@ManyToMany(() => User, (user) => user.match_history)
-	users: User[];
+	user: User[];
 
 	@OneToOne(() => MatchSetting, (matchSetting) => matchSetting.match)
 	matchSetting: MatchSetting;

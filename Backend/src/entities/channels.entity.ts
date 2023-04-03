@@ -3,7 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { ChannelUser } from './channel_user.entity';
 import { Message } from './messages.entity';
 
-@Entity({ name: 'channels' })
+@Entity({ name: 'channel' })
 export class Channel {
 	@PrimaryGeneratedColumn()
 	channel_id!: number;
@@ -18,8 +18,8 @@ export class Channel {
 	is_channel_private: boolean;
 
 	@OneToMany(() => ChannelUser, (us_channel) => us_channel.channel)
-	us_channels: ChannelUser[];
+	us_channel: ChannelUser[];
 
 	@OneToMany(() => Message, (message) => message.channel)
-	messages: Message[];
+	message: Message[];
 }

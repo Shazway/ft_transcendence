@@ -3,7 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Match } from './matchs.entity';
 import { User } from './users.entity';
 
-@Entity({ name: 'match history' })
+@Entity({ name: 'match_history' })
 export class MatchHistory {
 	@PrimaryGeneratedColumn()
 	match_history_id!: number;

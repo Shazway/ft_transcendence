@@ -13,12 +13,16 @@ import { Request, Response } from 'express';
 import { UsersService } from '../../services/users/users.service';
 import { CreateUserDto, NewUserDto } from '../../dtos/CreateUser.dto';
 import { AuthService } from 'src/homepage/services/auth/auth.service';
+import { ItemsService } from 'src/homepage/services/items/items.service';
+import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
 
 @Controller('users')
 export class UsersController {
 	constructor(
 		private usersService: UsersService,
 		private authService: AuthService,
+		private itemsService: ItemsService,
+		private tokenManager: TokenManagerService,
 	) {}
 	@Get('')
 	getUsers(@Req() req: Request, @Res() res: Response) {
@@ -28,12 +32,10 @@ export class UsersController {
 	}
 
 	@Get(':username')
-	getMatchHistory(
-		@Param('username') us: string,
-		@Req() req: Request,
-		@Res() res: Response,
-	) {
-		const user = this.usersService.findUser(us);
+	async getUser(@Req() req: Request, @Res() res: Response) {
+		const user = await this.itemsService.getUser(
+			this.tokenManager.getIdFromToken(req),
+		);
 		if (user) res.send(user);
 		else res.status(HttpStatus.NOT_FOUND).send({ msg: 'User not found' });
 	}

@@ -1,7 +1,8 @@
+/* eslint-disable prettier/prettier */
 import { Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 import { User } from './users.entity';
 
-@Entity()
+@Entity({ name: 'friend_request' })
 export class Friendrequest {
 	@PrimaryGeneratedColumn()
 	id: number;

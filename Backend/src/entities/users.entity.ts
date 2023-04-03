@@ -13,7 +13,7 @@ import { Friendrequest } from './friend_request.entity';
 import { ChannelUser } from './channel_user.entity';
 import { Match } from './matchs.entity';
 
-@Entity({ name: 'users' })
+@Entity({ name: 'user' })
 export class User {
 	@PrimaryGeneratedColumn()
 	user_id!: number;
@@ -55,28 +55,28 @@ export class User {
 	@OneToMany(() => Friendrequest, (friendrequest) => friendrequest.receiver)
 	receivedFriendRequests: Friendrequest[];
 
-	@ManyToMany(() => User, (user) => user.friends)
+	@ManyToMany(() => User, (user) => user.friend)
 	@JoinTable()
-	friends: User[];
+	friend: User[];
 
 	// ---------------------- Blacklist ----------------------------------
 
 	@OneToMany(() => User, (user) => user.blacklistedBy)
-	blacklistEntries: User[];
+	blacklistEntry: User[];
 
-	@ManyToOne(() => User, (user) => user.blacklistEntries)
+	@ManyToOne(() => User, (user) => user.blacklistEntry)
 	blacklistedBy: User;
 
 	// ---------------------- Achievements -------------------------------
 	@OneToMany(() => Achievements, (achievement) => achievement.user)
-	achievements: Achievements[];
+	achievement: Achievements[];
 
 	// ---------------------- Channels -------------------------------
 	@OneToMany(() => ChannelUser, (chan_user) => chan_user.user)
-	channels: ChannelUser[];
+	channel: ChannelUser[];
 
 	// ---------------------- Matchs -------------------------------
-	@ManyToMany(() => Match, (match) => match.users)
+	@ManyToMany(() => Match, (match) => match.user)
 	@JoinTable()
 	match_history: Match[];
 }

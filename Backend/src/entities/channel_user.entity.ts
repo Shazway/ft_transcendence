@@ -4,7 +4,7 @@ import { Channel } from './channels.entity';
 import { User } from './users.entity';
 import { Message } from './messages.entity';
 
-@Entity({ name: 'channel user' })
+@Entity({ name: 'channel_user' })
 export class ChannelUser {
 	@PrimaryGeneratedColumn()
 	channel_user_id!: number;
@@ -24,12 +24,12 @@ export class ChannelUser {
 	@Column({ default: null })
 	remaining_mute_time!: Date; // <--- Mute in milisecond
 
-	@ManyToOne(() => User, (user) => user.channels)
+	@ManyToOne(() => User, (user) => user.channel)
 	user: User;
 
-	@ManyToOne(() => Channel, (channel) => channel.us_channels)
+	@ManyToOne(() => Channel, (channel) => channel.us_channel)
 	channel: Channel;
 	
 	@OneToMany(() => Message, (message) => message.author)
-	messages: Message[];
+	message: Message[];
 }
