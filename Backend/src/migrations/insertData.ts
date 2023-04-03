@@ -1,12 +1,12 @@
 import { AchievementsEntity, ChannelEntity } from 'src/entities';
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class insertData1680452071691 implements MigrationInterface {
+export class insertData666666666666666666 implements MigrationInterface {
 	public async up(queryRunner: QueryRunner): Promise<void> {
 		const AchievementRepo =
-			queryRunner.connection.getRepository(AchievementsEntity);
+			queryRunner.manager.getRepository(AchievementsEntity);
 
-		await AchievementRepo.insert([
+		AchievementRepo.insert([
 			{
 				achievement_name: 'First Unraked Match',
 				achievement_description: 'Play your first unranked match',
@@ -37,7 +37,7 @@ export class insertData1680452071691 implements MigrationInterface {
 			},
 		]);
 
-		const ChannelRepo = queryRunner.connection.getRepository(ChannelEntity);
+		const ChannelRepo = queryRunner.manager.getRepository(ChannelEntity);
 
 		await ChannelRepo.insert([
 			{

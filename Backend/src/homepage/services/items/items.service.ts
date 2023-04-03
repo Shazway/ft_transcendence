@@ -19,6 +19,14 @@ export class ItemsService {
 			.getMany();
 		return user;
 	}
+	public async getUser(id: number) {
+		const user = await this.userRepo
+			.createQueryBuilder('user')
+			.leftJoinAndSelect('user.achievements', 'achievement')
+			.where('user.user_id = :id', { id })
+			.getOne();
+		return user;
+	}
 
 	public async getLeaderboard() {
 		const user = await this.userRepo
@@ -33,6 +41,21 @@ export class ItemsService {
 			.createQueryBuilder('achievements')
 			.getMany();
 		return achieve;
+	}
+
+	public async addAchievementsToUser(
+		user_id: number,
+		achievement_id: number,
+	) {
+		const user = await this.getUser(user_id);
+		console.log(user);
+		const achievement = await this.achieveRepo.findOneBy({
+			achievement_id,
+		});
+		console.log(achievement);
+
+		user.achievements.push(achievement);
+		await this.userRepo.save(user);
 	}
 
 	public async getAchievementsFromUser(id: number) {

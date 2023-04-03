@@ -19,7 +19,6 @@ export class ProfileController {
 		const user_id = this.tokenManager.getIdFromToken(req);
 		// eslint-disable-next-line prettier/prettier
 		const achievements = await this.itemService.getAchievementsFromUser(user_id);
-		// const userList = this.itemService.getAchievementsFromUser();
 		if (achievements.length === 0)
 		res.status(HttpStatus.NO_CONTENT).send({ msg: 'No achievements' });
 		else res.status(HttpStatus.OK).send(achievements);
@@ -29,8 +28,7 @@ export class ProfileController {
 	async addAchievement(@Req() req: Request, @Res() res: Response) {
 		const user_id = this.tokenManager.getIdFromToken(req);
 
+		this.itemService.addAchievementsToUser(user_id, 1);
 		res.status(HttpStatus.OK).send('Achievement added');
 	}
-
-
 }

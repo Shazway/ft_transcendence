@@ -7,8 +7,7 @@ export class AuthVerifMiddleware implements NestMiddleware {
 	constructor(private tokenManager: TokenManagerService) {}
 
 	use(@Req() req: Request, @Res() res: Response, next: () => void) {
-		const token = this.tokenManager.extractTokenFromHeader(req);
-		const keyClean = this.tokenManager.getUsernameFromToken(token);
+		this.tokenManager.getUsernameFromToken(req);
 		next();
 	}
 

@@ -8,19 +8,19 @@ export class Match {
 	@PrimaryGeneratedColumn()
 	match_id!: number;
 
-	@Column({ default: [0, 0] })
-	current_score!: number[];
+	@Column("int", {default: [0, 0], array: true })
+	current_score: number[];
 
 	@Column({ nullable: false })
 	match_timer!: number;
 
-	@Column({ default: [0, 0] })
+	@Column("int", { default: [0, 0] , array: true })
 	round_won!: number[];
 
 	@Column({ default: true })
 	is_ongoing!: boolean;
 
-	@Column({ default: [false, false] })
+	@Column("boolean", { default: [false, false], array: true })
 	is_victory!: boolean[];
 
 	@ManyToMany(() => User, (user) => user.match_history)

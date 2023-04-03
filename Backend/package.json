@@ -22,8 +22,8 @@
     "gen_help": "nest g --help",
     "psql": "postgresql",
     "typeorm:cli": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli -d src/config/typeorm.config-migration.ts",
-    "migration:create": "npm run typeorm:cli -- migration:create -d src/migrations -n",
-    "migration:generate": "npm run typeorm:cli -- migration:generate -d src/migrations -n",
+    "migration:create": "npm run typeorm:cli -- migration:create",
+    "migration:generate": "npm run typeorm:cli -- migration:generate",
     "migration:run": "npm run typeorm:cli -- migration:run",
     "migration:revert": "npm run typeorm:cli -- migration:revert"
   },
