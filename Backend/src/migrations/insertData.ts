@@ -8,7 +8,7 @@ export class insertData666666666666666666 implements MigrationInterface {
 
 		AchievementRepo.insert([
 			{
-				achievement_name: 'First Unraked Match',
+				achievement_name: 'First Unranked Match',
 				achievement_description: 'Play your first unranked match',
 			},
 			{
@@ -21,11 +21,11 @@ export class insertData666666666666666666 implements MigrationInterface {
 			},
 			{
 				achievement_name: 'We are number one',
-				achievement_description: 'Reach rank 1',
+				achievement_description: 'Reach 1st rank',
 			},
 			{
 				achievement_name: 'Consolation prize',
-				achievement_description: 'Loose your first match',
+				achievement_description: 'Lose your first match',
 			},
 			{
 				achievement_name: 'Oof',

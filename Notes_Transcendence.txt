@@ -1,56 +1,3 @@
-Notes Structures BDD:
-users
-	id
-	mdp
-	username
-	nickname
-	profile pic
-	friends (pointeur sur user)
-	matchs passes (pointeur sur matchs)
-	rank
-	status
-	achievements
-	blacklist
-	channels
-
-
-matchs
-	id
-	userA
-	userB
-	scoreA
-	scoreB
-	time
-	ranked
-	currently spectating
-	settings (map, level ...)
-
-
-channel
-	id
-	name
-	profile pic
-	visibility
-	password
-	owner
-	admins
-	members
-	messages
-	banned users
-	muted users
-
-
-messages
-	id
-	author
-	channel
-	date, hour
-	content
-
-muted users
-	user
-	time of end
-
 Backend dependencies: (you have to be in the Backend file):
 npm install @nestjs/cli && \
 npm install class-transformer --save && \
@@ -60,8 +7,8 @@ npm install --save @nestjs/passport passport && \
 npm install --save-dev @types/passport-local && \
 npm install --save @nestjs/jwt passport-jwt
 
-Frontend dependencies: (you have to be in the Frontend file): 
-npm install <-- execute this if you do not have node_modules file locally in your Frontend file
+Frontend dependencies: (you have to be in the Frontend file):
+npm install @angular/cli
 
 BDD links:
 https://hub.docker.com/_/postgres
