@@ -5,7 +5,8 @@ npm install --save dotenv && \
 npm install --save @nestjs/typeorm typeorm pg && \
 npm install --save @nestjs/passport passport && \
 npm install --save-dev @types/passport-local && \
-npm install --save @nestjs/jwt passport-jwt
+npm install --save @nestjs/jwt passport-jwt && \
+npm install @nestjs/websockets
 
 Frontend dependencies: (you have to be in the Frontend file):
 npm install @angular/cli

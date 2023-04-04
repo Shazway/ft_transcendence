@@ -20,6 +20,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import entities from 'src/entities';
 import { DataSourceOptions } from 'typeorm';
 import { TokenManagerService } from './services/token-manager/token-manager.service';
+import { HeaderInterceptor } from './middleware/header-interceptor/header-interceptor.middleware';
 
 @Module({
 	imports: [
@@ -51,9 +52,12 @@ import { TokenManagerService } from './services/token-manager/token-manager.serv
 export class HomepageModule {
 	public readonly connectionSource: DataSourceOptions;
 	configure(auth: MiddlewareConsumer) {
-		auth.apply(AuthVerifMiddleware).forRoutes({
-			path: 'login/test',
-			method: RequestMethod.ALL,
-		});
+		auth.apply(AuthVerifMiddleware)
+			.forRoutes({
+				path: 'login/test',
+				method: RequestMethod.ALL,
+			})
+			.apply(HeaderInterceptor)
+			.forRoutes('*');
 	}
 }
