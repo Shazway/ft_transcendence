@@ -21,6 +21,7 @@ import entities from 'src/entities';
 import { DataSourceOptions } from 'typeorm';
 import { TokenManagerService } from './services/token-manager/token-manager.service';
 import { HeaderInterceptor } from './middleware/header-interceptor/header-interceptor.middleware';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
 	imports: [
@@ -43,6 +44,10 @@ import { HeaderInterceptor } from './middleware/header-interceptor/header-interc
 			provide: UsersService,
 			useClass: UsersService,
 		},
+		{
+			provide: APP_INTERCEPTOR,
+			useClass: HeaderInterceptor,
+		},
 		VarFetchService,
 		ItemsService,
 		AuthService,
@@ -52,12 +57,9 @@ import { HeaderInterceptor } from './middleware/header-interceptor/header-interc
 export class HomepageModule {
 	public readonly connectionSource: DataSourceOptions;
 	configure(auth: MiddlewareConsumer) {
-		auth.apply(AuthVerifMiddleware)
-			.forRoutes({
-				path: 'login/test',
-				method: RequestMethod.ALL,
-			})
-			.apply(HeaderInterceptor)
-			.forRoutes('*');
+		auth.apply(AuthVerifMiddleware).forRoutes({
+			path: 'login/test',
+			method: RequestMethod.ALL,
+		});
 	}
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Header, HttpStatus, Req, Res } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Req, Res } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { Request, Response } from 'express';
 import { LeaderBoardUser } from 'src/homepage/dtos/LeaderBoardSerialize.dto';

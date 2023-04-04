@@ -1,17 +1,15 @@
 import { Exclude } from 'class-transformer';
 
 export class LeaderBoardUser {
-	nickname: string;
+	username: string;
 	img_url: string;
 	rank_score: number;
+	activity_status!: number;
+	createdAt: Date;
 	@Exclude()
 	user_id: number;
 	@Exclude()
 	intra_id!: number;
 	@Exclude()
-	username: string;
-	@Exclude()
-	activity_status!: number;
-	@Exclude()
-	createdAt: Date;
+	nickname: string;
 }
