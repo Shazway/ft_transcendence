@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { UsersService } from './users.service';
+import { FetchService } from '../fetch.service';
 
 @Component({
   selector: 'app-users',
@@ -10,11 +10,10 @@ import { UsersService } from './users.service';
 export class UsersComponent implements OnInit {
 	users$: Observable<any> | undefined;
 
-	constructor(private userService: UsersService) {}
+	constructor(private userService: FetchService) {}
 
 	ngOnInit(): void {
-		this.users$ = this.userService.getUsers();
-		console.log(this.users$);
+		this.users$ = this.userService.getAllUsers();
 	}
 
 }

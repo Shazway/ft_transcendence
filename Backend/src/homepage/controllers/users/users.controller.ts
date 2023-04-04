@@ -46,19 +46,13 @@ export class UsersController {
 		@Res() res: Response,
 		@Body() newUserDto: NewUserDto,
 	) {
+		console.log(req);
 		const userEntity = await this.usersService.createUserNew(newUserDto);
 		console.log(newUserDto);
 		res.status(HttpStatus.OK).send({
 			msg: 'User created',
 			token: await this.authService.login(userEntity),
 		});
-		// if (this.usersService.findUser(createUsersDto.username))
-		// 	res.status(HttpStatus.CONFLICT).send({
-		// 		msg: 'User already exists',
-		// 	});
-		// else {
-		// 	res.status(HttpStatus.OK).send({ msg: 'User created' });
-		// }
 	}
 
 	//Might be useful later ?

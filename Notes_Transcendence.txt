@@ -24,4 +24,5 @@ psql -a -f ./docker-entrypoint-initdb.d/Setup.sql
 in sql mode:
 \d to see all tables
 
-Les commandes migrations sont casse pour le moment, pas toucher
+Balises style:
+<div class="terminal"/>
