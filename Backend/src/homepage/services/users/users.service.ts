@@ -3,50 +3,28 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
 import { Repository } from 'typeorm';
 import {
-	CreateUserDto,
-	SerializedUserDto,
 	NewUserDto,
-} from '../../dtos/CreateUser.dto';
+} from '../../dtos/UserDto.dto';
 import { UserEntity } from 'src/entities';
+import { ItemsService } from '../items/items.service';
 
 @Injectable()
 export class UsersService {
 	constructor(
 		@InjectRepository(UserEntity)
 		private userRepository: Repository<UserEntity>,
+		private itemsService: ItemsService,
 	) {}
 
-	users = new Array<CreateUserDto>();
-
-	findUser(username: string) {
-		return this.users.find((user) => user.username === username);
-	}
-
-	createUser(userDto: CreateUserDto) {
-		userDto.createdAt = new Date();
-		this.users.push(userDto);
-	}
-
-	//Might be useful later ?
-	deleteUser(us: CreateUserDto) {
-		if (!this.findUser(us.username)) return false;
-		this.users.splice(this.users.indexOf(us) - 1, 1);
-		return true;
-	}
-
-	async createUserNew(userDto: NewUserDto) {
+	async createUser(userDto: NewUserDto) {
 		const newUser = this.userRepository.create(userDto);
 		return this.userRepository.save(newUser);
 	}
-
-	//Might be useful later ?
-	// deleteUserNew(us: NewUserDto) {
-	// 	if (!this.findUser(us.username)) return false;
-	// 	this.users.splice(this.users.indexOf(us) - 1, 1);
-	// 	return true;
-	// }
-
-	getAllUsers() {
-		return this.users.map((user) => plainToClass(SerializedUserDto, user));
+	async getAllUsers()
+	{
+		const userList = await this.itemsService.getAllUsers();
+		if (userList.length === 0)
+			return (null);
+		return (userList);
 	}
 }

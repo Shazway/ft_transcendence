@@ -12,6 +12,7 @@ import Achievements from './achievements.entity';
 import { Friendrequest } from './friend_request.entity';
 import { ChannelUser } from './channel_user.entity';
 import { Match } from './matchs.entity';
+import Achievement from './achievements.entity';
 
 @Entity({ name: 'user' })
 export class User {
@@ -23,9 +24,6 @@ export class User {
 
 	@Column({ nullable: false, length: 20, unique: true })
 	username: string;
-
-	@Column({ default: null, length: 20, unique: true })
-	nickname!: string;
 
 	@Column({ default: null, length: 255 })
 	img_url!: string;
@@ -53,7 +51,7 @@ export class User {
 	sentFriendRequests: Friendrequest[];
 
 	@OneToMany(() => Friendrequest, (friendrequest) => friendrequest.receiver)
-	receivedFriendRequests: Friendrequest[];
+	recievedFriendRequests: Friendrequest[];
 
 	@ManyToMany(() => User, (user) => user.friend)
 	@JoinTable()
@@ -68,8 +66,8 @@ export class User {
 	blacklistedBy: User;
 
 	// ---------------------- Achievements -------------------------------
-	@OneToMany(() => Achievements, (achievement) => achievement.user)
-	achievement: Achievements[];
+	@OneToMany(() => Achievement, (achievement) => achievement.user)
+	achievement: Achievement[];
 
 	// ---------------------- Channels -------------------------------
 	@OneToMany(() => ChannelUser, (chan_user) => chan_user.user)

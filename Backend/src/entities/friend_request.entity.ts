@@ -10,6 +10,6 @@ export class Friendrequest {
 	@ManyToOne(() => User, (user) => user.sentFriendRequests)
 	sender: User;
 
-	@ManyToOne(() => User, (user) => user.receivedFriendRequests)
+	@ManyToOne(() => User, (user) => user.recievedFriendRequests)
 	receiver: User;
 }

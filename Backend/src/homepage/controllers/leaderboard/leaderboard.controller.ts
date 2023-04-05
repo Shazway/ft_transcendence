@@ -1,7 +1,7 @@
 import { Controller, Get, HttpStatus, Req, Res } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { Request, Response } from 'express';
-import { LeaderBoardUser } from 'src/homepage/dtos/LeaderBoardSerialize.dto';
+import { LeaderBoardUser } from 'src/homepage/dtos/UserDto.dto';
 import { ItemsService } from 'src/homepage/services/items/items.service';
 
 @Controller('leaderboard')
