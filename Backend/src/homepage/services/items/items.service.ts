@@ -2,6 +2,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AchievementsEntity, ChannelEntity, ChannelUserRelation, FriendrequestRelation, MatchEntity, MatchSettingEntity, MessageEntity, UserEntity } from 'src/entities';
+import { ChannelUser } from 'src/entities/channel_user.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -24,16 +25,6 @@ export class ItemsService {
 		@InjectRepository(MessageEntity)
 			private readonly messageRepo: Repository<MessageEntity>,
 	) {}
-	tabRepo = [
-		{ name: 'user', repo: this.userRepo },
-		{ name: 'achievement', repo: this.achieveRepo },
-		{ name: 'channel_user', repo: this.chan_userRepo },
-		{ name: 'channel', repo: this.chanRepo },
-		{ name: 'friend_request', repo: this.friend_requestRepo },
-		{ name: 'match_setting', repo: this.match_settingRepo },
-		{ name: 'match', repo: this.matchRepo },
-		{ name: 'message', repo: this.messageRepo },
-	];
 
 	public async getAllUsers() {
 		const user = await this.userRepo
@@ -56,15 +47,26 @@ export class ItemsService {
 		return user;
 	}
 	
+	public async getChannel(id: number) {
+		const channel = await this.chanRepo
+			.createQueryBuilder('channel')
+			.leftJoinAndSelect('channel.us_channel', 'us_channel')
+			.leftJoinAndSelect('channel.message', 'message')
+			.where('channel.channel_id = :id', { id })
+			.getOne();
+		return channel;
+	}
+
 	public async getAchievement(id: number) {
 		const achieve = await this.achieveRepo
-			.createQueryBuilder('achievement')
-			.leftJoinAndSelect('achievement.user', 'user')
+		.createQueryBuilder('achievement')
+		.leftJoinAndSelect('achievement.user', 'user')
 			.where('achievement.achievement_id = :id', { id })
 			.getOne();
-		return achieve;
-	}
-	
+			return achieve;
+		}
+		
+
 	public async getChannelUser(id: number) {
 		const chan_user = await this.chan_userRepo
 			.createQueryBuilder('channel_user')
@@ -75,7 +77,52 @@ export class ItemsService {
 			.getOne();
 		return chan_user;
 	}
-	
+
+	public async getAllChannels() {
+		const chan_list = await this.chanRepo
+			.createQueryBuilder('channel')
+			.leftJoinAndSelect('channel.us_channel', 'channel')
+			.leftJoinAndSelect('channel.message', 'message')
+			.getMany();
+		return chan_list;
+	}
+
+	public async getAllPbChannels() {
+		const chan_user = await this.chanRepo
+			.createQueryBuilder('channel')
+			.leftJoinAndSelect('channel.us_channel', 'channel')
+			.leftJoinAndSelect('channel.message', 'message')
+			.where('channel.is_channel_private = false')
+			.getMany();
+		return chan_user;
+	}
+
+	public async getAllChannelsFromUser(id: number) {
+		const channels = this.chanRepo.createQueryBuilder('channel')
+			.innerJoin('channel.us_channel', 'us_channel')
+			.where('us_channel.user_id = :userId', { id })
+			.getMany();
+		return channels;
+	}
+
+	public async getPublicChannelsFromUser(id: number) {
+		const pb_channels = this.chanRepo.createQueryBuilder('channel')
+		.innerJoin('channel.us_channel', 'us_channel')
+		.where('us_channel.channel_user_id = :userId', { id })
+		.andWhere('channel.is_channel_private = false')
+		.getMany();
+		return pb_channels
+	}
+
+	public async getPvChannelsFromUser(id: number) {
+		const pv_channels = this.chanRepo.createQueryBuilder('channel')
+		.innerJoin('channel.us_channel', 'us_channel')
+		.where('us_channel.channel_user_id = :userId', { id })
+		.andWhere('channel.is_channel_private = true')
+		.getMany();
+		return pv_channels
+	}
+
 	public async getFriendrequest(id: number) {
 		const friend_request = await this.friend_requestRepo
 			.createQueryBuilder('friend_request')
@@ -115,44 +162,6 @@ export class ItemsService {
 		return match;
 	}
 
-	public async getItem(tableName: string, id: number) {
-		for (const val of this.tabRepo) {
-			if (val.name === tableName)
-				return await val.repo
-					.createQueryBuilder(tableName)
-					.where(tableName + '.' + tableName + '_id = :id', { id })
-					.getOne();
-		}
-		return null;
-	}
-	public async getTable(tableName: string) {
-		for (const val of this.tabRepo) {
-			if (val.name === tableName)
-				return await val.repo
-					.createQueryBuilder(tableName)
-					.getMany();
-		}
-		return null;
-	}
-
-	public async getItemByRelation(	tableName: string,
-										relation: string,
-										id: number,)
-	{
-		for (const val of this.tabRepo) {
-			if (val.name === tableName)
-			{
-				const ret = await val.repo
-					.createQueryBuilder(tableName)
-					.leftJoinAndSelect(tableName + '.' + relation, relation)
-					.where(tableName + '.' + tableName + '_id = :id', { id })
-					.getOne();
-				return ret;
-			}
-		}
-		return null;
-	}
-
 	public async getLeaderboard() {
 		const user = await this.userRepo
 			.createQueryBuilder('user')
@@ -188,5 +197,21 @@ export class ItemsService {
 		user.friend.push(friend);
 		friend.friend.push(user);
 		await this.userRepo.save([user, friend]);
+	}
+
+	public async addUserToChannel(
+		chan_user: ChannelUser,
+		channel_id: number,
+	)
+	{
+		const user = await this.getUser(chan_user.channel_user_id);
+		const channel = await this.getChannel(channel_id);
+
+		chan_user.channel = channel;
+		channel.us_channel.push(chan_user);
+		user.channel.push(chan_user);
+		await this.userRepo.save(user);
+		await this.chanRepo.save(channel);
+		await this.chan_userRepo.save(chan_user);
 	}
 }

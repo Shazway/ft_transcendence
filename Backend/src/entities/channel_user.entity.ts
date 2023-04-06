@@ -29,7 +29,7 @@ export class ChannelUser {
 
 	@ManyToOne(() => Channel, (channel) => channel.us_channel)
 	channel: Channel;
-	
+
 	@OneToMany(() => Message, (message) => message.author)
 	message: Message[];
 }

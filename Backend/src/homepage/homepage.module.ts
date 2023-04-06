@@ -22,6 +22,7 @@ import { DataSourceOptions } from 'typeorm';
 import { TokenManagerService } from './services/token-manager/token-manager.service';
 import { HeaderInterceptor } from './middleware/header-interceptor/header-interceptor.middleware';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ChannelsService } from './services/channels/channels.service';
 
 @Module({
 	imports: [
@@ -52,6 +53,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 		ItemsService,
 		AuthService,
 		TokenManagerService,
+		ChannelsService,
 	],
 })
 export class HomepageModule {
