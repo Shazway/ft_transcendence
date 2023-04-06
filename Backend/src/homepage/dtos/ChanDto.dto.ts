@@ -6,6 +6,11 @@ export class NewChanDto {
 	channel_name: string;
 }
 
+export class DeleteUserDto {
+	channel_id: number;
+	target_id: number;
+}
+
 export class SerializedChanDto {
 	channel_name: string;
 	is_channel_private: boolean;

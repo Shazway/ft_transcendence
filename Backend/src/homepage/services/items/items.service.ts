@@ -51,6 +51,7 @@ export class ItemsService {
 		const channel = await this.chanRepo
 			.createQueryBuilder('channel')
 			.leftJoinAndSelect('channel.us_channel', 'us_channel')
+			.leftJoinAndSelect('us_channel.user', 'user')
 			.leftJoinAndSelect('channel.message', 'message')
 			.where('channel.channel_id = :id', { id })
 			.getOne();

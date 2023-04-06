@@ -13,11 +13,7 @@ export class TokenManagerService {
 
 	public getToken(token: string) {
 		let keyClean;
-		if (!token)
-			throw new HttpException(
-				'No authentication token provided',
-				HttpStatus.UNPROCESSABLE_ENTITY,
-			);
+		if (!token) throw new HttpException('No authentication token provided', HttpStatus.UNPROCESSABLE_ENTITY);
 		try {
 			keyClean = this.jwtService.verify(token);
 		} catch (error) {
