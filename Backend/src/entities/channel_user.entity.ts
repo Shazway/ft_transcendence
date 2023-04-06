@@ -34,4 +34,20 @@ export class ChannelUser {
 
 	@OneToMany(() => Message, (message) => message.author)
 	message: Message[];
+
+	muteUser(duration = 0): void {
+		this.is_muted = true;
+		if (duration > 0) {
+		  const now = new Date();
+		  const muteDuration = new Date(now.getTime() + duration);
+		  this.remaining_mute_time = muteDuration;
+		} else {
+		  this.remaining_mute_time = null;
+		}
+	  }
+	
+	  unmuteUser(): void {
+		this.is_muted = false;
+		this.remaining_mute_time = null;
+	  }
 }

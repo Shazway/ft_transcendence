@@ -32,10 +32,12 @@ export class ChannelsController {
 
 	@Post('create')
 	async createChannel(@Req() req: Request, @Res() res: Response, @Body() newChannelDto: NewChanDto) {
-		const channelEntity = await this.channelService.createChannel(newChannelDto);
+		const userId = this.tokenManager.getIdFromToken(req);
+		const channelEntity = await this.channelService.createChannel(newChannelDto, userId);
 		console.log(channelEntity);
 		res.status(HttpStatus.OK).send({ msg: 'Channel created' });
 	}
+
 	@Delete('delete/:id')
 	async deleteChannel(@Param('id', ParseIntPipe) chan_id: number, @Req() req: Request, @Res() res: Response) {
 		console.log(chan_id);

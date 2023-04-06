@@ -11,10 +11,7 @@ import { UsersService } from './services/users/users.service';
 import { ItemsService } from './services/items/items.service';
 import { AuthService } from './services/auth/auth.service';
 import { JwtModule } from '@nestjs/jwt';
-import {
-	VarFetchService,
-	varFetchService,
-} from './services/var_fetch/var_fetch.service';
+import { VarFetchService, varFetchService } from './services/var_fetch/var_fetch.service';
 import { AuthVerifMiddleware } from './middleware/auth-verif/auth-verif.middleware';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import entities from 'src/entities';
@@ -59,9 +56,14 @@ import { ChannelsService } from './services/channels/channels.service';
 export class HomepageModule {
 	public readonly connectionSource: DataSourceOptions;
 	configure(auth: MiddlewareConsumer) {
-		auth.apply(AuthVerifMiddleware).forRoutes({
-			path: 'login/test',
-			method: RequestMethod.ALL,
-		});
+		auth.apply(AuthVerifMiddleware)
+			.exclude({
+				path: 'users/create',
+				method: RequestMethod.ALL,
+			})
+			.forRoutes({
+				path: '*',
+				method: RequestMethod.ALL,
+			});
 	}
 }
