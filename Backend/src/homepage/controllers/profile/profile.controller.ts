@@ -31,11 +31,8 @@ export class ProfileController {
 		);
 		if (user && user.username === us)
 			serializedUser = plainToClass(MyProfileUserDto, user);
-		else if (user)
-			serializedUser = plainToClass(AnyProfileUserDto, user);
-		else
-			res.status(HttpStatus.NOT_FOUND).send({ msg: 'User not found' });
-		if (user)
-			res.status(HttpStatus.FOUND).send(serializedUser);
+		else if (user) serializedUser = plainToClass(AnyProfileUserDto, user);
+		else res.status(HttpStatus.NOT_FOUND).send({ msg: 'User not found' });
+		if (user) res.status(HttpStatus.FOUND).send(serializedUser);
 	}
 }

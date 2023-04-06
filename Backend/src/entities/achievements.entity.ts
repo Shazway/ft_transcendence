@@ -3,7 +3,7 @@ import {
 	Entity,
 	PrimaryGeneratedColumn,
 	Column,
-	ManyToOne,
+	ManyToMany,
 } from 'typeorm';
 
 import { User } from './users.entity';
@@ -21,5 +21,5 @@ export default class Achievement {
 	@Column({ default: null, length: 30 })
 	achievement_reward!: string;
 
-	@ManyToOne(() => User, (user) => user.achievement) user: User;
+	@ManyToMany(() => User, (user) => user.achievement) user: User[];
 }

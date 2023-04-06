@@ -1,14 +1,4 @@
-import {
-	Entity,
-	PrimaryGeneratedColumn,
-	Column,
-	JoinTable,
-	ManyToMany,
-	OneToMany,
-	CreateDateColumn,
-	ManyToOne,
-} from 'typeorm';
-import Achievements from './achievements.entity';
+import { Entity, PrimaryGeneratedColumn, Column, JoinTable, ManyToMany, OneToMany, CreateDateColumn } from 'typeorm';
 import { Friendrequest } from './friend_request.entity';
 import { ChannelUser } from './channel_user.entity';
 import { Match } from './matchs.entity';
@@ -59,14 +49,13 @@ export class User {
 
 	// ---------------------- Blacklist ----------------------------------
 
-	@OneToMany(() => User, (user) => user.blacklistedBy)
+	@ManyToMany(() => User, (user) => user.blacklistEntry)
+	@JoinTable()
 	blacklistEntry: User[];
 
-	@ManyToOne(() => User, (user) => user.blacklistEntry)
-	blacklistedBy: User;
-
 	// ---------------------- Achievements -------------------------------
-	@OneToMany(() => Achievement, (achievement) => achievement.user)
+	@ManyToMany(() => Achievement, (achievement) => achievement.user)
+	@JoinTable()
 	achievement: Achievement[];
 
 	// ---------------------- Channels -------------------------------

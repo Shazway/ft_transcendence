@@ -74,14 +74,14 @@ export class ItemsService {
 			.leftJoinAndSelect('channel_user.channel', 'channel')
 			.leftJoinAndSelect('channel_user.message', 'message')
 			.where('channel_user.channel_user_id = :id', { id })
-			.getOne();
+			.getMany();
 		return chan_user;
 	}
 
 	public async getAllChannels() {
 		const chan_list = await this.chanRepo
 			.createQueryBuilder('channel')
-			.leftJoinAndSelect('channel.us_channel', 'channel')
+			.leftJoinAndSelect('channel.us_channel', 'channel_user')
 			.leftJoinAndSelect('channel.message', 'message')
 			.getMany();
 		return chan_list;
@@ -90,7 +90,7 @@ export class ItemsService {
 	public async getAllPbChannels() {
 		const chan_user = await this.chanRepo
 			.createQueryBuilder('channel')
-			.leftJoinAndSelect('channel.us_channel', 'channel')
+			.leftJoinAndSelect('channel.us_channel', 'channel_user')
 			.leftJoinAndSelect('channel.message', 'message')
 			.where('channel.is_channel_private = false')
 			.getMany();
@@ -98,26 +98,27 @@ export class ItemsService {
 	}
 
 	public async getAllChannelsFromUser(id: number) {
-		const channels = this.chanRepo.createQueryBuilder('channel')
-			.innerJoin('channel.us_channel', 'us_channel')
-			.where('us_channel.user_id = :userId', { id })
+		const channels = await this.chanRepo.createQueryBuilder('channel')
+			.innerJoin('channel.us_channel', 'channel_user')
+			.where('channel_user.user = :id', { id })
+			.orderBy('channel.is_channel_private')
 			.getMany();
 		return channels;
 	}
 
-	public async getPublicChannelsFromUser(id: number) {
-		const pb_channels = this.chanRepo.createQueryBuilder('channel')
-		.innerJoin('channel.us_channel', 'us_channel')
-		.where('us_channel.channel_user_id = :userId', { id })
-		.andWhere('channel.is_channel_private = false')
-		.getMany();
-		return pb_channels
-	}
+	// public async getPublicChannelsFromUser(id: number) {
+	// 	const pb_channels = this.chanRepo.createQueryBuilder('channel')
+	// 	.innerJoin('channel.us_channel', 'channel_user')
+	// 	.where('channel_user.channel_user_id = :userId', { id })
+	// 	.andWhere('channel.is_channel_private = false')
+	// 	.getMany();
+	// 	return pb_channels
+	// }
 
 	public async getPvChannelsFromUser(id: number) {
-		const pv_channels = this.chanRepo.createQueryBuilder('channel')
-		.innerJoin('channel.us_channel', 'us_channel')
-		.where('us_channel.channel_user_id = :userId', { id })
+		const pv_channels = await this.chanRepo.createQueryBuilder('channel')
+		.innerJoin('channel.us_channel', 'channel_user')
+		.where('channel_user.channel_user_id = :id', { id })
 		.andWhere('channel.is_channel_private = true')
 		.getMany();
 		return pv_channels
@@ -202,11 +203,13 @@ export class ItemsService {
 	public async addUserToChannel(
 		chan_user: ChannelUser,
 		channel_id: number,
+		user_id: number,
 	)
 	{
-		const user = await this.getUser(chan_user.channel_user_id);
+		const user = await this.getUser(user_id);
 		const channel = await this.getChannel(channel_id);
 
+		chan_user.user = user;
 		chan_user.channel = channel;
 		channel.us_channel.push(chan_user);
 		user.channel.push(chan_user);

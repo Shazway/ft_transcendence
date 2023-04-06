@@ -29,20 +29,11 @@ export class UsersController {
 	) {}
 	@Get('')
 	async getUsers(@Req() req: Request, @Res() res: Response) {
-		let userList = await this.usersService.getAllUsers();
+		const userList = await this.usersService.getAllUsers();
 		if (!userList)
 			res.status(HttpStatus.NO_CONTENT).send({ msg: 'No users registered' });
 		const serializedUsers = userList.map((user) => plainToClass(AnyProfileUserDto, user));
 		res.status(HttpStatus.FOUND).send(serializedUsers);
-	}
-
-	@Get(':username')
-	async getUser(@Req() req: Request, @Res() res: Response) {
-		const user = await this.itemsService.getUser(
-			this.tokenManager.getIdFromToken(req),
-		);
-		if (user) res.send(user);
-		else res.status(HttpStatus.NOT_FOUND).send({ msg: 'User not found' });
 	}
 
 	@Post('create')
@@ -51,7 +42,6 @@ export class UsersController {
 		@Res() res: Response,
 		@Body() newUserDto: NewUserDto,
 	) {
-		console.log(req);
 		const userEntity = await this.usersService.createUser(newUserDto);
 		console.log(newUserDto);
 		res.status(HttpStatus.OK).send({
@@ -62,6 +52,7 @@ export class UsersController {
 
 	@Get('add_achievement')
 	async addAchievement(@Req() req: Request, @Res() res: Response) {
+		console.log('pass1');
 		const user_id = await this.tokenManager.getIdFromToken(req);
 		this.itemsService.addAchievementsToUser(user_id, 1);
 		res.status(HttpStatus.OK).send('Achievement added');
@@ -78,5 +69,14 @@ export class UsersController {
 		console.log(friend_id);
 		this.itemsService.addFriendToUser(user_id, friend_id);
 		res.status(HttpStatus.OK).send('Friend added');
+	}
+
+	@Get(':username')
+	async getUser(@Req() req: Request, @Res() res: Response) {
+		const user = await this.itemsService.getUser(
+			this.tokenManager.getIdFromToken(req),
+		);
+		if (user) res.send(user);
+		else res.status(HttpStatus.NOT_FOUND).send({ msg: 'User not found' });
 	}
 }
