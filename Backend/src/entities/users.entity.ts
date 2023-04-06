@@ -43,18 +43,18 @@ export class User {
 	@OneToMany(() => Friendrequest, (friendrequest) => friendrequest.receiver)
 	recievedFriendRequests: Friendrequest[];
 
-	@ManyToMany(() => User, (user) => user.friend)
+	@ManyToMany(() => User, (user) => user.friend, { onDelete: 'CASCADE' })
 	@JoinTable()
 	friend: User[];
 
 	// ---------------------- Blacklist ----------------------------------
 
-	@ManyToMany(() => User, (user) => user.blacklistEntry)
+	@ManyToMany(() => User, (user) => user.blacklistEntry, { onDelete: 'CASCADE' })
 	@JoinTable()
 	blacklistEntry: User[];
 
 	// ---------------------- Achievements -------------------------------
-	@ManyToMany(() => Achievement, (achievement) => achievement.user)
+	@ManyToMany(() => Achievement, (achievement) => achievement.user, { onDelete: 'CASCADE' })
 	@JoinTable()
 	achievement: Achievement[];
 
@@ -63,7 +63,7 @@ export class User {
 	channel: ChannelUser[];
 
 	// ---------------------- Matchs -------------------------------
-	@ManyToMany(() => Match, (match) => match.user)
+	@ManyToMany(() => Match, (match) => match.user, { onDelete: 'CASCADE' })
 	@JoinTable()
 	match_history: Match[];
 }

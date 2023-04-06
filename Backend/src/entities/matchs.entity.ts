@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, ManyToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, ManyToMany, JoinTable } from 'typeorm';
 import { MatchSetting } from './match_setting.entity';
 import { User } from './users.entity';
 
@@ -23,9 +23,9 @@ export class Match {
 	@Column("boolean", { default: [false, false], array: true })
 	is_victory!: boolean[];
 
-	@ManyToMany(() => User, (user) => user.match_history)
+	@ManyToMany(() => User, (user) => user.match_history, { onDelete: 'CASCADE' })
 	user: User[];
 
-	@OneToOne(() => MatchSetting, (matchSetting) => matchSetting.match)
+	@OneToOne(() => MatchSetting, (matchSetting) => matchSetting.match, { onDelete: 'CASCADE' })
 	matchSetting: MatchSetting;
 }

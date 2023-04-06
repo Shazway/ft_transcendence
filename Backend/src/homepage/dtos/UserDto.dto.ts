@@ -20,9 +20,7 @@ export class AnyProfileUserDto {
 	losses: number;
 	achievements: Achievement[];
 	friend: User[];
-	@Exclude()
 	user_id: number;
-	@Exclude()
 	intra_id!: number;
 	@Exclude()
 	channel: ChannelUser[];
@@ -49,9 +47,7 @@ export class MyProfileUserDto {
 	friend: User[];
 	sentFriendRequests: Friendrequest[];
 	recievedFriendRequests: Friendrequest[];
-	@Exclude()
 	user_id: number;
-	@Exclude()
 	intra_id!: number;
 }
 
@@ -63,9 +59,7 @@ export class LeaderBoardUser {
 	createdAt: Date;
 	wins: number;
 	losses: number;
-	@Exclude()
 	user_id: number;
-	@Exclude()
 	intra_id!: number;
 	@Exclude()
 	match_history: Match[];

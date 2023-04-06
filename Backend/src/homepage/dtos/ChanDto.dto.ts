@@ -6,13 +6,16 @@ export class NewChanDto {
 	channel_name: string;
 }
 
+export class DeleteChanDto {
+	chan_id: number;
+}
+
 export class SerializedChanDto {
 	channel_name: string;
-	@Exclude()
-	channel_password: string;
 	is_channel_private: boolean;
 	us_channel: ChannelUser[];
 	message: Message[];
-	@Exclude()
 	channel_id: number;
+	@Exclude()
+	channel_password: string;
 }

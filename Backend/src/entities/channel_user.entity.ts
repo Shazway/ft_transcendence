@@ -24,11 +24,11 @@ export class ChannelUser {
 	@Column({ default: null })
 	remaining_mute_time!: Date; // <--- Mute in milisecond
 
-	@ManyToOne(() => User, { eager: true })
+	@ManyToOne(() => User, { eager: true, onDelete: 'CASCADE' })
 	@JoinColumn({ name: 'user_id' })
 	user!: User;
 
-	@ManyToOne(() => Channel)
+	@ManyToOne(() => Channel, { onDelete: 'CASCADE' })
 	@JoinColumn({ name: 'channel_id' })
 	channel!: Channel;
 

@@ -7,9 +7,9 @@ export class Friendrequest {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@ManyToOne(() => User, (user) => user.sentFriendRequests)
+	@ManyToOne(() => User, (user) => user.sentFriendRequests, { onDelete: 'CASCADE' })
 	sender: User;
 
-	@ManyToOne(() => User, (user) => user.recievedFriendRequests)
+	@ManyToOne(() => User, (user) => user.recievedFriendRequests, { onDelete: 'CASCADE' })
 	receiver: User;
 }

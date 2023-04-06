@@ -1,8 +1,8 @@
 /* eslint-disable prettier/prettier */
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class fifthMigration1680800008342 implements MigrationInterface {
-    name = 'fifthMigration1680800008342'
+export class fifthMigration1680805394662 implements MigrationInterface {
+    name = 'fifthMigration1680805394662'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE "friend_request" ("id" SERIAL NOT NULL, "senderUserId" integer, "receiverUserId" integer, CONSTRAINT "PK_4c9d23ff394888750cf66cac17c" PRIMARY KEY ("id"))`);
@@ -25,20 +25,20 @@ export class fifthMigration1680800008342 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE "user_match_history_match" ("userUserId" integer NOT NULL, "matchMatchId" integer NOT NULL, CONSTRAINT "PK_bcb0e635e5569f40f2f930f8aa3" PRIMARY KEY ("userUserId", "matchMatchId"))`);
         await queryRunner.query(`CREATE INDEX "IDX_85a8e9023f540a7570bccf2972" ON "user_match_history_match" ("userUserId") `);
         await queryRunner.query(`CREATE INDEX "IDX_b9048c3a1c53129706aab9f45a" ON "user_match_history_match" ("matchMatchId") `);
-        await queryRunner.query(`ALTER TABLE "friend_request" ADD CONSTRAINT "FK_b387088f13b068e4f4e76f328ad" FOREIGN KEY ("senderUserId") REFERENCES "user"("user_id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE "friend_request" ADD CONSTRAINT "FK_0d421a9a17dab5bb653b1dbcc53" FOREIGN KEY ("receiverUserId") REFERENCES "user"("user_id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE "message" ADD CONSTRAINT "FK_5dc0978a2ede39257d2e881f150" FOREIGN KEY ("authorChannelUserId") REFERENCES "channel_user"("channel_user_id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE "message" ADD CONSTRAINT "FK_33449c0422a3cc356a8749ae8a4" FOREIGN KEY ("channelChannelId") REFERENCES "channel"("channel_id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE "channel_user" ADD CONSTRAINT "FK_a846c7202b4f59da68ad20af060" FOREIGN KEY ("user_id") REFERENCES "user"("user_id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE "channel_user" ADD CONSTRAINT "FK_d31b165b69b0b23135ce413ce09" FOREIGN KEY ("channel_id") REFERENCES "channel"("channel_id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "friend_request" ADD CONSTRAINT "FK_b387088f13b068e4f4e76f328ad" FOREIGN KEY ("senderUserId") REFERENCES "user"("user_id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "friend_request" ADD CONSTRAINT "FK_0d421a9a17dab5bb653b1dbcc53" FOREIGN KEY ("receiverUserId") REFERENCES "user"("user_id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "message" ADD CONSTRAINT "FK_5dc0978a2ede39257d2e881f150" FOREIGN KEY ("authorChannelUserId") REFERENCES "channel_user"("channel_user_id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "message" ADD CONSTRAINT "FK_33449c0422a3cc356a8749ae8a4" FOREIGN KEY ("channelChannelId") REFERENCES "channel"("channel_id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "channel_user" ADD CONSTRAINT "FK_a846c7202b4f59da68ad20af060" FOREIGN KEY ("user_id") REFERENCES "user"("user_id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "channel_user" ADD CONSTRAINT "FK_d31b165b69b0b23135ce413ce09" FOREIGN KEY ("channel_id") REFERENCES "channel"("channel_id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "user_friend_user" ADD CONSTRAINT "FK_d8ee6796c777b44ef29c026bdd3" FOREIGN KEY ("userUserId_1") REFERENCES "user"("user_id") ON DELETE CASCADE ON UPDATE CASCADE`);
-        await queryRunner.query(`ALTER TABLE "user_friend_user" ADD CONSTRAINT "FK_7d095a83a532ec46832d9783ee1" FOREIGN KEY ("userUserId_2") REFERENCES "user"("user_id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "user_friend_user" ADD CONSTRAINT "FK_7d095a83a532ec46832d9783ee1" FOREIGN KEY ("userUserId_2") REFERENCES "user"("user_id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "user_blacklist_entry_user" ADD CONSTRAINT "FK_e8357b1750143e10fbd4467bae6" FOREIGN KEY ("userUserId_1") REFERENCES "user"("user_id") ON DELETE CASCADE ON UPDATE CASCADE`);
-        await queryRunner.query(`ALTER TABLE "user_blacklist_entry_user" ADD CONSTRAINT "FK_a2c19a1d94a0cb6abb68da675a5" FOREIGN KEY ("userUserId_2") REFERENCES "user"("user_id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "user_blacklist_entry_user" ADD CONSTRAINT "FK_a2c19a1d94a0cb6abb68da675a5" FOREIGN KEY ("userUserId_2") REFERENCES "user"("user_id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "user_achievement_achievement" ADD CONSTRAINT "FK_c42f5037a7ee4a2a98be5b9f70e" FOREIGN KEY ("userUserId") REFERENCES "user"("user_id") ON DELETE CASCADE ON UPDATE CASCADE`);
-        await queryRunner.query(`ALTER TABLE "user_achievement_achievement" ADD CONSTRAINT "FK_b1d1bd4c1fea88ece7cd0581d38" FOREIGN KEY ("achievementAchievementId") REFERENCES "achievement"("achievement_id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "user_achievement_achievement" ADD CONSTRAINT "FK_b1d1bd4c1fea88ece7cd0581d38" FOREIGN KEY ("achievementAchievementId") REFERENCES "achievement"("achievement_id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "user_match_history_match" ADD CONSTRAINT "FK_85a8e9023f540a7570bccf2972b" FOREIGN KEY ("userUserId") REFERENCES "user"("user_id") ON DELETE CASCADE ON UPDATE CASCADE`);
-        await queryRunner.query(`ALTER TABLE "user_match_history_match" ADD CONSTRAINT "FK_b9048c3a1c53129706aab9f45af" FOREIGN KEY ("matchMatchId") REFERENCES "match"("match_id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "user_match_history_match" ADD CONSTRAINT "FK_b9048c3a1c53129706aab9f45af" FOREIGN KEY ("matchMatchId") REFERENCES "match"("match_id") ON DELETE CASCADE ON UPDATE NO ACTION`);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {

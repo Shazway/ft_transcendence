@@ -21,5 +21,5 @@ export default class Achievement {
 	@Column({ default: null, length: 30 })
 	achievement_reward!: string;
 
-	@ManyToMany(() => User, (user) => user.achievement) user: User[];
+	@ManyToMany(() => User, (user) => user.achievement, { onDelete: 'CASCADE' }) user: User[];
 }

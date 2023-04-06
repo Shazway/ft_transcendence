@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { NewChanDto } from 'src/homepage/dtos/ChanDto.dto';
+import { DeleteChanDto, NewChanDto } from 'src/homepage/dtos/ChanDto.dto';
 import { Repository } from 'typeorm';
 import { ItemsService } from '../items/items.service';
 import { ChannelEntity } from 'src/entities';

@@ -123,46 +123,58 @@ export class ItemsService {
 		.getMany();
 		return pv_channels
 	}
-
+	
 	public async getFriendrequest(id: number) {
 		const friend_request = await this.friend_requestRepo
-			.createQueryBuilder('friend_request')
-			.leftJoinAndSelect('friend_request.sender', 'sender')
-			.leftJoinAndSelect('friend_request.receiver', 'receiver')
-			.where('friend_request.id = :id', { id })
-			.getOne();
+		.createQueryBuilder('friend_request')
+		.leftJoinAndSelect('friend_request.sender', 'sender')
+		.leftJoinAndSelect('friend_request.receiver', 'receiver')
+		.where('friend_request.id = :id', { id })
+		.getOne();
 		return friend_request;
 	}
 	
 	public async getMatchSetting(id: number) {
 		const match_setting = await this.match_settingRepo
-			.createQueryBuilder('match_setting')
-			.leftJoinAndSelect('match_setting.match', 'match')
-			.where('match_setting.match_setting_id = :id', { id })
-			.getOne();
+		.createQueryBuilder('match_setting')
+		.leftJoinAndSelect('match_setting.match', 'match')
+		.where('match_setting.match_setting_id = :id', { id })
+		.getOne();
 		return match_setting;
 	}
 	
 	public async getMessage(id: number) {
 		const message = await this.messageRepo
-			.createQueryBuilder('message')
-			.leftJoinAndSelect('message.author', 'author')
-			.leftJoinAndSelect('message.channel', 'channel')
-			.where('message.message_id = :id', { id })
-			.getOne();
+		.createQueryBuilder('message')
+		.leftJoinAndSelect('message.author', 'author')
+		.leftJoinAndSelect('message.channel', 'channel')
+		.where('message.message_id = :id', { id })
+		.getOne();
 		return message;
 	}
 	
 	public async getMatch(id: number) {
 		const match = await this.matchRepo
-			.createQueryBuilder('match')
-			.leftJoinAndSelect('match.user', 'user')
-			.leftJoinAndSelect('match.matchSetting', 'matchSetting')
-			.where('match.match_id = :id', { id })
-			.getOne();
+		.createQueryBuilder('match')
+		.leftJoinAndSelect('match.user', 'user')
+		.leftJoinAndSelect('match.matchSetting', 'matchSetting')
+		.where('match.match_id = :id', { id })
+		.getOne();
 		return match;
 	}
-
+	
+	public async getUserChan(user_id: number, channel_id: number)
+	{
+		const userChan = await this.chan_userRepo
+			.createQueryBuilder('channel_user')
+			.innerJoin('channel_user.channel', 'channel')
+			.innerJoin('channel_user.user', 'user')
+			.where("user.user_id = :user_id", {user_id})
+			.andWhere("channel.channel_id = :channel_id", {channel_id})
+			.getMany();
+		return (userChan);
+	}
+	
 	public async getLeaderboard() {
 		const user = await this.userRepo
 			.createQueryBuilder('user')
@@ -209,6 +221,10 @@ export class ItemsService {
 		const user = await this.getUser(user_id);
 		const channel = await this.getChannel(channel_id);
 
+		//if (channel.us_channel.map((user) => user.user.user_id === user_id))
+		const chanUser = (await this.getUserChan(user_id, channel_id))
+		if (chanUser.length)
+			return ;
 		chan_user.user = user;
 		chan_user.channel = channel;
 		channel.us_channel.push(chan_user);

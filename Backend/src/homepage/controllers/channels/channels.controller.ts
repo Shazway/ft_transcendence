@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpStatus, Param, ParseIntPipe, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, ParseIntPipe, Post, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { ChannelsService } from 'src/homepage/services/channels/channels.service';
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
@@ -31,9 +31,15 @@ export class ChannelsController {
 	}
 
 	@Post('create')
-	async createCustomer(@Req() req: Request, @Res() res: Response, @Body() newChannelDto: NewChanDto) {
+	async createChannel(@Req() req: Request, @Res() res: Response, @Body() newChannelDto: NewChanDto) {
 		const channelEntity = await this.channelService.createChannel(newChannelDto);
 		console.log(channelEntity);
 		res.status(HttpStatus.OK).send({ msg: 'Channel created' });
+	}
+	@Delete('delete/:id')
+	async deleteChannel(@Param('id', ParseIntPipe) chan_id: number, @Req() req: Request, @Res() res: Response) {
+		console.log(chan_id);
+		await this.channelService.deleteChannel(chan_id);
+		res.status(HttpStatus.OK).send({ msg: 'Channel deleted' });
 	}
 }
