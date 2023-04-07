@@ -28,7 +28,7 @@ export class ChannelsService {
 	//DELETE THE REST TO BE ADDED (messages, user_channels etc...)
 	async deleteChannel(chan_id: number, user_id: number) {
 		if (!(await this.isUserOwner(user_id, chan_id)))
-			throw new HttpException('No owner rights', HttpStatus.METHOD_NOT_ALLOWED);
+			throw new HttpException('No owner rights', HttpStatus.NOT_FOUND);
 		return this.chan_repo.delete(chan_id);
 	}
 	async getPubChannels() {
@@ -49,18 +49,18 @@ export class ChannelsService {
 		chan_user.is_creator = is_creator;
 		chan_user.is_admin = is_admin;
 		const channel = await this.itemsService.getChannel(chan_id);
-		if (!channel) throw new HttpException('Channel does not exist', HttpStatus.METHOD_NOT_ALLOWED);
+		if (!channel) throw new HttpException('Channel does not exist', HttpStatus.NOT_FOUND);
 		if (!channel.channel_password) await this.itemsService.addUserToChannel(chan_user, chan_id, user_id);
 		else if (pass === (await this.itemsService.getChannel(chan_id)).channel_password)
 			await this.itemsService.addUserToChannel(chan_user, chan_id, user_id);
-		else throw new HttpException('Invalid password', HttpStatus.METHOD_NOT_ALLOWED);
+		else throw new HttpException('Invalid password', HttpStatus.NOT_FOUND);
 		return true;
 	}
 	async setUserAdmin(setter_id: number, target_id: number, chan_id: number) {
 		if (!(await this.isUserOwner(setter_id, chan_id)))
-			throw new HttpException('No owner rights', HttpStatus.METHOD_NOT_ALLOWED);
+			throw new HttpException('No owner rights', HttpStatus.NOT_FOUND);
 		if (!(await this.isUserMember(target_id, chan_id)))
-			throw new HttpException('Not a member', HttpStatus.METHOD_NOT_ALLOWED);
+			throw new HttpException('Not a member', HttpStatus.NOT_FOUND);
 		const target = await this.itemsService.getUserChan(target_id, chan_id);
 		target[0].is_admin = true;
 		await this.chan_userRepo.save(target[0]);
@@ -68,9 +68,9 @@ export class ChannelsService {
 	}
 	async setUserOwner(setter_id: number, target_id: number, chan_id: number) {
 		if (!(await this.isUserOwner(setter_id, chan_id)))
-			throw new HttpException('No owner rights', HttpStatus.METHOD_NOT_ALLOWED);
+			throw new HttpException('No owner rights', HttpStatus.NOT_FOUND);
 		if (!(await this.isUserMember(target_id, chan_id)))
-			throw new HttpException('Not a member', HttpStatus.METHOD_NOT_ALLOWED);
+			throw new HttpException('Not a member', HttpStatus.NOT_FOUND);
 		const target = await this.itemsService.getUserChan(target_id, chan_id);
 		target[0].is_admin = true;
 		target[0].is_creator = true;
@@ -82,10 +82,10 @@ export class ChannelsService {
 	}
 	async kickUser(kicker_id: number, target_id: number, chan_id: number) {
 		if (!(await this.isUserAdmin(kicker_id, chan_id)))
-			throw new HttpException('No admin rights', HttpStatus.METHOD_NOT_ALLOWED);
+			throw new HttpException('No admin rights', HttpStatus.NOT_FOUND);
 		// eslint-disable-next-line prettier/prettier
 		if (!(await this.isUserMember(target_id, chan_id)) || ((await this.isUserAdmin(target_id, chan_id)) && !(await this.isUserOwner(kicker_id, chan_id))))
-			throw new HttpException('cannot kick', HttpStatus.METHOD_NOT_ALLOWED);
+			throw new HttpException('cannot kick', HttpStatus.NOT_FOUND);
 		const target = await this.itemsService.getUserChan(target_id, chan_id);
 		await this.chan_userRepo.delete(target[0].channel_user_id);
 		return true;

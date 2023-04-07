@@ -222,7 +222,6 @@ export class ItemsService {
 		const user = await this.getUser(user_id);
 		const channel = await this.getChannel(channel_id);
 
-		//if (channel.us_channel.map((user) => user.user.user_id === user_id))
 		const chanUser = (await this.getUserChan(user_id, channel_id))
 		if (chanUser.length)
 			return ;
@@ -234,4 +233,22 @@ export class ItemsService {
 		await this.chanRepo.save(channel);
 		await this.chan_userRepo.save(chan_user);
 	}
+
+	public async addUserToMatch(user: UserEntity, match: MatchEntity)
+	{
+		if (!match.is_ongoing)
+		return false;
+		match.user.push(user);
+		this.matchRepo.save(match);
+	}
+	
+	public async endMatch(match: MatchEntity)
+	{
+		match.is_ongoing = false;
+		match.is_victory[0] = (match.round_won[0] > match.round_won[1]);
+		match.is_victory[1] = !match.is_victory[0];
+		match.user[0].match_history.push(match);
+		match.user[1].match_history.push(match);
+	}
+
 }

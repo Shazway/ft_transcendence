@@ -20,6 +20,7 @@ import { TokenManagerService } from './services/token-manager/token-manager.serv
 import { HeaderInterceptor } from './middleware/header-interceptor/header-interceptor.middleware';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ChannelsService } from './services/channels/channels.service';
+import { MatchsService } from './services/matchs/matchs.service';
 
 @Module({
 	imports: [
@@ -51,6 +52,7 @@ import { ChannelsService } from './services/channels/channels.service';
 		AuthService,
 		TokenManagerService,
 		ChannelsService,
+		MatchsService,
 	],
 })
 export class HomepageModule {
