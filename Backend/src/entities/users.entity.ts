@@ -3,6 +3,7 @@ import { Friendrequest } from './friend_request.entity';
 import { ChannelUser } from './channel_user.entity';
 import { Match } from './matchs.entity';
 import Achievement from './achievements.entity';
+import { Message } from './messages.entity';
 
 @Entity({ name: 'user' })
 export class User {
@@ -66,4 +67,8 @@ export class User {
 	@ManyToMany(() => Match, (match) => match.user, { onDelete: 'CASCADE' })
 	@JoinTable()
 	match_history: Match[];
+
+	// ---------------------- Message -------------------------------
+	@OneToMany(() => Message, (message) => message.author)
+	message: Message[];
 }

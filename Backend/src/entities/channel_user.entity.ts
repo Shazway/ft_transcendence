@@ -32,9 +32,6 @@ export class ChannelUser {
 	@JoinColumn({ name: 'channel_id' })
 	channel!: Channel;
 
-	@OneToMany(() => Message, (message) => message.author)
-	message: Message[];
-
 	muteUser(duration = 0): void {
 		this.is_muted = true;
 		if (duration > 0) {

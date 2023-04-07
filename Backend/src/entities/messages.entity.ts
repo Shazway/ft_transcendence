@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Channel } from './channels.entity';
 import { ChannelUser } from './channel_user.entity';
+import { User } from './users.entity';
 
 @Entity({ name: 'message' })
 export class Message {
@@ -20,9 +21,9 @@ export class Message {
 	@CreateDateColumn()
 	createdAt!: Date;
 
-	@ManyToOne(() => ChannelUser, (us_channel) => us_channel.message, { onDelete: 'CASCADE' })
-	author: ChannelUser;
+	@ManyToOne(() => User, (us_channel) => us_channel.message)
+	author: User;
 
-	@ManyToOne(() => Channel, (channel) => channel.channel_id, { onDelete: 'CASCADE' })
+	@ManyToOne(() => Channel, (channel) => channel.channel_id)
 	channel: Channel;
 }

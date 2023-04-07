@@ -81,6 +81,7 @@ export class ChannelsService {
 		return true;
 	}
 	async kickUser(kicker_id: number, target_id: number, chan_id: number) {
+		console.log(target_id);
 		if (!(await this.isUserAdmin(kicker_id, chan_id)))
 			throw new HttpException('No admin rights', HttpStatus.NOT_FOUND);
 		// eslint-disable-next-line prettier/prettier
@@ -102,7 +103,7 @@ export class ChannelsService {
 	}
 	async isUserMember(user_id: number, chan_id: number) {
 		const chan_user = await this.itemsService.getUserChan(user_id, chan_id);
-		if (chan_user.length) return true;
+		if (chan_user.length > 0) return true;
 		return false;
 	}
 }

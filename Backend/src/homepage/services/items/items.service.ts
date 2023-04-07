@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AchievementsEntity, ChannelEntity, ChannelUserRelation, FriendrequestRelation, MatchEntity, MatchSettingEntity, MessageEntity, UserEntity } from 'src/entities';
 import { ChannelUser } from 'src/entities/channel_user.entity';
@@ -168,8 +168,8 @@ export class ItemsService {
 	{
 		const userChan = await this.chan_userRepo
 			.createQueryBuilder('channel_user')
-			.innerJoin('channel_user.channel', 'channel')
-			.innerJoin('channel_user.user', 'user')
+			.innerJoinAndSelect('channel_user.channel', 'channel')
+			.innerJoinAndSelect('channel_user.user', 'user')
 			.where("user.user_id = :user_id", {user_id})
 			.andWhere("channel.channel_id = :channel_id", {channel_id})
 			.getMany();
