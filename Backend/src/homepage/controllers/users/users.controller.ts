@@ -1,15 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import {
-	Body,
-	Controller,
-	Get,
-	HttpStatus,
-	Param,
-	ParseIntPipe,
-	Post,
-	Req,
-	Res,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, ParseIntPipe, Post, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { UsersService } from '../../services/users/users.service';
 import { NewUserDto } from '../../dtos/UserDto.dto';
@@ -18,6 +8,7 @@ import { ItemsService } from 'src/homepage/services/items/items.service';
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
 import { plainToClass } from 'class-transformer';
 import { AnyProfileUserDto } from 'src/homepage/dtos/UserDto.dto';
+import { ChannelsService } from 'src/homepage/services/channels/channels.service';
 
 @Controller('users')
 export class UsersController {
@@ -26,23 +17,20 @@ export class UsersController {
 		private authService: AuthService,
 		private itemsService: ItemsService,
 		private tokenManager: TokenManagerService,
+		private channelService: ChannelsService,
 	) {}
 	@Get('')
 	async getUsers(@Req() req: Request, @Res() res: Response) {
 		const userList = await this.usersService.getAllUsers();
-		if (!userList)
-			res.status(HttpStatus.NO_CONTENT).send({ msg: 'No users registered' });
+		if (!userList) res.status(HttpStatus.NO_CONTENT).send({ msg: 'No users registered' });
 		const serializedUsers = userList.map((user) => plainToClass(AnyProfileUserDto, user));
 		res.status(HttpStatus.FOUND).send(serializedUsers);
 	}
 
 	@Post('create')
-	async createCustomer(
-		@Req() req: Request,
-		@Res() res: Response,
-		@Body() newUserDto: NewUserDto,
-	) {
+	async createCustomer(@Req() req: Request, @Res() res: Response, @Body() newUserDto: NewUserDto) {
 		const userEntity = await this.usersService.createUser(newUserDto);
+		await this.channelService.addUserToChannel(userEntity.user_id, 1);
 		console.log(newUserDto);
 		res.status(HttpStatus.OK).send({
 			msg: 'User created',
@@ -59,11 +47,7 @@ export class UsersController {
 	}
 
 	@Get('add_friend/:id')
-	async addFriend(
-		@Param('id', ParseIntPipe) friend_id: number,
-		@Req() req: Request,
-		@Res() res: Response,
-	) {
+	async addFriend(@Param('id', ParseIntPipe) friend_id: number, @Req() req: Request, @Res() res: Response) {
 		const user_id = this.tokenManager.getIdFromToken(req);
 
 		console.log(friend_id);
@@ -73,9 +57,7 @@ export class UsersController {
 
 	@Get(':username')
 	async getUser(@Req() req: Request, @Res() res: Response) {
-		const user = await this.itemsService.getUser(
-			this.tokenManager.getIdFromToken(req),
-		);
+		const user = await this.itemsService.getUser(this.tokenManager.getIdFromToken(req));
 		if (user) res.send(user);
 		else res.status(HttpStatus.NOT_FOUND).send({ msg: 'User not found' });
 	}

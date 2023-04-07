@@ -21,6 +21,8 @@ import { HeaderInterceptor } from './middleware/header-interceptor/header-interc
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ChannelsService } from './services/channels/channels.service';
 import { MatchsService } from './services/matchs/matchs.service';
+import { MessagesService } from './services/messages/messages.service';
+import { ChannelGateway } from './gateway/channel/channel.gateway';
 
 @Module({
 	imports: [
@@ -53,6 +55,8 @@ import { MatchsService } from './services/matchs/matchs.service';
 		TokenManagerService,
 		ChannelsService,
 		MatchsService,
+		MessagesService,
+		ChannelGateway,
 	],
 })
 export class HomepageModule {
