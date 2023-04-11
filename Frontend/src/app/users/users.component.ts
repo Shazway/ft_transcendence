@@ -8,11 +8,11 @@ import { FetchService } from '../fetch.service';
   styleUrls: ['./users.component.css']
 })
 export class UsersComponent implements OnInit {
-	users$: Observable<any> | undefined;
+	users$: Promise<any> | undefined;
 
 	constructor(private userService: FetchService) {}
 
-	ngOnInit(): void {
+	async ngOnInit() {
 		this.users$ = this.userService.getAllUsers();
 	}
 

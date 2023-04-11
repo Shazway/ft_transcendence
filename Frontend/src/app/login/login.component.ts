@@ -12,6 +12,7 @@ export class LoginComponent {
 	constructor(private loginService: FetchService) {}
 
 	onClickSubmit(data: JSON) {
+		console.log(data);
 		console.log(this.loginService.createUser(data));
 	}
 }

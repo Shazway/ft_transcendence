@@ -6,8 +6,8 @@ import { HttpClientModule} from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { UsersModule } from './users/users.module';
 import { LoginModule } from './login/login.module';
-import { LoginComponent } from './login/login.component'
 import { FormsModule } from '@angular/forms';
+import { FetchService } from './fetch.service';
 
 @NgModule({
   declarations: [
@@ -21,7 +21,11 @@ import { FormsModule } from '@angular/forms';
     LoginModule,
 	FormsModule,
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  providers: [
+	FetchService,
+  ],
+  bootstrap: [
+	AppComponent,
+]
 })
 export class AppModule { }
