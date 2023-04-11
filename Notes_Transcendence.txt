@@ -1,4 +1,4 @@
-Backend dependencies: (you have to be in the Backend file):
+Backend dependencies: (you have to be in the Backend folder):
 npm install @nestjs/cli && \
 npm install class-transformer --save && \
 npm install --save dotenv && \
@@ -8,7 +8,7 @@ npm install --save-dev @types/passport-local && \
 npm install --save @nestjs/jwt passport-jwt && \
 npm install --save @nestjs/websockets @nestjs/platform-socket.io
 
-Frontend dependencies: (you have to be in the Frontend file):
+Frontend dependencies: (you have to be in the Frontend folder):
 npm install @angular/cli
 
 BDD links:

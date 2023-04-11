@@ -96,7 +96,7 @@ export class ChannelsService {
 		if (!(await this.isUserAdmin(user_id, channel_id)) || !(await this.isUserMember(target_id, channel_id)))
 			return false;
 		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
-		target_chan[0].muteUser(500 * 1000);
+		target_chan[0].muteUser(1000 * 30); //Multiply 1000 to the number of seconds you want to mute someone todo: to be changed to a parameter given
 		await this.chan_userRepo.save(target_chan[0]);
 		return true;
 	}
@@ -122,12 +122,14 @@ export class ChannelsService {
 	async isMuted(user_id: number, chan_id: number) {
 		const chan_user = await this.itemsService.getUserChan(user_id, chan_id);
 		const time = new Date();
-		if (chan_user.length > 0 && chan_user[0].is_muted) return true;
-		if (chan_user[0].is_muted && time.getTime() >= chan_user[0].remaining_mute_time.getTime()) {
-			console.log('Time now: ' + time.getTime() + 'time of end:' + chan_user[0].remaining_mute_time.getTime());
-			chan_user[0].unmuteUser();
-			this.chan_userRepo.save(chan_user[0]);
-		}
+
+		if (chan_user.length > 0
+			&& chan_user[0].is_muted
+			&& !(time.getTime() >= chan_user[0].remaining_mute_time.getTime()))
+			return true;
+
+		chan_user[0].unmuteUser();
+		this.chan_userRepo.save(chan_user[0]);
 		return false;
 	}
 
