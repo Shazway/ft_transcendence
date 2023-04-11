@@ -23,6 +23,7 @@ import { ChannelsService } from './services/channels/channels.service';
 import { MatchsService } from './services/matchs/matchs.service';
 import { MessagesService } from './services/messages/messages.service';
 import { ChannelGateway } from './gateway/channel/channel.gateway';
+import { OptionInterceptor } from './middleware/option-interceptor/option-interceptor.interceptor';
 
 @Module({
 	imports: [
@@ -62,6 +63,11 @@ import { ChannelGateway } from './gateway/channel/channel.gateway';
 export class HomepageModule {
 	public readonly connectionSource: DataSourceOptions;
 	configure(auth: MiddlewareConsumer) {
+		auth.apply(OptionInterceptor)
+			.forRoutes({
+				path: '*',
+				method: RequestMethod.OPTIONS,
+		});
 		auth.apply(AuthVerifMiddleware)
 			.exclude({
 				path: 'users/create',

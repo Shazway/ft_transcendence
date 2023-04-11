@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Body, Controller, Get, HttpStatus, Param, ParseIntPipe, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Options, Param, ParseIntPipe, Post, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { UsersService } from '../../services/users/users.service';
 import { NewUserDto } from '../../dtos/UserDto.dto';
@@ -19,6 +19,7 @@ export class UsersController {
 		private tokenManager: TokenManagerService,
 		private channelService: ChannelsService,
 	) {}
+
 	@Get('')
 	async getUsers(@Req() req: Request, @Res() res: Response) {
 		const userList = await this.usersService.getAllUsers();
@@ -26,7 +27,6 @@ export class UsersController {
 		const serializedUsers = userList.map((user) => plainToClass(AnyProfileUserDto, user));
 		res.status(HttpStatus.FOUND).send(serializedUsers);
 	}
-
 	@Post('create')
 	async createCustomer(@Req() req: Request, @Res() res: Response, @Body() newUserDto: NewUserDto) {
 		const userEntity = await this.usersService.createUser(newUserDto);
