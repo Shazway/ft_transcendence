@@ -69,7 +69,7 @@ export class ChannelsController {
 		console.log(userId);
 		if (!(await this.channelService.unMuteUser(userId, deleteUserDto.target_id, deleteUserDto.channel_id)))
 			res.status(HttpStatus.FORBIDDEN).send({ msg: 'Not an admin' });
-		else res.status(HttpStatus.OK).send({ msg: 'User muted' });
+		else res.status(HttpStatus.OK).send({ msg: 'User unmuted' });
 	}
 
 	@Delete('delete/:id')

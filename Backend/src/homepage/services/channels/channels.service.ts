@@ -93,14 +93,16 @@ export class ChannelsService {
 	}
 
 	async muteUser(user_id: number, target_id: number, channel_id: number) {
-		if (!(await this.isUserAdmin(user_id, channel_id)) || this.isUserMember(target_id, channel_id)) return false;
+		if (!(await this.isUserAdmin(user_id, channel_id)) || !(await this.isUserMember(target_id, channel_id)))
+			return false;
 		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
-		target_chan[0].muteUser(500);
+		target_chan[0].muteUser(500 * 1000);
 		await this.chan_userRepo.save(target_chan[0]);
 		return true;
 	}
 	async unMuteUser(user_id: number, target_id: number, channel_id: number) {
-		if (!(await this.isUserAdmin(user_id, channel_id)) || this.isUserMember(target_id, channel_id)) return false;
+		if (!(await this.isUserAdmin(user_id, channel_id)) || !(await this.isUserMember(target_id, channel_id)))
+			return false;
 		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
 		target_chan[0].unmuteUser();
 		await this.chan_userRepo.save(target_chan[0]);
@@ -109,7 +111,7 @@ export class ChannelsService {
 
 	async isUserAdmin(user_id: number, chan_id: number) {
 		const chan_user = await this.itemsService.getUserChan(user_id, chan_id);
-		if (chan_user.length && chan_user[0].is_admin) return true;
+		if (chan_user.length > 0 && chan_user[0].is_admin) return true;
 		return false;
 	}
 	async isUserOwner(user_id: number, chan_id: number) {
@@ -117,15 +119,21 @@ export class ChannelsService {
 		if (chan_user.length && chan_user[0].is_creator) return true;
 		return false;
 	}
-	async isUserMember(user_id: number, chan_id: number) {
+	async isMuted(user_id: number, chan_id: number) {
 		const chan_user = await this.itemsService.getUserChan(user_id, chan_id);
 		const time = new Date();
-		if (chan_user.length > 0 && !chan_user[0].is_banned && !chan_user[0].is_muted) return true;
-		if (chan_user[0].is_muted && time.getTime() < chan_user[0].remaining_mute_time.getTime()) return false;
-		else if (chan_user[0].is_muted) {
+		if (chan_user.length > 0 && chan_user[0].is_muted) return true;
+		if (chan_user[0].is_muted && time.getTime() >= chan_user[0].remaining_mute_time.getTime()) {
+			console.log('Time now: ' + time.getTime() + 'time of end:' + chan_user[0].remaining_mute_time.getTime());
 			chan_user[0].unmuteUser();
 			this.chan_userRepo.save(chan_user[0]);
 		}
-		return true;
+		return false;
+	}
+
+	async isUserMember(user_id: number, chan_id: number) {
+		const chan_user = await this.itemsService.getUserChan(user_id, chan_id);
+		if (chan_user.length > 0 && !chan_user[0].is_banned) return true;
+		return false;
 	}
 }

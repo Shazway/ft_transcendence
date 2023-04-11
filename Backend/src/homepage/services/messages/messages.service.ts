@@ -23,7 +23,12 @@ export class MessagesService {
 
 		const channel = await this.itemsService.getChannel(msg[1].channel_id);
 		const user = await this.itemsService.getUser(this.tokenManager.getToken(msg[1].auth).sub);
-		if (!user || !(await this.channelService.isUserMember(user.user_id, channel.channel_id))) return false;
+		if (
+			!user ||
+			!(await this.channelService.isUserMember(user.user_id, channel.channel_id)) ||
+			(await this.channelService.isMuted(user.user_id, channel.channel_id))
+		)
+			return false;
 		message.author = user;
 		message.channel = channel;
 		message.createdAt = new Date();

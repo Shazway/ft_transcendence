@@ -63,10 +63,9 @@ import { OptionInterceptor } from './middleware/option-interceptor/option-interc
 export class HomepageModule {
 	public readonly connectionSource: DataSourceOptions;
 	configure(auth: MiddlewareConsumer) {
-		auth.apply(OptionInterceptor)
-			.forRoutes({
-				path: '*',
-				method: RequestMethod.OPTIONS,
+		auth.apply(OptionInterceptor).forRoutes({
+			path: '*',
+			method: RequestMethod.OPTIONS,
 		});
 		auth.apply(AuthVerifMiddleware)
 			.exclude({
