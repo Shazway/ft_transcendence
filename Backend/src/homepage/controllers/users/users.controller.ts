@@ -30,11 +30,12 @@ export class UsersController {
 	@Post('create')
 	async createCustomer(@Req() req: Request, @Res() res: Response, @Body() newUserDto: NewUserDto) {
 		const userEntity = await this.usersService.createUser(newUserDto);
+		const user_id = userEntity.user_id;
 		await this.channelService.addUserToChannel(userEntity.user_id, 1);
 		console.log(newUserDto);
 		res.status(HttpStatus.OK).send({
 			msg: 'User created',
-			token: await this.authService.login(userEntity),
+			token: await this.authService.login(newUserDto, user_id),
 		});
 	}
 

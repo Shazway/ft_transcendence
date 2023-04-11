@@ -4,10 +4,15 @@ import { ChannelsService } from 'src/homepage/services/channels/channels.service
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
 import { DeleteUserDto, NewChanDto, SerializedChanDto } from '../../dtos/ChanDto.dto';
 import { plainToClass } from 'class-transformer';
+import { ItemsService } from 'src/homepage/services/items/items.service';
 
 @Controller('channels')
 export class ChannelsController {
-	constructor(private channelService: ChannelsService, private tokenManager: TokenManagerService) {}
+	constructor(
+		private channelService: ChannelsService,
+		private tokenManager: TokenManagerService,
+		private itemsService: ItemsService,
+	) {}
 	@Get('')
 	async getUsersChannel(@Req() req: Request, @Res() res: Response) {
 		const channelList = await this.channelService.getAllChannelsFromUser(this.tokenManager.getIdFromToken(req));
@@ -45,6 +50,26 @@ export class ChannelsController {
 		console.log(userId);
 		await this.channelService.kickUser(userId, deleteUserDto.target_id, deleteUserDto.channel_id);
 		res.status(HttpStatus.OK).send({ msg: 'User kicked from channel' });
+	}
+
+	@Post('mute')
+	async muteUser(@Req() req: Request, @Res() res: Response, @Body() deleteUserDto: DeleteUserDto) {
+		const userId = await this.tokenManager.getIdFromToken(req);
+		console.log(deleteUserDto);
+		console.log(userId);
+		if (!(await this.channelService.muteUser(userId, deleteUserDto.target_id, deleteUserDto.channel_id)))
+			res.status(HttpStatus.FORBIDDEN).send({ msg: 'Not an admin' });
+		else res.status(HttpStatus.OK).send({ msg: 'User muted' });
+	}
+
+	@Post('unmute')
+	async unMuteUser(@Req() req: Request, @Res() res: Response, @Body() deleteUserDto: DeleteUserDto) {
+		const userId = await this.tokenManager.getIdFromToken(req);
+		console.log(deleteUserDto);
+		console.log(userId);
+		if (!(await this.channelService.unMuteUser(userId, deleteUserDto.target_id, deleteUserDto.channel_id)))
+			res.status(HttpStatus.FORBIDDEN).send({ msg: 'Not an admin' });
+		else res.status(HttpStatus.OK).send({ msg: 'User muted' });
 	}
 
 	@Delete('delete/:id')

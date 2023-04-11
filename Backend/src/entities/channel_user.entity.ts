@@ -2,7 +2,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
 import { Channel } from './channels.entity';
 import { User } from './users.entity';
-import { Message } from './messages.entity';
 
 @Entity({ name: 'channel_user' })
 export class ChannelUser {
