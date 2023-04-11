@@ -42,10 +42,20 @@ export class FetchService {
 		return res;
 	}
 
-	createUser(param: JSON) {
-		let resp;
-		const res = this.httpClient.post<ResponseDto>('http://localhost:3001/users/create', param, this.httpOptions);
-		res.subscribe((response) => {resp = response as ResponseDto});
-		console.log(resp);
+	async createUser(param: JSON) {
+		let res;
+		await axios.post<ResponseDto>('http://localhost:3001/users/create', param, {
+			headers: {
+				'Content-Type': 'application/json; charset=utf-8',
+			}
+		  })
+		.then(function (response) {
+			res = response.data;
+			console.log(res);
+			localStorage.setItem('token', res.token);
+		})
+		.catch(function (error) { console.log(error); })
+		.finally(function () {});
+		return res;
 	}
 }
