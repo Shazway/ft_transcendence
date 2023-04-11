@@ -20,9 +20,12 @@ export class ChannelGateway implements OnModuleInit {
 
 	@SubscribeMessage('message')
 	async handleMessage(@ConnectedSocket() client: Socket, payload: any, @MessageBody() body: MessageDto[]) {
-		if (await this.messageService.addMessageToChannel(body)) this.server.emit('onMessage', body[0].content);
+		const Validity = await this.messageService.addMessageToChannel(body)
+		if (Validity.ret) this.server.emit('onMessage', body[0].content);
 		else {
-			client.emit('onMessage', 'go fuck yourself');
+			client.emit('onMessage', Validity.msg);
+			if (Validity.msg === 'User is muted' || Validity.msg === 'User is banned')
+				return ;
 			client.disconnect();
 		}
 	}

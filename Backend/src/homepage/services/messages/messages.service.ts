@@ -6,6 +6,8 @@ import { ItemsService } from '../items/items.service';
 import { MessageDto } from 'src/homepage/dtos/MessageDto.dto';
 import { TokenManagerService } from '../token-manager/token-manager.service';
 import { ChannelsService } from '../channels/channels.service';
+import { User } from 'src/entities/users.entity';
+import { Channel } from 'src/entities/channels.entity';
 
 @Injectable()
 export class MessagesService {
@@ -15,24 +17,40 @@ export class MessagesService {
 		private itemsService: ItemsService,
 		private channelService: ChannelsService,
 		private tokenManager: TokenManagerService,
-	) {}
+		) {}
 
+	error_tab =	[{ret: false, msg: "User not found"},
+				{ret: false, msg: "Channel doesn't exist"},
+				{ret: false, msg: "User doesn't belong to channel"},
+				{ret: false, msg: "User is muted"},
+				{ret: false, msg: "User is banned"},]
+	
+	async isValidUserChannel(user: User, channel: Channel)
+	{
+		if (!user)
+			return this.error_tab[0];
+		if (!channel)
+			return this.error_tab[1];
+		if (!(await this.channelService.isUserMember(user.user_id, channel.channel_id)))
+			return this.error_tab[2];
+		if (await this.channelService.isMuted(user.user_id, channel.channel_id))
+			return this.error_tab[3];
+		return ({ret: true, msg: "Valid User"});
+	}
+	
 	async addMessageToChannel(msg: MessageDto[]) {
 		const message = new MessageEntity();
 		message.message_content = msg[0].content;
 
 		const channel = await this.itemsService.getChannel(msg[1].channel_id);
 		const user = await this.itemsService.getUser(this.tokenManager.getToken(msg[1].auth).sub);
-		if (
-			!user ||
-			!(await this.channelService.isUserMember(user.user_id, channel.channel_id)) ||
-			(await this.channelService.isMuted(user.user_id, channel.channel_id))
-		)
-			return false;
+		const isValid = await this.isValidUserChannel(user, channel);
+		if (!isValid.ret)
+			return (isValid);
 		message.author = user;
 		message.channel = channel;
 		message.createdAt = new Date();
 		this.messageRepo.save(message);
-		return true;
+		return isValid;
 	}
 }
