@@ -24,9 +24,8 @@ export class ChannelGateway implements OnModuleInit {
 		if (Validity.ret) this.server.emit('onMessage', body[0].content);
 		else {
 			client.emit('onMessage', Validity.msg);
-			if (Validity.msg === 'User is muted' || Validity.msg === 'User is banned')
-				return ;
-			client.disconnect();
+			if (!(Validity.msg === 'User is muted'))
+				client.disconnect();
 		}
 	}
 }

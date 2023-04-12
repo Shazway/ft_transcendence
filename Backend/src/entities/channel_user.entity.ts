@@ -23,6 +23,9 @@ export class ChannelUser {
 	@Column({ default: null })
 	remaining_mute_time!: Date; // <--- Mute in milisecond
 
+	@Column({ default: null })
+	remaining_ban_time!: Date; // <--- Ban in milisecond
+
 	@ManyToOne(() => User, { eager: true, onDelete: 'CASCADE' })
 	@JoinColumn({ name: 'user_id' })
 	user!: User;
@@ -31,19 +34,36 @@ export class ChannelUser {
 	@JoinColumn({ name: 'channel_id' })
 	channel!: Channel;
 
+	banUser(duration = 0): void {
+		this.is_muted = true;
+		if (duration > 0) {
+			const now = new Date();
+			const muteDuration = (this.remaining_ban_time && this.remaining_ban_time.getTime() > 0) ?
+			new Date(now.getTime() + duration + this.remaining_mute_time.getTime()) : new Date(duration + now.getTime());
+			this.remaining_ban_time = muteDuration;
+		}
+		else
+			this.remaining_ban_time = null;
+	}
+
 	muteUser(duration = 0): void {
 		this.is_muted = true;
 		if (duration > 0) {
-		  const now = new Date();
-		  const muteDuration = new Date(now.getTime() + duration);
-		  this.remaining_mute_time = muteDuration;
-		} else {
-		  this.remaining_mute_time = null;
+			const now = new Date();
+			const muteDuration = (this.remaining_ban_time && this.remaining_ban_time.getTime() > 0) ?
+			new Date(duration + this.remaining_ban_time.getTime()) : new Date(duration + now.getTime());
+			this.remaining_mute_time = muteDuration;
 		}
-	  }
+		else
+			this.remaining_mute_time = null;
+	}
 	
-	  unmuteUser(): void {
+	unmuteUser(): void {
 		this.is_muted = false;
 		this.remaining_mute_time = null;
-	  }
+	}
+	unBanUser(): void {
+		this.is_banned = false;
+		this.remaining_ban_time = null;
+	}
 }

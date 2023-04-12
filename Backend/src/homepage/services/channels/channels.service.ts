@@ -109,6 +109,22 @@ export class ChannelsService {
 		return true;
 	}
 
+	async banUser(user_id: number, target_id: number, channel_id: number) {
+		if (!(await this.isUserAdmin(user_id, channel_id)) || !(await this.isUserMember(target_id, channel_id)))
+			return false;
+		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
+		target_chan[0].banUser(1000 * 30); //Multiply 1000 to the number of seconds you want to mute someone todo: to be changed to a parameter given
+		await this.chan_userRepo.save(target_chan[0]);
+		return true;
+	}
+	async unBanUser(user_id: number, target_id: number, channel_id: number) {
+		if (!(await this.isUserAdmin(user_id, channel_id)) || !(await this.isUserMember(target_id, channel_id)))
+			return false;
+		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
+		target_chan[0].unBanUser();
+		await this.chan_userRepo.save(target_chan[0]);
+		return true;
+	}
 	async isUserAdmin(user_id: number, chan_id: number) {
 		const chan_user = await this.itemsService.getUserChan(user_id, chan_id);
 		if (chan_user.length > 0 && chan_user[0].is_admin) return true;
@@ -129,6 +145,18 @@ export class ChannelsService {
 			return true;
 
 		chan_user[0].unmuteUser();
+		this.chan_userRepo.save(chan_user[0]);
+		return false;
+	}
+	async isBanned(user_id: number, chan_id: number) {
+		const chan_user = await this.itemsService.getUserChan(user_id, chan_id);
+		const time = new Date();
+
+		if (chan_user.length > 0
+			&& chan_user[0].is_banned
+			&& !(time.getTime() >= chan_user[0].remaining_ban_time.getTime()))
+			return true;
+		chan_user[0].unBanUser();
 		this.chan_userRepo.save(chan_user[0]);
 		return false;
 	}
