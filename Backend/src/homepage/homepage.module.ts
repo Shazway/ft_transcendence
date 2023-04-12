@@ -24,6 +24,8 @@ import { MatchsService } from './services/matchs/matchs.service';
 import { MessagesService } from './services/messages/messages.service';
 import { ChannelGateway } from './gateway/channel/channel.gateway';
 import { OptionInterceptor } from './middleware/option-interceptor/option-interceptor.interceptor';
+import { NotificationsGateway } from './gateway/notifications/notifications.gateway';
+import { NotificationsService } from './services/notifications/notifications.service';
 
 @Module({
 	imports: [
@@ -58,6 +60,8 @@ import { OptionInterceptor } from './middleware/option-interceptor/option-interc
 		MatchsService,
 		MessagesService,
 		ChannelGateway,
+		NotificationsGateway,
+		NotificationsService,
 	],
 })
 export class HomepageModule {

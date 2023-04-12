@@ -25,7 +25,7 @@ export class User {
 	@Column({ default: 0, unsigned: true })
 	currency!: number;
 
-	@Column({ default: 1 })
+	@Column({ default: 0 })
 	activity_status!: number;
 
 	@CreateDateColumn()

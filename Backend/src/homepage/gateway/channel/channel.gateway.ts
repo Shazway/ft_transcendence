@@ -1,4 +1,3 @@
-import { OnModuleInit } from '@nestjs/common';
 import {
 	ConnectedSocket,
 	MessageBody,
@@ -14,6 +13,7 @@ import { PunishmentDto } from 'src/homepage/dtos/PunishmentDto.dto';
 import { ChannelsService } from 'src/homepage/services/channels/channels.service';
 import { MessagesService } from 'src/homepage/services/messages/messages.service';
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
+import { NotificationsGateway } from '../notifications/notifications.gateway';
 
 @WebSocketGateway(3002)
 export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -22,6 +22,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		private messageService: MessagesService,
 		private tokenManager: TokenManagerService,
 		private channelService: ChannelsService,
+		private notificationGateway: NotificationsGateway,
 	) {
 		this.channelList = new Map<number, Map<number, Socket>>();
 	}
@@ -81,6 +82,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			author: 'System',
 		});
 	}
+
 	handleDisconnect(client: Socket) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
 		const channel_id = Number(client.handshake.query.channel_id);
@@ -93,6 +95,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				return client.emit('onError', 'Channel does not exist');
 		}
 	}
+
 	@SubscribeMessage('mute')
 	async handleMute(@ConnectedSocket() client: Socket, @MessageBody() body: PunishmentDto) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
@@ -101,11 +104,12 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			return client.emit('onError', 'Error while muting some dude');
 		// eslint-disable-next-line prettier/prettier
 		this.channelList.get(channel_id).get(body.target_id).emit(
-			'onMessage',
-			'You have been muted by ' + user.name + ' for reason: ' + body.message,
-		);
-		client.emit('onMessage', 'Successful mute');
+				'onMessage',
+				'You have been muted by ' + user.name + ' for reason: ' + body.message,
+			);
+		this.notificationGateway.sendMessage([user.sub], 'Successful mute');
 	}
+
 	@SubscribeMessage('ban')
 	async handleBan(@ConnectedSocket() client: Socket, @MessageBody() body: PunishmentDto) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
@@ -118,7 +122,23 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			'You have been banned by ' + user.name + ' for reason: ' + body.message,
 		);
 		target.disconnect();
-		client.emit('onMessage', 'Successful ban');
+		this.notificationGateway.sendMessage([user.sub], 'Successful ban');
+	}
+
+	@SubscribeMessage('kick')
+	async handleKick(@ConnectedSocket() client: Socket, @MessageBody() body: PunishmentDto) {
+		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		const channel_id = Number(client.handshake.query.channel_id);
+		if (!this.channelService.checkPrivileges(user.sub, body.target_id, channel_id))
+			return client.emit('onError', 'Lacking privileges');
+		// eslint-disable-next-line prettier/prettier
+		const target = this.channelList.get(channel_id).get(body.target_id);
+		target.emit(
+			'onMessage',
+			'You have been kicked by ' + user.name + ' for reason: ' + body.message,
+		);
+		target.disconnect();
+		this.notificationGateway.sendMessage([user.sub], 'Successful kick');
 	}
 
 	@SubscribeMessage('message')
