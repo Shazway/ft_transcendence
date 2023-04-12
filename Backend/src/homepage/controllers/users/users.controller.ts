@@ -1,5 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Body, Controller, Get, HttpStatus, Options, Param, ParseIntPipe, Post, Req, Res } from '@nestjs/common';
+import {
+	Body,
+	Controller,
+	Get,
+	HttpStatus,
+	Options,
+	Param,
+	ParseIntPipe,
+	Post,
+	Req,
+	Res,
+} from '@nestjs/common';
 import { Request, Response } from 'express';
 import { UsersService } from '../../services/users/users.service';
 import { NewUserDto } from '../../dtos/UserDto.dto';
@@ -28,7 +39,11 @@ export class UsersController {
 		res.status(HttpStatus.FOUND).send(serializedUsers);
 	}
 	@Post('create')
-	async createCustomer(@Req() req: Request, @Res() res: Response, @Body() newUserDto: NewUserDto) {
+	async createCustomer(
+		@Req() req: Request,
+		@Res() res: Response,
+		@Body() newUserDto: NewUserDto,
+	) {
 		const userEntity = await this.usersService.createUser(newUserDto);
 		const user_id = userEntity.user_id;
 		await this.channelService.addUserToChannel(userEntity.user_id, 1);
@@ -48,7 +63,11 @@ export class UsersController {
 	}
 
 	@Get('add_friend/:id')
-	async addFriend(@Param('id', ParseIntPipe) friend_id: number, @Req() req: Request, @Res() res: Response) {
+	async addFriend(
+		@Param('id', ParseIntPipe) friend_id: number,
+		@Req() req: Request,
+		@Res() res: Response,
+	) {
 		const user_id = this.tokenManager.getIdFromToken(req);
 
 		console.log(friend_id);

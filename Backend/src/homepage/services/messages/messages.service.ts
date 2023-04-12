@@ -17,36 +17,34 @@ export class MessagesService {
 		private itemsService: ItemsService,
 		private channelService: ChannelsService,
 		private tokenManager: TokenManagerService,
-		) {}
+	) {}
 
-	error_tab =	[{ret: false, msg: "User not found"},
-				{ret: false, msg: "Channel doesn't exist"},
-				{ret: false, msg: "User doesn't belong to channel"},
-				{ret: false, msg: "User is muted"},
-				{ret: false, msg: "User is banned"},]
-	
-	async isValidUserChannel(user: User, channel: Channel)
-	{
-		if (!user)
-			return this.error_tab[0];
-		if (!channel)
-			return this.error_tab[1];
+	error_tab = [
+		{ ret: false, msg: 'User not found' },
+		{ ret: false, msg: "Channel doesn't exist" },
+		{ ret: false, msg: "User doesn't belong to channel" },
+		{ ret: false, msg: 'User is muted' },
+		{ ret: false, msg: 'User is banned' },
+	];
+
+	async isValidUserChannel(user: User, channel: Channel) {
+		if (!user) return this.error_tab[0];
+		if (!channel) return this.error_tab[1];
 		if (!(await this.channelService.isUserMember(user.user_id, channel.channel_id)))
 			return this.error_tab[2];
 		if (await this.channelService.isMuted(user.user_id, channel.channel_id))
 			return this.error_tab[3];
-		return ({ret: true, msg: "Valid User"});
+		return { ret: true, msg: 'Valid User' };
 	}
-	
-	async addMessageToChannel(msg: MessageDto[]) {
-		const message = new MessageEntity();
-		message.message_content = msg[0].content;
 
-		const channel = await this.itemsService.getChannel(msg[1].channel_id);
-		const user = await this.itemsService.getUser(this.tokenManager.getToken(msg[1].auth).sub);
+	async addMessageToChannel(msg: MessageDto, token: string, channel_id: number) {
+		const message = new MessageEntity();
+		message.message_content = msg.content;
+
+		const channel = await this.itemsService.getChannel(channel_id);
+		const user = await this.itemsService.getUser(this.tokenManager.getToken(token).sub);
 		const isValid = await this.isValidUserChannel(user, channel);
-		if (!isValid.ret)
-			return (isValid);
+		if (!isValid.ret) return isValid;
 		message.author = user;
 		message.channel = channel;
 		message.createdAt = new Date();

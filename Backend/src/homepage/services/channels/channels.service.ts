@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { NewChanDto } from 'src/homepage/dtos/ChanDto.dto';
@@ -81,7 +82,6 @@ export class ChannelsService {
 		return true;
 	}
 	async kickUser(kicker_id: number, target_id: number, chan_id: number) {
-		console.log(target_id);
 		if (!(await this.isUserAdmin(kicker_id, chan_id)))
 			throw new HttpException('No admin rights', HttpStatus.NOT_FOUND);
 		// eslint-disable-next-line prettier/prettier
@@ -93,7 +93,10 @@ export class ChannelsService {
 	}
 
 	async muteUser(user_id: number, target_id: number, channel_id: number) {
-		if (!(await this.isUserAdmin(user_id, channel_id)) || !(await this.isUserMember(target_id, channel_id)))
+		if (
+			!(await this.isUserAdmin(user_id, channel_id)) ||
+			!(await this.isUserMember(target_id, channel_id))
+		)
 			return false;
 		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
 		target_chan[0].muteUser(1000 * 30); //Multiply 1000 to the number of seconds you want to mute someone todo: to be changed to a parameter given
@@ -101,7 +104,10 @@ export class ChannelsService {
 		return true;
 	}
 	async unMuteUser(user_id: number, target_id: number, channel_id: number) {
-		if (!(await this.isUserAdmin(user_id, channel_id)) || !(await this.isUserMember(target_id, channel_id)))
+		if (
+			!(await this.isUserAdmin(user_id, channel_id)) ||
+			!(await this.isUserMember(target_id, channel_id))
+		)
 			return false;
 		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
 		target_chan[0].unmuteUser();
@@ -110,7 +116,10 @@ export class ChannelsService {
 	}
 
 	async banUser(user_id: number, target_id: number, channel_id: number) {
-		if (!(await this.isUserAdmin(user_id, channel_id)) || !(await this.isUserMember(target_id, channel_id)))
+		if (
+			!(await this.isUserAdmin(user_id, channel_id)) ||
+			!(await this.isUserMember(target_id, channel_id))
+		)
 			return false;
 		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
 		target_chan[0].banUser(1000 * 30); //Multiply 1000 to the number of seconds you want to mute someone todo: to be changed to a parameter given
@@ -118,7 +127,10 @@ export class ChannelsService {
 		return true;
 	}
 	async unBanUser(user_id: number, target_id: number, channel_id: number) {
-		if (!(await this.isUserAdmin(user_id, channel_id)) || !(await this.isUserMember(target_id, channel_id)))
+		if (
+			!(await this.isUserAdmin(user_id, channel_id)) ||
+			!(await this.isUserMember(target_id, channel_id))
+		)
 			return false;
 		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
 		target_chan[0].unBanUser();
@@ -139,9 +151,11 @@ export class ChannelsService {
 		const chan_user = await this.itemsService.getUserChan(user_id, chan_id);
 		const time = new Date();
 
-		if (chan_user.length > 0
-			&& chan_user[0].is_muted
-			&& !(time.getTime() >= chan_user[0].remaining_mute_time.getTime()))
+		if (
+			chan_user.length > 0 &&
+			chan_user[0].is_muted &&
+			!(time.getTime() >= chan_user[0].remaining_mute_time.getTime())
+		)
 			return true;
 
 		chan_user[0].unmuteUser();

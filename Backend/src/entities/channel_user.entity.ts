@@ -38,20 +38,17 @@ export class ChannelUser {
 		this.is_muted = true;
 		if (duration > 0) {
 			const now = new Date();
-			const muteDuration = (this.remaining_ban_time && this.remaining_ban_time.getTime() > 0) ?
-			new Date(now.getTime() + duration + this.remaining_mute_time.getTime()) : new Date(duration + now.getTime());
+			const muteDuration =  new Date(duration + now.getTime());
 			this.remaining_ban_time = muteDuration;
 		}
 		else
 			this.remaining_ban_time = null;
 	}
-
 	muteUser(duration = 0): void {
 		this.is_muted = true;
 		if (duration > 0) {
 			const now = new Date();
-			const muteDuration = (this.remaining_ban_time && this.remaining_ban_time.getTime() > 0) ?
-			new Date(duration + this.remaining_ban_time.getTime()) : new Date(duration + now.getTime());
+			const muteDuration = new Date(duration + now.getTime());
 			this.remaining_mute_time = muteDuration;
 		}
 		else
