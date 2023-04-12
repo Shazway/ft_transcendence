@@ -86,25 +86,6 @@ export class ChannelsController {
 		res.status(HttpStatus.OK).send({ msg: 'User kicked from channel' });
 	}
 
-	@Post('mute')
-	async muteUser(
-		@Req() req: Request,
-		@Res() res: Response,
-		@Body() deleteUserDto: DeleteUserDto,
-	) {
-		const userId = await this.tokenManager.getIdFromToken(req);
-		console.log(deleteUserDto);
-		if (
-			!(await this.channelService.muteUser(
-				userId,
-				deleteUserDto.target_id,
-				deleteUserDto.channel_id,
-			))
-		)
-			res.status(HttpStatus.FORBIDDEN).send({ msg: 'Not an admin' });
-		else res.status(HttpStatus.OK).send({ msg: 'User muted' });
-	}
-
 	@Post('unmute')
 	async unMuteUser(
 		@Req() req: Request,

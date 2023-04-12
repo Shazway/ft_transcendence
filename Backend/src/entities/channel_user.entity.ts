@@ -35,24 +35,24 @@ export class ChannelUser {
 	channel!: Channel;
 
 	banUser(duration = 0): void {
-		this.is_muted = true;
 		if (duration > 0) {
-			const now = new Date();
-			const muteDuration =  new Date(duration + now.getTime());
-			this.remaining_ban_time = muteDuration;
-		}
-		else
-			this.remaining_ban_time = null;
-	}
-	muteUser(duration = 0): void {
-		this.is_muted = true;
-		if (duration > 0) {
+			this.is_banned = true;
 			const now = new Date();
 			const muteDuration = new Date(duration + now.getTime());
-			this.remaining_mute_time = muteDuration;
+			if (!this.remaining_ban_time
+				|| muteDuration.getTime() > this.remaining_ban_time.getTime())
+				this.remaining_ban_time = muteDuration;
 		}
-		else
-			this.remaining_mute_time = null;
+	}
+	muteUser(duration = 0): void {
+		if (duration > 0) {
+			this.is_muted = true;
+			const now = new Date();
+			const muteDuration = new Date(duration + now.getTime());
+			if (!this.remaining_mute_time
+				|| muteDuration.getTime() > this.remaining_mute_time.getTime())
+				this.remaining_mute_time = muteDuration;
+		}
 	}
 	
 	unmuteUser(): void {

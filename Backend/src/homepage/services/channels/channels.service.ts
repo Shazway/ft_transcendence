@@ -14,7 +14,17 @@ export class ChannelsService {
 		@InjectRepository(ChannelUserRelation)
 		private chan_userRepo: Repository<ChannelUserRelation>,
 		private itemsService: ItemsService,
-	) {}
+		) {}
+		
+	error_tab = [
+		{ ret: false, msg: 'User not found' },
+		{ ret: false, msg: "Channel doesn't exist" },
+		{ ret: false, msg: "User doesn't belong to channel" },
+		{ ret: false, msg: 'User is muted' },
+		{ ret: false, msg: 'User is banned' },
+		{ ret: false, msg: 'User is not an admin' },
+		{ ret: false, msg: 'Target is an admin' },
+	];
 
 	async getChannelById(channel_id: number) {
 		return this.itemsService.getChannel(channel_id);
@@ -81,33 +91,36 @@ export class ChannelsService {
 		await this.chan_userRepo.save(setter[0]);
 		return true;
 	}
-	async kickUser(kicker_id: number, target_id: number, chan_id: number) {
-		if (!(await this.isUserAdmin(kicker_id, chan_id)))
-			throw new HttpException('No admin rights', HttpStatus.NOT_FOUND);
-		// eslint-disable-next-line prettier/prettier
-		if (!(await this.isUserMember(target_id, chan_id)) || ((await this.isUserAdmin(target_id, chan_id)) && !(await this.isUserOwner(kicker_id, chan_id))))
-			throw new HttpException('cannot kick', HttpStatus.NOT_FOUND);
+
+	async checkPrivileges(source_id: number, target_id: number, chan_id: number) {
+		if (!(await this.isUserAdmin(source_id, chan_id)))
+			return this.error_tab[5];
+		if (!(await this.isUserMember(target_id, chan_id)))
+			return this.error_tab[2];
+		if (((await this.isUserAdmin(target_id, chan_id))
+			&& !(await this.isUserOwner(source_id, chan_id))))
+			return this.error_tab[6];
+		return {ret: true, msg: 'OK'};
+	}
+
+	async kickUser(user_id: number, target_id: number, chan_id: number) {
+		if (!(await (this.checkPrivileges(user_id, target_id, chan_id))).ret)
+			return false;
 		const target = await this.itemsService.getUserChan(target_id, chan_id);
 		await this.chan_userRepo.delete(target[0].channel_user_id);
 		return true;
 	}
 
-	async muteUser(user_id: number, target_id: number, channel_id: number) {
-		if (
-			!(await this.isUserAdmin(user_id, channel_id)) ||
-			!(await this.isUserMember(target_id, channel_id))
-		)
+	async muteUser(user_id: number, target_id: number, channel_id: number, timer: number) {
+		if (!(await (this.checkPrivileges(user_id, target_id, channel_id))).ret)
 			return false;
 		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
-		target_chan[0].muteUser(1000 * 30); //Multiply 1000 to the number of seconds you want to mute someone todo: to be changed to a parameter given
+		target_chan[0].muteUser(1000 * timer); //Multiply 1000 to the number of seconds you want to mute someone todo: to be changed to a parameter given
 		await this.chan_userRepo.save(target_chan[0]);
 		return true;
 	}
 	async unMuteUser(user_id: number, target_id: number, channel_id: number) {
-		if (
-			!(await this.isUserAdmin(user_id, channel_id)) ||
-			!(await this.isUserMember(target_id, channel_id))
-		)
+		if (!(await (this.checkPrivileges(user_id, target_id, channel_id))).ret)
 			return false;
 		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
 		target_chan[0].unmuteUser();
@@ -115,22 +128,16 @@ export class ChannelsService {
 		return true;
 	}
 
-	async banUser(user_id: number, target_id: number, channel_id: number) {
-		if (
-			!(await this.isUserAdmin(user_id, channel_id)) ||
-			!(await this.isUserMember(target_id, channel_id))
-		)
+	async banUser(user_id: number, target_id: number, channel_id: number, timer: number) {
+		if (!(await (this.checkPrivileges(user_id, target_id, channel_id))).ret)
 			return false;
 		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
-		target_chan[0].banUser(1000 * 30); //Multiply 1000 to the number of seconds you want to mute someone todo: to be changed to a parameter given
+		target_chan[0].banUser(1000 * timer); //Multiply 1000 to the number of seconds you want to mute someone todo: to be changed to a parameter given
 		await this.chan_userRepo.save(target_chan[0]);
 		return true;
 	}
 	async unBanUser(user_id: number, target_id: number, channel_id: number) {
-		if (
-			!(await this.isUserAdmin(user_id, channel_id)) ||
-			!(await this.isUserMember(target_id, channel_id))
-		)
+		if (!(await (this.checkPrivileges(user_id, target_id, channel_id))).ret)
 			return false;
 		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
 		target_chan[0].unBanUser();
@@ -154,6 +161,7 @@ export class ChannelsService {
 		if (
 			chan_user.length > 0 &&
 			chan_user[0].is_muted &&
+			chan_user[0].remaining_mute_time &&
 			!(time.getTime() >= chan_user[0].remaining_mute_time.getTime())
 		)
 			return true;
@@ -165,10 +173,14 @@ export class ChannelsService {
 	async isBanned(user_id: number, chan_id: number) {
 		const chan_user = await this.itemsService.getUserChan(user_id, chan_id);
 		const time = new Date();
-
-		if (chan_user.length > 0
-			&& chan_user[0].is_banned
-			&& !(time.getTime() >= chan_user[0].remaining_ban_time.getTime()))
+		if (!chan_user)
+			return false;
+		if (
+			chan_user.length > 0 &&
+			chan_user[0].is_banned &&
+			chan_user[0].remaining_ban_time &&
+			!(time.getTime() >= chan_user[0].remaining_ban_time.getTime())
+		)
 			return true;
 		chan_user[0].unBanUser();
 		this.chan_userRepo.save(chan_user[0]);

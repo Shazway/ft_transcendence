@@ -1,4 +1,4 @@
-import { OnModuleInit, ParseIntPipe } from '@nestjs/common';
+import { OnModuleInit } from '@nestjs/common';
 import {
 	ConnectedSocket,
 	MessageBody,
@@ -10,12 +10,13 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { MessageDto } from 'src/homepage/dtos/MessageDto.dto';
+import { PunishmentDto } from 'src/homepage/dtos/PunishmentDto.dto';
 import { ChannelsService } from 'src/homepage/services/channels/channels.service';
 import { MessagesService } from 'src/homepage/services/messages/messages.service';
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
 
 @WebSocketGateway(3002)
-export class ChannelGateway implements OnModuleInit, OnGatewayConnection, OnGatewayDisconnect {
+export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	private channelList: Map<number, Map<number, Socket>>;
 	constructor(
 		private messageService: MessagesService,
@@ -27,10 +28,6 @@ export class ChannelGateway implements OnModuleInit, OnGatewayConnection, OnGate
 
 	@WebSocketServer()
 	server: Server;
-
-	onModuleInit() {
-		console.log('someone connected');
-	}
 
 	addUserToList(client: Socket, user: any) {
 		const query = client.handshake.query;
@@ -57,24 +54,27 @@ export class ChannelGateway implements OnModuleInit, OnGatewayConnection, OnGate
 
 	sendMessageToChannel(channel_id: number, message: MessageDto) {
 		const channel = this.channelList.get(channel_id);
-		console.log('message sent');
 		if (!channel) return false;
 		channel.forEach((user) => user.emit('onMessage', message));
 		return true;
 	}
 
-	handleConnection(client: Socket) {
+	async handleConnection(client: Socket) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
-		console.log(user.name + ' joined the channel');
 		const channel_id = Number(client.handshake.query.channel_id);
 
-		this.channelService.isMuted(user.sub, channel_id);
+		if (!(await this.channelService.getChannelById(channel_id))) {
+			client.emit('onError', 'Channel does not exist');
+			client.disconnect();
+			return;
+		}
+		await this.channelService.isMuted(user.sub, channel_id);
 		if (
-			this.channelService.isBanned(user.sub, channel_id) ||
+			(await this.channelService.isBanned(user.sub, channel_id)) ||
 			!this.addUserToList(client, user)
 		) {
-			client.emit('onMessage', 'User is banned');
-			this.deleteUserFromList(client, user);
+			client.emit('onError', 'User is banned');
+			return client.disconnect();
 		}
 		this.sendMessageToChannel(channel_id, {
 			content: user.name + ' joined the channel',
@@ -83,22 +83,46 @@ export class ChannelGateway implements OnModuleInit, OnGatewayConnection, OnGate
 	}
 	handleDisconnect(client: Socket) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
-		console.log(user.name + ' disconnected the channel');
 		const channel_id = Number(client.handshake.query.channel_id);
-		this.sendMessageToChannel(channel_id, {
-			content: user.name + ' left the channel',
-			author: 'System',
-		});
-		if (!this.deleteUserFromList(client, user))
-			return client.emit('onMessage', 'Channel does not exist');
+		if (this.channelList.get(channel_id).get(user.sub)) {
+			this.sendMessageToChannel(channel_id, {
+				content: user.name + ' left the channel',
+				author: 'System',
+			});
+			if (!this.deleteUserFromList(client, user))
+				return client.emit('onError', 'Channel does not exist');
+		}
+	}
+	@SubscribeMessage('mute')
+	async handleMute(@ConnectedSocket() client: Socket, @MessageBody() body: PunishmentDto) {
+		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		const channel_id = Number(client.handshake.query.channel_id);
+		if (!this.channelService.muteUser(user.sub, body.target_id, channel_id, body.time))
+			return client.emit('onError', 'Error while muting some dude');
+		// eslint-disable-next-line prettier/prettier
+		this.channelList.get(channel_id).get(body.target_id).emit(
+			'onMessage',
+			'You have been muted by ' + user.name + ' for reason: ' + body.message,
+		);
+		client.emit('onMessage', 'Successful mute');
+	}
+	@SubscribeMessage('ban')
+	async handleBan(@ConnectedSocket() client: Socket, @MessageBody() body: PunishmentDto) {
+		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		const channel_id = Number(client.handshake.query.channel_id);
+		this.channelService.banUser(user.sub, body.target_id, channel_id, body.time);
+		// eslint-disable-next-line prettier/prettier
+		const target = this.channelList.get(channel_id).get(body.target_id);
+		target.emit(
+			'onMessage',
+			'You have been banned by ' + user.name + ' for reason: ' + body.message,
+		);
+		target.disconnect();
+		client.emit('onMessage', 'Successful ban');
 	}
 
 	@SubscribeMessage('message')
-	async handleMessage(
-		@ConnectedSocket() client: Socket,
-		payload: any,
-		@MessageBody() body: MessageDto,
-	) {
+	async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() body: MessageDto) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
 		const channel_id = Number(client.handshake.query.channel_id);
 		const Validity = await this.messageService.addMessageToChannel(
