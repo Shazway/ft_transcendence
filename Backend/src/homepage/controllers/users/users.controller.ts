@@ -78,9 +78,15 @@ export class UsersController {
 	}
 
 	@Get(':username')
-	async getUser(@Req() req: Request, @Res() res: Response) {
-		const user = await this.itemsService.getUser(this.tokenManager.getIdFromToken(req));
-		if (user) res.send(user);
+	async getUser(@Param('username') us: string, @Req() req: Request, @Res() res: Response) {
+		const user = await this.itemsService.getUserByUsername(us);
+		if (user) 
+			res.status(HttpStatus.OK).send({
+				msg: 'User connected',
+				token: await this.authService.login(plainToClass(NewUserDto, user), user.user_id),
+				user_id: user.user_id,
+				username: user.username,
+			});
 		else res.status(HttpStatus.NOT_FOUND).send({ msg: 'User not found' });
 	}
 }

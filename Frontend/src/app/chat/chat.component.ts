@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Message } from '../../dtos/message'
 import { FetchService } from '../fetch.service';
+import { webSocket } from 'rxjs/webSocket';
 
 @Component({
 	selector: 'app-chat',
@@ -9,7 +10,7 @@ import { FetchService } from '../fetch.service';
 })
 export class ChatComponent {
 	msgs$: Promise<any> | undefined;
-	constructor(private fetchService: FetchService) {
+	constructor(private fetchService: FetchService,) {
 		this.msgs$ = this.fetchService.getMessages(1, 0);
 	}
 

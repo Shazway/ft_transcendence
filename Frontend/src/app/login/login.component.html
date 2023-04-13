@@ -7,3 +7,9 @@
 	<br/>
 	<input type = "submit" value = "submit">
  </form>
+ <h2>OR LOGIN</h2>
+ <form #userlogin2="ngForm" (ngSubmit)="onClickSubmitLogin(userlogin2.value)" >
+	<input type = "text" name = "username" placeholder = "Username" ngModel>
+	<br/>
+	<input type = "submit" value = "submit">
+ </form>

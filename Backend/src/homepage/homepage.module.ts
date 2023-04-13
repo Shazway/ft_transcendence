@@ -76,6 +76,10 @@ export class HomepageModule {
 				path: 'users/create',
 				method: RequestMethod.ALL,
 			})
+			.exclude({
+				path: 'users/:username',
+				method: RequestMethod.ALL,
+			})
 			.forRoutes({
 				path: '*',
 				method: RequestMethod.ALL,

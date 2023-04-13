@@ -53,6 +53,19 @@ export class ItemsService {
 			.getOne();
 		return user;
 	}
+
+	public async getUserByUsername(username: string) {
+		const user = await this.userRepo
+			.createQueryBuilder('user')
+			.leftJoinAndSelect('user.achievement', 'achievement')
+			.leftJoinAndSelect('user.friend', 'friend')
+			.leftJoinAndSelect('user.blacklistEntry', 'blacklistEntry')
+			.leftJoinAndSelect('user.channel', 'channel')
+			.leftJoinAndSelect('user.match_history', 'match_history')
+			.where('user.username = :username', { username })
+			.getOne();
+		return user;
+	}
 	
 	public async getChannel(id: number) {
 		const channel = await this.chanRepo

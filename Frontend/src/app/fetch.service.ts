@@ -10,16 +10,17 @@ import { Message } from 'src/dtos/message';
   providedIn: 'root'
 })
 export class FetchService {
-
-	token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiY291Y291Iiwic3ViIjoxLCJpYXQiOjE2ODEzOTc5ODIsImV4cCI6MTY4MTQ4NDM4Mn0.cHaDKWlZVt2-74wd6ICutNTuCgfTWdf8Y9KucvISAYE';
-
-	constructor (private httpClient: HttpClient){}
+	chanList: Map<number, WebSocket>;
+	constructor (private httpClient: HttpClient){
+		this.chanList = new Map<number, WebSocket>;
+	}
 	httpOptions = {
 		headers: new HttpHeaders({
 			'Content-Type': 'application/json; charset=utf-8',
 			'Authorization': this.getToken(),
 		})
 	};
+
 
 	getToken() {
 		const token = localStorage.getItem('token');
@@ -33,7 +34,7 @@ export class FetchService {
 		await axios.get('http://localhost:3001/leaderboard', {
 			headers: {
 				'Content-Type': 'application/json; charset=utf-8',
-			  	'Authorization': 'Bearer ' + this.token,
+			  	'Authorization': 'Bearer ' + this.getToken(),
 			}
 		  })
 		.then(function (response) {
@@ -43,6 +44,40 @@ export class FetchService {
 		.catch(function (error) { console.log(error); })
 		.finally(function () {});
 		return res;
+	}
+
+	async sendMessage(content: string)
+	{}
+	async delchatSocket(channel_id: number)
+	{
+		const client = this.chanList.get(channel_id);
+		if (!client)
+			return false;
+		client.close();
+		this.chanList.delete(channel_id);
+		return true;
+
+	}
+	async addchatSocket(channel_id: number)
+	{
+		if (!this.chanList.get(channel_id))
+			return (false);
+		const client = new WebSocket('ws://localhost:3002?channel_id=' + channel_id);
+		if (!client)
+			return false;
+		client.addEventListener('onMessage', (event) => {console.log('Messaged recieved')});
+		client.addEventListener('onError', (event) => {
+		console.error('WebSocket error:', event)});
+
+		client.onopen('open', () => {
+			console.log('Connected to WebSocket server');
+		});
+		
+		client.on('close', () => {
+			console.log('Disconnected from WebSocket server');
+		});
+		this.chanList.set(channel_id, client);
+		return (true);
 	}
 
 	async createUser(param: UserDto) {
@@ -64,12 +99,31 @@ export class FetchService {
 		return res;
 	}
 
+	async getUser(param: UserDto) {
+		let res;
+		await axios.get<ResponseDto>('http://localhost:3001/users/' + param.username, {
+			headers: {
+				'Content-Type': 'application/json; charset=utf-8',
+			}
+		  })
+		.then(function (response) {
+			res = response.data;
+			console.log(res);
+			localStorage.setItem('token', res.token);
+			localStorage.setItem('id', res.user_id);
+			localStorage.setItem('username', res.username);
+		})
+		.catch(function (error) { console.log(error); })
+		.finally(function () {});
+		return res;
+	}
+
 	async getMessages(channel_id: number, page: number) {
 		let res;
 		await axios.get('http://localhost:3001/channels/' + channel_id + '/messages/' + page, {
 			headers: {
 				'Content-Type': 'application/json; charset=utf-8',
-			  	'Authorization': 'Bearer ' + this.token,
+			  	'Authorization': 'Bearer ' + this.getToken(),
 			}
 		  })
 		.then(function (response) {

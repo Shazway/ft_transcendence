@@ -12,8 +12,14 @@ export class LoginComponent {
 
 	constructor(private loginService: FetchService) {}
 
-	onClickSubmit(data: UserDto) {
+	async onClickSubmit(data: UserDto) {
 		console.log(data);
-		console.log(this.loginService.createUser(data));
+		if (!data.rank_score)
+			data.rank_score = 0;
+		console.log(await this.loginService.createUser(data));
+	}
+
+	async onClickSubmitLogin(data: UserDto) {
+		console.log(await this.loginService.getUser(data));
 	}
 }
