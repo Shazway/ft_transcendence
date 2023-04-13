@@ -144,20 +144,32 @@ export class ItemsService {
 	
 	public async getMatchSetting(id: number) {
 		const match_setting = await this.match_settingRepo
-		.createQueryBuilder('match_setting')
-		.leftJoinAndSelect('match_setting.match', 'match')
-		.where('match_setting.match_setting_id = :id', { id })
-		.getOne();
+			.createQueryBuilder('match_setting')
+			.leftJoinAndSelect('match_setting.match', 'match')
+			.where('match_setting.match_setting_id = :id', { id })
+			.getOne();
 		return match_setting;
 	}
 	
 	public async getMessage(id: number) {
 		const message = await this.messageRepo
-		.createQueryBuilder('message')
-		.leftJoinAndSelect('message.author', 'author')
-		.leftJoinAndSelect('message.channel', 'channel')
-		.where('message.message_id = :id', { id })
-		.getOne();
+			.createQueryBuilder('message')
+			.leftJoinAndSelect('message.author', 'author')
+			.leftJoinAndSelect('message.channel', 'channel')
+			.where('message.message_id = :id', { id })
+			.getOne();
+		return message;
+	}
+	
+	public async getPage(chan_id: number, page_num: number) {
+		const maxResult = 25;
+		const message = await this.messageRepo
+			.createQueryBuilder('message')
+			.leftJoinAndSelect('message.author', 'author')
+			.where('message.channel = :chan_id', { chan_id })
+			.take(maxResult)
+			.skip(page_num * maxResult)
+			.getMany();
 		return message;
 	}
 	

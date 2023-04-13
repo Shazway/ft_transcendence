@@ -1,0 +1,8 @@
+<div *ngFor="let msg of msgs$ | async">
+	<div class="sent_msg" *ngIf="isMe(msg)">
+		<p>{{msg.message_content}}</p>
+	</div>
+	<div class="received_msg" *ngIf="!isMe(msg)">
+		<p>{{msg.message_content}}</p>
+	</div>
+</div>

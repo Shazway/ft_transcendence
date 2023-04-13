@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import { LoginModule } from './login/login.module';
 import { FormsModule } from '@angular/forms';
 import { FetchService } from './fetch.service';
+import { ChatModule } from './chat/chat.module';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import { FetchService } from './fetch.service';
     AppRoutingModule,
     UsersModule,
     LoginModule,
+    ChatModule,
 	FormsModule,
   ],
   providers: [

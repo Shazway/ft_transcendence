@@ -15,14 +15,14 @@ import { ChannelsService } from 'src/homepage/services/channels/channels.service
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
 import { DeleteUserDto, NewChanDto, SerializedChanDto } from '../../dtos/ChanDto.dto';
 import { plainToClass } from 'class-transformer';
-import { ItemsService } from 'src/homepage/services/items/items.service';
+import { MessagesService } from 'src/homepage/services/messages/messages.service';
 
 @Controller('channels')
 export class ChannelsController {
 	constructor(
 		private channelService: ChannelsService,
 		private tokenManager: TokenManagerService,
-		private itemsService: ItemsService,
+		private messageService: MessagesService,
 	) {}
 	@Get('')
 	async getUsersChannel(@Req() req: Request, @Res() res: Response) {
@@ -114,6 +114,20 @@ export class ChannelsController {
 		const userId = this.tokenManager.getIdFromToken(req);
 		await this.channelService.deleteChannel(chan_id, userId);
 		res.status(HttpStatus.OK).send({ msg: 'Channel deleted' });
+	}
+
+	@Get(':id/messages/:page')
+	async getChannelMessages(
+		@Param('id', ParseIntPipe) chan_id: number,
+		@Param('page', ParseIntPipe) page_num: number,
+		@Req() req: Request,
+		@Res() res: Response,
+	) {
+		const messages = await this.messageService.getPage(chan_id, page_num);
+		console.log(messages);
+		if (!messages)
+			res.status(HttpStatus.NOT_FOUND).send({ msg: 'No message in the channel: ' + chan_id });
+		else res.status(HttpStatus.OK).send(messages);
 	}
 
 	@Get(':id')

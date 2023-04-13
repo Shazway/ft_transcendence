@@ -17,8 +17,6 @@ export class AuthService {
 			token_google: user.token_google,
 		};
 
-		return {
-			access_token: this.jwtService.sign(payload),
-		};
+		return this.jwtService.sign(payload);
 	}
 }

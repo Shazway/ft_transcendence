@@ -4,11 +4,14 @@ import axios from 'axios';
 import { Observable } from 'rxjs';
 import { ResponseDto } from 'src/dtos/Response.dto';
 import { UserDto } from 'src/dtos/UserDto.dto';
+import { Message } from 'src/dtos/message';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FetchService {
+
+	token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiY291Y291Iiwic3ViIjoxLCJpYXQiOjE2ODEzOTc5ODIsImV4cCI6MTY4MTQ4NDM4Mn0.cHaDKWlZVt2-74wd6ICutNTuCgfTWdf8Y9KucvISAYE';
 
 	constructor (private httpClient: HttpClient){}
 	httpOptions = {
@@ -30,7 +33,7 @@ export class FetchService {
 		await axios.get('http://localhost:3001/leaderboard', {
 			headers: {
 				'Content-Type': 'application/json; charset=utf-8',
-			  	'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiY291Y291Iiwic3ViIjoxLCJpYXQiOjE2ODExNzk2NDAsImV4cCI6MTY4MTI2NjA0MH0.PT85fSZF_6dxQ3YxhHhvEkdOwTgELe2t4kd32HLH5Rg',
+			  	'Authorization': 'Bearer ' + this.token,
 			}
 		  })
 		.then(function (response) {
@@ -42,7 +45,7 @@ export class FetchService {
 		return res;
 	}
 
-	async createUser(param: JSON) {
+	async createUser(param: UserDto) {
 		let res;
 		await axios.post<ResponseDto>('http://localhost:3001/users/create', param, {
 			headers: {
@@ -53,6 +56,25 @@ export class FetchService {
 			res = response.data;
 			console.log(res);
 			localStorage.setItem('token', res.token);
+			localStorage.setItem('id', res.user_id);
+			localStorage.setItem('username', res.username);
+		})
+		.catch(function (error) { console.log(error); })
+		.finally(function () {});
+		return res;
+	}
+
+	async getMessages(channel_id: number, page: number) {
+		let res;
+		await axios.get('http://localhost:3001/channels/' + channel_id + '/messages/' + page, {
+			headers: {
+				'Content-Type': 'application/json; charset=utf-8',
+			  	'Authorization': 'Bearer ' + this.token,
+			}
+		  })
+		.then(function (response) {
+		  res = response.data;
+		  console.log(res);
 		})
 		.catch(function (error) { console.log(error); })
 		.finally(function () {});

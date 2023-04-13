@@ -51,6 +51,8 @@ export class UsersController {
 		res.status(HttpStatus.OK).send({
 			msg: 'User created',
 			token: await this.authService.login(newUserDto, user_id),
+			user_id: user_id,
+			username: userEntity.username,
 		});
 	}
 

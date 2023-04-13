@@ -51,4 +51,12 @@ export class MessagesService {
 		this.messageRepo.save(message);
 		return isValid;
 	}
+
+	async getMessage(msg_id: number) {
+		return await this.itemsService.getMessage(msg_id);
+	}
+
+	async getPage(chan_id: number, page_num: number) {
+		return await this.itemsService.getPage(chan_id, page_num)
+	}
 }
