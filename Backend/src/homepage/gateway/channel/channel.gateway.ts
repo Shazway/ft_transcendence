@@ -15,7 +15,11 @@ import { MessagesService } from 'src/homepage/services/messages/messages.service
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
 import { NotificationsGateway } from '../notifications/notifications.gateway';
 
-@WebSocketGateway(3002)
+@WebSocketGateway(3002, {
+	cors: {
+		origin: '*',
+	},
+})
 export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	private channelList: Map<number, Map<number, Socket>>;
 	constructor(
@@ -78,7 +82,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			return client.disconnect();
 		}
 		this.sendMessageToChannel(channel_id, {
-			content: user.name + ' joined the channel',
+			message_content: user.name + ' joined the channel',
 			author: 'System',
 		});
 	}
@@ -88,7 +92,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const channel_id = Number(client.handshake.query.channel_id);
 		if (this.channelList.get(channel_id).get(user.sub)) {
 			this.sendMessageToChannel(channel_id, {
-				content: user.name + ' left the channel',
+				message_content: user.name + ' left the channel',
 				author: 'System',
 			});
 			if (!this.deleteUserFromList(client, user))
@@ -143,6 +147,8 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('message')
 	async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() body: MessageDto) {
+		console.log('log 1');
+		console.log(body);
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
 		const channel_id = Number(client.handshake.query.channel_id);
 		const Validity = await this.messageService.addMessageToChannel(

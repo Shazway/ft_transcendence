@@ -9,6 +9,7 @@ import { LoginModule } from './login/login.module';
 import { FormsModule } from '@angular/forms';
 import { FetchService } from './fetch.service';
 import { ChatModule } from './chat/chat.module';
+import { WebsocketService } from './websocket.service';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { ChatModule } from './chat/chat.module';
   ],
   providers: [
 	FetchService,
+	WebsocketService,
   ],
   bootstrap: [
 	AppComponent,

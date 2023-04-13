@@ -1,4 +1,4 @@
 export class MessageDto {
-	content: string;
+	message_content: string;
 	author: string;
 }

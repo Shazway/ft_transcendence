@@ -10,6 +10,7 @@ npm install --save @nestjs/websockets @nestjs/platform-socket.io
 
 Frontend dependencies: (you have to be in the Frontend folder):
 npm install @angular/cli
+npm install axios
 
 BDD links:
 https://hub.docker.com/_/postgres

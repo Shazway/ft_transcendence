@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
-import { Message } from '../../dtos/message'
+import { LessMessageDto, MessageDto } from '../../dtos/message'
 import { FetchService } from '../fetch.service';
-import { webSocket } from 'rxjs/webSocket';
+import { WebsocketService } from '../websocket.service';
+import { Socket, io } from 'socket.io-client';
 
 @Component({
 	selector: 'app-chat',
@@ -9,12 +10,36 @@ import { webSocket } from 'rxjs/webSocket';
 	styleUrls: ['./chat.component.css']
 })
 export class ChatComponent {
+	client: Socket;
 	msgs$: Promise<any> | undefined;
-	constructor(private fetchService: FetchService,) {
+	futur_msgs$ = new Array<MessageDto>;
+
+	constructor(
+		private fetchService: FetchService,
+		private websocketService: WebsocketService
+	) {
 		this.msgs$ = this.fetchService.getMessages(1, 0);
+		this.client = io('ws://localhost:3002?channel_id=' + 1, websocketService.getHeader());
+		if (!localStorage.getItem('token'))
+			return;
+		if (!this.client)
+			return;
+		this.client.on('onMessage', (event) => { console.log('Message recieved' + event); this.futur_msgs$.push(event) });
+		this.client.on('onError', (event) => { console.log('WebSocket error:', event); });
+		this.client.on('connection', () => { console.log('Connected to WebSocket server'); });
+		this.client.on('disconnect', () => { console.log('Disconnected from WebSocket server'); });
+		return;
 	}
 
-	isMe(msg : Message) : boolean {
+	isMe(msg : MessageDto) : boolean {
 		return (msg.author.user_id === Number(localStorage.getItem('id')));
 	};
+
+	async onClickChat(data: LessMessageDto) {
+		console.log(data.message_content);
+		if (!this.client)
+			return false;
+		this.client.emit('message', data);
+		return true;
+	}
 }

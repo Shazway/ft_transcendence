@@ -39,7 +39,7 @@ export class MessagesService {
 
 	async addMessageToChannel(msg: MessageDto, token: string, channel_id: number) {
 		const message = new MessageEntity();
-		message.message_content = msg.content;
+		message.message_content = msg.message_content;
 
 		const channel = await this.itemsService.getChannel(channel_id);
 		const user = await this.itemsService.getUser(this.tokenManager.getToken(token).sub);
@@ -57,6 +57,6 @@ export class MessagesService {
 	}
 
 	async getPage(chan_id: number, page_num: number) {
-		return await this.itemsService.getPage(chan_id, page_num)
+		return await this.itemsService.getPage(chan_id, page_num);
 	}
 }
