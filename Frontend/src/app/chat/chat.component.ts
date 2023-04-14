@@ -36,10 +36,13 @@ export class ChatComponent {
 	};
 
 	async onClickChat(data: LessMessageDto) {
-		console.log(data.message_content);
 		if (!this.client)
 			return false;
-		this.client.emit('message', data);
+		const author = localStorage.getItem('username');
+		const id = localStorage.getItem('id');
+		if (id && author)
+			this.client.emit('message', {message_content: data.message_content,
+			author: {username: author, user_id: id}});
 		return true;
 	}
 }

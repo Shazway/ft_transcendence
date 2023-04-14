@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Socket, io } from 'socket.io-client'
-import { MessageDto } from 'src/dtos/message';
+import { LessMessageDto } from 'src/dtos/message';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +27,7 @@ export class WebsocketService {
 		return token;	
 	}
 
-	async sendMessage(msg: MessageDto, channel_id: number) {
+	async sendMessage(msg: LessMessageDto, channel_id: number) {
 		const client = this.chanList.get(channel_id);
 		if (!client)
 			return false;

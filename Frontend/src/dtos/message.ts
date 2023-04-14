@@ -9,8 +9,10 @@ export interface MessageDto {
 
 export interface LessMessageDto {
 	message_id : number;
-	author : string;
+	author : {
+		username: string,
+		user_id: number,
+	};
 	createdAt : Date;
 	message_content : string;
 }
-

@@ -52,7 +52,6 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const channel = this.channelList.get(channel_id);
 		if (!channel) return false;
 		channel.delete(user.sub);
-		if (!channel.size) this.channelList.delete(channel_id);
 		client.disconnect();
 		return true;
 	}
@@ -83,7 +82,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		}
 		this.sendMessageToChannel(channel_id, {
 			message_content: user.name + ' joined the channel',
-			author: 'System',
+			author: { username: 'System', user_id: 0 },
 		});
 	}
 
@@ -93,7 +92,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		if (this.channelList.get(channel_id).get(user.sub)) {
 			this.sendMessageToChannel(channel_id, {
 				message_content: user.name + ' left the channel',
-				author: 'System',
+				author: { username: 'System', user_id: 0 },
 			});
 			if (!this.deleteUserFromList(client, user))
 				return client.emit('onError', 'Channel does not exist');
@@ -156,7 +155,8 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			client.request.headers.authorization,
 			Number(client.handshake.query.channel_id),
 		);
-		body.author = user.name;
+		body.author.username = user.name;
+		body.author.user_id = user.sub;
 		if (Validity.ret) this.sendMessageToChannel(channel_id, body);
 		else {
 			client.emit('onMessage', Validity.msg);

@@ -34,6 +34,8 @@ export class MessagesService {
 			return this.error_tab[2];
 		if (await this.channelService.isMuted(user.user_id, channel.channel_id))
 			return this.error_tab[3];
+		if (await this.channelService.isBanned(user.user_id, channel.channel_id))
+			return this.error_tab[4];
 		return { ret: true, msg: 'Valid User' };
 	}
 
