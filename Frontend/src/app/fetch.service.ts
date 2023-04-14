@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import axios from 'axios';
 import { ResponseDto } from 'src/dtos/Response.dto';
 import { UserDto } from 'src/dtos/UserDto.dto';
+import { MessageDto } from 'src/dtos/message';
 
 @Injectable({
   providedIn: 'root'
@@ -74,8 +75,8 @@ export class FetchService {
 		return res;
 	}
 
-	async getMessages(channel_id: number, page: number) {
-		let res;
+	async getMessages(channel_id: number, page: number): Promise<MessageDto[]> {
+		let res: MessageDto[] = [];
 		await axios.get('http://localhost:3001/channels/' + channel_id + '/messages/' + page, this.getHeader())
 		.then(function (response) {
 		  res = response.data;
