@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
-import { HttpClientModule} from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { UsersModule } from './users/users.module';
 import { LoginModule } from './login/login.module';
@@ -10,10 +10,12 @@ import { FormsModule } from '@angular/forms';
 import { FetchService } from './fetch.service';
 import { ChatModule } from './chat/chat.module';
 import { WebsocketService } from './websocket.service';
+import { AuthComponent } from './auth/auth.component';
 
 @NgModule({
   declarations: [
     AppComponent,
+    AuthComponent,
   ],
   imports: [
     BrowserModule,
@@ -22,14 +24,14 @@ import { WebsocketService } from './websocket.service';
     UsersModule,
     LoginModule,
     ChatModule,
-	FormsModule,
+	  FormsModule,
   ],
   providers: [
-	FetchService,
-	WebsocketService,
+    FetchService,
+    WebsocketService,
   ],
   bootstrap: [
-	AppComponent,
+	  AppComponent,
 ]
 })
 export class AppModule { }

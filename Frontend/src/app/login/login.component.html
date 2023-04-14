@@ -9,7 +9,11 @@
  </form>
  <h2>OR LOGIN</h2>
  <form #userlogin2="ngForm" (ngSubmit)="onClickSubmitLogin(userlogin2.value)" >
-	<input type = "text" name = "username" placeholder = "Username" ngModel>
-	<br/>
+	 <input type = "text" name = "username" placeholder = "Username" ngModel>
+	 <br/>
+	 <input type = "submit" value = "submit">
+</form>
+<h2>OR 42</h2>
+ <form #user42="ngForm" (ngSubmit)="onClickAuth()" >
 	<input type = "submit" value = "submit">
  </form>
