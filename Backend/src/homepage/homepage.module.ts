@@ -26,12 +26,14 @@ import { ChannelGateway } from './gateway/channel/channel.gateway';
 import { OptionInterceptor } from './middleware/option-interceptor/option-interceptor.interceptor';
 import { NotificationsGateway } from './gateway/notifications/notifications.gateway';
 import { NotificationsService } from './services/notifications/notifications.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
 	imports: [
 		JwtModule.register(varFetchService.getJwt()),
 		TypeOrmModule.forRootAsync(varFetchService.typeOrmAsyncConfig),
 		TypeOrmModule.forFeature(entities),
+		HttpModule,
 	],
 	controllers: [
 		ChannelsController,
@@ -72,14 +74,20 @@ export class HomepageModule {
 			method: RequestMethod.OPTIONS,
 		});
 		auth.apply(AuthVerifMiddleware)
-			.exclude({
-				path: 'users/create',
-				method: RequestMethod.ALL,
-			})
-			.exclude({
-				path: 'users/:username',
-				method: RequestMethod.ALL,
-			})
+			.exclude(
+				{
+					path: 'users/create',
+					method: RequestMethod.ALL,
+				},
+				{
+					path: 'users/:username',
+					method: RequestMethod.ALL,
+				},
+				{
+					path: 'login',
+					method: RequestMethod.ALL,
+				},
+			)
 			.forRoutes({
 				path: '*',
 				method: RequestMethod.ALL,
