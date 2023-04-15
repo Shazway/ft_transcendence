@@ -35,10 +35,10 @@ export class ChatComponent implements OnInit {
 		if (!this.msgs$)
 			return;
 		this.msgs$.forEach(async (element: MessageDto) => this.sortMessage(element));
-	  }
+	}
 
 	sortMessage(new_msg: MessageDto) {
-		if (this.test_msgs$.length && this.test_msgs$[this.test_msgs$.length - 1][0].author.user_id == new_msg.author.user_id) {
+		if (this.test_msgs$.length && this.test_msgs$[this.test_msgs$.length - 1][0].author.id == new_msg.author.id) {
 			this.test_msgs$[this.test_msgs$.length - 1].push(new_msg);
 			return;
 		}
@@ -48,7 +48,7 @@ export class ChatComponent implements OnInit {
 	}
 
 	isMe(msg : MessageDto) : boolean {
-		return (msg.author.user_id === Number(localStorage.getItem('id')));
+		return (msg.author.id === Number(localStorage.getItem('id')));
 	};
 
 	async onClickChat(data: LessMessageDto) {

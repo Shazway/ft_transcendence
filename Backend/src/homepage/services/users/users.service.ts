@@ -13,9 +13,21 @@ export class UsersService {
 		private itemsService: ItemsService,
 	) {}
 
+	async checkUserById(intra_id: number) {
+		return this.itemsService.getUserByIntraId(intra_id);
+	}
+
+	async checkUserByName(username: string) {
+		return this.itemsService.getUserByUsername(username);
+	}
+
 	async createUser(userDto: NewUserDto) {
-		console.log(userDto);
-		const newUser = this.userRepository.create(userDto);
+		const user = new UserEntity;
+		user.user_id = userDto.id;
+		user.username = userDto.login;
+		user.img_url = userDto.image.link;
+		user.rank_score = 100;
+		const newUser = this.userRepository.create(user);
 		return this.userRepository.save(newUser);
 	}
 	async getAllUsers() {

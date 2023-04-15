@@ -66,6 +66,18 @@ export class ItemsService {
 			.getOne();
 		return user;
 	}
+	public async getUserByIntraId(intra_id: number) {
+		const user = await this.userRepo
+			.createQueryBuilder('user')
+			.leftJoinAndSelect('user.achievement', 'achievement')
+			.leftJoinAndSelect('user.friend', 'friend')
+			.leftJoinAndSelect('user.blacklistEntry', 'blacklistEntry')
+			.leftJoinAndSelect('user.channel', 'channel')
+			.leftJoinAndSelect('user.match_history', 'match_history')
+			.where('user.intra_id = :intra_id', { intra_id })
+			.getOne();
+		return user;
+	}
 	
 	public async getChannel(id: number) {
 		const channel = await this.chanRepo
@@ -86,7 +98,6 @@ export class ItemsService {
 			.getOne();
 			return achieve;
 		}
-		
 
 	public async getChannelUser(id: number) {
 		const chan_user = await this.chan_userRepo

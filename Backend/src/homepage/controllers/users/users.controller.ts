@@ -38,17 +38,25 @@ export class UsersController {
 		const serializedUsers = userList.map((user) => plainToClass(AnyProfileUserDto, user));
 		res.status(HttpStatus.FOUND).send(serializedUsers);
 	}
+
 	@Post('create')
-	async createCustomer(
+	async createUser(
 		@Req() req: Request,
 		@Res() res: Response,
 		@Body() newUserDto: NewUserDto,
 	) {
+		const check_username = await this.usersService.checkUserByName(newUserDto.login);
+		if (check_username && check_username.user_id === newUserDto.id)
+			return res.status(HttpStatus.NOT_MODIFIED).send('You can\'t use the same username');
+		else if (check_username)
+			return res.status(HttpStatus.NOT_MODIFIED).send('Username is already taken');
+		const check_id = await this.usersService.checkUserById(newUserDto.id);
 		const userEntity = await this.usersService.createUser(newUserDto);
-		const user_id = userEntity.user_id;
-		await this.channelService.addUserToChannel(userEntity.user_id, 1);
+		if (!check_id)
+			await this.channelService.addUserToChannel(userEntity.user_id, 1);
+		const user_id = newUserDto.id;
 		console.log(newUserDto);
-		res.status(HttpStatus.OK).send({
+		return res.status(HttpStatus.OK).send({
 			msg: 'User created',
 			token: await this.authService.login(newUserDto, user_id),
 			user_id: user_id,

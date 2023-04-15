@@ -22,8 +22,10 @@ export class LoginController {
 			grant_type: 'client_credentials',
 			client_id: authWorker.u_key,
 			client_secret: authWorker.s_key,
-		  };
-		  const response = await this.httpClient
+			code: body.code,
+			redirect_uri: 'http://localhost:4200/auth'
+		};
+		const response = await this.httpClient
 			.post<TokenDto>('https://api.intra.42.fr/oauth/token', requestBody)
 			.toPromise();
 		if (response)

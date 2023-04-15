@@ -30,7 +30,7 @@ export class FetchService {
 		const token = localStorage.getItem('token');
 		if (!token)
 			return '';
-		return token;	
+		return token;
 	}
 
 	async getAllUsers() {
@@ -62,7 +62,7 @@ export class FetchService {
 
 	async getUser(param: UserDto) {
 		let res;
-		await axios.get<ResponseDto>('http://localhost:3001/users/' + param.username, this.getHeader())
+		await axios.get<ResponseDto>('http://localhost:3001/users/' + param.login, this.getHeader())
 		.then(function (response) {
 			res = response.data;
 			console.log(res);
@@ -79,8 +79,8 @@ export class FetchService {
 		let res: MessageDto[] = [];
 		await axios.get('http://localhost:3001/channels/' + channel_id + '/messages/' + page, this.getHeader())
 		.then(function (response) {
-		  res = response.data;
-		  console.log(res);
+		res = response.data;
+		console.log(res);
 		})
 		.catch(function (error) { console.log(error); })
 		.finally(function () {});

@@ -6,9 +6,10 @@ import { Match } from 'src/entities/matchs.entity';
 import { User } from 'src/entities/users.entity';
 
 export class NewUserDto {
-	username: string;
-	token_42: string;
-	token_google: string;
+	login: string;
+	id: number;
+	email: string;
+	image: {link: string};
 }
 
 export class AnyProfileUserDto {
