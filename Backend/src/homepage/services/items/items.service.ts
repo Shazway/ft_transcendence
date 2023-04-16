@@ -66,6 +66,7 @@ export class ItemsService {
 			.getOne();
 		return user;
 	}
+
 	public async getUserByIntraId(intra_id: number) {
 		const user = await this.userRepo
 			.createQueryBuilder('user')
