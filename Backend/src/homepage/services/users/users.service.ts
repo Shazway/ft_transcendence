@@ -16,7 +16,7 @@ export class UsersService {
 		private readonly httpClient: HttpService,
 		private itemsService: ItemsService,
 	) {}
-	
+
 	async getIntraBody(accessToken: string) {
 		let intraHeader: AxiosRequestConfig;
 		intraHeader.headers.Authorization = 'Bearer ' + accessToken;
@@ -24,8 +24,9 @@ export class UsersService {
 	}
 
 	async fetcIntraInfo(token: string) {
-		return await axios
-			.get<IntraInfo>('https://api.intra.42.fr/v2/me', {headers: {Authorization: 'Bearer ' + token}} );
+		return await axios.get<IntraInfo>('https://api.intra.42.fr/v2/me', {
+			headers: { Authorization: 'Bearer ' + token },
+		});
 	}
 
 	async checkUserById(intra_id: number) {
@@ -37,7 +38,7 @@ export class UsersService {
 	}
 
 	async createUser(userDto: IntraInfo) {
-		const user = new UserEntity;
+		const user = new UserEntity();
 		user.intra_id = userDto.id;
 		user.username = userDto.login;
 		user.img_url = userDto.image.link;

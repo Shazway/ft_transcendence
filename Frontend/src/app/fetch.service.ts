@@ -51,7 +51,7 @@ export class FetchService {
 		.then(function (response) {
 			res = response.data;
 			console.log(res);
-			localStorage.setItem('token', res.token);
+			localStorage.setItem('Jwt_token', res.token);
 			localStorage.setItem('id', res.user_id);
 			localStorage.setItem('username', res.username);
 		})
@@ -66,7 +66,7 @@ export class FetchService {
 		.then(function (response) {
 			res = response.data;
 			console.log(res);
-			localStorage.setItem('token', res.token);
+			localStorage.setItem('Jwt_token', res.token);
 			localStorage.setItem('id', res.user_id);
 			localStorage.setItem('username', res.username);
 		})

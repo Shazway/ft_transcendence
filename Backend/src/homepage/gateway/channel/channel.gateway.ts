@@ -14,6 +14,7 @@ import { ChannelsService } from 'src/homepage/services/channels/channels.service
 import { MessagesService } from 'src/homepage/services/messages/messages.service';
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
 import { NotificationsGateway } from '../notifications/notifications.gateway';
+import { ItemsService } from 'src/homepage/services/items/items.service';
 
 @WebSocketGateway(3002, {
 	cors: {
@@ -26,6 +27,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		private messageService: MessagesService,
 		private tokenManager: TokenManagerService,
 		private channelService: ChannelsService,
+		private itemService: ItemsService,
 		private notificationGateway: NotificationsGateway,
 	) {
 		this.channelList = new Map<number, Map<number, Socket>>();
@@ -57,8 +59,11 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	}
 
 	sendMessageToChannel(channel_id: number, message: MessageDto) {
+		console.log('Sending message: ' + message.message_content);
+		console.log('On channel: ' + channel_id);
 		const channel = this.channelList.get(channel_id);
 		if (!channel) return false;
+		console.log('Channel found with ' + channel.size + ' users');
 		channel.forEach((user) => user.emit('onMessage', message));
 		return true;
 	}
@@ -83,6 +88,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		this.sendMessageToChannel(channel_id, {
 			message_content: user.name + ' joined the channel',
 			author: { username: 'System', user_id: 0 },
+			createdAt: new Date(),
 		});
 	}
 
@@ -93,6 +99,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			this.sendMessageToChannel(channel_id, {
 				message_content: user.name + ' left the channel',
 				author: { username: 'System', user_id: 0 },
+				createdAt: new Date(),
 			});
 			if (!this.deleteUserFromList(client, user))
 				return client.emit('onError', 'Channel does not exist');
@@ -146,6 +153,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('message')
 	async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() body: MessageDto) {
+		body.createdAt = new Date();
 		console.log('log 1');
 		console.log(body);
 		const user = this.tokenManager.getToken(client.request.headers.authorization);

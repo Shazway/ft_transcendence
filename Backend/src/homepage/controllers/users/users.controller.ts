@@ -41,26 +41,22 @@ export class UsersController {
 	}
 
 	@Post('create')
-	async createUser(
-		@Req() req: Request,
-		@Res() res: Response,
-		@Body() newUserDto: IntraInfo,
-	) {
+	async createUser(@Req() req: Request, @Res() res: Response, @Body() newUserDto: IntraInfo) {
+		console.log(newUserDto);
 		const check_username = await this.usersService.checkUserByName(newUserDto.login);
 		if (check_username && check_username.user_id === newUserDto.id)
-			return res.status(HttpStatus.NOT_MODIFIED).send('You can\'t use the same username');
+			return res.status(HttpStatus.NOT_MODIFIED).send("You can't use the same username");
 		else if (check_username)
 			return res.status(HttpStatus.NOT_MODIFIED).send('Username is already taken');
 		const check_id = await this.usersService.checkUserById(newUserDto.id);
 		const userEntity = await this.usersService.createUser(newUserDto);
-		if (!check_id)
-			await this.channelService.addUserToChannel(userEntity.user_id, 1);
-		const user_id = newUserDto.id;
+		if (!check_id) await this.channelService.addUserToChannel(userEntity.user_id, 1);
+		newUserDto.id = userEntity.user_id;
 		console.log(newUserDto);
 		return res.status(HttpStatus.OK).send({
 			msg: 'User created',
 			token: await this.authService.login(newUserDto),
-			user_id: user_id,
+			user_id: userEntity.user_id,
 			username: userEntity.username,
 		});
 	}
@@ -89,10 +85,14 @@ export class UsersController {
 	@Get(':username')
 	async getUser(@Param('username') us: string, @Req() req: Request, @Res() res: Response) {
 		const user = await this.itemsService.getUserByUsername(us);
+		const info = {
+			id: user.user_id,
+			login: user.username,
+		};
 		if (user)
 			res.status(HttpStatus.OK).send({
 				msg: 'User connected',
-				token: await this.authService.login(plainToClass(IntraInfo, user) ),
+				token: await this.authService.login(plainToClass(IntraInfo, info)),
 				user_id: user.user_id,
 				username: user.username,
 			});

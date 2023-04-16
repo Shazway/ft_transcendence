@@ -19,7 +19,7 @@ export class TokenInfo {
 export class IntraInfo {
 	id: number;
 	login: string;
-	image: {link: string;}
+	image: { link: string };
 }
 
 export class AuthCode {

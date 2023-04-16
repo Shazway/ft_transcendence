@@ -13,9 +13,9 @@ export class WebsocketService {
 
 	getHeader() {
 		return {
-			withCredentials: false,
-			extraHeaders: {
-			Authorization: this.getJwtToken(),
+				withCredentials: false,
+				extraHeaders: {
+				Authorization: this.getJwtToken(),
 			}
 		}
 	}

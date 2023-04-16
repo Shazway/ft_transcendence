@@ -49,6 +49,7 @@ export class insertData666666666666666666 implements MigrationInterface {
 
 		await UserRepo.insert([
 			{
+				user_id: 0,
 				username: 'System',
 				img_url: 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.boredpanda.com%2Fblack-rain-frogs%2F&psig=AOvVaw2LFjEjUskM26fOaMOJUkp6&ust=1681747582612000&source=images&cd=vfe&ved=0CBEQjRxqFwoTCNjR_Ivkrv4CFQAAAAAdAAAAABAE',
 				rank_score: 0,

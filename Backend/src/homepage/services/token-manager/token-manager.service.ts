@@ -12,8 +12,6 @@ export class TokenManagerService {
 	}
 
 	public getToken(token: string) {
-		console.log('Token recieved');
-		console.log(token);
 		let keyClean;
 		if (!token)
 			throw new HttpException(

@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { IntraInfo } from 'src/homepage/dtos/ApiDto.dto';
-import { NewUserDto } from 'src/homepage/dtos/UserDto.dto';
 
 @Injectable()
 export class AuthService {
@@ -15,7 +14,6 @@ export class AuthService {
 			name: user.login,
 			sub: user.id,
 		};
-
 		return this.jwtService.sign(payload);
 	}
 }
