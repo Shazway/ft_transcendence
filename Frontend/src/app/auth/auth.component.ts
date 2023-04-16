@@ -37,6 +37,7 @@ export class AuthComponent {
 			localStorage.setItem('42_token', loginReturn.tokenInfo.access_token);
 			localStorage.setItem('Jwt_token', loginReturn.jwt_token);
 			localStorage.setItem('id', "" + loginReturn.intraInfo.id);
+			localStorage.setItem('username', loginReturn.intraInfo.login);
 			console.log("Jwt token: " + loginReturn.jwt_token);
 			console.log("42 token: " + loginReturn.tokenInfo.access_token);
 			console.log("	-Expires in: " + loginReturn.tokenInfo.expires_in);

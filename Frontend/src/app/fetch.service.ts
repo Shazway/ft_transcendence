@@ -23,7 +23,7 @@ export class FetchService {
 				'Content-Type': 'application/json; charset=utf-8',
 				'Authorization': 'Bearer ' + this.getJwtToken(),
 			}
-		  }
+		}
 	}
 
 	getJwtToken() {
@@ -37,8 +37,8 @@ export class FetchService {
 		let res;
 		await axios.get('http://localhost:3001/leaderboard', this.getHeader())
 		.then(function (response) {
-		  res = response.data;
-		  console.log(res);
+			res = response.data;
+			console.log(res);
 		})
 		.catch(function (error) { console.log(error); })
 		.finally(function () {});
