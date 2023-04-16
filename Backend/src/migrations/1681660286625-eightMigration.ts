@@ -1,12 +1,12 @@
 /* eslint-disable prettier/prettier */
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class seventhMigration1681336249864 implements MigrationInterface {
-    name = 'seventhMigration1681336249864'
+export class EightMigration1681660286625 implements MigrationInterface {
+    name = 'EightMigration1681660286625'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE "friend_request" ("id" SERIAL NOT NULL, "senderUserId" integer, "receiverUserId" integer, CONSTRAINT "PK_4c9d23ff394888750cf66cac17c" PRIMARY KEY ("id"))`);
-        await queryRunner.query(`CREATE TABLE "message" ("message_id" SERIAL NOT NULL, "message_content" character varying(255) NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "authorUserId" integer, "channelChannelId" integer, CONSTRAINT "PK_06a563cdbd963a9f7cbcb25c447" PRIMARY KEY ("message_id"))`);
+        await queryRunner.query(`CREATE TABLE "message" ("message_id" SERIAL NOT NULL, "message_content" character varying(255) NOT NULL, "is_visible" boolean NOT NULL DEFAULT true, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "authorUserId" integer, "channelChannelId" integer, CONSTRAINT "PK_06a563cdbd963a9f7cbcb25c447" PRIMARY KEY ("message_id"))`);
         await queryRunner.query(`CREATE TABLE "channel" ("channel_id" SERIAL NOT NULL, "channel_name" character varying(20) NOT NULL, "channel_password" character varying(30), "is_channel_private" boolean NOT NULL DEFAULT false, CONSTRAINT "UQ_82553d18a60331b291c927e5ffe" UNIQUE ("channel_name"), CONSTRAINT "PK_161c95ba32beeb8aa68267b54ae" PRIMARY KEY ("channel_id"))`);
         await queryRunner.query(`CREATE TABLE "channel_user" ("channel_user_id" SERIAL NOT NULL, "is_creator" boolean NOT NULL DEFAULT false, "is_admin" boolean NOT NULL DEFAULT false, "is_muted" boolean NOT NULL DEFAULT false, "is_banned" boolean NOT NULL DEFAULT false, "remaining_mute_time" TIMESTAMP, "remaining_ban_time" TIMESTAMP, "user_id" integer, "channel_id" integer, CONSTRAINT "PK_6749a0a72af6932f778f3ec495d" PRIMARY KEY ("channel_user_id"))`);
         await queryRunner.query(`CREATE TABLE "match settings" ("match_setting_id" SERIAL NOT NULL, "map_appearance" integer NOT NULL DEFAULT '0', "timer" integer NOT NULL DEFAULT '300', "is_ranked" boolean NOT NULL DEFAULT false, "score_to_win" integer NOT NULL DEFAULT '0', "max_players" integer NOT NULL DEFAULT '2', "round_to_win" integer NOT NULL DEFAULT '2', CONSTRAINT "PK_0622478bce499d0255260aa6816" PRIMARY KEY ("match_setting_id"))`);

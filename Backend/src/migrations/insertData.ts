@@ -1,10 +1,10 @@
-import { AchievementsEntity, ChannelEntity } from 'src/entities';
+/* eslint-disable prettier/prettier */
+import { AchievementsEntity, ChannelEntity, UserEntity } from 'src/entities';
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class insertData666666666666666666 implements MigrationInterface {
 	public async up(queryRunner: QueryRunner): Promise<void> {
-		const AchievementRepo =
-			queryRunner.manager.getRepository(AchievementsEntity);
+		const AchievementRepo = queryRunner.manager.getRepository(AchievementsEntity);
 
 		AchievementRepo.insert([
 			{
@@ -42,6 +42,16 @@ export class insertData666666666666666666 implements MigrationInterface {
 		await ChannelRepo.insert([
 			{
 				channel_name: 'Global',
+			},
+		]);
+
+		const UserRepo = queryRunner.manager.getRepository(UserEntity);
+
+		await UserRepo.insert([
+			{
+				username: 'System',
+				img_url: 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.boredpanda.com%2Fblack-rain-frogs%2F&psig=AOvVaw2LFjEjUskM26fOaMOJUkp6&ust=1681747582612000&source=images&cd=vfe&ved=0CBEQjRxqFwoTCNjR_Ivkrv4CFQAAAAAdAAAAABAE',
+				rank_score: 0,
 			},
 		]);
 	}

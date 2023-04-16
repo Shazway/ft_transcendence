@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { HttpException, HttpStatus, Injectable, Res } from '@nestjs/common';
+import { HttpStatus, Injectable, Res } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AchievementsEntity, ChannelEntity, ChannelUserRelation, FriendrequestRelation, MatchEntity, MatchSettingEntity, MessageEntity, UserEntity } from 'src/entities';
 import { ChannelUser } from 'src/entities/channel_user.entity';
@@ -191,6 +191,7 @@ export class ItemsService {
 			.createQueryBuilder('message')
 			.leftJoinAndSelect('message.author', 'author')
 			.where('message.channel = :chan_id', { chan_id })
+			.andWhere('message.is_visible = true')
 			.take(maxResult)
 			.skip(page_num * maxResult)
 			.getMany();

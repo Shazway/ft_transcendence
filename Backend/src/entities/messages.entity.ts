@@ -7,7 +7,6 @@ import {
 	CreateDateColumn,
 } from 'typeorm';
 import { Channel } from './channels.entity';
-import { ChannelUser } from './channel_user.entity';
 import { User } from './users.entity';
 
 @Entity({ name: 'message' })
@@ -17,6 +16,9 @@ export class Message {
 
 	@Column({ nullable: false, length: 255 })
 	message_content!: string;
+
+	@Column({ default: true })
+	is_visible!: boolean;
 
 	@CreateDateColumn()
 	createdAt!: Date;
