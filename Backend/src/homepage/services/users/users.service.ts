@@ -38,7 +38,7 @@ export class UsersService {
 
 	async createUser(userDto: IntraInfo) {
 		const user = new UserEntity;
-		user.user_id = userDto.id;
+		user.intra_id = userDto.id;
 		user.username = userDto.login;
 		user.img_url = userDto.image.link;
 		user.rank_score = 100;
