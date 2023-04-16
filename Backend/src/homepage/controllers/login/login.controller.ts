@@ -20,7 +20,7 @@ export class LoginController {
 	getTokenBody(code: string) {
 		const authWorker = varFetchService.getAPIKeys();
 		return {
-			grant_type: 'client_credentials',
+			grant_type: 'authorization_code',
 			client_id: authWorker.u_key,
 			client_secret: authWorker.s_key,
 			code: code,
@@ -46,13 +46,18 @@ export class LoginController {
 		{
 			console.log(resToken.data);
 			const intraInfo = await this.usersService.fetcIntraInfo(resToken.data.access_token);
-			console.log(intraInfo.data);
-			const user = this.itemsService.getUserByIntraId(intraInfo.data.id);
+			console.log('{' + intraInfo.data.id);
+			console.log(intraInfo.data.login + '}');
+			const user = await this.itemsService.getUserByIntraId(intraInfo.data.id);
 
 			if (user)
+			{
+				console.log('User logging in');
 				res.status(HttpStatus.ACCEPTED).send(this.buildLoginBody(resToken.data, intraInfo.data));
+			}
 			else
 			{
+				console.log('User signing in');
 				this.usersService.createUser(intraInfo.data);
 				res.status(HttpStatus.CREATED).send(this.buildLoginBody(resToken.data, intraInfo.data));
 			}
