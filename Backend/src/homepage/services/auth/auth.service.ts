@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { IntraInfo } from 'src/homepage/dtos/ApiDto.dto';
 import { NewUserDto } from 'src/homepage/dtos/UserDto.dto';
 
 @Injectable()
@@ -9,10 +10,10 @@ export class AuthService {
 	// 	//TODO check names
 	// }
 
-	async login(user: NewUserDto, user_id: number) {
+	async login(user: IntraInfo) {
 		const payload = {
 			name: user.login,
-			sub: user_id,
+			sub: user.id,
 		};
 
 		return this.jwtService.sign(payload);

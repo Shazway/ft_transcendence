@@ -4,42 +4,60 @@ import { UsersService } from 'src/homepage/services/users/users.service';
 import { Request, Response } from 'express';
 import { VarFetchService, varFetchService } from 'src/homepage/services/var_fetch/var_fetch.service';
 import { HttpService } from '@nestjs/axios';
-import { ApiDto, AuthCode, TokenDto } from 'src/homepage/dtos/ApiDto.dto';
-import { AxiosResponse } from 'axios';
-import * as querystring from 'querystring';
+import { ApiDto, AuthCode, IntraInfo, TokenInfo } from 'src/homepage/dtos/ApiDto.dto';
+import { ItemsService } from 'src/homepage/services/items/items.service';
+import { AuthService } from 'src/homepage/services/auth/auth.service';
 
 @Controller('login')
 export class LoginController {
 	constructor(
-		private userService: UsersService,
+		private usersService: UsersService,
 		private readonly httpClient: HttpService,
+		private readonly itemsService: ItemsService,
+		private readonly authService: AuthService,
 	) {}
 
-	@Post('')
-	async authFortyTwo(@Req() req: Request, @Res() res: Response, @Body() body: AuthCode) {
+	getTokenBody(code: string) {
 		const authWorker = varFetchService.getAPIKeys();
-		const requestBody = {
+		return {
 			grant_type: 'client_credentials',
 			client_id: authWorker.u_key,
 			client_secret: authWorker.s_key,
-			code: body.code,
+			code: code,
 			redirect_uri: 'http://localhost:4200/auth'
 		};
-		const response = await this.httpClient
-			.post<TokenDto>('https://api.intra.42.fr/oauth/token', requestBody)
-			.toPromise();
-		if (response)
-		{
-			console.log(response.data);
-			res.status(response.status).send(response.data);
-		}
-		else
-			res.status(HttpStatus.FORBIDDEN).send('Token GONE');
 	}
 
-	@Get('test')
-	validateKey(@Req() req: Request, @Res() res: Response) {
-		console.log('Done');
-		res.status(HttpStatus.OK).send({ msg: 'ok' });
+	buildLoginBody(tokenInfo: TokenInfo, intraInfo: IntraInfo, created: boolean = false) {
+		return {
+			tokenInfo: tokenInfo,
+			intraInfo: intraInfo,
+			created: created,
+			jwt_token: this.authService.login(intraInfo),
+		}
+	}
+
+	@Post('')
+	async authFortyTwo(@Res() res: Response, @Body() body: AuthCode) {
+		const resToken = await this.httpClient
+			.post<TokenInfo>('https://api.intra.42.fr/oauth/token', this.getTokenBody(body.code))
+			.toPromise();
+		if (resToken)
+		{
+			console.log(resToken.data);
+			const intraInfo = await this.usersService.fetcIntraInfo(resToken.data.access_token);
+			console.log(intraInfo.data);
+			const user = this.itemsService.getUserByIntraId(intraInfo.data.id);
+
+			if (user)
+				res.status(HttpStatus.ACCEPTED).send(this.buildLoginBody(resToken.data, intraInfo.data));
+			else
+			{
+				this.usersService.createUser(intraInfo.data);
+				res.status(HttpStatus.CREATED).send(this.buildLoginBody(resToken.data, intraInfo.data));
+			}
+		}
+		else
+			res.status(HttpStatus.UNAUTHORIZED).send('No token recieved');
 	}
 }
