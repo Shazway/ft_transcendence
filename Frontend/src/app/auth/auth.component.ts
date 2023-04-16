@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import axios from 'axios';
 import { FetchService } from '../fetch.service';
-import { AuthCode, AuthDto, TokenDto } from 'src/dtos/AuthDto';
+import { LogInReturnDto } from 'src/dtos/AuthDto';
 import { Token } from '@angular/compiler';
 import { UserDto } from 'src/dtos/UserDto.dto';
 import { ResponseDto } from 'src/dtos/Response.dto';
@@ -29,25 +29,19 @@ export class AuthComponent {
 
 	async ngOnInit() {
 		const code = this.route.snapshot.queryParamMap.get('code');
-		let token: TokenDto;
+		let loginReturn: LogInReturnDto;
 		let user_data: UserDto;
-		await axios.post<TokenDto>('http://localhost:3001/login', {code: code})
+		await axios.post<LogInReturnDto>('http://localhost:3001/login', {code: code})
 		.then(function (response) {
-			token = response.data;
-			localStorage.setItem('42_token', token.access_token);
-			console.log(token);
-		})
-		const newToken = localStorage.getItem('42_token');
-		if (newToken)
-			await axios.get<UserDto>('https://api.intra.42.fr/v2/me', this.getHeader(newToken))
-			.then(async function (response) {
-				user_data = response.data;
-				await axios.post<ResponseDto>('localhost:3001/users/create', user_data)
-				.then(async function (response) {
-					localStorage.setItem('token', response.data.token);
-					localStorage.setItem('id', response.data.user_id);
-					localStorage.setItem('username', response.data.username);
-			})
+			loginReturn = response.data;
+			localStorage.setItem('42_token', loginReturn.tokenInfo.access_token);
+			localStorage.setItem('Jwt_token', loginReturn.jwt_token);
+			localStorage.setItem('id', "" + loginReturn.intraInfo.id);
+			console.log("Jwt token: " + loginReturn.jwt_token);
+			console.log("42 token: " + loginReturn.tokenInfo.access_token);
+			console.log("	-Expires in: " + loginReturn.tokenInfo.expires_in);
+			console.log("Intra ID: " + loginReturn.intraInfo.id);
+			console.log("User login: " + loginReturn.intraInfo.login);
 		});
 		this.router.navigateByUrl('');
 	}

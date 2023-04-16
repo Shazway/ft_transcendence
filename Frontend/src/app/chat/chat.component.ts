@@ -19,7 +19,7 @@ export class ChatComponent implements OnInit {
 		private websocketService: WebsocketService
 	) {
 		this.client = io('ws://localhost:3002?channel_id=' + 1, websocketService.getHeader());
-		if (!localStorage.getItem('token'))
+		if (!localStorage.getItem('Jwt_Token'))
 			return;
 		if (!this.client)
 			return;

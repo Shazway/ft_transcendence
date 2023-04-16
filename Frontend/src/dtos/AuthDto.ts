@@ -7,11 +7,23 @@ export interface AuthDto {
 	};
 	created_at: Date;
 }
+export interface LogInReturnDto {
+	tokenInfo: TokenInfo;
+	jwt_token: string;
+	intraInfo: IntraInfo;
+	created: boolean;
+}
 export interface AuthCode {
 	access_token: string;
 }
 
-export interface TokenDto {
+export interface IntraInfo {
+	id: number;
+	login: string;
+	image: {link: string;}
+}
+
+export interface TokenInfo {
 	access_token: string;
 	token_type: string;
 	expires_in: Date;

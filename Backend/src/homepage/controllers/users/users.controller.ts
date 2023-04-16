@@ -20,6 +20,7 @@ import { TokenManagerService } from 'src/homepage/services/token-manager/token-m
 import { plainToClass } from 'class-transformer';
 import { AnyProfileUserDto } from 'src/homepage/dtos/UserDto.dto';
 import { ChannelsService } from 'src/homepage/services/channels/channels.service';
+import { IntraInfo } from 'src/homepage/dtos/ApiDto.dto';
 
 @Controller('users')
 export class UsersController {
@@ -43,7 +44,7 @@ export class UsersController {
 	async createUser(
 		@Req() req: Request,
 		@Res() res: Response,
-		@Body() newUserDto: NewUserDto,
+		@Body() newUserDto: IntraInfo,
 	) {
 		const check_username = await this.usersService.checkUserByName(newUserDto.login);
 		if (check_username && check_username.user_id === newUserDto.id)
@@ -58,7 +59,7 @@ export class UsersController {
 		console.log(newUserDto);
 		return res.status(HttpStatus.OK).send({
 			msg: 'User created',
-			token: await this.authService.login(newUserDto, user_id),
+			token: await this.authService.login(newUserDto),
 			user_id: user_id,
 			username: userEntity.username,
 		});
@@ -88,10 +89,10 @@ export class UsersController {
 	@Get(':username')
 	async getUser(@Param('username') us: string, @Req() req: Request, @Res() res: Response) {
 		const user = await this.itemsService.getUserByUsername(us);
-		if (user) 
+		if (user)
 			res.status(HttpStatus.OK).send({
 				msg: 'User connected',
-				token: await this.authService.login(plainToClass(NewUserDto, user), user.user_id),
+				token: await this.authService.login(plainToClass(IntraInfo, user) ),
 				user_id: user.user_id,
 				username: user.username,
 			});

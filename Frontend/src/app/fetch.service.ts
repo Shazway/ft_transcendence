@@ -13,7 +13,7 @@ export class FetchService {
 	httpOptions = {
 		headers: new HttpHeaders({
 			'Content-Type': 'application/json; charset=utf-8',
-			'Authorization': this.getToken(),
+			'Authorization': this.getJwtToken(),
 		})
 	};
 
@@ -21,13 +21,13 @@ export class FetchService {
 		return {
 			headers: {
 				'Content-Type': 'application/json; charset=utf-8',
-			  	'Authorization': 'Bearer ' + this.getToken(),
+				'Authorization': 'Bearer ' + this.getJwtToken(),
 			}
 		  }
 	}
 
-	getToken() {
-		const token = localStorage.getItem('token');
+	getJwtToken() {
+		const token = localStorage.getItem('Jwt_token');
 		if (!token)
 			return '';
 		return token;

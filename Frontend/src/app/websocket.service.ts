@@ -3,7 +3,7 @@ import { Socket, io } from 'socket.io-client'
 import { LessMessageDto } from 'src/dtos/message';
 
 @Injectable({
-  providedIn: 'root'
+	providedIn: 'root'
 })
 export class WebsocketService {
 	chanList: Map<number, Socket>;
@@ -15,16 +15,16 @@ export class WebsocketService {
 		return {
 			withCredentials: false,
 			extraHeaders: {
-			  Authorization: this.getToken(),
+			Authorization: this.getJwtToken(),
 			}
 		}
 	}
 
-	getToken() {
-		const token = localStorage.getItem('token');
+	getJwtToken() {
+		const token = localStorage.getItem('Jwt_token');
 		if (!token)
 			return '';
-		return token;	
+		return token;
 	}
 
 	async sendMessage(msg: LessMessageDto, channel_id: number) {
