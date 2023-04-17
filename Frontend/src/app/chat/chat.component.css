@@ -136,3 +136,17 @@ img{ max-width:100%;}
   height: 516px;
   overflow-y: auto;
 }
+
+.offscreen {
+	/* position: fixed; */
+	/* top: 0;
+	bottom: 0;
+	left: -200px;
+	width: 200px; */
+	bottom: -50vh;
+	transition: transform 0.3s ease-in-out;
+  }
+  
+  .offscreen.show {
+	transform: translateY(-50vh); /* move the div back onto the screen */
+  }

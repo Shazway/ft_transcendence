@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
 import { LessMessageDto, MessageDto } from '../../dtos/message'
 import { FetchService } from '../fetch.service';
 import { WebsocketService } from '../websocket.service';
@@ -9,15 +9,15 @@ import { Socket, io } from 'socket.io-client';
 	templateUrl: './chat.component.html',
 	styleUrls: ['./chat.component.css']
 })
-export class ChatComponent implements OnInit, AfterViewInit {
+export class ChatComponent implements OnInit {
 	client: Socket;
 	msgs$: MessageDto[] = [];
 	test_msgs$ = new Array<Array<MessageDto>>;
-	@ViewChild('chatMsgs') chatMsgs: any;
 
 	constructor(
 		private fetchService: FetchService,
-		private websocketService: WebsocketService
+		private websocketService: WebsocketService,
+		private elRef: ElementRef,
 	) {
 		this.client = io('ws://localhost:3002?channel_id=' + 1, websocketService.getHeader());
 		if (!localStorage.getItem('Jwt_token'))
@@ -38,15 +38,24 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		this.msgs$.forEach(async (element: MessageDto) => this.sortMessage(element));
 	}
 
-	ngAfterViewInit() {
-		const chat = document.querySelector('scrollbar');
+	slide() {
+		const offscreenElm = this.elRef.nativeElement.querySelector('.offscreen');
+		const offscreenBtn = this.elRef.nativeElement.querySelector('#chatBtn');
+		if (!offscreenElm)
+			return;
+		if (offscreenElm.classList.contains('show')) {
+			offscreenElm.classList.remove('show');
+			offscreenBtn.textContent = 'Open chat';
+		} else {
+			offscreenElm.classList.add('show');
+			offscreenBtn.textContent = 'Close chat';
+		}
 	}
 
 	sortMessage(new_msg: MessageDto) {
 		console.log(new_msg);
 		if (this.test_msgs$.length && this.test_msgs$[this.test_msgs$.length - 1][0].author.user_id == new_msg.author.user_id) {
 			this.test_msgs$[this.test_msgs$.length - 1].push(new_msg);
-			this.chatMsgs.nativeElement.scrollTop = this.chatMsgs.nativeElement.scrollHeight;
 			return;
 		}
 		const arr = new Array<MessageDto>;

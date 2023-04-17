@@ -1,12 +1,12 @@
 <div class="row d-flex justify-content-end fixed-bottom" style="margin-right: 0;">
 	<div class="order-1 pe-1" style="width: 400px;">
 <!-- Start of chat app -->
-		<div class="card" id="chat2">
+		<div class="card offscreen" id="chat2">
 			<div class="card-header d-flex justify-content-between align-items-center p-3">
 				<h5 class="mb-0">Chat</h5>
-				<button type="button" class="btn btn-primary btn-sm" data-mdb-ripple-color="dark">Let's Chat App</button>
+				<button type="button" id="chatBtn" (click)="slide()" class="btn btn-primary btn-sm" data-mdb-ripple-color="dark">Open chat</button>
 			</div>
-			<div class="scrollbar scrollbar-primary mt-2" style="max-height: 40vh; overflow-y: auto; overflow-x: hidden;" #chatMsgs>
+			<div class="scrollbar scrollbar-primary mt-2" style="height: 40vh; overflow-y: auto; overflow-x: hidden;" #chatMsgs>
 <!-- Start of text area -->
 				<div class="card-body p-0" data-mdb-perfect-scrollbar="true" style="position: relative; " *ngFor="let msg_list of test_msgs$">
 <!-- Start of not current user field -->
