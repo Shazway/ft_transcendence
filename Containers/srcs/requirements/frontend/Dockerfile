@@ -7,6 +7,6 @@ RUN apt-get update && \
 
 WORKDIR /front
 
-CMD npm install -g @angular/cli && \
+CMD npm install @angular/cli && \
 	npm install axios && \
 	npm run ng -- serve

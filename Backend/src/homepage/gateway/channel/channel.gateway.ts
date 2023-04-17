@@ -15,6 +15,7 @@ import { MessagesService } from 'src/homepage/services/messages/messages.service
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
 import { NotificationsGateway } from '../notifications/notifications.gateway';
 import { ItemsService } from 'src/homepage/services/items/items.service';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
 @WebSocketGateway(3002, {
 	cors: {

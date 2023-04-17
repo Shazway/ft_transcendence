@@ -1,38 +1,38 @@
-<div class="row d-flex justify-content-end">
-	<div class="col-sm-6">
+<div class="row d-flex justify-content-end fixed-bottom">
+	<div style="width: 400px;">
 <!-- Start of chat app -->
 		<div class="card" id="chat2">
 			<div class="card-header d-flex justify-content-between align-items-center p-3">
 				<h5 class="mb-0">Chat</h5>
 				<button type="button" class="btn btn-primary btn-sm" data-mdb-ripple-color="dark">Let's Chat App</button>
 			</div>
-			<div class="scrollbar scrollbar-primary" style="max-height: 50vh; overflow-y: auto;" #chatMsgs>
+			<div class="scrollbar scrollbar-primary mt-2" style="max-height: 40vh; overflow-y: auto; overflow-x: hidden;" #chatMsgs>
 <!-- Start of text area -->
-				<div class="card-body" data-mdb-perfect-scrollbar="true" style="position: relative;" *ngFor="let msg_list of test_msgs$">
+				<div class="card-body p-0" data-mdb-perfect-scrollbar="true" style="position: relative; " *ngFor="let msg_list of test_msgs$">
 <!-- Start of not current user field -->
 					<div *ngIf="!isMe(msg_list[0]) && !isSystem(msg_list[0])" class="d-flex flex-row justify-content-start">
 						<img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp" alt="avatar 1" style="width: 45px; height: 100%;">
 						<div>
 							<div *ngFor="let msg of msg_list">
-								<p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">{{msg.message_content}}</p>
+								<p class="small p-2 ms-1 mb-1 rounded-3 text-wrap" style="background-color: #f5f6f7;">{{msg.message_content}}</p>
 							</div>
-							<p class="small ms-3 mb-3 rounded-3 text-muted">{{ getTime(msg_list) }}</p>
+							<p class="small ms-3 mb-0 rounded-3 text-muted">{{ getTime(msg_list) }}</p>
 						</div>
 					</div>
 <!-- End of not current user field -->
 <!-- Start of current user field -->
-					<div *ngIf="isMe(msg_list[0]) && !isSystem(msg_list[0])" class="d-flex flex-row justify-content-end mb-4 pt-1">
+					<div *ngIf="isMe(msg_list[0]) && !isSystem(msg_list[0])" class="d-flex flex-row justify-content-end">
 						<div>
 							<div *ngFor="let msg of msg_list">
-								<p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #56a1ec;">{{msg.message_content}}</p>
+								<p class="small p-2 ms-3 mb-1 rounded-3 text-wrap" style="background-color: #56a1ec; ">{{msg.message_content}}</p>
 							</div>
-							<p class="small me-3 mb-3 rounded-3 text-muted d-flex justify-content-end">{{ getTime(msg_list) }}</p>
+							<p class="small me-3 mb-0 rounded-3 text-muted d-flex justify-content-end">{{ getTime(msg_list) }}</p>
 						</div>
 						<img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp" alt="avatar 1" style="width: 45px; height: 100%;">
 					</div>
 <!-- End of current user field -->
 <!-- Start of System field -->
-					<div *ngIf="isSystem(msg_list[0])" class="divider d-flex align-items-center mb-4">
+					<div *ngIf="isSystem(msg_list[0])" class="divider d-flex align-items-center">
 						<div *ngFor="let msg of msg_list">
 							<p class="text-center mx-3 mb-0" style="color: #a2aab7;">{{msg.message_content}}</p>
 						</div>
