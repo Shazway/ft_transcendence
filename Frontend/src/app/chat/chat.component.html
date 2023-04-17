@@ -1,5 +1,5 @@
-<div class="row d-flex justify-content-end fixed-bottom">
-	<div style="width: 400px;">
+<div class="row d-flex justify-content-end fixed-bottom" style="margin-right: 0;">
+	<div class="order-1 pe-1" style="width: 400px;">
 <!-- Start of chat app -->
 		<div class="card" id="chat2">
 			<div class="card-header d-flex justify-content-between align-items-center p-3">
@@ -42,13 +42,13 @@
 <!-- End of text area -->
 			</div>
 
-			<div class="card-footer text-muted d-flex justify-content-start align-items-center p-3">
-				<img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp" alt="avatar 3" style="width: 40px; height: 100%;">
-				<form #userChatBox="ngForm" (ngSubmit)="onClickChat(userChatBox.value)" >
-					<input type="text" name = "message_content" class="form-control form-control-lg" id="exampleFormControlInput1" placeholder="Type message" ngModel>
-				</form>
-				<a class="ms-3 text-muted text-decoration-none"><kbd>Send</kbd></a>
-			</div>
+			<form #userChatBox="ngForm" (ngSubmit)="onClickChat(userChatBox.value)" >
+				<div class="card-footer text-muted d-flex justify-content-start align-items-center p-3 gap-3">
+					<img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp" alt="avatar 3" style="width: 40px; height: 100%;">
+						<input type="text" name = "message_content" class="form-control form-control-lg" id="exampleFormControlInput1" placeholder="Type message" ngModel>
+						<input type = "submit" class="btn btn-outline-secondary btn-sm rounded-5" value = "submit">
+				</div>
+			</form>
 		</div>
 <!-- End of chat app -->
 	</div>

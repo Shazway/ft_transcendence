@@ -40,8 +40,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
 
 	ngAfterViewInit() {
 		const chat = document.querySelector('scrollbar');
-		if (chat)
-			chat.scrollTop = chat.scrollHeight;
 	}
 
 	sortMessage(new_msg: MessageDto) {
@@ -55,8 +53,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		arr.push(new_msg);
 		this.test_msgs$.push(arr);
 		const chat = document.querySelector('scrollbar');
-		if (chat)
-			chat.scrollTop = chat.scrollHeight;
 	}
 
 	isMe(msg : MessageDto) : boolean {
