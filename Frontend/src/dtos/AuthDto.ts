@@ -12,6 +12,7 @@ export interface LogInReturnDto {
 	jwt_token: string;
 	intraInfo: IntraInfo;
 	created: boolean;
+	user_id: number;
 }
 export interface AuthCode {
 	access_token: string;

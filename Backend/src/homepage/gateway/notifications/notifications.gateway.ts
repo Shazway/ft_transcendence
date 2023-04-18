@@ -7,7 +7,6 @@ import {
 import { Socket } from 'socket.io';
 import { NotificationsService } from 'src/homepage/services/notifications/notifications.service';
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
-import { Server } from 'typeorm';
 
 @WebSocketGateway(3003)
 export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -23,7 +22,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 	}
 
 	@WebSocketServer()
-	server: Server;
+	server;
 
 	async handleConnection(client: Socket) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
@@ -38,8 +37,9 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 	}
 
 	sendMessage(user_tab: number[], message: any) {
-		user_tab.map((user) => {
-			if (this.userList.get(user)) this.userList.get(user).emit('onNotif', message);
+		user_tab.forEach(user => {
+			const client = this.userList.get(user);
+			if (client) client.emit('onNotif', message);
 		});
 	}
 }

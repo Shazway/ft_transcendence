@@ -55,7 +55,7 @@ export class UsersController {
 		console.log(newUserDto);
 		return res.status(HttpStatus.OK).send({
 			msg: 'User created',
-			token: await this.authService.login(newUserDto),
+			token: await this.authService.login(newUserDto, userEntity.user_id),
 			user_id: userEntity.user_id,
 			username: userEntity.username,
 		});
@@ -80,22 +80,5 @@ export class UsersController {
 		console.log(friend_id);
 		this.itemsService.addFriendToUser(user_id, friend_id);
 		res.status(HttpStatus.OK).send('Friend added');
-	}
-
-	@Get(':username')
-	async getUser(@Param('username') us: string, @Req() req: Request, @Res() res: Response) {
-		const user = await this.itemsService.getUserByUsername(us);
-		const info = {
-			id: user.user_id,
-			login: user.username,
-		};
-		if (user)
-			res.status(HttpStatus.OK).send({
-				msg: 'User connected',
-				token: await this.authService.login(plainToClass(IntraInfo, info)),
-				user_id: user.user_id,
-				username: user.username,
-			});
-		else res.status(HttpStatus.NOT_FOUND).send({ msg: 'User not found' });
 	}
 }

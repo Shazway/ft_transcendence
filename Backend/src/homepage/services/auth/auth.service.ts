@@ -9,10 +9,10 @@ export class AuthService {
 	// 	//TODO check names
 	// }
 
-	async login(user: IntraInfo) {
+	async login(user: IntraInfo, user_id: number) {
 		const payload = {
 			name: user.login,
-			sub: user.id,
+			sub: user_id,
 		};
 		return this.jwtService.sign(payload);
 	}

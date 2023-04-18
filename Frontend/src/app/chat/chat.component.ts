@@ -24,6 +24,7 @@ export class ChatComponent implements OnInit {
 			return;
 		if (!this.client)
 			return;
+		console.log('JWT token: ' + localStorage.getItem('Jwt_token'));
 		this.client.on('onMessage', (event) => { console.log('Message recieved ' + event); this.sortMessage(event) });
 		this.client.on('onError', (event) => { console.log('WebSocket error: ' + event); });
 		this.client.on('connection', () => { console.log('Connected to WebSocket server'); });

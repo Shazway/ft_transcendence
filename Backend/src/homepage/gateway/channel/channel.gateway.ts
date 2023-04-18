@@ -7,7 +7,7 @@ import {
 	WebSocketGateway,
 	WebSocketServer,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import { Socket } from 'socket.io';
 import { MessageDto } from 'src/homepage/dtos/MessageDto.dto';
 import { PunishmentDto } from 'src/homepage/dtos/PunishmentDto.dto';
 import { ChannelsService } from 'src/homepage/services/channels/channels.service';
@@ -35,7 +35,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	}
 
 	@WebSocketServer()
-	server: Server;
+	server;
 
 	addUserToList(client: Socket, user: any) {
 		const query = client.handshake.query;
@@ -70,6 +70,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	}
 
 	async handleConnection(client: Socket) {
+		console.log(client.request.headers);
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
 		const channel_id = Number(client.handshake.query.channel_id);
 

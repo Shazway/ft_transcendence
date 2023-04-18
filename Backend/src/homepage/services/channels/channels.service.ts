@@ -158,6 +158,11 @@ export class ChannelsService {
 		const chan_user = await this.itemsService.getUserChan(user_id, chan_id);
 		const time = new Date();
 
+		if (!chan_user)
+		{
+			console.log({ismutedid: user_id, whatchan: chan_id});
+			return true;
+		}
 		if (
 			chan_user.length > 0 &&
 			chan_user[0].is_muted &&

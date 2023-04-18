@@ -1,30 +1,20 @@
-Backend dependencies: (you have to be in the Backend folder):
-npm install @nestjs/cli && \
-npm install class-transformer --save && \
-npm install --save dotenv && \
-npm install --save @nestjs/typeorm typeorm pg && \
-npm install --save @nestjs/passport passport && \
-npm install --save-dev @types/passport-local && \
-npm install --save @nestjs/jwt passport-jwt && \
-npm install --save @nestjs/websockets @nestjs/platform-socket.io && \
-npm install --save @nestjs/axios
+IF YOU RUN DOCKERLESS:
+	1. make BDD in Containers/ folder to start postgresql database
 
-Frontend dependencies: (you have to be in the Frontend folder):
-npm install @angular/cli
-npm install axios
+	2. Backend dependencies: (you have to be in the Backend folder):
+		npm install @nestjs/cli@latest && \
+		npm install class-transformer@latest --save && \
+		npm install --save dotenv@latest && \
+		npm install --save typeorm@latest pg && \
+		npm install --save @nestjs/passport@latest passport@latest && \
+		npm install --save-dev @types/passport-local@latest && \
+		npm install --save @nestjs/jwt@latest passport-jwt@latest && \
+		npm install --save @nestjs/websockets@latest @nestjs/platform-socket.io@latest && \
+		npm install --save @nestjs/axios@latest
+	Then run with npm run start:dev
 
-BDD links:
-https://hub.docker.com/_/postgres
-https://suedbroecker.net/2020/06/23/run-a-postgressql-container-as-a-non-root-user-in-openshift/
-
-Connexion BDD:
-docker exec -it postgresql bash
-psql -U root -W
-psql -U inox -d inox_db -W
-psql -a -f ./docker-entrypoint-initdb.d/Setup.sql
-
-in sql mode:
-\d to see all tables
-
-Balises style:
-<div class="terminal"/>
+	3. Frontend dependencies: (you have to be in the Frontend folder):
+		npm install @angular/cli && \
+		npm install axios && \
+		npm install jquery && \
+	Then run with npm run start
