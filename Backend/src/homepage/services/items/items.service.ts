@@ -234,11 +234,9 @@ export class ItemsService {
 		achievement_id: number,
 	) {
 		const user = await this.getUser(user_id);
-		console.log(user);
 		const achievement = await this.achieveRepo.findOneBy({
 			achievement_id,
 		});
-		console.log(achievement);
 
 		user.achievement.push(achievement);
 		await this.userRepo.save(user);
@@ -249,9 +247,7 @@ export class ItemsService {
 		friend_id: number,
 	) {
 		const user = await this.getUser(user_id);
-		console.log(user);
 		const friend = await this.getUser(friend_id);
-		console.log(friend);
 
 		user.friend.push(friend);
 		friend.friend.push(user);

@@ -47,21 +47,20 @@ export class LoginController {
 			.toPromise();
 		if (resToken)
 		{
-			console.log(resToken.data);
+			console.log({TokenInfo: resToken.data});
 			const intraInfo = await this.usersService.fetcIntraInfo(resToken.data.access_token);
 			console.log({ Id: intraInfo.data.id, Login: intraInfo.data.login});
 			const user = await this.itemsService.getUserByIntraId(intraInfo.data.id);
-
 			if (user)
 			{
-				console.log('User logging in');
+				console.log('Logging in');
 				if (!await this.channelsService.isUserMember(user.user_id, 1))
-					await this.channelsService.addUserToChannel(user.user_id, 1);
+				await this.channelsService.addUserToChannel(user.user_id, 1);
 				res.status(HttpStatus.ACCEPTED).send(await this.buildLoginBody(resToken.data, intraInfo.data, user.user_id));
 			}
 			else
 			{
-				console.log('User signing in');
+				console.log('Signing in');
 				const user = await this.usersService.createUser(intraInfo.data);
 				await this.channelsService.addUserToChannel(user.user_id, 1);
 				res.status(HttpStatus.CREATED).send(this.buildLoginBody(resToken.data, intraInfo.data, user.user_id));

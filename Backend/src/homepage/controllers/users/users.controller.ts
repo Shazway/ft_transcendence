@@ -52,7 +52,6 @@ export class UsersController {
 		const userEntity = await this.usersService.createUser(newUserDto);
 		if (!check_id) await this.channelService.addUserToChannel(userEntity.user_id, 1);
 		newUserDto.id = userEntity.user_id;
-		console.log(newUserDto);
 		return res.status(HttpStatus.OK).send({
 			msg: 'User created',
 			token: await this.authService.login(newUserDto, userEntity.user_id),
@@ -63,7 +62,6 @@ export class UsersController {
 
 	@Get('add_achievement')
 	async addAchievement(@Req() req: Request, @Res() res: Response) {
-		console.log('pass1');
 		const user_id = await this.tokenManager.getIdFromToken(req);
 		this.itemsService.addAchievementsToUser(user_id, 1);
 		res.status(HttpStatus.OK).send('Achievement added');
@@ -77,7 +75,7 @@ export class UsersController {
 	) {
 		const user_id = this.tokenManager.getIdFromToken(req);
 
-		console.log(friend_id);
+		console.log({FriendToAdd: friend_id});
 		this.itemsService.addFriendToUser(user_id, friend_id);
 		res.status(HttpStatus.OK).send('Friend added');
 	}

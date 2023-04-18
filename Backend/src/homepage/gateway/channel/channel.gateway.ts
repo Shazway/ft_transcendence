@@ -60,17 +60,16 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	}
 
 	sendMessageToChannel(channel_id: number, message: MessageDto) {
-		console.log('Sending message: ' + message.message_content);
-		console.log('On channel: ' + channel_id);
+		console.log({Sending_message: message.message_content});
+		console.log({On_channel:  channel_id});
 		const channel = this.channelList.get(channel_id);
 		if (!channel) return false;
-		console.log('Channel found with ' + channel.size + ' users');
+		console.log({Active_Users: channel.size});
 		channel.forEach((user) => user.emit('onMessage', message));
 		return true;
 	}
 
 	async handleConnection(client: Socket) {
-		console.log(client.request.headers);
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
 		const channel_id = Number(client.handshake.query.channel_id);
 
@@ -156,7 +155,6 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@SubscribeMessage('message')
 	async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() body: MessageDto) {
 		body.createdAt = new Date();
-		console.log('log 1');
 		console.log(body);
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
 		const channel_id = Number(client.handshake.query.channel_id);
