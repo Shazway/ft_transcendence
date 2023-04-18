@@ -62,8 +62,7 @@ export class LoginController {
 			else
 			{
 				console.log('User signing in');
-				await this.usersService.createUser(intraInfo.data);
-				const user = await this.itemsService.getUserByIntraId(intraInfo.data.id);
+				const user = await this.usersService.createUser(intraInfo.data);
 				await this.channelsService.addUserToChannel(user.user_id, 1);
 				res.status(HttpStatus.CREATED).send(this.buildLoginBody(resToken.data, intraInfo.data, user.user_id));
 			}
