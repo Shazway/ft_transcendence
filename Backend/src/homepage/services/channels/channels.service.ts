@@ -15,7 +15,7 @@ export class ChannelsService {
 		private chan_userRepo: Repository<ChannelUserRelation>,
 		private itemsService: ItemsService,
 		) {}
-		
+
 	error_tab = [
 		{ ret: false, msg: 'User not found' },
 		{ ret: false, msg: "Channel doesn't exist" },
@@ -93,10 +93,12 @@ export class ChannelsService {
 	}
 
 	async checkPrivileges(source_id: number, target_id: number, chan_id: number) {
-		if (!(await this.isUserAdmin(source_id, chan_id)))
-			return this.error_tab[5];
 		if (!(await this.isUserMember(target_id, chan_id)))
 			return this.error_tab[2];
+		if (source_id === target_id)
+			return ({ret: true, msg: 'OK'});
+		if (!(await this.isUserAdmin(source_id, chan_id)))
+			return this.error_tab[5];
 		if (((await this.isUserAdmin(target_id, chan_id))
 			&& !(await this.isUserOwner(source_id, chan_id))))
 			return this.error_tab[6];

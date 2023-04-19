@@ -193,6 +193,7 @@ export class ItemsService {
 			.leftJoinAndSelect('message.author', 'author')
 			.where('message.channel = :chan_id', { chan_id })
 			.andWhere('message.is_visible = true')
+			.orderBy('message.message_id', 'DESC')
 			.take(maxResult)
 			.skip(page_num * maxResult)
 			.getMany();
@@ -252,6 +253,43 @@ export class ItemsService {
 		user.friend.push(friend);
 		friend.friend.push(user);
 		await this.userRepo.save([user, friend]);
+	}
+
+	public async removeFriendFromUsers(
+		source: UserEntity,
+		friend: UserEntity,
+	) {
+		if (!(source && friend))
+			return false;
+		source.friend = source.friend.filter((source) => source.user_id === friend.user_id);
+		friend.friend = friend.friend.filter((user) => user.user_id === source.user_id);
+		await this.userRepo.save([source, friend]);
+		return true;
+	}
+
+	public async blockUser(source_id: number, target_id: number)
+	{
+		const sourceUser = await this.getUser(source_id);
+		const targetUser = await this.getUser(target_id);
+
+		if (!(sourceUser && targetUser))
+			return false;
+		if (sourceUser.friend.find((user) => user.user_id === targetUser.user_id))
+			await this.removeFriendFromUsers(sourceUser, targetUser);
+		sourceUser.blacklistEntry.push(targetUser);
+		this.userRepo.save(sourceUser);
+		return true;
+	}
+
+	public async unblockUser(source_id: number, target_id: number)
+	{
+		const sourceUser = await this.getUser(source_id);
+
+		if (!sourceUser)
+			return false;
+		sourceUser.blacklistEntry = sourceUser.blacklistEntry.filter((user) => user.user_id === target_id);
+		this.userRepo.save(sourceUser);
+		return true;
 	}
 
 	public async addUserToChannel(

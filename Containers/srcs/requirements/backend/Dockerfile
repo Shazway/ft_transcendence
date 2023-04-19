@@ -7,13 +7,5 @@ RUN apt-get update && \
 
 WORKDIR /app
 
-CMD npm install @nestjs/cli && \
-	npm install class-transformer --save && \
-	npm install --save dotenv && \
-	npm install --save @nestjs/typeorm typeorm pg && \
-	npm install --save @nestjs/passport passport passport-local && \
-	npm install --save-dev @types/passport-local && \
-	npm install --save @nestjs/jwt passport-jwt && \
-	npm install --save @nestjs/websockets @nestjs/platform-socket.io && \
-	npm run migration:run && \
+CMD npm install && \
 	npm run start

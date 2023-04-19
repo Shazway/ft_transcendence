@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
 import { LessMessageDto, MessageDto } from '../../dtos/message'
+import { ChannelDto } from '../../dtos/Channel.dto'
 import { FetchService } from '../fetch.service';
 import { WebsocketService } from '../websocket.service';
 import { Socket, io } from 'socket.io-client';
@@ -11,6 +12,7 @@ import { Socket, io } from 'socket.io-client';
 })
 export class ChatComponent implements OnInit {
 	client: Socket;
+	channels$: ChannelDto[] = [];
 	msgs$: MessageDto[] = [];
 	test_msgs$ = new Array<Array<MessageDto>>;
 
@@ -36,7 +38,9 @@ export class ChatComponent implements OnInit {
 		this.msgs$ = await this.fetchService.getMessages(1, 0);
 		if (!this.msgs$)
 			return;
-		this.msgs$.forEach(async (element: MessageDto) => this.sortMessage(element));
+		for (let index = this.msgs$.length; index > 0; index--)
+			this.sortMessage(this.msgs$[index - 1]);
+		this.channels$ = await this.fetchService.getChannels();
 	}
 
 	slide() {
@@ -51,6 +55,48 @@ export class ChatComponent implements OnInit {
 			offscreenElm.classList.add('show');
 			offscreenBtn.textContent = 'Close chat';
 		}
+	}
+
+	slideChan() {
+		const offscreenChat = this.elRef.nativeElement.querySelector('.offscreen');
+		const offscreenChatBtn = this.elRef.nativeElement.querySelector('#chatBtn');
+		const offscreenElm = this.elRef.nativeElement.querySelector('.channel_pan');
+		const onscreenElm = this.elRef.nativeElement.querySelector('.channel_unpan');
+		const offscreenBtn = this.elRef.nativeElement.querySelector('#chanBtn');
+		if (!offscreenElm)
+			return;
+		if (!offscreenChat.classList.contains('show')) {
+			offscreenChat.classList.add('show');
+			offscreenChatBtn.textContent = 'Close chat';
+		}
+		if (offscreenElm.classList.contains('show')) {
+			offscreenElm.classList.remove('show');
+			onscreenElm.classList.remove('hide');
+		} else {
+			offscreenElm.classList.add('show');
+			onscreenElm.classList.add('hide');
+		}
+	}
+
+	async openChannel(channelId: number) {
+		this.client.close();
+		this.msgs$.splice(0, this.msgs$.length);
+		this.test_msgs$.splice(0, this.test_msgs$.length);
+		this.msgs$ = await this.fetchService.getMessages(channelId, 0);
+		if (!this.msgs$)
+			return;
+		for (let index = this.msgs$.length; index > 0; index--)
+			this.sortMessage(this.msgs$[index - 1]);
+		this.client = io('ws://localhost:3002?channel_id=' + channelId, this.websocketService.getHeader());
+		this.client.on('onMessage', (event) => { console.log('Message recieved ' + event); this.sortMessage(event) });
+		this.client.on('onError', (event) => { console.log('WebSocket error: ' + event); });
+		this.client.on('connection', () => { console.log('Connected to WebSocket server'); });
+		this.client.on('disconnect', () => { console.log('Disconnected from WebSocket server'); });
+		this.slideChan();
+	}
+
+	createChannel() {
+		this.fetchService.createChannel({ channel_name: 'chan2' });
 	}
 
 	sortMessage(new_msg: MessageDto) {
@@ -76,12 +122,16 @@ export class ChatComponent implements OnInit {
 		return (hour + ':' + min);
 	}
 
+	getName(msgList: Array<MessageDto>) {
+		return (msgList[0].author.username);
+	}
+
 	isSystem(msg : MessageDto) {
 		return (msg.author.user_id == 0)
 	}
 
 	async onClickChat(data: LessMessageDto) {
-		if (!this.client)
+		if (!this.client || data.message_content.trim().length == 0)
 			return false;
 		const author = localStorage.getItem('username');
 		const id = localStorage.getItem('id');

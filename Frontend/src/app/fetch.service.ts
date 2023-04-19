@@ -4,6 +4,8 @@ import axios from 'axios';
 import { ResponseDto } from 'src/dtos/Response.dto';
 import { UserDto } from 'src/dtos/UserDto.dto';
 import { MessageDto } from 'src/dtos/message';
+import { NewChanDto } from 'src/dtos/NewChan.dto';
+import { ChannelDto } from 'src/dtos/Channel.dto'
 
 @Injectable({
   providedIn: 'root'
@@ -81,6 +83,31 @@ export class FetchService {
 		.then(function (response) {
 		res = response.data;
 		console.log(res);
+		})
+		.catch(function (error) { console.log(error); })
+		.finally(function () {});
+		return res;
+	}
+
+	async createChannel(param: NewChanDto) {
+		let res;
+		console.log(param);
+		await axios.post('http://localhost:3001/channels/create', param, this.getHeader())
+		.then(function (response) {
+			res = response.data;
+			console.log(res);
+		})
+		.catch(function (error) { console.log(error); })
+		.finally(function () {});
+		return res;
+	}
+
+	async getChannels(): Promise<ChannelDto[]> {
+		let res: ChannelDto[] = [];
+		await axios.get('http://localhost:3001/channels/all', this.getHeader())
+		.then(function (response) {
+			res = response.data;
+			console.log(res);
 		})
 		.catch(function (error) { console.log(error); })
 		.finally(function () {});

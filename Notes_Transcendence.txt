@@ -5,7 +5,7 @@ IF YOU RUN DOCKERLESS:
 		npm install @nestjs/cli@latest && \
 		npm install class-transformer@latest --save && \
 		npm install --save dotenv@latest && \
-		npm install --save typeorm@latest pg && \
+		npm install --save @nestjs/typeorm@latest pg && \
 		npm install --save @nestjs/passport@latest passport@latest && \
 		npm install --save-dev @types/passport-local@latest && \
 		npm install --save @nestjs/jwt@latest passport-jwt@latest && \

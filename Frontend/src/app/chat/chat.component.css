@@ -146,7 +146,21 @@ img{ max-width:100%;}
 	bottom: -50vh;
 	transition: transform 0.3s ease-in-out;
   }
-  
-  .offscreen.show {
-	transform: translateY(-50vh); /* move the div back onto the screen */
-  }
+
+.offscreen.show {
+	transform: translateY(-50vh);
+}
+
+.channel_pan {
+  position: relative;
+  display: none;
+}
+
+.channel_pan.show {
+  display: block;
+  height: 100%;
+}
+
+.channel_unpan.hide {
+  display: none;
+}

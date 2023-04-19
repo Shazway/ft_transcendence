@@ -34,7 +34,7 @@ export class ChannelsController {
 		const serializedChannels = channelList.map((channel) =>
 			plainToClass(SerializedChanDto, channel),
 		);
-		return res.status(HttpStatus.FOUND).send(serializedChannels);
+		return res.status(HttpStatus.OK).send(serializedChannels);
 	}
 
 	@Get('add_channel/:id')
@@ -52,10 +52,17 @@ export class ChannelsController {
 	}
 
 	@Get('public')
-	async getPublicChannel(@Req() req: Request, @Res() res: Response) {
+	async getPublicChannels(@Req() req: Request, @Res() res: Response) {
 		const channelList = await this.channelService.getPubChannels();
 		if (!channelList) res.status(HttpStatus.NO_CONTENT).send({ msg: 'No channels registered' });
-		else res.status(HttpStatus.FOUND).send(channelList);
+		else res.status(HttpStatus.OK).send(channelList);
+	}
+	@Get('all')
+	async getPrivateChannels(@Req() req: Request, @Res() res: Response) {
+		const user = await this.tokenManager.getIdFromToken(req);
+		const channelList = await this.channelService.getAllChannelsFromUser(user);
+		if (!channelList) res.status(HttpStatus.NO_CONTENT).send({ msg: 'No channels registered' });
+		else res.status(HttpStatus.OK).send(channelList);
 	}
 
 	@Post('create')
@@ -124,7 +131,7 @@ export class ChannelsController {
 		@Res() res: Response,
 	) {
 		const messages = await this.messageService.getPage(chan_id, page_num);
-		console.log(messages);
+		console.log({Messages: messages});
 		if (!messages)
 			res.status(HttpStatus.NOT_FOUND).send({ msg: 'No message in the channel: ' + chan_id });
 		else res.status(HttpStatus.OK).send(messages);
@@ -139,6 +146,6 @@ export class ChannelsController {
 		const channel = await this.channelService.getChannelById(chan_id);
 		if (!channel)
 			res.status(HttpStatus.NOT_FOUND).send({ msg: 'No channels with id ' + chan_id });
-		else res.status(HttpStatus.FOUND).send(channel);
+		else res.status(HttpStatus.OK).send(channel);
 	}
 }
