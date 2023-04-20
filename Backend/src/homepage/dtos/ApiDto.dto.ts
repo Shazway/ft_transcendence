@@ -19,9 +19,17 @@ export class TokenInfo {
 export class IntraInfo {
 	id: number;
 	login: string;
+	email: string;
 	image: { link: string };
 }
 
 export class AuthCode {
-	code: string;
+	mail_code: string;
+	id: string;
+	api_code: string;
+}
+
+export class AuthPair {
+	secret: string;
+	intra_token: TokenInfo;
 }

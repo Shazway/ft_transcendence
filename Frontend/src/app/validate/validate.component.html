@@ -1,0 +1,6 @@
+<form #validateCode="ngForm" (ngSubmit)="getCode(validateCode.value)" >
+	<div class="card-footer text-muted d-flex justify-content-start align-items-center p-3 gap-3">
+		<input type="text" name = "code" class="form-control form-control-lg" id="exampleFormControlInput1" placeholder="Type message" ngModel>
+		<input type = "submit" class="btn btn-outline-secondary btn-sm rounded-5" value = "submit">
+	</div>
+</form>

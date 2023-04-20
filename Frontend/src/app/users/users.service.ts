@@ -11,8 +11,8 @@ export class UsersService {
 
   getUsers() {
     console.log('pass getUser');
-    lethead = new HttpHeaders;
-    
-    return this.httpClient.get('http://localhost:4200http://localhost:3001/leaderboard', options: {header: });
+    let head = new HttpHeaders;
+
+    return this.httpClient.get('http://localhost:3001/leaderboard', options: {header: });
   }
 }

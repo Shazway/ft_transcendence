@@ -87,6 +87,10 @@ export class HomepageModule {
 					path: 'login',
 					method: RequestMethod.ALL,
 				},
+				{
+					path: 'login/callback',
+					method: RequestMethod.ALL,
+				},
 			)
 			.forRoutes({
 				path: '*',

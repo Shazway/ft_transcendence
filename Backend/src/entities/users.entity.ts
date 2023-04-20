@@ -36,6 +36,9 @@ export class User {
 
 	@Column({ default: 0, unsigned: true })
 	losses!: number;
+
+	@Column({ default: false })
+	double_auth!: boolean;
 	// ---------------------- Friendship ----------------------------------
 
 	@OneToMany(() => Friendrequest, (friendrequest) => friendrequest.sender)

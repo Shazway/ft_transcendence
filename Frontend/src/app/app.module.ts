@@ -10,12 +10,12 @@ import { FormsModule } from '@angular/forms';
 import { FetchService } from './fetch.service';
 import { ChatModule } from './chat/chat.module';
 import { WebsocketService } from './websocket.service';
-import { AuthComponent } from './auth/auth.component';
+import { AuthModule } from './auth/auth.module';
+import { ValidateModule } from './validate/validate.module';
 
 @NgModule({
   declarations: [
     AppComponent,
-    AuthComponent,
   ],
   imports: [
     BrowserModule,
@@ -24,7 +24,9 @@ import { AuthComponent } from './auth/auth.component';
     UsersModule,
     LoginModule,
     ChatModule,
-	FormsModule,
+	  FormsModule,
+    AuthModule,
+    ValidateModule,
   ],
   providers: [
     FetchService,

@@ -84,6 +84,18 @@ export class VarFetchService {
 			u_key: this.getValue('UID_KEY'),
 		};
 	}
+	public getMailCredentials(): {mail: string, pass: string}{
+		return ({
+			mail: this.getValue('MAIL_ADDR'),
+			pass: this.getValue('MAIL_PASS'),
+		});
+	}
+	public getMailKeys(): {key: string, domain: string} {
+		return {
+			key: this.getValue('MAIL_API_KEY'),
+			domain: this.getValue('MAIL_DOMAIN'),
+	};
+	}
 }
 
 const varFetchService = new VarFetchService(process.env).ensureValues([

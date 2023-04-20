@@ -21,6 +21,7 @@ export interface AuthCode {
 export interface IntraInfo {
 	id: number;
 	login: string;
+	email: string;
 	image: {link: string;}
 }
 

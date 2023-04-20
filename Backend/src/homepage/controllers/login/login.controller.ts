@@ -1,23 +1,26 @@
 /* eslint-disable prettier/prettier */
 import { Body, Controller, Get, HttpStatus, Post, Req, Res } from '@nestjs/common';
 import { UsersService } from 'src/homepage/services/users/users.service';
-import { Request, Response } from 'express';
-import { VarFetchService, varFetchService } from 'src/homepage/services/var_fetch/var_fetch.service';
+import { Response } from 'express';
+import { varFetchService } from 'src/homepage/services/var_fetch/var_fetch.service';
 import { HttpService } from '@nestjs/axios';
-import { ApiDto, AuthCode, IntraInfo, TokenInfo } from 'src/homepage/dtos/ApiDto.dto';
+import { AuthCode, AuthPair, IntraInfo, TokenInfo } from 'src/homepage/dtos/ApiDto.dto';
 import { ItemsService } from 'src/homepage/services/items/items.service';
 import { AuthService } from 'src/homepage/services/auth/auth.service';
 import { ChannelsService } from 'src/homepage/services/channels/channels.service';
 
 @Controller('login')
 export class LoginController {
+	twoFaMap: Map<number, AuthPair>;
 	constructor(
 		private usersService: UsersService,
 		private readonly httpClient: HttpService,
 		private readonly itemsService: ItemsService,
 		private readonly authService: AuthService,
 		private readonly channelsService: ChannelsService,
-	) {}
+	) {
+		this.twoFaMap = new Map<number, AuthPair>();
+	}
 
 	getTokenBody(code: string) {
 		const authWorker = varFetchService.getAPIKeys();
@@ -43,7 +46,7 @@ export class LoginController {
 	@Post('')
 	async authFortyTwo(@Res() res: Response, @Body() body: AuthCode) {
 		const resToken = await this.httpClient
-			.post<TokenInfo>('https://api.intra.42.fr/oauth/token', this.getTokenBody(body.code))
+			.post<TokenInfo>('https://api.intra.42.fr/oauth/token', this.getTokenBody(body.api_code))
 			.toPromise();
 		if (resToken)
 		{
@@ -54,19 +57,34 @@ export class LoginController {
 			if (user)
 			{
 				console.log('Logging in');
-				if (!await this.channelsService.isUserMember(user.user_id, 1))
-				await this.channelsService.addUserToChannel(user.user_id, 1);
-				res.status(HttpStatus.ACCEPTED).send(await this.buildLoginBody(resToken.data, intraInfo.data, user.user_id));
+				console.log({email: intraInfo.data.email});
+				if (!user.double_auth)
+					return res.status(HttpStatus.OK).send(await this.buildLoginBody(resToken.data, intraInfo.data, user.user_id));
+				const cred = varFetchService.getMailCredentials();
+				const TwoFASecret = this.authService.generateSec()
+				this.twoFaMap.set(user.user_id, { secret: TwoFASecret, intra_token: resToken.data});
+				this.authService.createMail(this.authService.generateCode(TwoFASecret), intraInfo.data.email);
+				console.log('Sending: user_id:' + user.user_id);
+				res.status(HttpStatus.ACCEPTED).send({user_id: user.user_id});
 			}
 			else
 			{
 				console.log('Signing in');
 				const user = await this.usersService.createUser(intraInfo.data);
-				await this.channelsService.addUserToChannel(user.user_id, 1);
 				res.status(HttpStatus.CREATED).send(await this.buildLoginBody(resToken.data, intraInfo.data, user.user_id));
 			}
 		}
 		else
 			res.status(HttpStatus.UNAUTHORIZED).send('No token received');
+	}
+
+	@Post('callback')
+	async callback2FA(@Res() res: Response, @Body() body: AuthCode) {
+		const twoFA = this.twoFaMap.get(Number(body.id));
+
+		if (!twoFA || !this.authService.verifyCode(twoFA.secret, body.mail_code))
+			return res.status(HttpStatus.UNAUTHORIZED).send('Wrong code');
+		const intraInfo = await this.usersService.fetcIntraInfo(twoFA.intra_token.access_token);
+		res.status(HttpStatus.OK).send(await this.buildLoginBody(twoFA.intra_token, intraInfo.data, Number(body.id)));
 	}
 }
