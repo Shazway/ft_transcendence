@@ -8,7 +8,9 @@ import {
 	WebSocketServer,
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
+import { AchievementsEntity } from 'src/entities';
 import { NotificationRequest, NotificationResponse } from 'src/homepage/dtos/Notifications.dto';
+import { ChannelsService } from 'src/homepage/services/channels/channels.service';
 import { ItemsService } from 'src/homepage/services/items/items.service';
 import { NotificationsService } from 'src/homepage/services/notifications/notifications.service';
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
@@ -27,9 +29,10 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		private tokenManager: TokenManagerService,
 		private notificationService: NotificationsService,
 		private itemsService: ItemsService,
-	) {
-		this.userList = new Map<number, Socket>();
-	}
+		private channelsService: ChannelsService,
+		) {
+			this.userList = new Map<number, Socket>();
+		}
 
 	@WebSocketServer()
 	server;
@@ -53,44 +56,63 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		});
 	}
 
-	@SubscribeMessage('friendRequest')
-	async handleFriendRequest(@ConnectedSocket() client: Socket, @MessageBody() body: NotificationRequest) {
-		body.sent_at = new Date();
-		let answer: NotificationResponse;
-		const source = this.tokenManager.getToken(client.request.headers.authorization);
-		const target = await this.itemsService.getUser(body.target_id);
-
-		if (target.blacklistEntry.find((user) => user.user_id === source.sub))
-			return client.emit('notAllowed', "User blocked");
-		else {
-			const user = this.userList.get(target.user_id);
-			answer.sent_at = body.sent_at;
-			answer.source_id = source.sub;
-			answer.source_name = source.name;
-			answer.type = "friend";
-			if (user)
-				user.emit('friendRequest', answer);
-		}
+	//Send achievements to user
+	async sendAchievement(user_id: number, achievement: AchievementsEntity)
+	{
+		const client = this.userList.get(user_id);
+		if (!client)
+			return false;
+		this.itemsService.addAchievementsToUser(user_id, achievement.achievement_id);
+		client.emit('newAchievement', 'Congratulations! You received the ' + achievement.achievement_name);
+		return true;
 	}
 
-	@SubscribeMessage('friendAnswer')
-	async handleFriendAnswer(@ConnectedSocket() client: Socket, @MessageBody() body: NotificationRequest) {
+	buildAnswer(id: number, username: string, type: string, accept: boolean = false) {
+		const answer: NotificationResponse = {
+			source_id: id,
+			type: type,
+			source_name: username,
+			sent_at: new Date(),
+			accepted: accept
+		};
+		return answer;
+	}
+
+	//Answer and send friend requests
+
+	@SubscribeMessage('inviteRequest')
+	async handleInvite(@ConnectedSocket() client: Socket, @MessageBody() body: NotificationRequest) {
 		body.sent_at = new Date();
-		let answer: Notification;
 		const source = this.tokenManager.getToken(client.request.headers.authorization);
+		const answer = this.buildAnswer(source.sub, source.name, body.type);
 		const target = await this.itemsService.getUser(body.target_id);
+		const user = this.userList.get(target.user_id);
 
 		if (target.blacklistEntry.find((user) => user.user_id === source.sub))
-			return client.emit('notAllowed', "User blocked");
-		else {
-			const user = this.userList.get(target.user_id);
+			return client.emit('notAllowed', "User blocked, they cannot interact with this user");
+		else
 			if (user)
-			{
-				if (!body.accepted)
-					return user.emit('newFriend', target.username + " refused your invite");
-				await this.itemsService.addFriendToUser(source.sub, target.user_id);
-				user.emit('newFriend', "You are now friends with " + target.username);
-			}
+				user.emit(body.type + 'Invite', {notification: answer, msg: answer.type + ' invite'});
+	}
+
+	@SubscribeMessage('inviteAnswer')
+	async handeAnswer(@ConnectedSocket() client: Socket, @MessageBody() body: NotificationRequest) {
+		const source = this.tokenManager.getToken(client.request.headers.authorization);
+		const answer = this.buildAnswer(source.sub, source.name, body.type, body.accepted);
+
+		if (!body.accepted) {
+			this.userList.get(body.target_id)
+			.emit(body.type + 'Answer', {notification: answer, msg: answer.type + ' refused'});
+			return false;
+		}
+		else {
+			const user = this.userList.get(body.target_id);
+			if (body.type == 'friend')
+				await this.itemsService.addFriendToUser(source.sub, body.target_id);
+			if (body.type == 'channel')
+					await this.channelsService.addUserToChannel(body.target_id, body.channel_id);
+			if (user)
+				user.emit(body.type + 'Answer', {notification: answer, msg: answer.type + ' accepted'});
 		}
 	}
 }

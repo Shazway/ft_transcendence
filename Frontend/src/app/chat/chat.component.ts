@@ -27,7 +27,7 @@ export class ChatComponent implements OnInit {
 		if (!this.client)
 			return;
 		console.log('JWT token: ' + localStorage.getItem('Jwt_token'));
-		this.client.on('onMessage', (event) => { console.log('Message recieved ' + event); this.sortMessage(event) });
+		this.client.on('onMessage', (event) => { console.log('Message reveived ' + event); this.sortMessage(event) });
 		this.client.on('onError', (event) => { console.log('WebSocket error: ' + event); });
 		this.client.on('connection', () => { console.log('Connected to WebSocket server'); });
 		this.client.on('disconnect', () => { console.log('Disconnected from WebSocket server'); });
@@ -88,7 +88,7 @@ export class ChatComponent implements OnInit {
 		for (let index = this.msgs$.length; index > 0; index--)
 			this.sortMessage(this.msgs$[index - 1]);
 		this.client = io('ws://localhost:3002?channel_id=' + channelId, this.websocketService.getHeader());
-		this.client.on('onMessage', (event) => { console.log('Message recieved ' + event); this.sortMessage(event) });
+		this.client.on('onMessage', (event) => { console.log('Message reveived ' + event); this.sortMessage(event) });
 		this.client.on('onError', (event) => { console.log('WebSocket error: ' + event); });
 		this.client.on('connection', () => { console.log('Connected to WebSocket server'); });
 		this.client.on('disconnect', () => { console.log('Disconnected from WebSocket server'); });

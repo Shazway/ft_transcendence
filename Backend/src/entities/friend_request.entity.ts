@@ -10,6 +10,6 @@ export class Friendrequest {
 	@ManyToOne(() => User, (user) => user.sentFriendRequests, { onDelete: 'CASCADE' })
 	sender: User;
 
-	@ManyToOne(() => User, (user) => user.recievedFriendRequests, { onDelete: 'CASCADE' })
+	@ManyToOne(() => User, (user) => user.receivedFriendRequests, { onDelete: 'CASCADE' })
 	receiver: User;
 }

@@ -67,6 +67,6 @@ export class LoginController {
 			}
 		}
 		else
-			res.status(HttpStatus.UNAUTHORIZED).send('No token recieved');
+			res.status(HttpStatus.UNAUTHORIZED).send('No token received');
 	}
 }

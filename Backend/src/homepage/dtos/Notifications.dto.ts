@@ -4,6 +4,7 @@ export class NotificationRequest {
 	target_id: number;
 	sent_at: Date
 	accepted: boolean;
+	channel_id: number;
 }
 export class NotificationResponse {
 	type: string;

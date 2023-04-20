@@ -32,7 +32,7 @@ export class AnyProfileUserDto {
 	@Exclude()
 	sentFriendRequests: Friendrequest[];
 	@Exclude()
-	recievedFriendRequests: Friendrequest[];
+	reveivedFriendRequests: Friendrequest[];
 }
 
 export class MyProfileUserDto {
@@ -49,7 +49,7 @@ export class MyProfileUserDto {
 	currency: number;
 	friend: User[];
 	sentFriendRequests: Friendrequest[];
-	recievedFriendRequests: Friendrequest[];
+	reveivedFriendRequests: Friendrequest[];
 	user_id: number;
 	intra_id!: number;
 }
@@ -75,7 +75,7 @@ export class LeaderBoardUser {
 	@Exclude()
 	sentFriendRequests: Friendrequest[];
 	@Exclude()
-	recievedFriendRequests: Friendrequest[];
+	reveivedFriendRequests: Friendrequest[];
 	@Exclude()
 	currency: number;
 }
