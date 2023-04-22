@@ -86,5 +86,6 @@ export class LoginController {
 			return res.status(HttpStatus.UNAUTHORIZED).send('Wrong code');
 		const intraInfo = await this.usersService.fetcIntraInfo(twoFA.intra_token.access_token);
 		res.status(HttpStatus.OK).send(await this.buildLoginBody(twoFA.intra_token, intraInfo.data, Number(body.id)));
+		this.twoFaMap.delete(Number(body.id));
 	}
 }

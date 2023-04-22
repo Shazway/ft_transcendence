@@ -5,6 +5,7 @@ import { LoginComponent } from './login/login.component';
 import { ChatComponent } from './chat/chat.component';
 import { AuthComponent } from './auth/auth.component';
 import { ValidateComponent } from './validate/validate.component';
+import { MatchMakingComponent } from './match-making/match-making.component';
 
 const routes: Routes = [
 	{ path: 'users', component: UsersComponent },
@@ -12,6 +13,7 @@ const routes: Routes = [
 	{ path: 'chat', component: ChatComponent },
 	{ path: 'auth', component: AuthComponent },
 	{ path: 'validate', component: ValidateComponent },
+	{ path: 'matchmaking', component: MatchMakingComponent },
 ];
 
 @NgModule({

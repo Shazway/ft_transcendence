@@ -92,27 +92,22 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 			return client.emit('notAllowed', "User blocked, they cannot interact with this user");
 		else
 			if (user)
-				user.emit(body.type + 'Invite', {notification: answer, msg: answer.type + ' invite'});
+				user.emit(body.type + 'Invite', {notification: answer});
 	}
 
 	@SubscribeMessage('inviteAnswer')
 	async handeAnswer(@ConnectedSocket() client: Socket, @MessageBody() body: NotificationRequest) {
 		const source = this.tokenManager.getToken(client.request.headers.authorization);
 		const answer = this.buildAnswer(source.sub, source.name, body.type, body.accepted);
+		const user = this.userList.get(body.target_id);
 
-		if (!body.accepted) {
-			this.userList.get(body.target_id)
-			.emit(body.type + 'Answer', {notification: answer, msg: answer.type + ' refused'});
-			return false;
-		}
-		else {
-			const user = this.userList.get(body.target_id);
+		if (body.accepted) {
 			if (body.type == 'friend')
 				await this.itemsService.addFriendToUser(source.sub, body.target_id);
 			if (body.type == 'channel')
 					await this.channelsService.addUserToChannel(body.target_id, body.channel_id);
-			if (user)
-				user.emit(body.type + 'Answer', {notification: answer, msg: answer.type + ' accepted'});
+			//if(body.type == 'match')?
 		}
+		user.emit(body.type + 'Answer', {notification: answer});
 	}
 }

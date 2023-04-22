@@ -23,7 +23,4 @@ export class MatchSetting {
 
 	@Column({ default: 2 })
 	round_to_win!: number;
-
-	@OneToOne(() => Match, (match) => match.matchSetting)
-	match: Match;
 }

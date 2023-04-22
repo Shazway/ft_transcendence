@@ -12,6 +12,7 @@ import { ChatModule } from './chat/chat.module';
 import { WebsocketService } from './websocket.service';
 import { AuthModule } from './auth/auth.module';
 import { ValidateModule } from './validate/validate.module';
+import { MatchMakingComponent } from './match-making/match-making.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,7 @@ import { ValidateModule } from './validate/validate.module';
     WebsocketService,
   ],
   bootstrap: [
-	AppComponent,
+	  AppComponent,
 ]
 })
 export class AppModule { }

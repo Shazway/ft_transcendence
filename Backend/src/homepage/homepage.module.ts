@@ -27,6 +27,7 @@ import { OptionInterceptor } from './middleware/option-interceptor/option-interc
 import { NotificationsGateway } from './gateway/notifications/notifications.gateway';
 import { NotificationsService } from './services/notifications/notifications.service';
 import { HttpModule } from '@nestjs/axios';
+import { MatchmakingGateway } from './gateway/matchmaking/matchmaking.gateway';
 
 @Module({
 	imports: [
@@ -64,6 +65,7 @@ import { HttpModule } from '@nestjs/axios';
 		MessagesService,
 		NotificationsGateway,
 		NotificationsService,
+		MatchmakingGateway,
 	],
 })
 export class HomepageModule {
