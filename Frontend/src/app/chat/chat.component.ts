@@ -5,6 +5,8 @@ import { FetchService } from '../fetch.service';
 import { WebsocketService } from '../websocket.service';
 import { Socket, io } from 'socket.io-client';
 import { fromEvent, lastValueFrom } from 'rxjs';
+import { NgbModal  } from '@ng-bootstrap/ng-bootstrap';
+import { PunishmentPopup } from '../popup-component/popup-component.component';
 
 @Component({
 	selector: 'app-chat',
@@ -29,6 +31,7 @@ export class ChatComponent implements OnInit {
 		private fetchService: FetchService,
 		private websocketService: WebsocketService,
 		private elRef: ElementRef,
+		private modalService: NgbModal,
 	) {
 		this.client = io('ws://localhost:3002?channel_id=' + 1, websocketService.getHeader());
 		if (!localStorage.getItem('Jwt_token'))
@@ -138,15 +141,25 @@ export class ChatComponent implements OnInit {
 		}
 	}
 
+	async createPopup(title: string, label: string) {
+		const modalRef = this.modalService.open(PunishmentPopup);
+		modalRef.componentInstance.title = title;
+		modalRef.componentInstance.label = label;
+		return await modalRef.result;
+	}
+
 	addFriend(msg: MessageDto) {}
 	blockUser(msg: MessageDto) {}
-	muteUser(msg: MessageDto) {
+	async muteUser(msg: MessageDto) {
 		const muteUserElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-mute');
 		if (!muteUserElm.classList.contains('show'))
 			return;
+		const muteTime = await this.createPopup("Mute", "Time");
+		if (!muteTime)
+			return;
 		this.client.emit('mute', {
 			target_id: msg.author.user_id,
-			time: 10,
+			time: muteTime,
 			message: "You have been muted",
 		})
 	}
@@ -159,9 +172,12 @@ export class ChatComponent implements OnInit {
 			message: "You have been kicked",
 		})
 	}
-	banUser(msg: MessageDto) {
+	async banUser(msg: MessageDto) {
 		const banUserElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-ban');
 		if (!banUserElm.classList.contains('show'))
+			return;
+		const banTime = await this.createPopup("Ban", "Time");
+		if (!banTime)
 			return;
 		this.client.emit('ban', {
 			target_id: msg.author.user_id,
@@ -172,10 +188,10 @@ export class ChatComponent implements OnInit {
 		const banUserElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-del');
 		if (!banUserElm.classList.contains('show'))
 			return;
-		this.client.emit('ban', {
-			target_id: msg.author.user_id,
-			message: "You have been banned",
-		})
+		// this.client.emit('ban', {
+		// 	target_id: msg.author.user_id,
+		// 	message: "You have been banned",
+		// })
 	}
 
 	slideChan() {

@@ -47,10 +47,12 @@ export class MatchmakingGateway {
 		console.log({new_player: user});
 		const player_rank = (await this.itemsService.getUser(user.sub)).rank_score;
 		const rankFork = this.getRankFork(player_rank);
-		const playersFork = this.userQueue.get(rankFork);
-		if (!playersFork)
+		let bracket = this.userQueue.get(rankFork);
+		if (!bracket)
+		{
 			this.userQueue.set(rankFork, new Map<number, Player>());
-		const bracket = this.userQueue.get(rankFork);
+			bracket = this.userQueue.get(rankFork);
+		}
 		const player = this.buildPlayer(client, user.sub, user.name);
 		bracket.set(user.sub, player);
 		if (!this.interval)

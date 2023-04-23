@@ -13,10 +13,12 @@ import { WebsocketService } from './websocket.service';
 import { AuthModule } from './auth/auth.module';
 import { ValidateModule } from './validate/validate.module';
 import { MatchMakingComponent } from './match-making/match-making.component';
+import { PunishmentPopup } from './popup-component/popup-component.component';
 
 @NgModule({
   declarations: [
     AppComponent,
+    PunishmentPopup,
   ],
   imports: [
     BrowserModule,

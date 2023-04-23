@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ChatComponent } from './chat.component';
 import { FormsModule } from '@angular/forms';
 import { MatchMakingModule } from '../match-making/match-making.module';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 
 
@@ -16,6 +17,7 @@ import { MatchMakingModule } from '../match-making/match-making.module';
 	imports: [
 		CommonModule,
 		FormsModule,
+		NgbModule,
 	]
 })
 export class ChatModule { }

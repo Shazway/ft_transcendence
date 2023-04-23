@@ -170,3 +170,7 @@ img{ max-width:100%;}
 .hidden_icon.show {
   opacity: 1;
 }
+
+.chat-size {
+  width: 500px;
+}

@@ -159,6 +159,9 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	async handleMute(@ConnectedSocket() client: Socket, @MessageBody() body: PunishmentDto) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
 		const channel_id = Number(client.handshake.query.channel_id);
+		const ret = await this.channelService.checkPrivileges(user.sub, body.target_id, channel_id);
+		if (!ret.ret)
+			return client.emit('onError', 'Lacking privileges');
 		if (!this.channelService.muteUser(user.sub, body.target_id, channel_id, body.time))
 			return client.emit('onError', 'Error while muting some dude');
 		// eslint-disable-next-line prettier/prettier
@@ -174,6 +177,9 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	async handleBan(@ConnectedSocket() client: Socket, @MessageBody() body: PunishmentDto) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
 		const channel_id = Number(client.handshake.query.channel_id);
+		const ret = await this.channelService.checkPrivileges(user.sub, body.target_id, channel_id);
+		if (!ret.ret)
+			return client.emit('onError', 'Lacking privileges');
 		this.channelService.banUser(user.sub, body.target_id, channel_id, body.time);
 		// eslint-disable-next-line prettier/prettier
 		const targets = this.channelList.get(channel_id).get(body.target_id);
@@ -190,21 +196,23 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	async handleKick(@ConnectedSocket() client: Socket, @MessageBody() body: PunishmentDto) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
 		const channel_id = Number(client.handshake.query.channel_id);
-		if (!this.channelService.checkPrivileges(user.sub, body.target_id, channel_id))
+		const ret = await this.channelService.checkPrivileges(user.sub, body.target_id, channel_id);
+		if (!ret.ret)
 			return client.emit('onError', 'Lacking privileges');
 		// eslint-disable-next-line prettier/prettier
 		const target = this.channelList.get(channel_id).get(body.target_id);
-		if (user.sub === body.target_id)
-		{
+		if (user.sub === body.target_id) {
 			this.channelLeaveMsg(channel_id, body);
 			return this.notificationGateway.sendMessage([user.sub], 'You have left the room');
 		}
-		this.socketEmit(target,
-			'onMessage',
-			'You have been kicked by ' + user.name + ' for reason: ' + body.message,
-		);
+		if (target) {
+			this.socketEmit(target,
+				'onMessage',
+				'You have been kicked by ' + user.name + ' for reason: ' + body.message,
+			);
+			this.socketDisconnect(target);
+		}
 		this.channelLeaveMsg(channel_id, body);
-		this.socketDisconnect(target);
 		this.notificationGateway.sendMessage([user.sub], 'Successful kick');
 	}
 
