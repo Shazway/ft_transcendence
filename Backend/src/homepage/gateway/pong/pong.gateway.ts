@@ -1,10 +1,11 @@
-import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { ItemsService } from 'src/homepage/services/items/items.service';
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
 import { Socket } from 'socket.io';
 import { MatchDto } from 'src/homepage/dtos/MatchDto.dto';
 import { MatchsService } from 'src/homepage/services/matchs/matchs.service';
-import { Position } from 'src/homepage/dtos/Pong.dto';
+import { Move, Position } from 'src/homepage/dtos/Pong.dto';
+import { Player } from 'src/homepage/dtos/Matchmaking.dto';
 
 @WebSocketGateway(3005, {
 	cors: {
@@ -14,7 +15,9 @@ import { Position } from 'src/homepage/dtos/Pong.dto';
 
 export class PongGateway {
 	private matchs: Map<number, MatchDto>;
-
+	UP = 1;
+	DOWN = 0;
+	VELOCITY = 1;
 	constructor(
 		private tokenManager: TokenManagerService,
 		private itemsService: ItemsService,
@@ -44,6 +47,7 @@ export class PongGateway {
 		if (!match)
 		{
 			match = new MatchDto();
+			match.players = new Array<Player>;
 			match.entity = await this.itemsService.getMatch(match_id);
 			match.players.push(this.buildPlayer(client, user.sub, user.name, this.playerStartingPos('left')));
 			this.matchs.set(match_id, match);
@@ -76,6 +80,31 @@ export class PongGateway {
 		const match = this.matchs.get(match_id);
 		match.players.forEach((user) => {
 			user.client.emit(event, content);
+		})
+	}
+
+	setUpindexes(user_id: number, players: Array<Player>): {moving: number, opponent: number} {
+		if (players[0].user_id == user_id)
+			return ({moving: 0, opponent: 1});
+		return ({moving: 1, opponent: 0});
+	}
+
+	@SubscribeMessage('playerMove')
+	handleMove(@ConnectedSocket() client: Socket, @MessageBody() body: Move) {
+		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		const match = this.matchs.get(body.match_id);
+		const indexes = this.setUpindexes(user.sub, match.players);
+		const posMover = match.players[indexes.moving].position;
+
+		if ((posMover.y == 100 && body.direction == this.UP)
+			|| (posMover.y == 0 && body.direction == this.DOWN))
+			return ;
+		if (body.direction == this.DOWN)
+			posMover.y -= this.VELOCITY;
+		else if (posMover.y < 100)
+			posMover.y += this.VELOCITY;
+		match.players.forEach((player) => {
+			player.client.emit('onMove', {user_id: user.sub, pos: posMover});
 		})
 	}
 }

@@ -3,3 +3,8 @@ export class Position {
 	x: number;
 	y: number;
 }
+
+export class Move {
+	direction: number;
+	match_id: number;
+}
