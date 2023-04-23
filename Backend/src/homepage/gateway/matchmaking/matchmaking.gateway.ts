@@ -87,21 +87,30 @@ export class MatchmakingGateway {
 		const bracket = this.userQueue.get(rankFork);
 		bracket.set(user_id, player);
 	}
+	
+	secureMatchMaker(user: Player) {
+		let replaceCheck = false;
+		this.matchMaker.forEach((player) => {
+			if (user.user_id == player.user_id)
+			{
+				player.client.disconnect();
+				player = user;
+				replaceCheck = true;
+			}
+		})
+		if (!replaceCheck)
+			return this.matchMaker.push(user);
+		return user;
+	}
 
 	async handleStartTimer() {
 		this.interval = setInterval(async () => {
 			this.userQueue.forEach(async (bracket) => {
 				bracket.forEach(async (user) => {
-					this.matchMaker.push(user);
+					this.secureMatchMaker(user);
 					if (this.matchMaker.length == 2)
 					{
-						console.log('yoooooooooooooooooooooooooooooooooooooooooooooooooooooooooo');
-						console.log(this.matchMaker[0]);
-						console.log('yuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu');
-						console.log(this.matchMaker[1]);
 						const match = await this.matchsService.createFullMatch(this.matchMaker[0].user_id, this.matchMaker[1].user_id, false);
-						console.log('yeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee');
-						console.log(this.matchMaker[0]);
 						this.matchMaker[0].client.emit('foundMatch', this.buildMatchDto(this.matchMaker[1].username, match.match_id));
 						this.matchMaker[1].client.emit('foundMatch', this.buildMatchDto(this.matchMaker[0].username, match.match_id));
 						this.matchMaker.splice(0, this.matchMaker.length);

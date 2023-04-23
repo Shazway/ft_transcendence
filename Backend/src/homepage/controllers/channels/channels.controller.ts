@@ -131,7 +131,6 @@ export class ChannelsController {
 		@Res() res: Response,
 	) {
 		const messages = await this.messageService.getPage(chan_id, page_num);
-		console.log({Messages: messages});
 		if (!messages)
 			res.status(HttpStatus.NOT_FOUND).send({ msg: 'No message in the channel: ' + chan_id });
 		else res.status(HttpStatus.OK).send(messages);

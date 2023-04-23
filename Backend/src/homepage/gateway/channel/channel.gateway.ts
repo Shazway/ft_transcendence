@@ -15,7 +15,8 @@ import { MessagesService } from 'src/homepage/services/messages/messages.service
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
 import { NotificationsGateway } from '../notifications/notifications.gateway';
 import { ItemsService } from 'src/homepage/services/items/items.service';
-import { ChannelUserRelation } from 'src/entities';
+import { ChannelUserRelation, MessageEntity } from 'src/entities';
+import { cp } from 'fs';
 
 @WebSocketGateway(3002, {
 	cors: {
@@ -23,7 +24,7 @@ import { ChannelUserRelation } from 'src/entities';
 	},
 })
 export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect {
-	private channelList: Map<number, Map<number, Socket>>;
+	private channelList: Map<number, Map<number, Array<Socket>>>;
 	constructor(
 		private messageService: MessagesService,
 		private tokenManager: TokenManagerService,
@@ -31,7 +32,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		private itemService: ItemsService,
 		private notificationGateway: NotificationsGateway,
 	) {
-		this.channelList = new Map<number, Map<number, Socket>>();
+		this.channelList = new Map<number, Map<number, Array<Socket>>>();
 	}
 
 	@WebSocketServer()
@@ -43,9 +44,16 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			client.disconnect();
 			return false;
 		}
-		if (!this.channelList.get(Number(query.channel_id)))
-			this.channelList.set(Number(query.channel_id), new Map<number, Socket>());
-		this.channelList.get(Number(query.channel_id)).set(user.sub, client);
+		let channel = this.channelList.get(Number(query.channel_id));
+		if (!channel)
+		{
+			this.channelList.set(Number(query.channel_id), new Map<number, Array<Socket>>());
+			channel = this.channelList.get(Number(query.channel_id));
+		}
+		const users = channel.get(user.sub);
+		if (!users)
+			channel.set(user.sub, new Array<Socket>);
+		channel.get(user.sub).push(client);
 		return true;
 	}
 
@@ -54,18 +62,27 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const channel_id = Number(query.channel_id);
 		const channel = this.channelList.get(channel_id);
 		if (!channel) return false;
-		channel.delete(user.sub);
+		let users = channel.get(user.sub);
+		channel.set(user.sub, users.filter((user) => user !== client));
 		client.disconnect();
+		users = channel.get(user.sub);
+		if (users && !users.length)
+			channel.delete(user.sub);
+		if (!channel.size)
+			this.channelList.delete(user.sub);
 		return true;
 	}
 
+	socketDisconnect(clients: Array<Socket>) {
+		clients.forEach((client) => {
+			client.disconnect();
+		});
+	}
+	
 	sendMessageToChannel(channel_id: number, message: MessageDto) {
-		console.log({Sending_message: message.message_content});
-		console.log({On_channel: channel_id});
 		const channel = this.channelList.get(channel_id);
 		if (!channel) return false;
-		console.log({Active_Users: channel.size});
-		channel.forEach((user) => user.emit('onMessage', message));
+		channel.forEach((user) => this.socketEmit(user, 'onMessage', message));
 		return true;
 	}
 
@@ -78,10 +95,10 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		if (!channel) false;
 		else if (!channel.channel_password) await this.itemService.addUserToChannel(chan_user, chan_id, user_id);
 		else if (pass === (channel.channel_password))
-			await this.itemService.addUserToChannel(chan_user, chan_id, user_id);
+		await this.itemService.addUserToChannel(chan_user, chan_id, user_id);
 		return true;
 	}
-
+	
 	async handleConnection(client: Socket) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
 		const channel_id = Number(client.handshake.query.channel_id);
@@ -91,37 +108,48 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			client.disconnect();
 			return;
 		}
-
 		if (!( await this.channelService.isUserMember(user.sub, channel_id))) {
 			if (!channel.is_channel_private &&
 				((!channel.channel_password && await this.addUserToChannel(user.sub, channel_id)) ||
 				await this.addUserToChannel(user.sub, channel_id, client.handshake.query.channel_pass)))
 				this.sendMessageToChannel(channel_id, {
+					message_id: 0,
 					message_content: user.name + ' joined the channel',
 					author: { username: 'System', user_id: 0 },
 					createdAt: new Date(),
 				});
-			else return client.disconnect();
-		}
-		await this.channelService.isMuted(user.sub, channel_id);
+				else return client.disconnect();
+			}
+			await this.channelService.isMuted(user.sub, channel_id);
 		if (
 			(await this.channelService.isBanned(user.sub, channel_id)) ||
 			!this.addUserToList(client, user)
-		) {
-			client.emit('onError', 'User is banned');
-			return client.disconnect();
+			) {
+				client.emit('onError', 'User is banned');
+				return client.disconnect();
 		}
+	}
+	
+	socketEmit(clients: Array<Socket>, eventDest: string, ...content: any[]) {
+		clients.forEach((client) => {
+			client.emit(eventDest, content[0]);
+		});
+	}
+	
+	async channelLeaveMsg(channel_id: number, target: PunishmentDto) {
+		const user = await this.itemService.getUser(target.target_id);
+		this.sendMessageToChannel(channel_id, {
+			message_id: 0,
+			message_content: user.username + ' left the channel',
+			author: { username: 'System', user_id: 0 },
+			createdAt: new Date(),
+		});
 	}
 
 	handleDisconnect(client: Socket) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
 		const channel_id = Number(client.handshake.query.channel_id);
 		if (this.channelList.get(channel_id).get(user.sub)) {
-			this.sendMessageToChannel(channel_id, {
-				message_content: user.name + ' left the channel',
-				author: { username: 'System', user_id: 0 },
-				createdAt: new Date(),
-			});
 			if (!this.deleteUserFromList(client, user))
 				return client.emit('onError', 'Channel does not exist');
 		}
@@ -134,7 +162,8 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		if (!this.channelService.muteUser(user.sub, body.target_id, channel_id, body.time))
 			return client.emit('onError', 'Error while muting some dude');
 		// eslint-disable-next-line prettier/prettier
-		this.channelList.get(channel_id).get(body.target_id).emit(
+		const users = this.channelList.get(channel_id).get(body.target_id);
+		this.socketEmit(users,
 				'onMessage',
 				'You have been muted by ' + user.name + ' for reason: ' + body.message,
 			);
@@ -147,12 +176,13 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const channel_id = Number(client.handshake.query.channel_id);
 		this.channelService.banUser(user.sub, body.target_id, channel_id, body.time);
 		// eslint-disable-next-line prettier/prettier
-		const target = this.channelList.get(channel_id).get(body.target_id);
-		target.emit(
+		const targets = this.channelList.get(channel_id).get(body.target_id);
+		this.socketEmit(targets,
 			'onMessage',
 			'You have been banned by ' + user.name + ' for reason: ' + body.message,
 		);
-		target.disconnect();
+		this.channelLeaveMsg(channel_id, body);
+		this.socketDisconnect(targets);
 		this.notificationGateway.sendMessage([user.sub], 'Successful ban');
 	}
 
@@ -165,12 +195,16 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		// eslint-disable-next-line prettier/prettier
 		const target = this.channelList.get(channel_id).get(body.target_id);
 		if (user.sub === body.target_id)
+		{
+			this.channelLeaveMsg(channel_id, body);
 			return this.notificationGateway.sendMessage([user.sub], 'You have left the room');
-		target.emit(
+		}
+		this.socketEmit(target,
 			'onMessage',
 			'You have been kicked by ' + user.name + ' for reason: ' + body.message,
-			);
-			target.disconnect();
+		);
+		this.channelLeaveMsg(channel_id, body);
+		this.socketDisconnect(target);
 		this.notificationGateway.sendMessage([user.sub], 'Successful kick');
 	}
 
@@ -187,10 +221,19 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		);
 		body.author.username = user.name;
 		body.author.user_id = user.sub;
-		if (Validity.ret) this.sendMessageToChannel(channel_id, body);
+		body.message_id = Validity.message.message_id;
+		if (Validity.check.ret) this.sendMessageToChannel(channel_id, body);
 		else {
-			client.emit('onMessage', Validity.msg);
-			if (Validity.msg === 'User is banned') this.deleteUserFromList(client, user);
+			client.emit('onMessage', Validity.check.msg);
+			if (Validity.check.msg === 'User is banned') this.deleteUserFromList(client, user);
 		}
+	}
+	
+	@SubscribeMessage('checkPrivileges')
+	async checkPrivileges(@ConnectedSocket() client: Socket, @MessageBody() body: MessageDto) {
+		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		const channel_id = Number(client.handshake.query.channel_id);
+		const rights = await this.channelService.checkPrivileges(user.sub, body.author.user_id, channel_id);
+		client.emit('answerPrivileges', rights.ret);
 	}
 }

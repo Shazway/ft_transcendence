@@ -138,17 +138,12 @@ img{ max-width:100%;}
 }
 
 .offscreen {
-	/* position: fixed; */
-	/* top: 0;
-	bottom: 0;
-	left: -200px;
-	width: 200px; */
-	bottom: -50vh;
+	bottom: -52vh;
 	transition: transform 0.3s ease-in-out;
   }
 
 .offscreen.show {
-	transform: translateY(-50vh);
+	transform: translateY(-52vh);
 }
 
 .channel_pan {
@@ -163,4 +158,13 @@ img{ max-width:100%;}
 
 .channel_unpan.hide {
   display: none;
+}
+
+.hidden_icon {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.hidden_icon.show {
+  opacity: 1;
 }

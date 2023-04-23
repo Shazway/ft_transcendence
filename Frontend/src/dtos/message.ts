@@ -5,6 +5,7 @@ export interface MessageDto {
 	author : UserDto;
 	createdAt : Date;
 	message_content : string;
+	0: MessageDto;
 }
 
 export interface LessMessageDto {

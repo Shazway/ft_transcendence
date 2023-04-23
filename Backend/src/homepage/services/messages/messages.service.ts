@@ -46,12 +46,12 @@ export class MessagesService {
 		const channel = await this.itemsService.getChannel(channel_id);
 		const user = await this.itemsService.getUser(this.tokenManager.getToken(token).sub);
 		const isValid = await this.isValidUserChannel(user, channel);
-		if (!isValid.ret) return isValid;
+		if (!isValid.ret) return {check: isValid, message: null};
 		message.author = user;
 		message.channel = channel;
 		message.createdAt = new Date();
-		this.messageRepo.save(message);
-		return isValid;
+		const messageEntity = await this.messageRepo.save(message);
+		return {check: isValid, message: messageEntity};
 	}
 
 	async getMessage(msg_id: number) {

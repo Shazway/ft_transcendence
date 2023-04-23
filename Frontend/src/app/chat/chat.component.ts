@@ -4,6 +4,7 @@ import { ChannelDto } from '../../dtos/Channel.dto'
 import { FetchService } from '../fetch.service';
 import { WebsocketService } from '../websocket.service';
 import { Socket, io } from 'socket.io-client';
+import { fromEvent, lastValueFrom } from 'rxjs';
 
 @Component({
 	selector: 'app-chat',
@@ -15,6 +16,13 @@ export class ChatComponent implements OnInit {
 	channels$: ChannelDto[] = [];
 	msgs$: MessageDto[] = [];
 	test_msgs$ = new Array<Array<MessageDto>>;
+	icone_list = {
+		add_friend: "https://static.vecteezy.com/system/resources/previews/020/936/584/original/add-friend-icon-for-your-website-design-logo-app-ui-free-vector.jpg",
+		block_user: "https://static.thenounproject.com/png/45218-200.png",
+		mute_user: "https://static.thenounproject.com/png/45218-200.png",
+		kick_user: "https://static.thenounproject.com/png/45218-200.png",
+		ban_user: "https://static.thenounproject.com/png/45218-200.png",
+	}
 
 	constructor(
 		private fetchService: FetchService,
@@ -57,6 +65,25 @@ export class ChatComponent implements OnInit {
 		}
 	}
 
+	async  onDropdrownMessage(msg: MessageDto) {
+		console.log("response");
+		const addFriendElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-add');
+		const blockUserElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-block');
+		if (!addFriendElm)
+			return;
+		if (addFriendElm.classList.contains('show')) {
+			addFriendElm.classList.remove('show');
+			blockUserElm.classList.remove('show');
+		} else {
+			addFriendElm.classList.add('show');
+			blockUserElm.classList.add('show');
+		}
+		this.client.emit('checkPrivileges', msg);
+		fromEvent(this.client, 'answerPrivileges').subscribe((data) => {
+			console.log(data);
+		})
+	}
+
 	slideChan() {
 		const offscreenChat = this.elRef.nativeElement.querySelector('.offscreen');
 		const offscreenChatBtn = this.elRef.nativeElement.querySelector('#chatBtn');
@@ -88,7 +115,7 @@ export class ChatComponent implements OnInit {
 		for (let index = this.msgs$.length; index > 0; index--)
 			this.sortMessage(this.msgs$[index - 1]);
 		this.client = io('ws://localhost:3002?channel_id=' + channelId, this.websocketService.getHeader());
-		this.client.on('onMessage', (event) => { console.log('Message reveived ' + event); this.sortMessage(event) });
+		this.client.on('onMessage', (event) => { console.log('Message reveived ' + event); this.sortMessage(event); });
 		this.client.on('onError', (event) => { console.log('WebSocket error: ' + event); });
 		this.client.on('connection', () => { console.log('Connected to WebSocket server'); });
 		this.client.on('disconnect', () => { console.log('Disconnected from WebSocket server'); });
@@ -100,7 +127,7 @@ export class ChatComponent implements OnInit {
 	}
 
 	sortMessage(new_msg: MessageDto) {
-		console.log(new_msg);
+		console.log(new_msg)
 		if (this.test_msgs$.length && this.test_msgs$[this.test_msgs$.length - 1][0].author.user_id == new_msg.author.user_id) {
 			this.test_msgs$[this.test_msgs$.length - 1].push(new_msg);
 			return;
@@ -136,8 +163,10 @@ export class ChatComponent implements OnInit {
 		const author = localStorage.getItem('username');
 		const id = localStorage.getItem('id');
 		if (id && author)
-			this.client.emit('message', {message_content: data.message_content,
-			author: {username: author, user_id: id}});
+			this.client.emit('message', {
+				message_content: data.message_content,
+				author: {username: author, user_id: id}
+			});
 		return true;
 	}
 }
