@@ -39,11 +39,16 @@ export class ChatComponent implements OnInit {
 		if (!this.client)
 			return;
 		console.log('JWT token: ' + localStorage.getItem('Jwt_token'));
+		this.setClientEvent();
+		return;
+	}
+
+	setClientEvent() {
 		this.client.on('onMessage', (event) => { console.log('Message reveived ' + event); this.sortMessage(event) });
 		this.client.on('onError', (event) => { console.log('WebSocket error: ' + event); });
 		this.client.on('connection', () => { console.log('Connected to WebSocket server'); });
 		this.client.on('disconnect', () => { console.log('Disconnected from WebSocket server'); });
-		return;
+		this.client.on('delMessage', (event) => { console.log('Deleting message ' + event); this.deleteMessage(event); })
 	}
 
 	async ngOnInit() {
@@ -53,6 +58,27 @@ export class ChatComponent implements OnInit {
 		for (let index = this.msgs$.length; index > 0; index--)
 			this.sortMessage(this.msgs$[index - 1]);
 		this.channels$ = await this.fetchService.getChannels();
+	}
+
+	deleteMessage(msg: MessageDto) {
+		console.log('deleting message');
+		this.test_msgs$.forEach(element => {
+			const index = element.findIndex(mess => mess.message_id == msg.message_id)
+			if (index != -1) {
+				element.splice(index, 1);
+				console.log('Message deleted');
+				if (element.length <= 0) {
+					const delGrpElm = this.elRef.nativeElement.querySelector('#group-' + msg.message_id);
+					delGrpElm.remove();
+				} else {
+					const delMsgElm = this.elRef.nativeElement.querySelector('#message-' + msg.message_id);
+					delMsgElm.remove();
+				}
+			}
+			if (element.length <= 0)
+				this.test_msgs$.splice(this.test_msgs$.findIndex(arr => arr.length <= 0), 1);
+		});
+		console.log('Message not deleted');
 	}
 
 	slide() {
@@ -188,10 +214,7 @@ export class ChatComponent implements OnInit {
 		const banUserElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-del');
 		if (!banUserElm.classList.contains('show'))
 			return;
-		// this.client.emit('ban', {
-		// 	target_id: msg.author.user_id,
-		// 	message: "You have been banned",
-		// })
+		this.client.emit('delMessage', msg)
 	}
 
 	slideChan() {
@@ -225,10 +248,7 @@ export class ChatComponent implements OnInit {
 		for (let index = this.msgs$.length; index > 0; index--)
 			this.sortMessage(this.msgs$[index - 1]);
 		this.client = io('ws://localhost:3002?channel_id=' + channelId, this.websocketService.getHeader());
-		this.client.on('onMessage', (event) => { console.log('Message reveived ' + event); this.sortMessage(event); });
-		this.client.on('onError', (event) => { console.log('WebSocket error: ' + event); });
-		this.client.on('connection', () => { console.log('Connected to WebSocket server'); });
-		this.client.on('disconnect', () => { console.log('Disconnected from WebSocket server'); });
+		this.setClientEvent();
 		this.slideChan();
 	}
 

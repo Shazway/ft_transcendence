@@ -16,7 +16,7 @@ export class MessagesService {
 		private messageRepo: Repository<MessageEntity>,
 		private itemsService: ItemsService,
 		private channelService: ChannelsService,
-		private tokenManager: TokenManagerService,
+		private tokenManager: TokenManagerService
 	) {}
 
 	error_tab = [
@@ -24,7 +24,7 @@ export class MessagesService {
 		{ ret: false, msg: "Channel doesn't exist" },
 		{ ret: false, msg: "User doesn't belong to channel" },
 		{ ret: false, msg: 'User is muted' },
-		{ ret: false, msg: 'User is banned' },
+		{ ret: false, msg: 'User is banned' }
 	];
 
 	async isValidUserChannel(user: User, channel: Channel) {
@@ -46,16 +46,24 @@ export class MessagesService {
 		const channel = await this.itemsService.getChannel(channel_id);
 		const user = await this.itemsService.getUser(this.tokenManager.getToken(token).sub);
 		const isValid = await this.isValidUserChannel(user, channel);
-		if (!isValid.ret) return {check: isValid, message: null};
+		if (!isValid.ret) return { check: isValid, message: null };
 		message.author = user;
 		message.channel = channel;
 		message.createdAt = new Date();
 		const messageEntity = await this.messageRepo.save(message);
-		return {check: isValid, message: messageEntity};
+		return { check: isValid, message: messageEntity };
 	}
 
 	async getMessage(msg_id: number) {
 		return await this.itemsService.getMessage(msg_id);
+	}
+
+	async delMessage(msg_id: number) {
+		const msg = await this.itemsService.getMessage(msg_id);
+		if (!msg) return false;
+		msg.is_visible = false;
+		this.messageRepo.save(msg);
+		return true;
 	}
 
 	async getPage(chan_id: number, page_num: number) {

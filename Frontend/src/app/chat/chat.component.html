@@ -12,7 +12,7 @@
 				<div class="channel_unpan bg-light">
 					<div class="card-body p-0" data-mdb-perfect-scrollbar="true" style="position: relative; " *ngFor="let msg_list of test_msgs$">
 <!-- Start of not current user field -->
-						<div *ngIf="!isMe(msg_list[0]) && !isSystem(msg_list[0])" class="d-flex flex-row justify-content-start">
+						<div *ngIf="!isMe(msg_list[0]) && !isSystem(msg_list[0])" class="d-flex flex-row justify-content-start" id="group-{{msg_list[0].message_id}}">
 							<img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp" alt="avatar 1" style="width: 45px; height: 100%;">
 							<div>
 								<div class="d-flex align-items-end">
@@ -23,7 +23,7 @@
 									<img (click)="kickUser(msg_list[0])" class="rounded-circle border border-2 m-0 ms-2 m-auto hidden_icon" id="img-{{msg_list[0].message_id}}-kick" src="{{icone_list.kick_user}}" alt="kick_user">
 									<img (click)="banUser(msg_list[0])" class="rounded-circle border border-2 m-0 ms-2 m-auto hidden_icon" id="img-{{msg_list[0].message_id}}-ban" src="{{icone_list.ban_user}}" alt="ban_user">
 								</div>
-								<div *ngFor="let msg of msg_list" class="d-flex">
+								<div *ngFor="let msg of msg_list" class="d-flex" id="message-{{msg.message_id}}">
 									<p class="small pb-1 ps-2 pe-2 pt-0 ms-2 me-2 mb-1 rounded-3 text-wrap d-block" (click)="onDropdownDel(msg)" style="background-color: rgb(206, 210, 216);">{{msg.message_content}}</p>
 									<img (click)="delMsg(msg_list[0])" class="m-0 ms-2 m-auto hidden_icon" style="height: 20px; width: 20px;" id="img-{{msg.message_id}}-del" src="{{icone_list.del_message}}" alt="del_message">
 								</div>
@@ -32,12 +32,12 @@
 						</div>
 <!-- End of not current user field -->
 <!-- Start of current user field -->
-						<div *ngIf="isMe(msg_list[0]) && !isSystem(msg_list[0])" class="d-flex flex-row justify-content-end">
+						<div *ngIf="isMe(msg_list[0]) && !isSystem(msg_list[0])" class="d-flex flex-row justify-content-end" id="group-{{msg_list[0].message_id}}">
 							<div>
 								<p class="small me-3 mb-0 rounded-3 text-muted d-flex justify-content-end">{{ getName(msg_list) }}</p>
-								<div *ngFor="let msg of msg_list">
+								<div *ngFor="let msg of msg_list" class="d-flex" id="message-{{msg.message_id}}">
 									<img (click)="delMsg(msg_list[0])" class="m-0 ms-2 m-auto hidden_icon" style="height: 20px; width: 20px;" id="img-{{msg.message_id}}-del" src="{{icone_list.del_message}}" alt="del_message">
-									<p class="small pb-1 ps-2 pe-2 pt-1 ms-3 mb-1 me-1 rounded-3 text-wrap d-block float-end" (click)="onDropdownDel(msg)" style="background-color: #56a1ec; ">{{msg.message_content}}</p>
+									<p class="small pb-1 ps-2 pe-2 pt-1 ms-3 mb-1 me-1 rounded-3 text-wrap float-end" (click)="onDropdownDel(msg)" style="background-color: #56a1ec;">{{msg.message_content}}</p>
 								</div>
 								<p class="small me-3 mb-0 rounded-3 text-muted float-end">{{ getTime(msg_list) }}</p>
 							</div>
