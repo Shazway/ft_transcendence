@@ -27,7 +27,7 @@ import { PunishmentPopup } from './popup-component/popup-component.component';
     UsersModule,
     LoginModule,
     ChatModule,
-	  FormsModule,
+	FormsModule,
     AuthModule,
     ValidateModule,
   ],
