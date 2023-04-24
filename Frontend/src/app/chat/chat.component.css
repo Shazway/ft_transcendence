@@ -138,12 +138,12 @@ img{ max-width:100%;}
 }
 
 .offscreen {
-	bottom: -52vh;
+	bottom: -90%;
 	transition: transform 0.3s ease-in-out;
   }
 
 .offscreen.show {
-	transform: translateY(-52vh);
+	transform: translateY(-90%);
 }
 
 .channel_pan {
