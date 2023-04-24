@@ -82,7 +82,7 @@
     "@types/speakeasy": "^2.0.7",
     "class-transformer": "^0.5.1",
     "dotenv": "^16.0.3",
-    "mailgun-js": "^0.22.0",
+    "mailgun-js": "^0.6.7",
     "nodemailer": "^6.9.1",
     "nodemailer-mailgun-transport": "^2.1.5",
     "notp": "^2.0.3",

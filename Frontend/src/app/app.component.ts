@@ -6,4 +6,11 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'Frontend';
+  isExpanded = false;
+
+  toggleSidebar() {
+	console.log("Toggling the sidebar");
+	console.log(this.isExpanded);
+	this.isExpanded = !this.isExpanded
+  }
 }
