@@ -37,7 +37,7 @@ export class AuthComponent {
 		.then(function (response) {
 			statusCode = response.status;
 			loginReturn = response.data;
-			if (statusCode == 200)
+			if (statusCode == 201 || statusCode == 200)
 			{
 				localStorage.setItem('42_token', loginReturn.tokenInfo.access_token);
 				localStorage.setItem('Jwt_token', loginReturn.jwt_token);

@@ -60,7 +60,6 @@ export class LoginController {
 				console.log({email: intraInfo.data.email});
 				if (!user.double_auth)
 					return res.status(HttpStatus.OK).send(await this.buildLoginBody(resToken.data, intraInfo.data, user.user_id));
-				const cred = varFetchService.getMailCredentials();
 				const TwoFASecret = this.authService.generateSec()
 				this.twoFaMap.set(user.user_id, { secret: TwoFASecret, intra_token: resToken.data});
 				this.authService.createMail(this.authService.generateCode(TwoFASecret), intraInfo.data.email);
