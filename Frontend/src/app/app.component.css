@@ -7,12 +7,6 @@
     align-items: stretch;
 }
 
-#sidebar {
-    min-width: 250px;
-    max-width: 250px;
-    min-height: 100vh;
-}
-
 #sidebar.active {
     margin-left: -250px;
 }
@@ -49,6 +43,9 @@ a, a:hover, a:focus {
 }
 
 #sidebar {
+	min-width: 250px;
+    max-width: 250px;
+    min-height: 100vh;
     /* don't forget to add all the previously mentioned styles here too */
     background: #7386D5;
     color: #fff;
@@ -80,12 +77,8 @@ a, a:hover, a:focus {
     background: #fff;
 }
 
-#sidebar ul li.active > a, a[aria-expanded="true"] {
-    color: #fff;
-    background: #6d7fcc;
-}
+
 ul ul a {
     font-size: 0.9em !important;
     padding-left: 30px !important;
-    background: #6d7fcc;
 }

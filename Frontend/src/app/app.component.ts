@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef } from '@angular/core';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -8,9 +8,18 @@ export class AppComponent {
   title = 'Frontend';
   isExpanded = false;
 
-  toggleSidebar() {
-	console.log("Toggling the sidebar");
-	console.log(this.isExpanded);
-	this.isExpanded = !this.isExpanded
+  constructor(
+	private elRef: ElementRef
+  ){}
+
+  togglePlay() {
+	const offscreenElm = this.elRef.nativeElement.querySelector('#play');
+	if (!offscreenElm)
+		return;
+	if (offscreenElm.classList.contains('show')) {
+		offscreenElm.classList.remove('show');
+	} else {
+		offscreenElm.classList.add('show');
+	}
   }
 }

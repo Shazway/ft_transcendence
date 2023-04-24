@@ -6,18 +6,19 @@
 <!-- * * * * * * * * * Delete the template below * * * * * * * * * * -->
 <!-- * * * * * * * to get started with your project! * * * * * * * * -->
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
 
 <div class="wrapper">
 
     <!-- Sidebar -->
-    <nav id="sidebar">
+    <nav id="sidebar" class="offscreen">
         <div class="sidebar-header">
-            <h3>Inox_Transcendence</h3>
+            <h4>Inox_Transcendence</h4>
         </div>
-		<ul class="list-unstyled components">
-            <li class="active">
-                <a href="matchmaking" data-toggle="collapse" aria-expanded="true" class="dropdown-toggle">Play</a>
-                <ul class="collapse list-unstyled" id="homeSubmenu">
+		<ul class="list-group active">
+            <li class="active" aria-owns="#homeSubmenu">
+                <a data-toggle="collapse" class="dropdown-toggle" (click)="togglePlay()">Home</a>
+                <ul class="collapse list-unstyled show " id="play">
                     <li>
                         <a href="matchmaking">Ranked match</a>
                     </li>
