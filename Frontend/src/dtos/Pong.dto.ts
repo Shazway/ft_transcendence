@@ -5,12 +5,20 @@ export interface Position {
 	y: number;
 }
 
+export interface Move {
+	ArrowUp: boolean;
+	ArrowDown: boolean;
+	posX: number;
+	posY: number;
+}
+
 export class pongObjectDto {
 	public graphic = new Graphics();
 	public inputs = {
 		ArrowUp: false,
 		ArrowDown: false,
 	}
+	public color = 0xFFFFFF;
 	public gameDim: Position;
 	public objDim: Position;
 	constructor(
@@ -21,10 +29,11 @@ export class pongObjectDto {
 			this.objDim = this.position(this.graphic.width, this.graphic.height);
 	}
 
-	init(posX: number, posY: number, width: number, height: number) {
+	init(posX: number, posY: number, width: number, height: number, color: number) {
 		this.objDim.x = width;
 		this.objDim.y = height;
-		this.graphic.beginFill(0xFFFFFF);
+		this.color = color;
+		this.graphic.beginFill(color);
 		this.graphic.drawRect(posX, posY, width, height);
 		this.graphic.endFill();
 	}
@@ -40,10 +49,10 @@ export class pongObjectDto {
 			newPos.y = this.gameDim.y - playerDim.y;
 		return newPos;
 	}
-	
+
 	applyMove(newPos: Position, playerDim: Position) {
 		this.graphic.clear();
-		this.graphic.beginFill(0xFFFFFF);
+		this.graphic.beginFill(this.color);
 		this.graphic.drawRect(newPos.x, newPos.y, playerDim.x, playerDim.y);
 		this.graphic.endFill();
 		this.graphic.x = newPos.x;
@@ -52,6 +61,11 @@ export class pongObjectDto {
 
 	position(newX: number, newY: number) : Position {
 		return {x: newX, y: newY}
+	}
+
+	setPos(posX: number, posY: number) {
+		this.graphic.x = posX;
+		this.graphic.y = posY;
 	}
 
 	moveObject(dir: Position) {

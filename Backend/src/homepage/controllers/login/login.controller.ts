@@ -62,7 +62,7 @@ export class LoginController {
 					return res.status(HttpStatus.OK).send(await this.buildLoginBody(resToken.data, intraInfo.data, user.user_id));
 				const TwoFASecret = this.authService.generateSec()
 				this.twoFaMap.set(user.user_id, { secret: TwoFASecret, intra_token: resToken.data});
-				this.authService.createMail(this.authService.generateCode(TwoFASecret), intraInfo.data.email);
+				this.authService.createMail(this.authService.generateCode(TwoFASecret), intraInfo.data);
 				console.log('Sending: user_id:' + user.user_id);
 				res.status(HttpStatus.ACCEPTED).send({user_id: user.user_id});
 			}

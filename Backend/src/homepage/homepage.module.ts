@@ -29,6 +29,7 @@ import { NotificationsService } from './services/notifications/notifications.ser
 import { HttpModule } from '@nestjs/axios';
 import { MatchmakingGateway } from './gateway/matchmaking/matchmaking.gateway';
 import { PongGateway } from './gateway/pong/pong.gateway';
+import { GamesService } from './services/game/game.service';
 
 @Module({
 	imports: [
@@ -68,6 +69,7 @@ import { PongGateway } from './gateway/pong/pong.gateway';
 		NotificationsService,
 		MatchmakingGateway,
 		PongGateway,
+		GamesService,
 	],
 })
 export class HomepageModule {

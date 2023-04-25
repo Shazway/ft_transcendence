@@ -204,7 +204,6 @@ export class ItemsService {
 		const match = await this.matchRepo
 		.createQueryBuilder('match')
 		.leftJoinAndSelect('match.user', 'user')
-		.leftJoinAndSelect('match.matchSetting', 'matchSetting')
 		.where('match.match_id = :id', { id })
 		.getOne();
 		return match;

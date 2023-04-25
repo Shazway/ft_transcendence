@@ -19,16 +19,16 @@ export class AuthService {
 		return this.jwtService.sign(payload);
 	}
 
-	createMail(code: string = null, email: string = "inox.transcendence@gmail.com") {	
+	createMail(code: string = null, user: IntraInfo) {
 		const mailgun = require("mailgun-js");
 		const keys = varFetchService.getMailKeys();
 		const mg = mailgun({apiKey: keys.key, domain: keys.domain});
 		const data = {
 			from: varFetchService.getMailCredentials().mail,
-			to: email,
+			to: user.email,
 			subject: "Hello",
 			template: "one-time-authentification-code",
-			'h:X-Mailgun-Variables': JSON.stringify({Username: "sivouplé", Code: code}),
+			'h:X-Mailgun-Variables': JSON.stringify({Username: user.login, Code: code}),
 		};
 		mg.messages().send(data, function (error, body) {
 			console.log(body);
