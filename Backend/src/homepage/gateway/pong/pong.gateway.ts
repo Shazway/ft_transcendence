@@ -89,22 +89,17 @@ export class PongGateway {
 		return { moving: 1, opponent: 0 };
 	}
 
-	@SubscribeMessage('playerMove')
-	handleMove(@ConnectedSocket() client: Socket, @MessageBody() body: Move) {
-		const user = this.tokenManager.getToken(client.request.headers.authorization);
-		const match = this.matchs.get(body.match_id);
-		const indexes = this.setUpindexes(user.sub, match.players);
-		const posMover = match.players[indexes.moving].position;
+	
 
-		if (
-			(posMover.y == 100 && body.direction == this.UP) ||
-			(posMover.y == 0 && body.direction == this.DOWN)
-		)
-			return;
-		if (body.direction == this.DOWN) posMover.y -= this.VELOCITY;
-		else if (posMover.y < 100) posMover.y += this.VELOCITY;
-		match.players.forEach((player) => {
-			player.client.emit('onMove', { user_id: user.sub, pos: posMover });
-		});
+	@SubscribeMessage('ArrowDown')
+	handleDown(@ConnectedSocket() client: Socket, @MessageBody() body: Move) {
+		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		this.emitToMatch(body.match_id, 'ArrowDown', {user_id: user.sub});
+	}
+
+	@SubscribeMessage('ArrowUp')
+	handleUp(@ConnectedSocket() client: Socket, @MessageBody() body: Move) {
+		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		this.emitToMatch(body.match_id, 'ArrowUp', {user_id: user.sub});
 	}
 }
