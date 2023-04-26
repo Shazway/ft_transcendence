@@ -52,7 +52,12 @@ export class PongGateway {
 		if (match.players.length == 2) {
 			this.initMatch(match);
 			this.emitToMatch('startMatch', 'Match can begin', match);
-		} else this.emitToMatch('waitMatch', 'Waiting for other player to join', match);
+		} else
+			this.emitToMatch(
+				'waitMatch',
+				'Waiting for ' + match.entity.user[0] + ' to join or ' + match.entity.user[1],
+				match
+			);
 	}
 
 	initMatch(match: MatchDto) {
@@ -96,6 +101,7 @@ export class PongGateway {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
 		const match_id = Number(client.handshake.query.match_id);
 		const match = this.matchs.get(match_id);
+		if (!match.gameService) return;
 
 		// console.log('user ' + user.sub + ' pressed ArrowDown');
 		match.gameService.changeInput(user.sub, 'ArrowDown', body);
@@ -111,6 +117,7 @@ export class PongGateway {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
 		const match_id = Number(client.handshake.query.match_id);
 		const match = this.matchs.get(match_id);
+		if (!match.gameService) return;
 
 		// console.log('user ' + user.sub + ' pressed ArrowUp');
 		match.gameService.changeInput(user.sub, 'ArrowUp', body);

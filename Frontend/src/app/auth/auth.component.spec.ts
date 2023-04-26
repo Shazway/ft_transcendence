@@ -9,7 +9,7 @@ describe('AuthComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [ AuthComponent ]
-    })
+    })matchFound
     .compileComponents();
 
     fixture = TestBed.createComponent(AuthComponent);

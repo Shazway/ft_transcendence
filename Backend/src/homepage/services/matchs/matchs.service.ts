@@ -9,12 +9,14 @@ import { MatchSetting } from 'src/entities/match_setting.entity';
 @Injectable()
 export class MatchsService {
 	constructor(
-	@InjectRepository(MatchEntity)
-	private matchRepo: Repository<MatchEntity>,
-	@InjectRepository(MatchSettingEntity)
-	private matchSettingRepo: Repository<MatchSetting>,
-	private itemsService: ItemsService)
-	{}
+		@InjectRepository(MatchEntity)
+		private matchRepo: Repository<MatchEntity>,
+		@InjectRepository(MatchSettingEntity)
+		private matchSettingRepo: Repository<MatchSetting>,
+		@InjectRepository(UserEntity)
+		private usersRepo: Repository<UserEntity>,
+		private itemsService: ItemsService
+	) {}
 
 	async createRankedMatchSetting() {
 		const Settings = new MatchSettingEntity();
@@ -45,6 +47,9 @@ export class MatchsService {
 		const userTwo = await this.itemsService.getUser(playerOne);
 		const match = await this.createMatch(userOne, userTwo, isCustom);
 		await this.createRankedMatchSetting();
+		userOne.match_history.push(match);
+		userTwo.match_history.push(match);
+		await this.usersRepo.save([userOne, userTwo]);
 		return await this.matchRepo.save(match);
 	}
 
@@ -55,7 +60,7 @@ export class MatchsService {
 
 		if (!match) throw new HttpException('Match does not exist', HttpStatus.NOT_FOUND);
 		else if (!user) throw new HttpException('User does not exist', HttpStatus.NOT_FOUND);
-		else if	(!(await this.itemsService.addUserToMatch(user, match)))
+		else if (!(await this.itemsService.addUserToMatch(user, match)))
 			throw new HttpException('Failed to add user', HttpStatus.NOT_ACCEPTABLE);
 		return true;
 	}

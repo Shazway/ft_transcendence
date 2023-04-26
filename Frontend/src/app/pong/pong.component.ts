@@ -47,10 +47,10 @@ export class PongComponent {
 	setMatch(match_id: number) {
 		if (this.client)
 			this.client.close();
-		this.client = io('ws://localhost:3005?match_id=' + match_id, this.websocketService.getHeader());
-		this.client.on('onPlayerMove', (event) => { console.log('Message received ' + event); this.updatePlayer(event); });
-		this.client.on('onOpponentMove', (event) => { console.log('Message received ' + event); this.updateOpponent(event); });
-		this.client.on('onBallMove', (event) => { console.log('Message received ' + event); this.updateBall(event); });
+		this.client = io('ws://10.11.1.7:3005?match_id=' + match_id, this.websocketService.getHeader());
+		this.client.on('onPlayerMove', (event) => { this.updatePlayer(event); });
+		this.client.on('onOpponentMove', (event) => { this.updateOpponent(event); });
+		this.client.on('onBallMove', (event) => { this.updateBall(event); });
 		this.client.on('startMatch', (event) => { console.log('Message received ' + event); this.updateBall(event); });
 		this.client.on('waitMatch', (event) => { console.log('Message received ' + event); this.updateBall(event); });
 	}
@@ -68,13 +68,11 @@ export class PongComponent {
 	}
 
 	updatePlayer(event: Move) {
-		console.log('updatePlayer');
 		this.player.setPos(event.posX, event.posY);
 		this.player.inputs.ArrowUp = event.ArrowUp;
 		this.player.inputs.ArrowDown = event.ArrowDown;
 	}
 	updateOpponent(event: Move) {
-		console.log('updateOpponent');
 		this.opponent.setPos(event.posX + 490, event.posY);
 		this.opponent.inputs.ArrowUp = event.ArrowUp;
 		this.opponent.inputs.ArrowDown = event.ArrowDown;
@@ -100,7 +98,6 @@ export class PongComponent {
 	@HostListener('window:keyup', ['$event'])
 	handleKeyUp(event: KeyboardEvent) {
 		const key = event.key;
-		console.log('You have presse keyup');
 		if (!this.client)
 			return;
 		if (key == 'ArrowUp')

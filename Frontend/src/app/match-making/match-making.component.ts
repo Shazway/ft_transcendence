@@ -2,8 +2,7 @@ import { Component, ElementRef } from '@angular/core';
 import { Socket, io } from 'socket.io-client';
 import { WebsocketService } from '../websocket.service';
 import { MatchMaking } from '../../dtos/MatchMaking.dto';
-import { ChatComponent } from '../chat/chat.component';
-import { ChatModule } from '../chat/chat.module';
+import { Router } from '@angular/router';
 
 @Component({
 	selector: 'app-match-making',
@@ -15,8 +14,9 @@ export class MatchMakingComponent {
 	constructor(
 		private websocketService: WebsocketService,
 		private elRef: ElementRef,
+		private router: Router
 	) {
-		this.client = io('ws://localhost:3004', websocketService.getHeader());
+		this.client = io('ws://10.11.1.7:3004', websocketService.getHeader());
 		if (!localStorage.getItem('Jwt_token'))
 			return;
 		if (!this.client)
@@ -33,5 +33,6 @@ export class MatchMakingComponent {
 		loadingSpin.classList.remove('spinner-border');
 		loadingSpin.classList.add('spinner-grow');
 		loadingText.textContent = "Starting match " + match.match_id + " against " + match.username;
+		this.router.navigateByUrl('pong?match_id=' + match.match_id);
 	}
 }
