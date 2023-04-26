@@ -29,7 +29,7 @@ export class PongGateway {
 	@WebSocketServer()
 	server;
 
-	buildPlayer(socket: Socket, id: number, name: string) {
+	buildPlayer(socket: Socket, id: number, name: string): Player {
 		return { client: socket, user_id: id, username: name };
 	}
 

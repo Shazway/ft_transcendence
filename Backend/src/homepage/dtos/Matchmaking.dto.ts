@@ -4,8 +4,8 @@ export class Player {
 	client: Socket;
 	user_id: number;
 	username: string;
-	rounds_won: number;
-	current_points: number;
+	rounds_won?: number;
+	current_points?: number;
 	directionUp?: boolean;
 	directionDown?: boolean;
 }

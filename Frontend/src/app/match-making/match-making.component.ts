@@ -16,7 +16,7 @@ export class MatchMakingComponent {
 		private elRef: ElementRef,
 		private router: Router
 	) {
-		this.client = io('ws://10.11.1.7:3004', websocketService.getHeader());
+		this.client = io('ws://localhost:3004', websocketService.getHeader());
 		if (!localStorage.getItem('Jwt_token'))
 			return;
 		if (!this.client)
