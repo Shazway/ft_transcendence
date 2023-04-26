@@ -9,8 +9,6 @@ import { ItemsService } from 'src/homepage/services/items/items.service';
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
 import { Socket } from 'socket.io';
 import { MatchDto } from 'src/homepage/dtos/MatchDto.dto';
-import { MatchsService } from 'src/homepage/services/matchs/matchs.service';
-import { Move, Position } from 'src/homepage/dtos/Pong.dto';
 import { Player } from 'src/homepage/dtos/Matchmaking.dto';
 import { GamesService } from 'src/homepage/services/game/game.service';
 
@@ -24,10 +22,7 @@ export class PongGateway {
 	UP = 1;
 	DOWN = 0;
 	VELOCITY = 1;
-	constructor(
-		private tokenManager: TokenManagerService,
-		private itemsService: ItemsService,
-	) {
+	constructor(private tokenManager: TokenManagerService, private itemsService: ItemsService) {
 		this.matchs = new Map<number, MatchDto>();
 	}
 
@@ -35,7 +30,7 @@ export class PongGateway {
 	server;
 
 	buildPlayer(socket: Socket, id: number, name: string) {
-		return { client: socket, user_id: id, username: name};
+		return { client: socket, user_id: id, username: name };
 	}
 
 	async handleConnection(client: Socket) {
@@ -48,28 +43,26 @@ export class PongGateway {
 			match = new MatchDto();
 			match.players = new Array<Player>();
 			match.entity = await this.itemsService.getMatch(match_id);
-			match.players.push(
-				this.buildPlayer(client, user.sub, user.name)
-			);
+			match.players.push(this.buildPlayer(client, user.sub, user.name));
 			this.matchs.set(match_id, match);
 		}
-		if (match.players.length == 1 && match.players[0].user_id == user.sub)
-		{
-			match.players.push(
-				this.buildPlayer(client, user.sub, user.name)
-			);
+		if (match.players.length == 1 && match.players[0].user_id !== user.sub) {
+			match.players.push(this.buildPlayer(client, user.sub, user.name));
 		}
 		if (match.players.length == 2) {
-			console.log(match.players);
 			this.initMatch(match);
 			this.emitToMatch('startMatch', 'Match can begin', match);
-		}
-		else this.emitToMatch('waitMatch', 'Waiting for other player to join', match);
+		} else
+			this.emitToMatch(
+				'waitMatch',
+				'Waiting for ' + match.entity.user[0] + ' to join or ' + match.entity.user[1],
+				match
+			);
 	}
 
 	initMatch(match: MatchDto) {
 		match.gameService = new GamesService();
-		match.gameService.initObjects(match.players[0].user_id, match.players[1].user_id);
+		match.gameService.initObjects(match.players[0], match.players[1]);
 		match.gameService.startGame();
 	}
 
@@ -108,15 +101,14 @@ export class PongGateway {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
 		const match_id = Number(client.handshake.query.match_id);
 		const match = this.matchs.get(match_id);
+		if (!match.gameService) return;
 
-		console.log('user ' + user.sub + ' pressed ArrowDown');
+		// console.log('user ' + user.sub + ' pressed ArrowDown');
 		match.gameService.changeInput(user.sub, 'ArrowDown', body);
 		const move = match.gameService.getMove(user.sub);
 		match.players.forEach((player) => {
-			if (player.user_id == user.sub)
-				player.client.emit('onPlayerMove', move);
-			else
-				player.client.emit('onOpponentMove', move);
+			if (player.user_id == user.sub) player.client.emit('onPlayerMove', move);
+			else player.client.emit('onOpponentMove', move);
 		});
 	}
 
@@ -125,15 +117,14 @@ export class PongGateway {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
 		const match_id = Number(client.handshake.query.match_id);
 		const match = this.matchs.get(match_id);
+		if (!match.gameService) return;
 
-		console.log('user ' + user.sub + ' pressed ArrowUp');
+		// console.log('user ' + user.sub + ' pressed ArrowUp');
 		match.gameService.changeInput(user.sub, 'ArrowUp', body);
 		const move = match.gameService.getMove(user.sub);
 		match.players.forEach((player) => {
-			if (player.user_id == user.sub)
-				player.client.emit('onPlayerMove', move);
-			else
-				player.client.emit('onOpponentMove', move);
+			if (player.user_id == user.sub) player.client.emit('onPlayerMove', move);
+			else player.client.emit('onOpponentMove', move);
 		});
 	}
 }

@@ -5,11 +5,103 @@ export interface Position {
 	y: number;
 }
 
+export interface VectorPos {
+	vec: Position;
+	pos: Position;
+}
+
 export interface Move {
 	ArrowUp: boolean;
 	ArrowDown: boolean;
 	posX: number;
 	posY: number;
+}
+
+export class ballObjectDto {
+	DIAMETER = 100;
+	RADIUS = this.DIAMETER / 2;
+	public speed = 2;
+	public graphic = new Graphics();
+	public color = 0xFFFFFF;
+	public gameDim: Position;
+	public vec: Position;
+	constructor(
+		private gameWidth: number,
+		private gameHeight: number,
+		) {
+			this.vec = this.position(this.speed, this.speed);
+			this.gameDim = this.position(gameWidth / 2, gameHeight / 2);
+	}
+
+	position(newX: number, newY: number) : Position {
+		return {x: newX, y: newY}
+	}
+	init(posX: number, posY: number, radius: number, color: number) {
+		this.RADIUS = radius;
+		this.DIAMETER = radius * 2;
+		this.color = color;
+		this.graphic.lineStyle(0);
+		this.graphic.beginFill(color);
+		this.graphic.drawCircle(posX, posY, this.RADIUS);
+		this.graphic.endFill();
+	}
+	applyMove(newPos: Position) {
+		this.graphic.clear();
+		this.graphic.lineStyle(0);
+		this.graphic.beginFill(this.color);
+		this.graphic.drawCircle(newPos.x, newPos.y, this.RADIUS);
+		this.graphic.endFill();
+		this.graphic.x = newPos.x;
+		this.graphic.y = newPos.y;
+	}
+	checkXCollision(x: number) {
+		if (x + this.RADIUS / 2 >= this.gameDim.x)
+			this.vec.x = -this.speed;
+		else if (x - this.RADIUS / 2 <= 0)
+			this.vec.x = this.speed;
+	}
+	checkYCollision(y: number) {
+		if (y + this.RADIUS / 2 >= this.gameDim.y)
+			this.vec.y = -this.speed;
+		else if (y - this.RADIUS / 2 <= 0)
+			this.vec.y = this.speed;
+	}
+
+	checkWallCollision(newPos: Position) {
+		this.checkXCollision(newPos.x);
+		this.checkYCollision(newPos.y);
+	}
+
+	inRange(a : number, r1: number, r2: number)
+	{
+		return (a >= r1 && a <= r2)
+	};
+
+	collisionPaddle(player: pongObjectDto, opponent: pongObjectDto)
+	{
+		let pos: Position = {x: this.graphic.x, y: this.graphic.y};
+		if (pos.x - (this.RADIUS / 2) <= player.objDim.x / 2 && this.inRange(pos.y, player.graphic.y, player.graphic.y + (player.objDim.y / 2)) )
+			this.vec.x = this.speed;
+		if (pos.x + (this.RADIUS / 2) >= this.gameDim.x - player.objDim.x / 2 && this.inRange(pos.y, opponent.graphic.y, opponent.graphic.y + (opponent.objDim.y / 2)) )
+			this.vec.x = -this.speed;
+	}
+
+	setPos(pos: Position) {
+		this.graphic.x = pos.x;
+		this.graphic.y = pos.y;
+	}
+
+	setVec(pos: Position) {
+		this.vec.x = pos.x;
+		this.vec.y = pos.y;
+	}
+
+	moveObject(delta: number) { 
+		let pos: Position = {x: this.graphic.x, y: this.graphic.y};
+
+		this.checkWallCollision(this.position(pos.x, pos.y));
+		this.applyMove(this.position(pos.x + (this.vec.x * delta), pos.y + (this.vec.y * delta)));
+	}
 }
 
 export class pongObjectDto {
