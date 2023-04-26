@@ -16,7 +16,6 @@ export class GamesService {
 		this.player1 = new pongObjectDto(1000, 600);
 		this.player2 = new pongObjectDto(1000, 600);
 		this.oldDate = new Date();
-		console.log('init');
 	}
 
 	initObjects(player1_id: number, player2_id: number) {
@@ -28,7 +27,7 @@ export class GamesService {
 		this.interval = setInterval(() => {
 			const date = new Date();
 			this.update((date.getTime() - this.oldDate.getTime()) / this.gamespeed);
-			this.oldDate = date;
+			this.oldDate = new Date();
 		}, 1000 / 120);
 	}
 

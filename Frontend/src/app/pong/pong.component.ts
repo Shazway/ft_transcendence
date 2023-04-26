@@ -40,7 +40,7 @@ export class PongComponent {
 		this.app.ticker.add(() => {
 			const date = new Date();
 			this.update((date.getTime() - this.oldDate.getTime()) / this.gamespeed);
-			this.oldDate = date;
+			this.oldDate = new Date();
 		});
 	}
 

@@ -50,7 +50,6 @@ export class PongGateway {
 			match.players.push(this.buildPlayer(client, user.sub, user.name));
 		}
 		if (match.players.length == 2) {
-			console.log(match.players);
 			this.initMatch(match);
 			this.emitToMatch('startMatch', 'Match can begin', match);
 		} else this.emitToMatch('waitMatch', 'Waiting for other player to join', match);
