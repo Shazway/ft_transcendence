@@ -2,7 +2,7 @@ import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { Socket, io } from 'socket.io-client';
 import { WebsocketService } from '../websocket.service';
 import { Application, Graphics } from 'pixi.js';
-import { Position, pongObjectDto, Move } from 'src/dtos/Pong.dto';
+import { Position, pongObjectDto, ballObjectDto, Move, VectorPos } from 'src/dtos/Pong.dto';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -14,6 +14,7 @@ export class PongComponent {
 	private client!: Socket;
 	private app;
 	private player;
+	private ball;
 	private opponent;
 	private i = 0;
 	private oldDate: Date;
@@ -31,6 +32,7 @@ export class PongComponent {
 				width: 1000,
 				antialias: true,
 			});
+		this.ball = new ballObjectDto(this.app.view.width, this.app.view.height);
 		this.player	= new pongObjectDto(this.app.view.width, this.app.view.height);
 		this.opponent = new pongObjectDto(this.app.view.width, this.app.view.height);
 		this.initObjects();
@@ -50,7 +52,7 @@ export class PongComponent {
 		this.client = io('ws://10.11.1.7:3005?match_id=' + match_id, this.websocketService.getHeader());
 		this.client.on('onPlayerMove', (event) => { this.updatePlayer(event); });
 		this.client.on('onOpponentMove', (event) => { this.updateOpponent(event); });
-		this.client.on('onBallMove', (event) => { this.updateBall(event); });
+		this.client.on('onBallCollide', (event) => { this.updateBall(event); });
 		this.client.on('startMatch', (event) => { console.log('Message received ' + event); this.updateBall(event); });
 		this.client.on('waitMatch', (event) => { console.log('Message received ' + event); this.updateBall(event); });
 	}
@@ -65,6 +67,8 @@ export class PongComponent {
 			this.opponent.moveObject(this.opponent.position(0, -this.movespeed * delta));
 		if (this.opponent.inputs.ArrowDown)
 			this.opponent.moveObject(this.opponent.position(0, this.movespeed * delta));
+		this.ball.collisionPaddle(this.player, this.opponent);
+		this.ball.moveObject(delta);
 	}
 
 	updatePlayer(event: Move) {
@@ -77,13 +81,16 @@ export class PongComponent {
 		this.opponent.inputs.ArrowUp = event.ArrowUp;
 		this.opponent.inputs.ArrowDown = event.ArrowDown;
 	}
-	updateBall(event: any) {}
+	updateBall(event: VectorPos) {
+		this.ball.setPos(event.pos);
+		this.ball.setVec(event.vec);
+	}
 
 	initObjects() {
 		this.player.init(0, 0, 20, 100, 0x83d0c9);
-		this.app.stage.addChild(this.player.graphic);
 		this.opponent.init(this.app.view.width - 20, 0, 20, 100, 0xFF0000);
-		this.app.stage.addChild(this.opponent.graphic);
+		this.ball.init(500, 300, 15, 0xFFFFFF);
+		this.app.stage.addChild(this.ball.graphic, this.player.graphic, this.opponent.graphic);
 		// const ruler = new Graphics();
 		// for (let index = 0; index < 12; index++) {
 		// 	for (let index2 = 0; index2 < 8; index2++) {

@@ -62,7 +62,7 @@ export class PongGateway {
 
 	initMatch(match: MatchDto) {
 		match.gameService = new GamesService();
-		match.gameService.initObjects(match.players[0].user_id, match.players[1].user_id);
+		match.gameService.initObjects(match.players[0], match.players[1]);
 		match.gameService.startGame();
 	}
 
