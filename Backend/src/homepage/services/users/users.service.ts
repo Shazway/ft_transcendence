@@ -1,7 +1,6 @@
-import { Header, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { NewUserDto } from '../../dtos/UserDto.dto';
 import { UserEntity } from 'src/entities';
 import { ItemsService } from '../items/items.service';
 import { HttpService } from '@nestjs/axios';
@@ -35,6 +34,13 @@ export class UsersService {
 
 	async checkUserByName(username: string) {
 		return this.itemsService.getUserByUsername(username);
+	}
+
+	async changeUserName(username: string, userId: number) {
+		const userEntity = await this.itemsService.getUser(userId);
+
+		userEntity.username = username;
+		await this.userRepository.save(userEntity);
 	}
 
 	async createUser(userDto: IntraInfo) {

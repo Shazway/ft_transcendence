@@ -40,6 +40,19 @@ export class UsersController {
 		res.status(HttpStatus.OK).send(serializedUsers);
 	}
 
+	@Post('change_name')
+	async changeUsername(@Req() req: Request, @Res() res: Response, @Body() body: {username: string}) {
+		const checkUser = await this.itemsService.getUserByUsername(body.username);
+		const currentUser = this.tokenManager.getToken(req.headers.authorization);
+
+		if (checkUser && checkUser.user_id == currentUser.sub)
+			return res.status(HttpStatus.NOT_MODIFIED);
+		if (checkUser && checkUser.user_id != currentUser.sub)
+			return res.status(HttpStatus.UNAUTHORIZED);
+		this.usersService.changeUserName(body.username, currentUser.sub);
+		return res.status(HttpStatus.ACCEPTED).send('Username changed');
+	}
+
 	@Post('create')
 	async createUser(@Req() req: Request, @Res() res: Response, @Body() newUserDto: IntraInfo) {
 		console.log(newUserDto);

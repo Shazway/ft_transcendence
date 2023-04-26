@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { Application, Ticker } from 'pixi.js';
 import { Move, pongObjectDto } from 'src/homepage/dtos/Pong.dto';
 
 @Injectable()
@@ -14,7 +13,6 @@ export class GamesService {
 		this.player1 = new pongObjectDto(1000, 600);
 		this.player2 = new pongObjectDto(1000, 600);
 		this.oldDate = new Date();
-		console.log('init');
 	}
 
 	initObjects(player1_id: number, player2_id: number) {
