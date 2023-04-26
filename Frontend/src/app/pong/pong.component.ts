@@ -16,6 +16,10 @@ export class PongComponent {
 	private player;
 	private opponent;
 	private i = 0;
+	private oldDate: Date;
+	private movespeed = 5;
+	private gamespeed = 13;
+	private timeoutId!: any;
 
 	constructor(
 		private websocketService: WebsocketService,
@@ -32,29 +36,35 @@ export class PongComponent {
 		this.initObjects();
 		this.setMatch(Number(this.route.snapshot.queryParamMap.get('match_id')));
 		this.pixiContainer.nativeElement.appendChild(this.app.view);
-		this.app.ticker.add((delta) => this.update(delta));
+		this.oldDate = new Date();
+		this.app.ticker.add(() => {
+			const date = new Date();
+			this.update((date.getTime() - this.oldDate.getTime()) / this.gamespeed);
+			this.oldDate = date;
+		});
 	}
 
 	setMatch(match_id: number) {
 		if (this.client)
 			this.client.close();
 		this.client = io('ws://localhost:3005?match_id=' + match_id, this.websocketService.getHeader());
-		this.client.on('onPlayerMove', (event) => { console.log('Message reveived ' + event); this.updatePlayer(event); });
-		this.client.on('onOpponentMove', (event) => { console.log('Message reveived ' + event); this.updateOpponent(event); });
-		this.client.on('onBallMove', (event) => { console.log('Message reveived ' + event); this.updateBall(event); });
+		this.client.on('onPlayerMove', (event) => { console.log('Message received ' + event); this.updatePlayer(event); });
+		this.client.on('onOpponentMove', (event) => { console.log('Message received ' + event); this.updateOpponent(event); });
+		this.client.on('onBallMove', (event) => { console.log('Message received ' + event); this.updateBall(event); });
+		this.client.on('startMatch', (event) => { console.log('Message received ' + event); this.updateBall(event); });
+		this.client.on('waitMatch', (event) => { console.log('Message received ' + event); this.updateBall(event); });
 	}
 
 	update(delta: number) {
-		this.i += delta;
-		console.log(this.i);
+		// console.log(this.opponent);
 		if (this.player.inputs.ArrowUp)
-			this.player.moveObject(this.player.position(0, -3 * delta));
+			this.player.moveObject(this.player.position(0, -this.movespeed * delta));
 		if (this.player.inputs.ArrowDown)
-			this.player.moveObject(this.player.position(0, 3 * delta));
+			this.player.moveObject(this.player.position(0, this.movespeed * delta));
 		if (this.opponent.inputs.ArrowUp)
-			this.opponent.moveObject(this.opponent.position(0, -3 * delta));
+			this.opponent.moveObject(this.opponent.position(0, -this.movespeed * delta));
 		if (this.opponent.inputs.ArrowDown)
-			this.opponent.moveObject(this.opponent.position(0, 3 * delta));
+			this.opponent.moveObject(this.opponent.position(0, this.movespeed * delta));
 	}
 
 	updatePlayer(event: Move) {
@@ -65,7 +75,7 @@ export class PongComponent {
 	}
 	updateOpponent(event: Move) {
 		console.log('updateOpponent');
-		this.opponent.setPos(event.posX, event.posY + 980);
+		this.opponent.setPos(event.posX + 490, event.posY);
 		this.opponent.inputs.ArrowUp = event.ArrowUp;
 		this.opponent.inputs.ArrowDown = event.ArrowDown;
 	}
@@ -90,6 +100,7 @@ export class PongComponent {
 	@HostListener('window:keyup', ['$event'])
 	handleKeyUp(event: KeyboardEvent) {
 		const key = event.key;
+		console.log('You have presse keyup');
 		if (!this.client)
 			return;
 		if (key == 'ArrowUp')
@@ -101,11 +112,16 @@ export class PongComponent {
 	@HostListener('window:keydown', ['$event'])
 	handleKeyDown(event: KeyboardEvent) {
 		const key = event.key;
+		clearTimeout(this.timeoutId);
+		this.timeoutId = setTimeout(() => {
+			this.client.emit('ArrowUp', false);
+			this.client.emit('ArrowDown', false);
+		}, 500);
 		if (!this.client)
 			return;
-		if (key == 'ArrowUp')
+		if (key == 'ArrowUp' && !this.player.inputs.ArrowUp)
 			this.client.emit('ArrowUp', true);
-	if (key == 'ArrowDown')
+		if (key == 'ArrowDown' && !this.player.inputs.ArrowDown)
 			this.client.emit('ArrowDown', true);
 	}
 }

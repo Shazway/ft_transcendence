@@ -9,6 +9,8 @@ export class GamesService {
 	private player2: pongObjectDto;
 	private oldDate: Date;
 	private i = 0;
+	private movespeed = 5;
+	private gamespeed = 13;
 
 	constructor() {
 		this.player1 = new pongObjectDto(1000, 600);
@@ -25,52 +27,42 @@ export class GamesService {
 	startGame() {
 		this.interval = setInterval(() => {
 			const date = new Date();
-			this.update((date.getTime() - this.oldDate.getTime()) / 10);
+			this.update((date.getTime() - this.oldDate.getTime()) / this.gamespeed);
 			this.oldDate = date;
-		}, 1000 / 60);
+		}, 1000 / 120);
 	}
 
 	update(delta: number) {
-		this.i += delta;
-		console.log(this.i);
 		this.applyPlayerMove(this.player1, delta);
 		this.applyPlayerMove(this.player2, delta);
 	}
 
 	applyPlayerMove(player: pongObjectDto, delta: number) {
-		if (player.inputs.ArrowUp)
-			player.moveObject(player.position(0, -3 * delta));
-		if (player.inputs.ArrowDown)
-			player.moveObject(player.position(0, 3 * delta));
+		if (player.inputs.ArrowUp) player.moveObject(player.position(0, -this.movespeed * delta));
+		if (player.inputs.ArrowDown) player.moveObject(player.position(0, this.movespeed * delta));
 	}
 
 	changeInput(user_id: number, move: string, state: boolean) {
 		if (move == 'ArrowUp') {
-			if (user_id == this.player1.player_id)
-				this.player1.inputs.ArrowUp = state;
-			else
-				this.player2.inputs.ArrowUp = state;
-		}
-		else {
-			if (user_id == this.player1.player_id)
-				this.player1.inputs.ArrowDown = state;
-			else
-				this.player2.inputs.ArrowDown = state;
+			if (user_id == this.player1.player_id) this.player1.inputs.ArrowUp = state;
+			else this.player2.inputs.ArrowUp = state;
+		} else {
+			if (user_id == this.player1.player_id) this.player1.inputs.ArrowDown = state;
+			else this.player2.inputs.ArrowDown = state;
 		}
 	}
 
-	getInput(player: pongObjectDto, isPlayer2: number = 0): Move {
+	getInput(player: pongObjectDto): Move {
 		return {
 			ArrowUp: player.inputs.ArrowUp,
 			ArrowDown: player.inputs.ArrowDown,
-			posX: player.pos.x,
-			posY: player.pos.y - (980 * isPlayer2),
-		}
+			posX: 0,
+			posY: player.pos.y
+		};
 	}
 
 	getMove(user_id: number) {
-		if (user_id == this.player1.player_id)
-			return this.getInput(this.player1, 0);
-		return this.getInput(this.player2, 1);
+		if (user_id == this.player1.player_id) return this.getInput(this.player1);
+		return this.getInput(this.player2);
 	}
 }
