@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Player } from './Matchmaking.dto';
 
 export class Position {
@@ -101,14 +102,75 @@ export class ballObjectDto {
 			this.vec.x = this.speed;
 			ret = true;
 		}
-		if (
+		else if (
 			this.pos.x + this.RADIUS / 2 >= this.gameDim.x - player.objDim.x / 2 &&
 			this.inRange(this.pos.y, opponent.pos.y, opponent.pos.y + opponent.objDim.y / 2)
 		) {
 			this.vec.x = -this.speed;
 			ret = true;
 		}
+		if (
+			this.pos.y - this.RADIUS / 2 <= player.objDim.y / 2 &&
+			this.inRange(this.pos.x, player.pos.x, player.pos.x + player.objDim.x / 2)
+		)
+		{
+			this.vec.y = this.speed;
+			ret = true;
+		}
+		else if (
+			this.pos.y + this.RADIUS / 2 >= this.gameDim.y - player.objDim.y / 2 &&
+			this.inRange(this.pos.x, opponent.pos.x, opponent.pos.x + opponent.objDim.x / 2)
+		) {
+			this.vec.y = -this.speed;
+			ret = true;
+		}
 		return ret;
+	}
+
+	hypothenuse(x : number, y : number)
+	{
+		const res = x * x + y * y;
+		return (Math.sqrt(res));
+	}
+
+	collisionMarina(player: pongObjectDto)
+	{
+		const pos: Position = {x: this.pos.x, y: this.pos.y};
+		const upperCorner : Position = {x: player.pos.x + (player.objDim.x / 2), y: player.pos.y}
+		const lowerCorner : Position = {x: player.pos.x + (player.objDim.x / 2), y: player.pos.y + (player.objDim.y / 2)}
+		const middleFace : Position = {x: player.pos.x + (player.objDim.x / 2), y: player.pos.y + (player.objDim.y / 2) / 2}
+
+		if (!(pos.x > middleFace.x && pos.x <= middleFace.x + this.vec.x))
+			return false;
+		
+		let sinus = 1;
+
+		//n'est pas dans la zone raquette elargie (+radius)
+		if (!this.inRange(pos.y, player.pos.y - (this.RADIUS / 2), player.pos.y + (player.objDim.y / 2) + (this.RADIUS / 2)))
+			return false;
+		//est dans la zone ou ca risque de toucher le coin superieur
+		if (this.inRange(pos.y, player.pos.y - (this.RADIUS / 2), player.pos.y))
+		{
+			//il y a collision acvec le coin du haut
+			if (this.hypothenuse(pos.x - upperCorner.x + this.vec.x, pos.y - upperCorner.y + this.vec.y) < (this.RADIUS / 2) / 2)
+				sinus = 0.5;
+		}
+		//est dans la zone ou ca risque de toucher le coin inferieur
+		else if (this.inRange(pos.y, player.pos.y - (this.RADIUS / 2), player.pos.y))
+		{
+			//il y a collision acvec le coin du haut
+			if (this.hypothenuse(pos.x - lowerCorner.x + this.vec.x, pos.y - lowerCorner.y + this.vec.y) < (this.RADIUS / 2) / 2)
+				sinus = -0.5;
+		}
+		//est 100% dans la raquette, donc sinus compris entre -0.5 et 0.5
+		else
+			sinus = (middleFace.y - pos.y) / (player.objDim.y / 2);
+		if (sinus == 1)
+			return false;
+		const angle = Math.asin(sinus);
+		this.vec.x = Math.cos(angle) * this.speed;
+		this.vec.y = sinus * this.speed;
+		return true;
 	}
 
 	moveObject(delta: number) {

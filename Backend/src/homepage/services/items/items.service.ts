@@ -170,7 +170,6 @@ export class ItemsService {
 	public async getMatchSetting(id: number) {
 		const match_setting = await this.match_settingRepo
 			.createQueryBuilder('match_setting')
-			.leftJoinAndSelect('match_setting.match', 'match')
 			.where('match_setting.match_setting_id = :id', { id })
 			.getOne();
 		return match_setting;

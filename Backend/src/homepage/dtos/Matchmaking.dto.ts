@@ -8,6 +8,7 @@ export class Player {
 	current_points?: number;
 	directionUp?: boolean;
 	directionDown?: boolean;
+	isReady: boolean;
 }
 
 export class FoundMatch {

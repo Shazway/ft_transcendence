@@ -7,6 +7,7 @@ import { AuthComponent } from './auth/auth.component';
 import { ValidateComponent } from './validate/validate.component';
 import { MatchMakingComponent } from './match-making/match-making.component';
 import { PongComponent } from './pong/pong.component';
+import { PongDebugComponent } from './pong-debug/pong-debug.component';
 
 const routes: Routes = [
 	{ path: 'users', component: UsersComponent },
@@ -16,6 +17,7 @@ const routes: Routes = [
 	{ path: 'validate', component: ValidateComponent },
 	{ path: 'matchmaking', component: MatchMakingComponent },
 	{ path: 'pong', component: PongComponent },
+	{ path: 'pong_debug', component: PongDebugComponent },
 ];
 
 @NgModule({

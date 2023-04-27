@@ -11,6 +11,7 @@ import { Socket } from 'socket.io';
 import { MatchDto } from 'src/homepage/dtos/MatchDto.dto';
 import { Player } from 'src/homepage/dtos/Matchmaking.dto';
 import { GamesService } from 'src/homepage/services/game/game.service';
+import { MatchSettingEntity } from 'src/entities';
 
 @WebSocketGateway(3005, {
 	cors: {
@@ -30,7 +31,7 @@ export class PongGateway {
 	server;
 
 	buildPlayer(socket: Socket, id: number, name: string): Player {
-		return { client: socket, user_id: id, username: name };
+		return { client: socket, user_id: id, username: name, isReady: false };
 	}
 
 	async handleConnection(client: Socket) {
@@ -50,8 +51,7 @@ export class PongGateway {
 			match.players.push(this.buildPlayer(client, user.sub, user.name));
 		}
 		if (match.players.length == 2) {
-			this.initMatch(match);
-			this.emitToMatch('startMatch', 'Match can begin', match);
+			this.initMatch(match, await this.itemsService.getMatchSetting(match.entity.match_id));
 		} else
 			this.emitToMatch(
 				'waitMatch',
@@ -60,10 +60,10 @@ export class PongGateway {
 			);
 	}
 
-	initMatch(match: MatchDto) {
+	async initMatch(match: MatchDto, setting: MatchSettingEntity) {
 		match.gameService = new GamesService();
 		match.gameService.initObjects(match.players[0], match.players[1]);
-		match.gameService.startGame();
+		match.gameService.startGame(setting);
 	}
 
 	async handleDisconnect(client: Socket) {
@@ -126,5 +126,26 @@ export class PongGateway {
 			if (player.user_id == user.sub) player.client.emit('onPlayerMove', move);
 			else player.client.emit('onOpponentMove', move);
 		});
+	}
+
+	@SubscribeMessage('ready')
+	async playerReady(@ConnectedSocket() client: Socket) {
+		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		const match_id = Number(client.handshake.query.match_id);
+		const match = this.matchs.get(match_id);
+		if (!match.gameService) return;
+
+		match.players.forEach((player) => {
+			if (player.user_id == user.sub) {
+				player.isReady = true;
+				player.client.emit('onPlayerReady');
+			} else player.client.emit('onOpponentReady');
+		});
+		if (match.players[0].isReady && match.players[1].isReady)
+			this.emitToMatch(
+				'startMatch',
+				await this.itemsService.getMatchSetting(match.entity.match_id),
+				match
+			);
 	}
 }

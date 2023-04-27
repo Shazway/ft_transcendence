@@ -7,11 +7,11 @@ import { ActivatedRoute } from '@angular/router';
 import { MatchSetting } from 'src/dtos/MatchSetting.dto';
 
 @Component({
-  selector: 'app-pong',
-  templateUrl: './pong.component.html',
-  styleUrls: ['./pong.component.css']
+  selector: 'app-pong-debug',
+  templateUrl: './pong-debug.component.html',
+  styleUrls: ['./pong-debug.component.css']
 })
-export class PongComponent {
+export class PongDebugComponent {
 	private client!: Socket;
 	private app;
 	private player;
@@ -24,7 +24,6 @@ export class PongComponent {
 	private gameSettings!: MatchSetting;
 
 	constructor(
-		private websocketService: WebsocketService,
 		private pixiContainer: ElementRef,
 		private route: ActivatedRoute,
 		private elRef: ElementRef,
@@ -38,7 +37,6 @@ export class PongComponent {
 		this.player	= new pongObjectDto(this.app.view.width, this.app.view.height);
 		this.opponent = new pongObjectDto(this.app.view.width, this.app.view.height);
 		this.initObjects();
-		this.setMatch(Number(this.route.snapshot.queryParamMap.get('match_id')));
 		this.pixiContainer.nativeElement.appendChild(this.app.view);
 		this.oldDate = new Date();
 		this.app.ticker.add(() => {
@@ -48,33 +46,7 @@ export class PongComponent {
 		});
 	}
 
-	setMatch(match_id: number) {
-		if (this.client)
-			this.client.close();
-		this.client = io('ws://localhost:3005?match_id=' + match_id, this.websocketService.getHeader());
-		this.client.on('onPlayerMove', (event) => { this.updatePlayer(event); });
-		this.client.on('onOpponentMove', (event) => { this.updateOpponent(event); });
-		this.client.on('onBallCollide', (event) => { this.updateBall(event); });
-		this.client.on('startMatch', (event) => { console.log('Match is starting ' + event); this.startMatch(event); });
-		this.client.on('onPlayerReady', (event) => { console.log('You are ready '); });
-		this.client.on('onOpponentReady', (event) => { console.log('Opponent is ready '); });
-	}
-
-	startMatch(settings: MatchSetting) {
-		this.gameSettings = settings;
-	}
-
-	setReady() {
-		const removeElm = this.elRef.nativeElement.querySelector('#removable');
-		if (removeElm)
-			removeElm.remove();
-		this.client.emit('ready');
-
-	}
-
 	update(delta: number) {
-		if (!this.gameSettings)
-			return;
 		if (this.player.inputs.ArrowUp)
 			this.player.moveObject(this.player.position(0, -this.movespeed * delta));
 		if (this.player.inputs.ArrowDown)
@@ -88,25 +60,10 @@ export class PongComponent {
 		this.ball.moveObject(delta);
 	}
 
-	updatePlayer(event: Move) {
-		this.player.setPos(event.posX, event.posY);
-		this.player.inputs.ArrowUp = event.ArrowUp;
-		this.player.inputs.ArrowDown = event.ArrowDown;
-	}
-	updateOpponent(event: Move) {
-		this.opponent.setPos(event.posX + 490, event.posY);
-		this.opponent.inputs.ArrowUp = event.ArrowUp;
-		this.opponent.inputs.ArrowDown = event.ArrowDown;
-	}
-	updateBall(event: VectorPos) {
-		this.ball.setPos(event.pos);
-		this.ball.setVec(event.vec);
-	}
-
 	initObjects() {
-		this.player.init(0, 0, 20, 100, 0x83d0c9);
-		this.opponent.init(this.app.view.width - 20, 0, 20, 100, 0xFF0000);
-		this.ball.init(500, 300, 15, 0xFFFFFF);
+		this.player.init(10, 0, 10, 100, 0x83d0c9);
+		this.opponent.init(this.app.view.width - 30, 0, 20, 100, 0xFF0000);
+		this.ball.init(500, 300, 10, 0xFFFFFF);
 		this.app.stage.addChild(this.ball.graphic, this.player.graphic, this.opponent.graphic);
 		// const ruler = new Graphics();
 		// for (let index = 0; index < 12; index++) {
@@ -122,12 +79,10 @@ export class PongComponent {
 	@HostListener('window:keyup', ['$event'])
 	handleKeyUp(event: KeyboardEvent) {
 		const key = event.key;
-		if (!this.client)
-			return;
 		if (key == 'ArrowUp')
-			this.client.emit('ArrowUp', false);
+			this.player.inputs.ArrowUp = false;
 		if (key == 'ArrowDown')
-			this.client.emit('ArrowDown', false);
+			this.player.inputs.ArrowDown = false;
 	}
 
 	@HostListener('window:keydown', ['$event'])
@@ -135,14 +90,12 @@ export class PongComponent {
 		const key = event.key;
 		clearTimeout(this.timeoutId);
 		this.timeoutId = setTimeout(() => {
-			this.client.emit('ArrowUp', false);
-			this.client.emit('ArrowDown', false);
+			this.player.inputs.ArrowUp = false;
+			this.player.inputs.ArrowDown = false;
 		}, 500);
-		if (!this.client)
-			return;
 		if (key == 'ArrowUp' && !this.player.inputs.ArrowUp)
-			this.client.emit('ArrowUp', true);
+			this.player.inputs.ArrowUp = true;
 		if (key == 'ArrowDown' && !this.player.inputs.ArrowDown)
-			this.client.emit('ArrowDown', true);
+			this.player.inputs.ArrowDown = true;
 	}
 }

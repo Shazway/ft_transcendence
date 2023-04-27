@@ -33,8 +33,8 @@ export class MatchmakingGateway {
 		return (rank_score - (rank_score % 100)).toString();
 	}
 
-	buildPlayer(socket: Socket, id: number, name: string) {
-		return { client: socket, user_id: id, username: name };
+	buildPlayer(socket: Socket, id: number, name: string): Player {
+		return { client: socket, user_id: id, username: name, isReady: false };
 	}
 
 	async handleConnection(client: Socket) {
