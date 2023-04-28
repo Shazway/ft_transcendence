@@ -22,6 +22,7 @@ export class PongDebugComponent {
 	private gamespeed = 13;
 	private timeoutId!: any;
 	private gameSettings!: MatchSetting;
+	bouncenumber: number = 0;
 
 	constructor(
 		private pixiContainer: ElementRef,
@@ -57,9 +58,16 @@ export class PongDebugComponent {
 			this.opponent.moveObject(this.opponent.position(0, this.movespeed * delta));
 		//console.log(this.ball.collidesWithPaddle(this.player));
 		if (this.ball.collidesWithPaddle(this.player))
+		{
+			this.bouncenumber = 0;
 			this.ball.changeDirectionPlayer(this.player);
+		}
 		if (this.ball.collidesWithPaddle(this.opponent))
+		{
+			this.bouncenumber++;
 			this.ball.changeDirectionOpponent(this.opponent);
+			console.log(this.bouncenumber);
+		}
 		// if (this.ball.collidesWithPaddle(this.opponent))
 		// 	this.ball.changeDirection(this.opponent);
 		this.ball.moveObject(delta);

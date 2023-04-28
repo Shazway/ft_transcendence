@@ -63,6 +63,20 @@ export class ballObjectDto {
 	}
 
 
+	collideswithOpponent(paddle: pongObjectDto): boolean {
+		const vecRadX = (this.RADIUS / 2) * ((this.vec.x > 0) ? 1 : -1);
+		const vecRadY = (this.RADIUS / 2) * ((this.vec.y > 0) ? 1 : -1);
+		const ret = (
+			this.vec.x + vecRadX >= paddle.graphic.x &&
+			this.vec.x + vecRadX <= paddle.graphic.x + paddle.objDim.x &&
+			this.vec.y + vecRadY >= paddle.graphic.y &&
+			this.vec.y + vecRadY <= paddle.graphic.y + paddle.objDim.y / 2
+		)
+		if (ret) {
+			//console.log(this.vec);
+		}
+		return ret;
+	}
 
 	collidesWithPaddle(paddle: pongObjectDto): boolean {
 		const vecRadX = (this.RADIUS / 2) * ((this.vec.x > 0) ? 1 : -1);
@@ -74,7 +88,7 @@ export class ballObjectDto {
 			this.vec.y + vecRadY <= paddle.graphic.y + paddle.objDim.y / 2
 		)
 		if (ret) {
-			console.log(this.vec);
+			//console.log(this.vec);
 		}
 		return ret;
 	}
@@ -82,7 +96,7 @@ export class ballObjectDto {
 	checkWallCollision(newPos: Position) {
 		if (newPos.x - (this.RADIUS / 2) <= 0 || newPos.x + (this.RADIUS / 2) >= this.gameDim.x)
 			this.direction = Math.PI -this.direction;
-	
+
 		if (newPos.y - (this.RADIUS / 2) <= 0 || newPos.y + (this.RADIUS / 2) >= this.gameDim.y)
 			this.direction = -this.direction;
 	}
@@ -100,38 +114,37 @@ export class ballObjectDto {
 		return (a >= r1 && a <= r2)
 	}
 
-	changeDirectionOpponent(opponent: pongObjectDto) {
+	changeDirectionOpponent(opponent: pongObjectDto)
+	{
+		const maxSinus = -0.8;
+        const minSinus = -maxSinus;
+        const paddleSize = this.position(opponent.objDim.x / 2, opponent.objDim.y / 2);
+        const pos: Position = {x: this.graphic.x, y: this.graphic.y};
+        const upperCorner : Position = {x: opponent.graphic.x, y: opponent.graphic.y}
+        const lowerCorner : Position = {x: opponent.graphic.x, y: opponent.graphic.y + paddleSize.y}
+        const middleFace : Position = {x: opponent.graphic.x, y: opponent.graphic.y + paddleSize.y / 2}
 
-		const maxSinus = 0.8;
-		const minSinus = -maxSinus;
-		const paddleSize = this.position(opponent.objDim.x / 2, opponent.objDim.y / 2);
-		const pos: Position = {x: this.graphic.x, y: this.graphic.y};
-		const upperCorner : Position = {x: opponent.graphic.x, y: opponent.graphic.y}
-		const lowerCorner : Position = {x: opponent.graphic.x, y: opponent.graphic.y + paddleSize.y}
-		const middleFace : Position = {x: opponent.graphic.x, y: opponent.graphic.y + paddleSize.y / 2}
-
-		let sinus = 1;
-		if	(pos.x >= upperCorner.x + (this.RADIUS / 2) ||
-			(pos.y + (this.RADIUS / 2) < upperCorner.y && pos.y - (this.RADIUS / 2) > lowerCorner.y))
-		{
-			this.direction = -this.direction;
-			return ;
-		}
-		if (this.inRange(pos.y, upperCorner.y - (this.RADIUS / 2), upperCorner.y))
-		{
-			if (this.hypothenuse(pos.x + upperCorner.x, pos.y - upperCorner.y) < (this.RADIUS / 2))
-				sinus = maxSinus;
-		}
-		else if (this.inRange(pos.y, lowerCorner.y, lowerCorner.y + (this.RADIUS / 2)))
-		{
-			if (this.hypothenuse(pos.x + lowerCorner.x, pos.y - lowerCorner.y) < (this.RADIUS / 2))
-				sinus = minSinus;
-		}
-		else
-			sinus = (middleFace.y - pos.y) * (maxSinus * 2) / (opponent.objDim.y / 2);
-		if (sinus == 1)
-			return ;
-		this.direction = Math.sin(-sinus);
+        let sinus = 1;
+        if (pos.x <= upperCorner.x - (this.RADIUS / 2) || (pos.y + (this.RADIUS / 2) < upperCorner.y && pos.y - (this.RADIUS / 2) > lowerCorner.y))
+        {
+            this.direction = -this.direction;
+            return ;
+        }
+        if (this.inRange(pos.y, upperCorner.y - (this.RADIUS / 2), upperCorner.y))
+        {
+            if (this.hypothenuse(pos.x - upperCorner.x, pos.y - upperCorner.y) < (this.RADIUS / 2))
+                sinus = maxSinus;
+        }
+        else if (this.inRange(pos.y, lowerCorner.y, lowerCorner.y + (this.RADIUS / 2)))
+        {
+            if (this.hypothenuse(pos.x - lowerCorner.x, pos.y - lowerCorner.y) < (this.RADIUS / 2))
+                    sinus = minSinus;
+        }
+        else
+            sinus = (middleFace.y - pos.y) * (maxSinus * 2) / (opponent.objDim.y / 2);
+        if (sinus == 1)
+            return ;
+        this.direction = Math.PI - Math.asin(sinus);
 	}
 
 	changeDirectionPlayer(player: pongObjectDto)
@@ -149,7 +162,7 @@ export class ballObjectDto {
 		{
 			this.direction = -this.direction;
 			return ;
-		}	
+		}
 		if (this.inRange(pos.y, upperCorner.y - (this.RADIUS / 2), upperCorner.y))
 		{
 			if (this.hypothenuse(pos.x - upperCorner.x, pos.y - upperCorner.y) < (this.RADIUS / 2))
@@ -182,7 +195,7 @@ export class ballObjectDto {
 		return this.vec;
 	}
 
-	moveObject(delta: number) { 
+	moveObject(delta: number) {
 		let pos: Position = {x: this.graphic.x, y: this.graphic.y};
 
 		this.checkWallCollision(this.updateVec(delta));
@@ -258,16 +271,4 @@ export class pongObjectDto {
 	{
 		return (a >= r1 && a <= r2);
 	}
-
-	// collideCheck(pos: Position, vec: Position) {
-	// 	const impact = this.position(0, 0);
-	// 	const touched = {x: false, y: false};
-
-	// 	impact.x = pos.x + vec.x;
-	// 	impact.y = pos.y + vec.y;
-	// 	if (this.inRange(impact.x, this.graphic.x, this.graphic.x + this.objDim.x))
-	// 		touched.x = true;
-	// 	if (this.inRange(impact.y, this.graphic.y, this.graphic.y + this.objDim.y))
-	// 		touched.y = true;
-	// }
 }
