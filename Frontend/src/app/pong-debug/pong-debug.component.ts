@@ -1,7 +1,7 @@
 import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { Socket, io } from 'socket.io-client';
 import { WebsocketService } from '../websocket.service';
-import { Application } from 'pixi.js';
+import { Application, Graphics } from 'pixi.js';
 import { pongObjectDto, ballObjectDto, Move, VectorPos } from 'src/dtos/Pong.dto';
 import { ActivatedRoute } from '@angular/router';
 import { MatchSetting } from 'src/dtos/MatchSetting.dto';
@@ -57,7 +57,9 @@ export class PongDebugComponent {
 			this.opponent.moveObject(this.opponent.position(0, this.movespeed * delta));
 		//console.log(this.ball.collidesWithPaddle(this.player));
 		if (this.ball.collidesWithPaddle(this.player))
-			this.ball.changeDirection(this.player);
+			this.ball.changeDirectionPlayer(this.player);
+		if (this.ball.collidesWithPaddle(this.opponent))
+			this.ball.changeDirectionOpponent(this.opponent);
 		// if (this.ball.collidesWithPaddle(this.opponent))
 		// 	this.ball.changeDirection(this.opponent);
 		this.ball.moveObject(delta);
@@ -67,7 +69,14 @@ export class PongDebugComponent {
 		this.player.init(10, 0, 20, 100, 0x83d0c9);
 		this.opponent.init(this.app.view.width - 30, 0, 20, 100, 0xFF0000);
 		this.ball.init(500, 300, 10, 0xFFFFFF);
-		this.app.stage.addChild(this.ball.graphic, this.player.graphic, this.opponent.graphic);
+		const graphicElm = new Graphics();
+		graphicElm.beginFill(0x333333);
+		graphicElm.drawRect(490, 0, 20, 250);
+		graphicElm.drawRect(490, 350, 20, 250);
+		graphicElm.endFill();
+		this.ball.graphic.zIndex = 1;
+		graphicElm.zIndex = -5;
+		this.app.stage.addChild(this.ball.graphic, this.player.graphic, this.opponent.graphic, graphicElm);
 		// const ruler = new Graphics();
 		// for (let index = 0; index < 12; index++) {
 		// 	for (let index2 = 0; index2 < 8; index2++) {
@@ -86,6 +95,10 @@ export class PongDebugComponent {
 			this.player.inputs.ArrowUp = false;
 		if (key == 'ArrowDown')
 			this.player.inputs.ArrowDown = false;
+		if (key == 'z')
+			this.opponent.inputs.ArrowUp = false;
+		if (key == 's')
+			this.opponent.inputs.ArrowDown = false;
 	}
 
 	@HostListener('window:keydown', ['$event'])
@@ -100,5 +113,9 @@ export class PongDebugComponent {
 			this.player.inputs.ArrowUp = true;
 		if (key == 'ArrowDown' && !this.player.inputs.ArrowDown)
 			this.player.inputs.ArrowDown = true;
+		if (key == 'z' && !this.opponent.inputs.ArrowUp)
+			this.opponent.inputs.ArrowUp = true;
+		if (key == 's' && !this.opponent.inputs.ArrowDown)
+			this.opponent.inputs.ArrowDown = true;
 	}
 }
