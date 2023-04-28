@@ -55,13 +55,16 @@ export class PongDebugComponent {
 			this.opponent.moveObject(this.opponent.position(0, -this.movespeed * delta));
 		if (this.opponent.inputs.ArrowDown)
 			this.opponent.moveObject(this.opponent.position(0, this.movespeed * delta));
-		//this.ball.collisionPaddle(this.player, this.opponent);
-		this.ball.collisionMarina(this.player);
+		//console.log(this.ball.collidesWithPaddle(this.player));
+		if (this.ball.collidesWithPaddle(this.player))
+			this.ball.changeDirection(this.player);
+		// if (this.ball.collidesWithPaddle(this.opponent))
+		// 	this.ball.changeDirection(this.opponent);
 		this.ball.moveObject(delta);
 	}
 
 	initObjects() {
-		this.player.init(10, 0, 10, 100, 0x83d0c9);
+		this.player.init(10, 0, 20, 100, 0x83d0c9);
 		this.opponent.init(this.app.view.width - 30, 0, 20, 100, 0xFF0000);
 		this.ball.init(500, 300, 10, 0xFFFFFF);
 		this.app.stage.addChild(this.ball.graphic, this.player.graphic, this.opponent.graphic);

@@ -19,24 +19,27 @@ export interface Move {
 }
 
 export class ballObjectDto {
-	DIAMETER = 100;
-	RADIUS = this.DIAMETER / 2;
-	public speed = 2;
+	DIAMETER!: number;
+	RADIUS!: number;
+	public speed = 4;
 	public graphic = new Graphics();
 	public color = 0xFFFFFF;
 	public gameDim: Position;
+	public direction: number;
 	public vec: Position;
 	constructor(
 		private gameWidth: number,
 		private gameHeight: number,
 	) {
-		this.vec = this.position(this.speed, this.speed);
+		this.direction = Math.PI / 4;
+		this.vec = this.updateVec(500);
 		this.gameDim = this.position(gameWidth / 2, gameHeight / 2);
 	}
 
 	position(newX: number, newY: number) : Position {
 		return {x: newX, y: newY}
 	}
+
 	init(posX: number, posY: number, radius: number, color: number) {
 		this.RADIUS = radius;
 		this.DIAMETER = radius * 2;
@@ -48,6 +51,7 @@ export class ballObjectDto {
 		this.graphic.drawCircle(posX / 2, posY / 2, this.RADIUS);
 		this.graphic.endFill();
 	}
+
 	applyMove(newPos: Position) {
 		this.graphic.clear();
 		this.graphic.lineStyle(0);
@@ -57,49 +61,28 @@ export class ballObjectDto {
 		this.graphic.x = newPos.x;
 		this.graphic.y = newPos.y;
 	}
-	checkXCollision(x: number) {
-		if (x + this.RADIUS / 2 >= this.gameDim.x)
-			this.vec.x = -this.speed;
-		else if (x - this.RADIUS / 2 <= 0)
-			this.vec.x = this.speed;
-	}
-	checkYCollision(y: number) {
-		if (y + this.RADIUS / 2 >= this.gameDim.y)
-			this.vec.y = -this.speed;
-		else if (y - this.RADIUS / 2 <= 0)
-			this.vec.y = this.speed;
+
+
+
+	collidesWithPaddle(paddle: pongObjectDto): boolean {
+		const ret = (
+			this.vec.x + this.RADIUS / 2 > paddle.graphic.x &&
+			this.vec.x - this.RADIUS / 2 < paddle.graphic.x + paddle.objDim.x / 2 &&
+			this.vec.y + this.RADIUS / 2 > paddle.graphic.y &&
+			this.vec.y - this.RADIUS / 2 < paddle.graphic.y + paddle.objDim.y / 2
+		)
+		if (ret) {
+			console.log(this.vec);
+		}
+		return ret;
 	}
 
 	checkWallCollision(newPos: Position) {
-		this.checkXCollision(newPos.x);
-		this.checkYCollision(newPos.y);
-	}
-
-	inRange(a : number, r1: number, r2: number)
-	{
-		return (a >= r1 && a <= r2)
-	};
-
-	collisionPaddle(player: pongObjectDto, opponent: pongObjectDto)
-	{
-		let pos: Position = {x: this.graphic.x, y: this.graphic.y};
-
-		if (pos.x - (this.RADIUS / 2) <= player.objDim.x / 2 && this.inRange(pos.y, player.graphic.y, player.graphic.y + (player.objDim.y / 2))) {
-			this.vec.x = this.speed;
-
-		}
-		else if (pos.x + (this.RADIUS / 2) >= this.gameDim.x - player.objDim.x / 2 && this.inRange(pos.y, opponent.graphic.y, opponent.graphic.y + (opponent.objDim.y / 2)) )
-			this.vec.x = -this.speed;
-		// if (
-		// 	pos.y - this.RADIUS / 2 <= player.objDim.y / 2 &&
-		// 	this.inRange(pos.x, player.graphic.x, player.graphic.x + player.objDim.x / 2)
-		// )
-		// 	this.vec.y = this.speed;
-		// else if (
-		// 	pos.y + this.RADIUS / 2 >= this.gameDim.y - player.objDim.y / 2 &&
-		// 	this.inRange(pos.x, opponent.graphic.x, opponent.graphic.x + opponent.objDim.x / 2)
-		// )
-		// 	this.vec.y = -this.speed;
+		if (newPos.x - (this.RADIUS / 2) <= 0 || newPos.x + (this.RADIUS / 2) >= this.gameDim.x)
+			this.direction = Math.PI -this.direction;
+	
+		if (newPos.y - (this.RADIUS / 2) <= 0 || newPos.y + (this.RADIUS / 2) >= this.gameDim.y)
+			this.direction = -this.direction;
 	}
 
 	hypothenuse(x : number, y : number)
@@ -109,9 +92,15 @@ export class ballObjectDto {
 		return (Math.sqrt(res));
 	}
 
-	collisionMarina(player: pongObjectDto)
+
+	inRange(a : number, r1: number, r2: number)
 	{
-		const maxSinus = Math.sqrt(2) / 2;
+		return (a >= r1 && a <= r2)
+	}
+
+	changeDirection(player: pongObjectDto)
+	{
+		const maxSinus = 0.8;
 		const minSinus = -maxSinus;
 		const paddleSize = this.position(player.objDim.x / 2, player.objDim.y / 2);
 		const pos: Position = {x: this.graphic.x, y: this.graphic.y};
@@ -119,73 +108,30 @@ export class ballObjectDto {
 		const lowerCorner : Position = {x: player.graphic.x + paddleSize.x, y: player.graphic.y + paddleSize.y}
 		const middleFace : Position = {x: player.graphic.x + paddleSize.x, y: player.graphic.y + paddleSize.y / 2}
 
-		if (!(pos.x <= middleFace.x + (this.RADIUS / 2)))
-			return ;
-
 		let sinus = 1;
 
-		//n'est pas dans la zone raquette elargie (+radius)
-		if (!this.inRange(pos.y, upperCorner.y - (this.RADIUS / 2), lowerCorner.y + (this.RADIUS / 2)))
+		if (pos.x <= upperCorner.x - (this.RADIUS / 2) || (pos.y + (this.RADIUS / 2) < upperCorner.y && pos.y - (this.RADIUS / 2) > lowerCorner.y))
 		{
-			//console.log("n'est pas dans la zone raquette elargie (+radius)")
+			this.direction = -this.direction;
+			console.log("hit tranche");
 			return ;
-		}
-		//est dans la zone ou ca risque de toucher le coin superieur
+		}	
 		if (this.inRange(pos.y, upperCorner.y - (this.RADIUS / 2), upperCorner.y))
 		{
-			//console.log("est dans la zone ou ca risque de toucher le coin superieur");
-			//il y a collision acvec le coin du haut
 			if (this.hypothenuse(pos.x - upperCorner.x, pos.y - upperCorner.y) < (this.RADIUS / 2))
-			{
-			//	console.log("il y a collision avec le coin du haut")
-				if (Math.abs((upperCorner.x - pos.x) / this.vec.x) <= Math.abs((upperCorner.y - pos.y) / this.vec.y))
-					//face de la raquette
-					sinus = maxSinus;
-				else
-				//tranche de la raquette
-				{
-					console.log("tranche du haut");
-					this.vec.y = -this.vec.y;
-					return ;
-				}
-			}
+				sinus = maxSinus;
 		}
-		//est dans la zone ou ca risque de toucher le coin inferieur
 		else if (this.inRange(pos.y, lowerCorner.y, lowerCorner.y + (this.RADIUS / 2)))
 		{
-			//console.log("est dans la zone ou ca risque de toucher le coin inferieur");
-			//il y a collision acvec le coin du haut
 			if (this.hypothenuse(pos.x - lowerCorner.x, pos.y - lowerCorner.y) < (this.RADIUS / 2))
-			{
-				if (Math.abs((lowerCorner.x - pos.x) / this.vec.x) <= Math.abs((lowerCorner.y - pos.y) / this.vec.y))
-					//face de la raquette
 					sinus = minSinus;
-				else
-					//tranche de la raquette
-				{
-					console.log("tranche du bas");
-					this.vec.y = -Math.abs(this.vec.y);
-				}
-			}
 		}
-		//     TODO : mettre des print dans tous les if
-
-
-		//est 100% dans la raquette, donc sinus compris entre -0.5 et 0.5
 		else
-		{
-			sinus = (middleFace.y - pos.y) * maxSinus / (player.objDim.y / 2);
-			//console.log("est 100% dans la raquette, donc sinus compris entre -0.5 et 0.5: ");
-			console.log(sinus);
-		}
+			sinus = (middleFace.y - pos.y) * (maxSinus * 2) / (player.objDim.y / 2);
+	
 		if (sinus == 1)
-		{
-			//console.log("n'a pas touche la raquette");
 			return ;
-		}
-		const angle = Math.asin(sinus);
-		this.vec.x = Math.cos(angle) * this.speed;
-		this.vec.y = -sinus * this.speed;
+		this.direction = -Math.asin(sinus);
 	}
 
 	setPos(pos: Position) {
@@ -198,11 +144,17 @@ export class ballObjectDto {
 		this.vec.y = pos.y;
 	}
 
+	updateVec(delta: number): Position {
+		this.vec = this.position(this.graphic.x + (this.speed * delta * Math.cos(this.direction)), this.graphic.y + (this.speed * delta * Math.sin(this.direction)));
+		return this.vec;
+	}
+
 	moveObject(delta: number) { 
 		let pos: Position = {x: this.graphic.x, y: this.graphic.y};
 
-		this.checkWallCollision(this.position(pos.x, pos.y));
-		this.applyMove(this.position(pos.x + (this.vec.x * delta), pos.y + (this.vec.y * delta)));
+		this.checkWallCollision(this.updateVec(delta));
+		this.direction = this.direction % (Math.PI * 2);
+		this.applyMove(this.updateVec(delta));
 	}
 }
 

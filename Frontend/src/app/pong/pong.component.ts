@@ -84,7 +84,6 @@ export class PongComponent {
 		if (this.opponent.inputs.ArrowDown)
 			this.opponent.moveObject(this.opponent.position(0, this.movespeed * delta));
 		//this.ball.collisionPaddle(this.player, this.opponent);
-		this.ball.collisionMarina(this.player);
 		this.ball.moveObject(delta);
 	}
 
