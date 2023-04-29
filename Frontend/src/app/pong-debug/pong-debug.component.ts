@@ -64,9 +64,9 @@ export class PongDebugComponent {
 	}
 
 	initObjects() {
-		this.player.init(10, 200, 250, 20, 0x83d0c9);
-		this.opponent.init(this.app.view.width - 230, 250, 200, 20, 0xFF0000);
-		this.ball.init(500, 300, 10, 0xFFFFFF);
+		this.player.init(10, 200, 250, 200, 0x83d0c9);
+		this.opponent.init(this.app.view.width - 210, 200, 200, 200, 0xFF0000);
+		this.ball.init(500, 470, 10, 0xFFFFFF);
 		const graphicElm = new Graphics();
 		graphicElm.beginFill(0xFFFFFF, 0.3);
 		graphicElm.drawRect(490, 0, 20, 250);
