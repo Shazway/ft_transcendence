@@ -56,29 +56,19 @@ export class PongDebugComponent {
 			this.opponent.moveObject(this.opponent.position(0, -this.movespeed * delta));
 		if (this.opponent.inputs.ArrowDown)
 			this.opponent.moveObject(this.opponent.position(0, this.movespeed * delta));
-		//console.log(this.ball.collidesWithPaddle(this.player));
-		if (this.ball.collidesWithPaddle(this.player))
-		{
-			this.bouncenumber = 0;
+		if (this.ball.collidesWithPlayer(this.player))
 			this.ball.changeDirectionPlayer(this.player);
-		}
-		if (this.ball.collidesWithPaddle(this.opponent))
-		{
-			this.bouncenumber++;
+		if (this.ball.collidesWithOpponent(this.opponent))
 			this.ball.changeDirectionOpponent(this.opponent);
-			console.log(this.bouncenumber);
-		}
-		// if (this.ball.collidesWithPaddle(this.opponent))
-		// 	this.ball.changeDirection(this.opponent);
 		this.ball.moveObject(delta);
 	}
 
 	initObjects() {
-		this.player.init(10, 0, 20, 100, 0x83d0c9);
-		this.opponent.init(this.app.view.width - 30, 0, 20, 100, 0xFF0000);
+		this.player.init(10, 200, 250, 20, 0x83d0c9);
+		this.opponent.init(this.app.view.width - 230, 250, 200, 20, 0xFF0000);
 		this.ball.init(500, 300, 10, 0xFFFFFF);
 		const graphicElm = new Graphics();
-		graphicElm.beginFill(0x333333);
+		graphicElm.beginFill(0xFFFFFF, 0.3);
 		graphicElm.drawRect(490, 0, 20, 250);
 		graphicElm.drawRect(490, 350, 20, 250);
 		graphicElm.endFill();

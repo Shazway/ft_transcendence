@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Body, Controller, Get, HttpStatus, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
 import { UsersService } from 'src/homepage/services/users/users.service';
 import { Response } from 'express';
 import { varFetchService } from 'src/homepage/services/var_fetch/var_fetch.service';
@@ -33,7 +33,7 @@ export class LoginController {
 		};
 	}
 
-	async buildLoginBody(tokenInfo: TokenInfo, intraInfo: IntraInfo, id: number,created: boolean = false) {
+	async buildLoginBody(tokenInfo: TokenInfo, intraInfo: IntraInfo, id: number, created = false) {
 		return {
 			tokenInfo: tokenInfo,
 			intraInfo: intraInfo,
