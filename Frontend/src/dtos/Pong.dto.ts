@@ -8,8 +8,8 @@ export interface Position {
 }
 
 export interface VectorPos {
-	vec: Position;
 	pos: Position;
+	dir: number;
 }
 
 export interface Move {
@@ -32,7 +32,7 @@ export class ballObjectDto {
 		private gameWidth: number,
 		private gameHeight: number,
 	) {
-		this.direction = -0.218;
+		this.direction = Math.PI/4;
 		this.vec = this.updateVec(1);
 		this.gameDim = this.position(gameWidth / 2, gameHeight / 2);
 	}
@@ -207,9 +207,8 @@ export class ballObjectDto {
 		this.graphic.y = pos.y;
 	}
 
-	setVec(pos: Position) {
-		this.vec.x = pos.x;
-		this.vec.y = pos.y;
+	setDir(dir: number) {
+		this.direction = dir;
 	}
 
 	updateVec(delta: number): Position {
@@ -218,8 +217,6 @@ export class ballObjectDto {
 	}
 
 	moveObject(delta: number) {
-		let pos: Position = {x: this.graphic.x, y: this.graphic.y};
-
 		this.checkWallCollision(this.updateVec(delta));
 		this.direction = this.direction % (Math.PI * 2);
 		this.applyMove(this.updateVec(delta));
@@ -263,10 +260,10 @@ export class pongObjectDto {
 		return newPos;
 	}
 
-	applyMove(newPos: Position, playerDim: Position) {
+	applyMove(newPos: Position) {
 		this.graphic.clear();
 		this.graphic.beginFill(this.color);
-		this.graphic.drawRect(newPos.x, newPos.y, playerDim.x, playerDim.y);
+		this.graphic.drawRect(newPos.x, newPos.y, this.objDim.x, this.objDim.y);
 		this.graphic.endFill();
 		this.graphic.x = newPos.x;
 		this.graphic.y = newPos.y;
@@ -286,8 +283,11 @@ export class pongObjectDto {
 		const width = this.objDim.x;
 		const height = this.objDim.y;
 
-		pos = this.checkWallCollision(this.position(pos.x + dir.x, pos.y + dir.y), this.position(width / 2, height / 2));
-		this.applyMove(pos, this.objDim);
+		pos = this.checkWallCollision(
+			this.position(pos.x + dir.x, pos.y + dir.y),
+			this.position(width / 2, height / 2)
+		);
+		this.applyMove(pos);
 	}
 
 	inRange(a : number, r1: number, r2: number)

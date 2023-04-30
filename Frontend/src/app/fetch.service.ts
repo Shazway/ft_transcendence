@@ -37,7 +37,7 @@ export class FetchService {
 
 	async getAllUsers() {
 		let res;
-		await axios.get('http://localhost:3001/leaderboard', this.getHeader())
+		await axios.get('http://10.11.2.3:3001/leaderboard', this.getHeader())
 		.then(function (response) {
 			res = response.data;
 			console.log(res);
@@ -49,7 +49,7 @@ export class FetchService {
 
 	async createUser(param: UserDto) {
 		let res;
-		await axios.post<ResponseDto>('http://localhost:3001/users/create', param, this.getHeader())
+		await axios.post<ResponseDto>('http://10.11.2.3:3001/users/create', param, this.getHeader())
 		.then(function (response) {
 			res = response.data;
 			console.log(res);
@@ -64,7 +64,7 @@ export class FetchService {
 
 	async getUser(param: UserDto) {
 		let res;
-		await axios.get<ResponseDto>('http://localhost:3001/users/' + param.login, this.getHeader())
+		await axios.get<ResponseDto>('http://10.11.2.3:3001/users/' + param.login, this.getHeader())
 		.then(function (response) {
 			res = response.data;
 			console.log(res);
@@ -79,7 +79,7 @@ export class FetchService {
 
 	async getMessages(channel_id: number, page: number): Promise<MessageDto[]> {
 		let res: MessageDto[] = [];
-		await axios.get('http://localhost:3001/channels/' + channel_id + '/messages/' + page, this.getHeader())
+		await axios.get('http://10.11.2.3:3001/channels/' + channel_id + '/messages/' + page, this.getHeader())
 		.then(function (response) {
 		res = response.data;
 		console.log(res);
@@ -92,7 +92,7 @@ export class FetchService {
 	async createChannel(param: NewChanDto) {
 		let res;
 		console.log(param);
-		await axios.post('http://localhost:3001/channels/create', param, this.getHeader())
+		await axios.post('http://10.11.2.3:3001/channels/create', param, this.getHeader())
 		.then(function (response) {
 			res = response.data;
 			console.log(res);
@@ -104,7 +104,7 @@ export class FetchService {
 
 	async getChannels(): Promise<ChannelDto[]> {
 		let res: ChannelDto[] = [];
-		await axios.get('http://localhost:3001/channels/all', this.getHeader())
+		await axios.get('http://10.11.2.3:3001/channels/all', this.getHeader())
 		.then(function (response) {
 			res = response.data;
 			console.log(res);

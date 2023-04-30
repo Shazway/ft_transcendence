@@ -1,5 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Player } from './Matchmaking.dto';
+import * as math from "mathjs"
 
 export class Position {
 	x: number;
@@ -7,8 +8,8 @@ export class Position {
 }
 
 export class VectorPos {
-	vec: Position;
 	pos: Position;
+	dir: number;
 }
 
 export class Move {
@@ -21,13 +22,14 @@ export class Move {
 export class ballObjectDto {
 	DIAMETER = 100;
 	RADIUS = this.DIAMETER / 2;
-	public speed = 2;
+	public speed = 4;
 	public pos = new Position();
-	public color = 0xffffff;
 	public gameDim: Position;
+	public direction: number;
 	public vec: Position;
 	constructor(private gameWidth: number, private gameHeight: number) {
-		this.vec = this.position(this.speed, this.speed);
+		this.direction = Math.PI/4;
+		this.vec = this.updateVec(1);
 		this.gameDim = this.position(gameWidth / 2, gameHeight / 2);
 	}
 
@@ -38,8 +40,8 @@ export class ballObjectDto {
 	init(posX: number, posY: number, radius: number) {
 		this.RADIUS = radius;
 		this.DIAMETER = radius * 2;
-		this.pos.x = posX;
-		this.pos.y = posY;
+		this.pos.x = posX / 2;
+		this.pos.y = posY / 2;
 	}
 
 	applyMove(newPos: Position) {
@@ -47,138 +49,166 @@ export class ballObjectDto {
 		this.pos.y = newPos.y;
 	}
 
-	checkXCollision(x: number) {
-		if (x + this.RADIUS / 2 >= this.gameDim.x) {
-			this.vec.x = -this.speed;
-			return true;
-		} else if (x - this.RADIUS / 2 <= 0) {
-			this.vec.x = this.speed;
-			return true;
-		}
-		return false;
-	}
-
-	checkYCollision(y: number) {
-		if (y + this.RADIUS / 2 >= this.gameDim.y) {
-			this.vec.y = -this.speed;
-			return true;
-		} else if (y - this.RADIUS / 2 <= 0) {
-			this.vec.y = this.speed;
-			return true;
-		}
-		return false;
-	}
-
 	checkWallCollision(newPos: Position) {
-		const ret1 = this.checkXCollision(newPos.x);
-		const ret2 = this.checkYCollision(newPos.y);
-		return ret1 || ret2;
-	}
+		if (newPos.x - (this.RADIUS / 2) <= 0 || newPos.x + (this.RADIUS / 2) >= this.gameDim.x)
+		this.direction = Math.PI -this.direction;
 
-	getMovement(): VectorPos {
-		return {
-			vec: this.vec,
-			pos: this.pos
-		};
+		if (newPos.y - (this.RADIUS / 2) <= 0 || newPos.y + (this.RADIUS / 2) >= this.gameDim.y)
+		this.direction = -this.direction;
 	}
-
-	getMovementMirrored(): VectorPos {
-		return {
-			vec: this.position(this.vec.x * -1, this.vec.y),
-			pos: this.position(this.gameDim.x - this.pos.x, this.pos.y)
-		};
-	}
-
-	inRange(a: number, r1: number, r2: number) {
-		return a >= r1 && a <= r2;
-	}
-
-	collisionPaddle(player: pongObjectDto, opponent: pongObjectDto) {
-		let ret = false;
-		if (
-			this.pos.x - this.RADIUS / 2 <= player.objDim.x / 2 &&
-			this.inRange(this.pos.y, player.pos.y, player.pos.y + player.objDim.y / 2)
-		) {
-			this.vec.x = this.speed;
-			ret = true;
-		}
-		else if (
-			this.pos.x + this.RADIUS / 2 >= this.gameDim.x - player.objDim.x / 2 &&
-			this.inRange(this.pos.y, opponent.pos.y, opponent.pos.y + opponent.objDim.y / 2)
-		) {
-			this.vec.x = -this.speed;
-			ret = true;
-		}
-		if (
-			this.pos.y - this.RADIUS / 2 <= player.objDim.y / 2 &&
-			this.inRange(this.pos.x, player.pos.x, player.pos.x + player.objDim.x / 2)
-		)
-		{
-			this.vec.y = this.speed;
-			ret = true;
-		}
-		else if (
-			this.pos.y + this.RADIUS / 2 >= this.gameDim.y - player.objDim.y / 2 &&
-			this.inRange(this.pos.x, opponent.pos.x, opponent.pos.x + opponent.objDim.x / 2)
-		) {
-			this.vec.y = -this.speed;
-			ret = true;
-		}
-		return ret;
-	}
-
+	
 	hypothenuse(x : number, y : number)
 	{
 		const res = x * x + y * y;
 		return (Math.sqrt(res));
 	}
 
-	collisionMarina(player: pongObjectDto)
-	{
-		const pos: Position = {x: this.pos.x, y: this.pos.y};
-		const upperCorner : Position = {x: player.pos.x + (player.objDim.x / 2), y: player.pos.y}
-		const lowerCorner : Position = {x: player.pos.x + (player.objDim.x / 2), y: player.pos.y + (player.objDim.y / 2)}
-		const middleFace : Position = {x: player.pos.x + (player.objDim.x / 2), y: player.pos.y + (player.objDim.y / 2) / 2}
+	inRange(a: number, r1: number, r2: number) {
+		return a >= r1 && a <= r2;
+	}
+	
+	goingUp(pos: Position) {
+		return this.vec.y <= pos.y;
+	}
+	
+	distancePos(pos1: Position, pos2: Position) { //Easier to write distance comparing
+		return Math.abs(Number(math.distance([pos1.x, pos1.y], [pos2.x, pos2.y])));
+	}
 
-		if (!(pos.x > middleFace.x && pos.x <= middleFace.x + this.vec.x))
-			return false;
+	collidesWithOpponent(opponent: pongObjectDto): boolean { //Check collision for opponent (right side player)
+		const paddleSize = this.position(opponent.objDim.x / 2, opponent.objDim.y / 2);
+		const upperCorner : Position = {x: opponent.pos.x, y: opponent.pos.y}
+		const lowerCorner : Position = {x: opponent.pos.x, y: opponent.pos.y + paddleSize.y}
+		const pos: Position = {x: this.pos.x, y: this.pos.y};
+
+		const ret = (
+			this.distancePos(this.vec, upperCorner) <= (this.RADIUS / 2) || // Checking corners
+			this.distancePos(this.vec, lowerCorner) <= (this.RADIUS / 2) ||
+			((Math.abs(upperCorner.x - pos.x) <= this.RADIUS / 2) && //Checking face or upper and lower sides
+			this.vec.y >= upperCorner.y &&
+			this.vec.y <= lowerCorner.y) ||
+			(pos.y + this.RADIUS / 2 >= upperCorner.y &&
+			pos.y - this.RADIUS / 2 <= lowerCorner.y &&
+			this.vec.x >= upperCorner.x)
+		)
+		return ret;
+	}
+
+	collidesWithPlayer(player: pongObjectDto): boolean { //Check collision for player (left side player)
+		const paddleSize = this.position(player.objDim.x / 2, player.objDim.y / 2);
+		const upperCorner : Position = {x: player.pos.x + paddleSize.x, y: player.pos.y}
+		const lowerCorner : Position = {x: player.pos.x + paddleSize.x, y: player.pos.y + paddleSize.y}
+		const pos: Position = {x: this.pos.x, y: this.pos.y};
+
+		const ret = (
+			this.distancePos(this.vec, upperCorner) <= (this.RADIUS / 2) || // Checking corners
+			this.distancePos(this.vec, lowerCorner) <= (this.RADIUS / 2) ||
+			((Math.abs(upperCorner.x - pos.x) <= this.RADIUS / 2) && //Checking face or upper and lower sides
+			this.vec.y >= upperCorner.y &&
+			this.vec.y <= lowerCorner.y) ||
+			(pos.y + this.RADIUS / 2 >= upperCorner.y &&
+			pos.y - this.RADIUS / 2 <= lowerCorner.y &&
+			this.vec.x <= upperCorner.x)
+		)
+		return ret;
+	}
+	
+	changeDirectionOpponent(opponent: pongObjectDto)
+	{
+		const maxSinus = -0.8;
+		const minSinus = -maxSinus;
+		const paddleSize = this.position(opponent.objDim.x / 2, opponent.objDim.y / 2);
+		const pos: Position = {x: this.pos.x, y: this.pos.y};
+		const upperCorner : Position = {x: opponent.pos.x, y: opponent.pos.y}
+		const lowerCorner : Position = {x: opponent.pos.x, y: opponent.pos.y + paddleSize.y}
+		const middleFace : Position = {x: opponent.pos.x, y: opponent.pos.y + paddleSize.y / 2}
 		
 		let sinus = 1;
-
-		//n'est pas dans la zone raquette elargie (+radius)
-		if (!this.inRange(pos.y, player.pos.y - (this.RADIUS / 2), player.pos.y + (player.objDim.y / 2) + (this.RADIUS / 2)))
-			return false;
-		//est dans la zone ou ca risque de toucher le coin superieur
-		if (this.inRange(pos.y, player.pos.y - (this.RADIUS / 2), player.pos.y))
+		if ((pos.x >= upperCorner.x && pos.x <= upperCorner.x + paddleSize.x) &&
+		(pos.y + this.RADIUS / 2 >= upperCorner.y && pos.y - this.RADIUS / 2 <= lowerCorner.y)) //Checking if the ball is in the range of the paddle slice
 		{
-			//il y a collision acvec le coin du haut
-			if (this.hypothenuse(pos.x - upperCorner.x + this.vec.x, pos.y - upperCorner.y + this.vec.y) < (this.RADIUS / 2) / 2)
-				sinus = 0.5;
+			if ((this.goingUp(pos) && this.distancePos(pos, lowerCorner) < this.distancePos(pos, upperCorner)) ||
+			(!this.goingUp(pos)) && this.distancePos(pos, lowerCorner) > this.distancePos(pos, upperCorner)) //Checking if the ball is going towards the slice (lower or upper)
+			this.direction = -this.direction; //Applying same direction change as wall, like the original pong
+			return ;
 		}
-		//est dans la zone ou ca risque de toucher le coin inferieur
-		else if (this.inRange(pos.y, player.pos.y - (this.RADIUS / 2), player.pos.y))
+		if (this.inRange(pos.y, upperCorner.y - (this.RADIUS / 2), upperCorner.y)) // Upper corner direction change
 		{
-			//il y a collision acvec le coin du haut
-			if (this.hypothenuse(pos.x - lowerCorner.x + this.vec.x, pos.y - lowerCorner.y + this.vec.y) < (this.RADIUS / 2) / 2)
-				sinus = -0.5;
+			if (this.hypothenuse(pos.x - upperCorner.x, pos.y - upperCorner.y) < (this.RADIUS / 2))
+				sinus = maxSinus;
 		}
-		//est 100% dans la raquette, donc sinus compris entre -0.5 et 0.5
+		else if (this.inRange(pos.y, lowerCorner.y, lowerCorner.y + (this.RADIUS / 2))) // Lower corner direction change
+		{
+			if (this.hypothenuse(pos.x - lowerCorner.x, pos.y - lowerCorner.y) < (this.RADIUS / 2))
+				sinus = minSinus;
+		}
 		else
-			sinus = (middleFace.y - pos.y) / (player.objDim.y / 2);
+			sinus = (middleFace.y - pos.y) * (maxSinus * 2) / (opponent.objDim.y / 2); // The rest of the paddle (front face)
 		if (sinus == 1)
-			return false;
-		const angle = Math.asin(sinus);
-		this.vec.x = Math.cos(angle) * this.speed;
-		this.vec.y = sinus * this.speed;
-		return true;
+		return ;
+		this.direction = Math.PI - Math.asin(sinus);
+	}
+	
+	changeDirectionPlayer(player: pongObjectDto)
+	{
+		const maxSinus = 0.8;
+		const minSinus = -maxSinus;
+		const paddleSize = this.position(player.objDim.x / 2, player.objDim.y / 2);
+		const pos: Position = {x: this.pos.x, y: this.pos.y};
+		const upperCorner : Position = {x: player.pos.x + paddleSize.x, y: player.pos.y}
+		const lowerCorner : Position = {x: player.pos.x + paddleSize.x, y: player.pos.y + paddleSize.y}
+		const middleFace : Position = {x: player.pos.x + paddleSize.x, y: player.pos.y + paddleSize.y / 2}
+		
+		let sinus = 1;
+		if ((pos.x <= upperCorner.x && pos.x >= upperCorner.x - paddleSize.x) &&
+		(pos.y + this.RADIUS / 2 >= upperCorner.y && pos.y - this.RADIUS / 2 <= lowerCorner.y)) //Checking if the ball is in the range of the paddle slice
+		{
+			if ((this.goingUp(pos) && this.distancePos(pos, lowerCorner) < this.distancePos(pos, upperCorner)) || //Checking if the ball is going towards the slice (lower or upper)
+			(!this.goingUp(pos)) && this.distancePos(pos, lowerCorner) > this.distancePos(pos, upperCorner))
+				this.direction = -this.direction; //Applying same direction change as wall, like the original pong
+			return ;
+		}
+		if (this.inRange(pos.y, upperCorner.y - (this.RADIUS / 2), upperCorner.y)) // Upper corner direction change
+		{
+			if (this.hypothenuse(pos.x - upperCorner.x, pos.y - upperCorner.y) < (this.RADIUS / 2))
+				sinus = maxSinus;
+		}
+		else if (this.inRange(pos.y, lowerCorner.y, lowerCorner.y + (this.RADIUS / 2))) // Lower corner direction change
+		{
+			if (this.hypothenuse(pos.x - lowerCorner.x, pos.y - lowerCorner.y) < (this.RADIUS / 2))
+					sinus = minSinus;
+		}
+		else
+			sinus = (middleFace.y - pos.y) * (maxSinus * 2) / (player.objDim.y / 2); // The rest of the paddle (front face)
+		if (sinus == 1)
+			return ;
+		this.direction = -Math.asin(sinus); // New angle to apply
+	}
+
+	updateVec(delta: number): Position {
+		this.vec = this.position(this.pos.x + (this.speed * delta * Math.cos(this.direction)), this.pos.y + (this.speed * delta * Math.sin(this.direction)));
+		return this.vec;
 	}
 
 	moveObject(delta: number) {
-		const ret = this.checkWallCollision(this.position(this.pos.x, this.pos.y));
-		this.applyMove(
-			this.position(this.pos.x + this.vec.x * delta, this.pos.y + this.vec.y * delta)
-		);
-		return ret;
+		this.checkWallCollision(this.updateVec(delta));
+		this.direction = this.direction % (Math.PI * 2);
+		this.applyMove(this.updateVec(delta));
+		this.updateVec(delta);
+	}
+
+	getMovement(): VectorPos {
+		return {
+			pos: this.pos,
+			dir: this.direction,
+		};
+	}
+
+	getMovementMirrored(): VectorPos {
+		return {
+			pos: this.position(this.gameDim.x - this.pos.x, this.pos.y),
+			dir: Math.PI - this.direction,
+		};
 	}
 }
 
@@ -199,16 +229,16 @@ export class pongObjectDto {
 	init(posX: number, posY: number, width: number, height: number, id: Player) {
 		this.objDim.x = width;
 		this.objDim.y = height;
-		this.pos.x = posX;
-		this.pos.y = posY;
+		this.pos.x = posX / 2;
+		this.pos.y = posY / 2;
 		this.player = id;
 	}
 
 	checkWallCollision(newPos: Position, playerDim: Position) {
-		if (newPos.x < 0) newPos.x = 0;
-		else if (newPos.x + playerDim.x > this.gameDim.x) newPos.x = this.gameDim.x - playerDim.x;
-		if (newPos.y < 0) newPos.y = 0;
-		else if (newPos.y + playerDim.y > this.gameDim.y) newPos.y = this.gameDim.y - playerDim.y;
+		if (newPos.y < 0)
+			newPos.y = 0;
+		else if (newPos.y + playerDim.y > this.gameDim.y)
+			newPos.y = this.gameDim.y - playerDim.y;
 		return newPos;
 	}
 
