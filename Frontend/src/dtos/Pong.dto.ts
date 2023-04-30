@@ -228,9 +228,9 @@ export class pongObjectDto {
 	constructor(
 		private gameWidth: number,
 		private gameHeight: number,
-		) {
-			this.gameDim = this.position(gameWidth / 2, gameHeight / 2);
-			this.objDim = this.position(this.graphic.width, this.graphic.height);
+	) {
+		this.gameDim = this.position(gameWidth / 2, gameHeight / 2);
+		this.objDim = this.position(this.graphic.width, this.graphic.height);
 	}
 
 	init(posX: number, posY: number, width: number, height: number, color: number) {

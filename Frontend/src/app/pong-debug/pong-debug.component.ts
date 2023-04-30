@@ -1,10 +1,12 @@
 import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { Socket, io } from 'socket.io-client';
 import { WebsocketService } from '../websocket.service';
-import { Application, Graphics } from 'pixi.js';
+import { Application, Assets, Graphics, TextStyle, Text } from 'pixi.js';
 import { pongObjectDto, ballObjectDto, Move, VectorPos } from 'src/dtos/Pong.dto';
 import { ActivatedRoute } from '@angular/router';
 import { MatchSetting } from 'src/dtos/MatchSetting.dto';
+import { right } from '@popperjs/core';
+import { PlainText, WowText } from 'src/dtos/GraphElem.dto';
 
 @Component({
   selector: 'app-pong-debug',
@@ -22,6 +24,10 @@ export class PongDebugComponent {
 	private gamespeed = 13;
 	private timeoutId!: any;
 	private gameSettings!: MatchSetting;
+	private scoreP1!: PlainText;
+	private scoreP2!: PlainText;
+	private funkyText!: WowText;
+	private i = 0;
 	bouncenumber: number = 0;
 
 	constructor(
@@ -61,20 +67,41 @@ export class PongDebugComponent {
 		if (this.ball.collidesWithOpponent(this.opponent))
 			this.ball.changeDirectionOpponent(this.opponent);
 		this.ball.moveObject(delta);
+		if (this.funkyText)
+			this.funkyText.update();
 	}
 
-	initObjects() {
-		this.player.init(10, 200, 250, 20, 0x83d0c9);
-		this.opponent.init(this.app.view.width - 230, 250, 200, 20, 0xFF0000);
+	async initAssets() {
+		Assets.addBundle('fonts', {
+			PixeloidSans: 'assets/PixeloidMono.ttf',
+			PixeloidMono: 'assets/PixeloidMono.ttf',
+			PixeloidSansBold: 'assets/PixeloidSansBold.ttf',
+		});
+		return await Assets.loadBundle('fonts').then(() => {
+			return {
+				p1: new TextStyle({ fontFamily: 'PixeloidSansBold', fontSize: 70, fill: 'white', align: 'right' }),
+				p2: new TextStyle({ fontFamily: 'PixeloidSansBold', fontSize: 70, fill: 'white' }),
+				funText: new TextStyle({ fontFamily: 'PixeloidSansBold' }),
+			}
+		});
+	}
+
+	async initObjects() {
+		this.player.init(10, 250, 20, 100, 0x83d0c9);
+		this.opponent.init(this.app.view.width - 30, 250, 20, 100, 0xFF0000);
 		this.ball.init(500, 300, 10, 0xFFFFFF);
 		const graphicElm = new Graphics();
-		graphicElm.beginFill(0xFFFFFF, 0.3);
+		graphicElm.beginFill(0xFFFFFF, 0.8);
 		graphicElm.drawRect(490, 0, 20, 250);
 		graphicElm.drawRect(490, 350, 20, 250);
 		graphicElm.endFill();
-		this.ball.graphic.zIndex = 1;
-		graphicElm.zIndex = -5;
-		this.app.stage.addChild(this.ball.graphic, this.player.graphic, this.opponent.graphic, graphicElm);
+		const style = await this.initAssets();
+		this.scoreP1 = new PlainText('0', style.p1, 402, 50, this.app);
+		this.scoreP2 = new PlainText('0', style.p2, 550, 50, this.app);
+		this.funkyText = new WowText('this is my fun text', style.funText, 100, 200, this.app);
+		this.funkyText.setRGB(true, 5000, 20);
+		this.funkyText.setWavy(true, 2000, 10, 10);
+		this.app.stage.addChild(graphicElm, this.ball.graphic, this.player.graphic, this.opponent.graphic);
 		// const ruler = new Graphics();
 		// for (let index = 0; index < 12; index++) {
 		// 	for (let index2 = 0; index2 < 8; index2++) {
@@ -115,5 +142,7 @@ export class PongDebugComponent {
 			this.opponent.inputs.ArrowUp = true;
 		if (key == 's' && !this.opponent.inputs.ArrowDown)
 			this.opponent.inputs.ArrowDown = true;
+		if (key == '+' && !this.opponent.inputs.ArrowDown)
+			this.scoreP1.text.text = (++this.i).toString();
 	}
 }
