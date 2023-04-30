@@ -85,7 +85,7 @@ export class PongDebugComponent {
 			}
 		});
 	}
-
+	
 	async initObjects() {
 		this.player.init(10, 250, 20, 100, 0x83d0c9);
 		this.opponent.init(this.app.view.width - 30, 250, 20, 100, 0xFF0000);
