@@ -64,7 +64,7 @@ export class PongDebugComponent {
 			this.opponent.moveObject(this.opponent.position(0, this.movespeed * delta));
 		if (this.ball.collidesWithPlayer(this.player))
 			this.ball.changeDirectionPlayer(this.player);
-		if (this.ball.collidesWithOpponent(this.opponent))
+		if (this.ball.collidesWithPlayer(this.opponent))
 			this.ball.changeDirectionOpponent(this.opponent);
 		this.ball.moveObject(delta);
 		if (this.funkyText)
@@ -85,10 +85,10 @@ export class PongDebugComponent {
 			}
 		});
 	}
-	
+
 	async initObjects() {
-		this.player.init(10, 250, 20, 100, 0x83d0c9);
-		this.opponent.init(this.app.view.width - 30, 250, 20, 100, 0xFF0000);
+		this.player.init(10, 250, 250, 250, 0x83d0c9);
+		this.opponent.init(this.app.view.width - (10 + 250), 250, 250, 100, 0xFF0000);
 		this.ball.init(500, 300, 10, 0xFFFFFF);
 		const graphicElm = new Graphics();
 		graphicElm.beginFill(0xFFFFFF, 0.8);
