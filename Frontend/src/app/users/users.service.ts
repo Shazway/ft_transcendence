@@ -13,6 +13,6 @@ export class UsersService {
     console.log('pass getUser');
     let head = new HttpHeaders;
 
-    return this.httpClient.get('http://10.11.2.3:3001/leaderboard', options: {header: });
+    return this.httpClient.get('http://localhost:3001/leaderboard', options: {header: });
   }
 }

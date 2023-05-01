@@ -71,6 +71,8 @@ export class PongGateway {
 		const userEntity = await this.itemsService.getUser(user.sub);
 		const matchEntity = userEntity.match_history[userEntity.match_history.length - 1];
 		const match = this.matchs.get(matchEntity.match_id);
+		if (!match)
+			return ;
 		if (!matchEntity) {
 			match.players = match.players.filter((player) => {
 				player.user_id !== user.sub;

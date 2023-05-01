@@ -89,17 +89,14 @@ export class ballObjectDto {
 	}
 
 	distancePos(pos1: Position, pos2: Position) { //Easier to write distance comparing
-		return Math.abs(Number(math.distance([pos1.x, pos1.y], [pos2.x, pos2.y])));
+		return math.distance([pos1.x, pos1.y], [pos2.x, pos2.y]);
 	}
 
 	collidesWithPlayer(player: pongObjectDto): boolean { //Check collision for player (left side player)
-		const upperRightCorner : Position = {x: player.graphic.x + player.paddleSize.x, y: player.graphic.y}
-		const upperLeftCorner : Position = {x: player.graphic.x, y: player.graphic.y}
-		const lowerCorner : Position = {x: player.graphic.x + player.paddleSize.x, y: player.graphic.y + player.paddleSize.y}
 		const pos: Position = {x: this.graphic.x, y: this.graphic.y};
 
-		const ret =	(pos.x >= upperLeftCorner.x - (this.RADIUS / 2) && pos.x <= upperRightCorner.x + (this.RADIUS / 2) &&
-					pos.y >= upperRightCorner.y - (this.RADIUS / 2) && pos.y <= lowerCorner.y + (this.RADIUS / 2));
+		const ret = (pos.x >= player.upperLeftCorner.x - (this.RADIUS / 2) && pos.x <= player.upperRightCorner.x + (this.RADIUS / 2) &&
+					pos.y >= player.upperRightCorner.y - (this.RADIUS / 2) && pos.y <= player.lowerCorner.y + (this.RADIUS / 2));
 		return ret;
 	}
 
@@ -114,12 +111,11 @@ export class ballObjectDto {
 		const middleFace : Position = {x: opponent.graphic.x, y: opponent.graphic.y + paddleSize.y / 2}
 
 		let sinus = 1;
-		if ((pos.x >= upperCorner.x && pos.x <= upperCorner.x + paddleSize.x) &&
-		(pos.y + this.RADIUS / 2 >= upperCorner.y && pos.y - this.RADIUS / 2 <= lowerCorner.y)) //Checking if the ball is in the range of the paddle slice
+		if ((pos.x >= upperCorner.x && pos.x <= upperCorner.x + paddleSize.x)) //Checking if the ball is in the range of the paddle slice
 		{
 			if ((this.goingUp(pos) && this.distancePos(pos, lowerCorner) < this.distancePos(pos, upperCorner)) ||
 			(!this.goingUp(pos)) && this.distancePos(pos, lowerCorner) > this.distancePos(pos, upperCorner)) //Checking if the ball is going towards the slice (lower or upper)
-			this.direction = -this.direction; //Applying same direction change as wall, like the original pong
+				this.direction = -this.direction; //Applying same direction change as wall, like the original pong
 			return ;
 		}
 		if (this.inRange(pos.y, upperCorner.y - (this.RADIUS / 2), upperCorner.y)) // Upper corner direction change
@@ -150,8 +146,7 @@ export class ballObjectDto {
 		const middleFace : Position = {x: player.graphic.x + paddleSize.x, y: player.graphic.y + paddleSize.y / 2}
 
 		let sinus = 1;
-		if ((pos.x <= upperCorner.x && pos.x >= upperCorner.x - paddleSize.x) &&
-		(pos.y + this.RADIUS / 2 >= upperCorner.y && pos.y - this.RADIUS / 2 <= lowerCorner.y)) //Checking if the ball is in the range of the paddle slice
+		if ((pos.x <= upperCorner.x && pos.x >= upperCorner.x - paddleSize.x)) //Checking if the ball is in the range of the paddle slice
 		{
 			if ((this.goingUp(pos) && this.distancePos(pos, lowerCorner) < this.distancePos(pos, upperCorner)) || //Checking if the ball is going towards the slice (lower or upper)
 			(!this.goingUp(pos)) && this.distancePos(pos, lowerCorner) > this.distancePos(pos, upperCorner))
@@ -181,6 +176,8 @@ export class ballObjectDto {
 	}
 
 	setDir(dir: number) {
+		console.log(dir);
+		console.log(this.direction);
 		this.direction = dir;
 	}
 
@@ -200,6 +197,9 @@ export class ballObjectDto {
 export class pongObjectDto {
 	public graphic = new Graphics();
 	public paddleSize: Position = this.position(0, 0);
+	public upperRightCorner: Position = this.position(0, 0);
+	public upperLeftCorner: Position = this.position(0, 0);
+	public lowerCorner: Position = this.position(0, 0);
 	public inputs = {
 		ArrowUp: false,
 		ArrowDown: false,
@@ -211,7 +211,7 @@ export class pongObjectDto {
 		private gameWidth: number,
 		private gameHeight: number,
 		) {
-		this.gameDim = this.position(gameWidth / 2, gameHeight / 2);
+			this.gameDim = this.position(gameWidth / 2, gameHeight / 2);
 		this.objDim = this.position(this.graphic.width, this.graphic.height);
 	}
 
@@ -222,6 +222,9 @@ export class pongObjectDto {
 		this.color = color;
 		this.graphic.x = posX / 2;
 		this.graphic.y = posY / 2;
+		this.upperLeftCorner = this.position(this.graphic.x, this.graphic.y);
+		this.upperRightCorner = this.position(this.graphic.x + this.paddleSize.x, this.graphic.y);
+		this.lowerCorner = this.position(this.graphic.x + this.paddleSize.x, this.graphic.y + this.paddleSize.y);
 		this.graphic.beginFill(color);
 		this.graphic.drawRect(posX / 2, posY / 2, width, height);
 		this.graphic.endFill();
@@ -242,6 +245,9 @@ export class pongObjectDto {
 		this.graphic.endFill();
 		this.graphic.x = newPos.x;
 		this.graphic.y = newPos.y;
+		this.upperLeftCorner = this.position(this.graphic.x, this.graphic.y);
+		this.upperRightCorner = this.position(this.graphic.x + this.paddleSize.x, this.graphic.y);
+		this.lowerCorner = this.position(this.graphic.x + this.paddleSize.x, this.graphic.y + this.paddleSize.y);
 	}
 
 	position(newX: number, newY: number) : Position {

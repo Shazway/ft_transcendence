@@ -43,13 +43,20 @@ export class GamesService {
 		clearTimeout(this.interval);
 	}
 
+	closeEnoughPlayer() {
+		return this.ball.pos.x <= this.player1.upperRightCorner.x + (this.ball.DIAMETER)
+	}
+	closeEnoughOpponent() {
+		return this.ball.pos.x >= this.player2.upperLeftCorner.x - (this.ball.DIAMETER)
+	}
+
 	update(delta: number) {
 		if (!this.player1.player.isReady || !this.player2.player.isReady) return;
 		this.applyPlayerMove(this.player1, delta);
 		this.applyPlayerMove(this.player2, delta);
-		if (this.ball.collidesWithPlayer(this.player1))
+		if (this.closeEnoughPlayer() && this.ball.collidesWithPlayer(this.player1))
 			this.ball.changeDirectionPlayer(this.player1);
-		if (this.ball.collidesWithOpponent(this.player2))
+		else if (this.closeEnoughOpponent() && this.ball.collidesWithPlayer(this.player2))
 			this.ball.changeDirectionOpponent(this.player2);
 		this.ball.moveObject(delta);
 		if (this.oldDir != this.ball.direction) {
