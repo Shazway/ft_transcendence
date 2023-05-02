@@ -1,8 +1,8 @@
-<div class="row d-flex justify-content-end fixed-bottom" style="margin-right: 0;">
+<div class="row d-flex justify-content-end fixed-bottom chat-card">
 	<div class="order-1 pe-1 chat-size">
 <!-- Start of chat app -->
 		<div class="card offscreen" style="height: 60vh;" id="chat2">
-			<div class="card-header d-flex justify-content-between align-items-center p-3">
+			<div class="card-header d-flex justify-content-between align-items-center p-3 chat-card-header">
 				<h5 class="mb-0">Chat</h5>
 				<button type="button" id="chanBtn" (click)="slideChan()" class="btn btn-primary btn-sm" data-mdb-ripple-color="dark">Open channels</button>
 				<button type="button" id="chatBtn" (click)="slide()" class="btn btn-primary btn-sm" data-mdb-ripple-color="dark">Open chat</button>
@@ -65,7 +65,7 @@
 			<form #userChatBox="ngForm" (ngSubmit)="onClickChat(userChatBox.value)" >
 				<div class="card-footer text-muted d-flex justify-content-start align-items-center p-3 gap-3">
 					<img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp" alt="avatar 3" style="width: 40px; height: 100%;">
-					<input type="text" name="message_content" class="form-control form-control-lg" id="exampleFormControlInput1" placeholder="Type message" ngModel>
+					<input type="text" name="message_content" autocomplete="off" class="form-control form-control-lg text-input" id="exampleFormControlInput1" placeholder="Type message" ngModel>
 					<input type = "submit" class="btn btn-outline-secondary btn-sm rounded-5" value = "submit">
 				</div>
 			</form>

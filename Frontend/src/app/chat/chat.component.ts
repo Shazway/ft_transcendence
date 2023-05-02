@@ -290,6 +290,7 @@ export class ChatComponent implements OnInit {
 	async onClickChat(data: LessMessageDto) {
 		if (!this.client || data.message_content.trim().length == 0)
 			return false;
+		this.elRef.nativeElement.querySelector('.text-input').value = '';
 		const author = localStorage.getItem('username');
 		const id = localStorage.getItem('id');
 		if (id && author)

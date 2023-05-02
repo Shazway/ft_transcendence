@@ -144,6 +144,7 @@ img{ max-width:100%;}
 
 .offscreen.show {
 	transform: translateY(-90%);
+	pointer-events: all;
 }
 
 .channel_pan {
@@ -173,4 +174,13 @@ img{ max-width:100%;}
 
 .chat-size {
   width: 500px;
+}
+
+.chat-card {
+	margin-right: 0;
+	pointer-events: none;
+}
+
+.chat-card-header {
+	pointer-events: all;
 }
