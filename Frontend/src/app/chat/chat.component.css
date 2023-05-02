@@ -161,6 +161,16 @@ img{ max-width:100%;}
   display: none;
 }
 
+.channel_create_pan {
+  position: relative;
+  display: none;
+}
+
+.channel_create_pan.show {
+	display: block;
+	height: 100%;
+}
+
 .hidden_icon {
   height: 25px;
   width: 25px;
@@ -183,4 +193,15 @@ img{ max-width:100%;}
 
 .chat-card-header {
 	pointer-events: all;
+}
+
+#chatBtn {
+	height: 15px;
+	width: 20px;
+	opacity: 0.8;
+	transition: transform 0.3s ease-in-out;
+}
+
+#chatBtn.reverse {
+	transform: rotate(180deg);
 }
