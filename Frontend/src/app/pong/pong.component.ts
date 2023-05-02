@@ -51,7 +51,7 @@ export class PongComponent {
 	setMatch(match_id: number) {
 		if (this.client)
 			this.client.close();
-		this.client = io('ws://10.11.6.1:3005?match_id=' + match_id, this.websocketService.getHeader());
+		this.client = io('ws://localhost:3005?match_id=' + match_id, this.websocketService.getHeader());
 		this.client.on('onPlayerMove', (event) => { this.updatePlayer(event); });
 		this.client.on('onOpponentMove', (event) => { this.updateOpponent(event); });
 		this.client.on('onBallCollide', (event) => { this.updateBall(event); });
@@ -91,11 +91,12 @@ export class PongComponent {
 			this.opponent.moveObject(this.opponent.position(0, -this.movespeed * delta));
 		if (this.opponent.inputs.ArrowDown)
 			this.opponent.moveObject(this.opponent.position(0, this.movespeed * delta));
-		// if (this.closeEnoughPlayer() && this.ball.collidesWithPlayer(this.player))
-		// 	this.ball.changeDirectionPlayer(this.player);
-		// else if (this.closeEnoughOpponent() && this.ball.collidesWithPlayer(this.opponent))
-		// 	this.ball.changeDirectionOpponent(this.opponent);
+		if (this.closeEnoughPlayer() && this.ball.collidesWithPlayer(this.player))
+			this.ball.changeDirectionPlayer(this.player);
+		if (this.closeEnoughOpponent() && this.ball.collidesWithPlayer(this.opponent))
+			this.ball.changeDirectionOpponent(this.opponent);
 		this.ball.moveObject(delta);
+		//console.log('Ball' + this.ball.graphic.x + " " + this.ball.graphic.y);
 	}
 
 	updatePlayer(event: Move) {
@@ -109,14 +110,16 @@ export class PongComponent {
 		this.opponent.inputs.ArrowDown = event.ArrowDown;
 	}
 	updateBall(event: VectorPos) {
+		//console.log("Ball before ", this.ball.graphic.x, this.ball.graphic.y);
 		this.ball.setPos(event.pos);
 		this.ball.setDir(event.dir);
+		//console.log("Ball after ", this.ball.graphic.x, this.ball.graphic.y);
 	}
 
 	initObjects() {
 		this.player.init(10, 250, 20, 100, 0x83d0c9);
 		this.opponent.init(this.app.view.width - 30, 250, 20, 100, 0xFF0000,);
-		this.ball.init(500, 300, 10, 0xFFFFFF);
+		this.ball.init(500, 300, 15, 0xFFFFFF);
 		this.app.stage.addChild(this.ball.graphic, this.player.graphic, this.opponent.graphic);
 		// const ruler = new Graphics();
 		// for (let index = 0; index < 12; index++) {

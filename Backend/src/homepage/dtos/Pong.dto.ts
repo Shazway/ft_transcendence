@@ -20,8 +20,8 @@ export class Move {
 }
 
 export class ballObjectDto {
-	DIAMETER = 100;
-	RADIUS = this.DIAMETER / 2;
+	DIAMETER: number;
+	RADIUS: number;
 	public speed = 4;
 	public pos = new Position();
 	public gameDim: Position;
@@ -78,8 +78,10 @@ export class ballObjectDto {
 	collidesWithPlayer(player: pongObjectDto): boolean { //Check collision for player (left side player)
 		const pos: Position = {x: this.pos.x, y: this.pos.y};
 
-		const ret = (pos.x >= player.upperLeftCorner.x - (this.RADIUS / 2) && pos.x <= player.upperRightCorner.x + (this.RADIUS / 2) &&
-					pos.y >= player.upperRightCorner.y - (this.RADIUS / 2) && pos.y <= player.lowerCorner.y + (this.RADIUS / 2));
+		const ret = (pos.x >= player.upperLeftCorner.x - (this.RADIUS / 2)
+					&& pos.x <= player.upperRightCorner.x + (this.RADIUS / 2)
+					&& pos.y >= player.upperRightCorner.y - (this.RADIUS / 2)
+					&& pos.y <= player.lowerCorner.y + (this.RADIUS / 2));
 		return ret;
 	}
 
@@ -114,8 +116,8 @@ export class ballObjectDto {
 		}
 		else
 			sinus = (middleFace.y - pos.y) * (maxSinus * 2) / (opponent.objDim.y / 2); // The rest of the paddle (front face)
-		if (sinus == 1)
-		return ;
+		if (sinus >= 1 || sinus <= -1)
+			return ;
 		this.direction = Math.PI - Math.asin(sinus);
 	}
 	
@@ -149,7 +151,7 @@ export class ballObjectDto {
 		}
 		else
 			sinus = (middleFace.y - pos.y) * (maxSinus * 2) / (player.objDim.y / 2); // The rest of the paddle (front face)
-		if (sinus == 1)
+		if (sinus >= 1 || sinus <= -1)
 			return ;
 		this.direction = -Math.asin(sinus); // New angle to apply
 	}

@@ -95,8 +95,10 @@ export class ballObjectDto {
 	collidesWithPlayer(player: pongObjectDto): boolean { //Check collision for player (left side player)
 		const pos: Position = {x: this.graphic.x, y: this.graphic.y};
 
-		const ret = (pos.x >= player.upperLeftCorner.x - (this.RADIUS / 2) && pos.x <= player.upperRightCorner.x + (this.RADIUS / 2) &&
-					pos.y >= player.upperRightCorner.y - (this.RADIUS / 2) && pos.y <= player.lowerCorner.y + (this.RADIUS / 2));
+		const ret = (pos.x >= player.upperLeftCorner.x - (this.RADIUS / 2)
+					&& pos.x <= player.upperRightCorner.x + (this.RADIUS / 2)
+					&& pos.y >= player.upperRightCorner.y - (this.RADIUS / 2)
+					&& pos.y <= player.lowerCorner.y + (this.RADIUS / 2));
 		return ret;
 	}
 
@@ -130,13 +132,23 @@ export class ballObjectDto {
 		}
 		else
 			sinus = (middleFace.y - pos.y) * (maxSinus * 2) / (opponent.objDim.y / 2); // The rest of the paddle (front face)
-		if (sinus == 1)
-		return ;
+		if (sinus >= 1 || sinus <= -1)
+			return ;
 		this.direction = Math.PI - Math.asin(sinus);
+	}
+
+	printGameState(key: string) {
+		console.error("Key: " + key);
+		console.log("dir: " + this.direction);
+		console.log("posX: " + this.graphic.x);
+		console.log("posY: " + this.graphic.y);
+		console.log("vexX: " + this.vec.x);
+		console.log("vexY: " + this.vec.y);
 	}
 
 	changeDirectionPlayer(player: pongObjectDto)
 	{
+		//if (Number.isNaN(this.direction)) this.printGameState('1');
 		const maxSinus = 0.8;
 		const minSinus = -maxSinus;
 		const paddleSize = this.position(player.objDim.x / 2, player.objDim.y / 2);
@@ -150,7 +162,10 @@ export class ballObjectDto {
 		{
 			if ((this.goingUp(pos) && this.distancePos(pos, lowerCorner) < this.distancePos(pos, upperCorner)) || //Checking if the ball is going towards the slice (lower or upper)
 			(!this.goingUp(pos)) && this.distancePos(pos, lowerCorner) > this.distancePos(pos, upperCorner))
+			{
 				this.direction = -this.direction; //Applying same direction change as wall, like the original pong
+				//if (Number.isNaN(this.direction)) this.printGameState('2');
+			}
 			return ;
 		}
 		if (this.inRange(pos.y, upperCorner.y - (this.RADIUS / 2), upperCorner.y)) // Upper corner direction change
@@ -165,9 +180,10 @@ export class ballObjectDto {
 		}
 		else
 			sinus = (middleFace.y - pos.y) * (maxSinus * 2) / (player.objDim.y / 2); // The rest of the paddle (front face)
-		if (sinus == 1)
+		if (sinus >= 1 || sinus <= -1)
 			return ;
 		this.direction = -Math.asin(sinus); // New angle to apply
+	//	if (Number.isNaN(this.direction)) this.printGameState('3');
 	}
 
 	setPos(pos: Position) {
@@ -176,9 +192,8 @@ export class ballObjectDto {
 	}
 
 	setDir(dir: number) {
-		console.log(dir);
-		console.log(this.direction);
 		this.direction = dir;
+		//if (Number.isNaN(this.direction)) this.printGameState('4');
 	}
 
 	updateVec(delta: number): Position {
@@ -188,7 +203,6 @@ export class ballObjectDto {
 
 	moveObject(delta: number) {
 		this.checkWallCollision(this.updateVec(delta));
-		this.direction = this.direction % (Math.PI * 2);
 		this.applyMove(this.updateVec(delta));
 		this.updateVec(delta);
 	}

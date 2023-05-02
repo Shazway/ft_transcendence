@@ -26,6 +26,6 @@ export class LoginComponent {
 	}
 
 	async onClickAuth() {
-		window.location.href = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-5884ecaa84483dd01eaaca762e24f49dfe690f780a65a0eb5e3b62b8ff55c714&redirect_uri=http%3A%2F%2F10.11.6.1%3A4200%2Fauth&response_type=code';
+		window.location.href = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-5884ecaa84483dd01eaaca762e24f49dfe690f780a65a0eb5e3b62b8ff55c714&redirect_uri=http%3A%2F%2Flocalhost%3A4200%2Fauth&response_type=code';
 	}
 }
