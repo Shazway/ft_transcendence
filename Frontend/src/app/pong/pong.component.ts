@@ -51,7 +51,7 @@ export class PongComponent {
 	setMatch(match_id: number) {
 		if (this.client)
 			this.client.close();
-		this.client = io('ws://10.11.6.1:3005?match_id=' + match_id, this.websocketService.getHeader());
+		this.client = io('ws://localhost:3005?match_id=' + match_id, this.websocketService.getHeader());
 		this.client.on('onPlayerMove', (event) => { this.updatePlayer(event); });
 		this.client.on('onOpponentMove', (event) => { this.updateOpponent(event); });
 		this.client.on('onBallCollide', (event) => { this.updateBall(event); });

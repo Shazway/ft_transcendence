@@ -33,7 +33,7 @@ export class ChatComponent implements OnInit {
 		private elRef: ElementRef,
 		private modalService: NgbModal,
 	) {
-		this.client = io('ws://10.11.6.1:3002?channel_id=' + 1, websocketService.getHeader());
+		this.client = io('ws://localhost:3002?channel_id=' + 1, websocketService.getHeader());
 		if (!localStorage.getItem('Jwt_token'))
 			return;
 		if (!this.client)
@@ -88,10 +88,10 @@ export class ChatComponent implements OnInit {
 			return;
 		if (offscreenElm.classList.contains('show')) {
 			offscreenElm.classList.remove('show');
-			offscreenBtn.textContent = 'Open chat';
+			offscreenBtn.classList.remove('reverse');
 		} else {
 			offscreenElm.classList.add('show');
-			offscreenBtn.textContent = 'Close chat';
+			offscreenBtn.classList.add('reverse');
 		}
 	}
 
@@ -222,19 +222,22 @@ export class ChatComponent implements OnInit {
 		const offscreenChatBtn = this.elRef.nativeElement.querySelector('#chatBtn');
 		const offscreenElm = this.elRef.nativeElement.querySelector('.channel_pan');
 		const onscreenElm = this.elRef.nativeElement.querySelector('.channel_unpan');
-		const offscreenBtn = this.elRef.nativeElement.querySelector('#chanBtn');
+		const offCreateChan = this.elRef.nativeElement.querySelector('.channel_create_pan');
 		if (!offscreenElm)
 			return;
 		if (!offscreenChat.classList.contains('show')) {
 			offscreenChat.classList.add('show');
-			offscreenChatBtn.textContent = 'Close chat';
+			offscreenChatBtn.classList.add('reverse');
+			offCreateChan.classList.remove('show');
 		}
 		if (offscreenElm.classList.contains('show')) {
 			offscreenElm.classList.remove('show');
 			onscreenElm.classList.remove('hide');
+			offCreateChan.classList.remove('show');
 		} else {
 			offscreenElm.classList.add('show');
 			onscreenElm.classList.add('hide');
+			offCreateChan.classList.remove('show');
 		}
 	}
 
@@ -247,13 +250,23 @@ export class ChatComponent implements OnInit {
 			return;
 		for (let index = this.msgs$.length; index > 0; index--)
 			this.sortMessage(this.msgs$[index - 1]);
-		this.client = io('ws://10.11.6.1:3002?channel_id=' + channelId, this.websocketService.getHeader());
+		this.client = io('ws://localhost:3002?channel_id=' + channelId, this.websocketService.getHeader());
 		this.setClientEvent();
 		this.slideChan();
 	}
 
 	createChannel() {
-		this.fetchService.createChannel({ channel_name: 'chan2' });
+		const offCreateChan = this.elRef.nativeElement.querySelector('.channel_create_pan');
+		const offscreenElm = this.elRef.nativeElement.querySelector('.channel_pan');
+		if (!offCreateChan.classList.contains('show')) {
+			offCreateChan.classList.remove('show');
+			offscreenElm.classList.add('show');
+		}
+		else {
+			offCreateChan.classList.add('show');
+			offscreenElm.classList.remove('show');
+		}
+		// this.fetchService.createChannel({ channel_name: 'chan2' });
 	}
 
 	sortMessage(new_msg: MessageDto) {
