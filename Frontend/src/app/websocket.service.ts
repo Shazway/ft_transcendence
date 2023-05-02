@@ -47,7 +47,7 @@ export class WebsocketService {
 	async addChatSocket(channel_id: number) {
 		if (!this.chanList.get(channel_id))
 			return (false);
-		const client = io('ws://localhost:3002?channel_id=' + channel_id, this.getHeader());
+		const client = io('ws://10.11.6.1:3002?channel_id=' + channel_id, this.getHeader());
 		if (!client)
 			return false;
 		client.on('onMessage', (event) => { console.log('Messaged reveived'); });

@@ -12,6 +12,7 @@ import { MatchDto } from 'src/homepage/dtos/MatchDto.dto';
 import { Player } from 'src/homepage/dtos/Matchmaking.dto';
 import { GamesService } from 'src/homepage/services/game/game.service';
 import { MatchSettingEntity } from 'src/entities';
+import { MatchsService } from 'src/homepage/services/matchs/matchs.service';
 
 @WebSocketGateway(3005, {
 	cors: {
@@ -23,7 +24,11 @@ export class PongGateway {
 	UP = 1;
 	DOWN = 0;
 	VELOCITY = 1;
-	constructor(private tokenManager: TokenManagerService, private itemsService: ItemsService) {
+	constructor(
+		private tokenManager: TokenManagerService,
+		private itemsService: ItemsService,
+		private matchService: MatchsService
+	) {
 		this.matchs = new Map<number, MatchDto>();
 	}
 
@@ -70,6 +75,8 @@ export class PongGateway {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
 		const userEntity = await this.itemsService.getUser(user.sub);
 		const matchEntity = userEntity.match_history[userEntity.match_history.length - 1];
+		if (!matchEntity)
+			return ;
 		const match = this.matchs.get(matchEntity.match_id);
 		if (!match)
 			return ;
@@ -83,7 +90,11 @@ export class PongGateway {
 			match.players = match.players.filter((player) => {
 				player.user_id !== user.sub;
 			});
-			if (!match.players.length) this.matchs.delete(matchEntity.match_id);
+			if (!match.players.length) {
+				match.gameService.endGame();
+				await this.matchService.setMatchEnd(matchEntity);
+				this.matchs.delete(matchEntity.match_id);
+			}
 		} else return; //TODO faire des trucs genre attendre qu'il se reconnecte après le point en cours ou autre
 	}
 

@@ -41,6 +41,7 @@ export class GamesService {
 
 	endGame() {
 		clearTimeout(this.interval);
+		this.interval = null;
 	}
 
 	closeEnoughPlayer() {

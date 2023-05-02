@@ -64,4 +64,9 @@ export class MatchsService {
 			throw new HttpException('Failed to add user', HttpStatus.NOT_ACCEPTABLE);
 		return true;
 	}
+
+	public async setMatchEnd(matchEntity: MatchEntity) {
+		matchEntity.is_ongoing = false;
+		await this.matchRepo.save(matchEntity);
+	}
 }
