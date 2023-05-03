@@ -110,8 +110,8 @@ export class PongComponent {
 	}
 
 	initObjects() {
-		this.player.init(10, 250, 20, 100, 0x83d0c9);
-		this.opponent.init(this.app.view.width - 30, 250, 20, 100, 0xFF0000,);
+		this.player.init(10, 250, 200, 200, 0x83d0c9);
+		this.opponent.init(this.app.view.width - (10 + 200), 250, 200, 200, 0xFF0000,);
 		this.ball.init(500, 300, 10, 0xFFFFFF);
 		this.app.stage.addChild(this.ball.graphic, this.player.graphic, this.opponent.graphic);
 		// const ruler = new Graphics();

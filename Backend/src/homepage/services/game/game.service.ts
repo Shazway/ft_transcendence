@@ -23,8 +23,8 @@ export class GamesService {
 	}
 
 	initObjects(player1: Player, player2: Player) {
-		this.player1.init(10, 250, 20, 100, player1);
-		this.player2.init(970, 250, 20, 100, player2);
+		this.player1.init(10, 250, 200, 200, player1);
+		this.player2.init(1000 - (10 + 200), 250, 200, 200, player2);
 		this.ball.init(500, 300, 10);
 	}
 
