@@ -36,18 +36,19 @@ export class GamesService {
 			const date = new Date();
 			this.update((date.getTime() - this.oldDate.getTime()) / this.gamespeed);
 			this.oldDate = new Date();
-		}, 1000 / 120);
+		}, 1000 / 300);
 	}
 
 	endGame() {
 		clearTimeout(this.interval);
+		this.interval = null;
 	}
 
 	closeEnoughPlayer() {
-		return this.ball.pos.x <= this.player1.upperRightCorner.x + (this.ball.DIAMETER)
+		return this.ball.pos.x <= this.player1.upperRightCorner.x + this.ball.DIAMETER;
 	}
 	closeEnoughOpponent() {
-		return this.ball.pos.x >= this.player2.upperLeftCorner.x - (this.ball.DIAMETER)
+		return this.ball.pos.x >= this.player2.upperLeftCorner.x - this.ball.DIAMETER;
 	}
 
 	update(delta: number) {
@@ -58,12 +59,15 @@ export class GamesService {
 			this.ball.changeDirectionPlayer(this.player1);
 		else if (this.closeEnoughOpponent() && this.ball.collidesWithPlayer(this.player2))
 			this.ball.changeDirectionOpponent(this.player2);
-		this.ball.moveObject(delta);
 		if (this.oldDir != this.ball.direction) {
 			this.oldDir = this.ball.direction;
+			//console.log('Ballbefore' + this.ball.pos.x + ' ' + this.ball.pos.y);
 			this.player1.player.client.emit('onBallCollide', this.ball.getMovement());
-			this.player2.player.client.emit('onBallCollide', this.ball.getMovementMirrored());
+			if (this.player2.player.client)
+				this.player2.player.client.emit('onBallCollide', this.ball.getMovementMirrored());
+			//console.log('Ballafter' + this.ball.pos.x + ' ' + this.ball.pos.y);
 		}
+		this.ball.moveObject(delta);
 	}
 
 	applyPlayerMove(player: pongObjectDto, delta: number) {

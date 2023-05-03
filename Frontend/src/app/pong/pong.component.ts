@@ -91,7 +91,12 @@ export class PongComponent {
 			this.opponent.moveObject(this.opponent.position(0, -this.movespeed * delta));
 		if (this.opponent.inputs.ArrowDown)
 			this.opponent.moveObject(this.opponent.position(0, this.movespeed * delta));
+		if (this.closeEnoughPlayer() && this.ball.collidesWithPlayer(this.player))
+			this.ball.changeDirectionPlayer(this.player);
+		if (this.closeEnoughOpponent() && this.ball.collidesWithPlayer(this.opponent))
+			this.ball.changeDirectionOpponent(this.opponent);
 		this.ball.moveObject(delta);
+		//console.log('Ball' + this.ball.graphic.x + " " + this.ball.graphic.y);
 	}
 
 	updatePlayer(event: Move) {
@@ -105,8 +110,10 @@ export class PongComponent {
 		this.opponent.inputs.ArrowDown = event.ArrowDown;
 	}
 	updateBall(event: VectorPos) {
+		//console.log("Ball before ", this.ball.graphic.x, this.ball.graphic.y);
 		this.ball.setPos(event.pos);
 		this.ball.setDir(event.dir);
+		//console.log("Ball after ", this.ball.graphic.x, this.ball.graphic.y);
 	}
 
 	initObjects() {

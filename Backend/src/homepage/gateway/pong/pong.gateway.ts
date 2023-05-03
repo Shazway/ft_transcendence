@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
 	ConnectedSocket,
 	MessageBody,
@@ -12,6 +13,7 @@ import { MatchDto } from 'src/homepage/dtos/MatchDto.dto';
 import { Player } from 'src/homepage/dtos/Matchmaking.dto';
 import { GamesService } from 'src/homepage/services/game/game.service';
 import { MatchSettingEntity } from 'src/entities';
+import { MatchsService } from 'src/homepage/services/matchs/matchs.service';
 
 @WebSocketGateway(3005, {
 	cors: {
@@ -23,7 +25,11 @@ export class PongGateway {
 	UP = 1;
 	DOWN = 0;
 	VELOCITY = 1;
-	constructor(private tokenManager: TokenManagerService, private itemsService: ItemsService) {
+	constructor(
+		private tokenManager: TokenManagerService,
+		private itemsService: ItemsService,
+		private matchService: MatchsService
+	) {
 		this.matchs = new Map<number, MatchDto>();
 	}
 
@@ -38,7 +44,7 @@ export class PongGateway {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
 		const match_id = Number(client.handshake.query.match_id);
 		let match = this.matchs.get(match_id);
-
+		
 		console.log({ new_player: user });
 		if (!match) {
 			match = new MatchDto();
@@ -50,6 +56,19 @@ export class PongGateway {
 		if (match.players.length == 1 && match.players[0].user_id !== user.sub) {
 			match.players.push(this.buildPlayer(client, user.sub, user.name));
 		}
+		if (match_id == 0)
+		{
+			match.players.push(this.buildPlayer(null, 0, 'System'));
+			const matchEntity = await this.matchService.createFullMatch(
+				user.sub,
+				0,
+				false
+			);
+			match.entity = matchEntity;
+			match.players[1].isReady = true;
+			this.initMatch(match, await this.itemsService.getMatchSetting(match.entity.match_id));
+			return ;
+		}
 		if (match.players.length == 2) {
 			this.initMatch(match, await this.itemsService.getMatchSetting(match.entity.match_id));
 		} else
@@ -60,7 +79,7 @@ export class PongGateway {
 			);
 	}
 
-	async initMatch(match: MatchDto, setting: MatchSettingEntity) {
+	initMatch(match: MatchDto, setting: MatchSettingEntity) {
 		match.gameService = new GamesService();
 		match.gameService.initObjects(match.players[0], match.players[1]);
 		match.gameService.startGame(setting);
@@ -70,26 +89,46 @@ export class PongGateway {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
 		const userEntity = await this.itemsService.getUser(user.sub);
 		const matchEntity = userEntity.match_history[userEntity.match_history.length - 1];
+		if (!matchEntity)
+			return ;
 		const match = this.matchs.get(matchEntity.match_id);
 		if (!match)
 			return ;
+		matchEntity.is_ongoing = false;
 		if (!matchEntity) {
 			match.players = match.players.filter((player) => {
 				player.user_id !== user.sub;
 			});
 			if (!match.players.length) this.matchs.delete(matchEntity.match_id);
 		}
-		if (!matchEntity.is_ongoing) {
-			match.players = match.players.filter((player) => {
+		if (!matchEntity.is_ongoing) 
+		{
+			match.players = match.players.filter((player) => 
+			{
 				player.user_id !== user.sub;
 			});
-			if (!match.players.length) this.matchs.delete(matchEntity.match_id);
-		} else return; //TODO faire des trucs genre attendre qu'il se reconnecte après le point en cours ou autre
+			if (!match.players.length) {
+				match.gameService.endGame();
+				await this.matchService.setMatchEnd(matchEntity);
+				this.matchs.delete(matchEntity.match_id);
+			}
+		}
+		else if (match.entity.match_id == 0)
+		{
+			match.players.splice(0);
+			match.gameService.endGame();
+			await this.matchService.setMatchEnd(matchEntity);
+			this.matchs.delete(matchEntity.match_id);
+			return; //TODO faire des trucs genre attendre qu'il se reconnecte après le point en cours ou autre
+		}
+		else return;
 	}
 
 	emitToMatch(event: string, content: any, match: MatchDto) {
 		match.players.forEach((user) => {
-			user.client.emit(event, content);
+			if (user.user_id == 0) {}
+			else
+				user.client.emit(event, content);
 		});
 	}
 
@@ -109,7 +148,9 @@ export class PongGateway {
 		match.gameService.changeInput(user.sub, 'ArrowDown', body);
 		const move = match.gameService.getMove(user.sub);
 		match.players.forEach((player) => {
-			if (player.user_id == user.sub) player.client.emit('onPlayerMove', move);
+			if (player.user_id == 0){
+			}
+			else if (player.user_id == user.sub) player.client.emit('onPlayerMove', move);
 			else player.client.emit('onOpponentMove', move);
 		});
 	}
@@ -125,7 +166,9 @@ export class PongGateway {
 		match.gameService.changeInput(user.sub, 'ArrowUp', body);
 		const move = match.gameService.getMove(user.sub);
 		match.players.forEach((player) => {
-			if (player.user_id == user.sub) player.client.emit('onPlayerMove', move);
+			if (player.user_id == 0){
+			}
+			else if (player.user_id == user.sub) player.client.emit('onPlayerMove', move);
 			else player.client.emit('onOpponentMove', move);
 		});
 	}
@@ -136,9 +179,10 @@ export class PongGateway {
 		const match_id = Number(client.handshake.query.match_id);
 		const match = this.matchs.get(match_id);
 		if (!match.gameService) return;
-
 		match.players.forEach((player) => {
-			if (player.user_id == user.sub) {
+			if (player.user_id == 0){
+			}
+			else if (player.user_id == user.sub) {
 				player.isReady = true;
 				player.client.emit('onPlayerReady');
 			} else player.client.emit('onOpponentReady');
