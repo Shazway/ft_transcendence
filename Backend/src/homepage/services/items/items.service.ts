@@ -138,6 +138,7 @@ export class ItemsService {
 		const channels = await this.chanRepo.createQueryBuilder('channel')
 			.innerJoin('channel.us_channel', 'channel_user')
 			.where('channel_user.user = :id', { id })
+			.orWhere('channel.is_channel_private = false')
 			.orderBy('channel.is_channel_private')
 			.getMany();
 		return channels;
