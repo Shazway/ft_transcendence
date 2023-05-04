@@ -1,4 +1,4 @@
-export class MatchSettingDto {
+export class MatchSetting {
 	map_appeareance: number;
 	timer: number;
 	is_ranked: boolean;

@@ -4,8 +4,8 @@ import { Repository } from 'typeorm';
 import { UserEntity } from 'src/entities';
 import { ItemsService } from '../items/items.service';
 import { HttpService } from '@nestjs/axios';
-import { IntraInfo } from 'src/homepage/dtos/ApiDto.dto';
 import axios, { AxiosRequestConfig, AxiosRequestHeaders } from 'axios';
+import { IntraInfo } from 'src/homepage/dtos/Api.dto';
 
 @Injectable()
 export class UsersService {
@@ -43,14 +43,14 @@ export class UsersService {
 		await this.userRepository.save(userEntity);
 	}
 
-	async createUser(userDto: IntraInfo) {
+	async createUser(userInfo: IntraInfo) {
 		const user = new UserEntity();
-		user.intra_id = userDto.id;
-		user.username = userDto.login;
-		user.img_url = userDto.image.link;
+		user.intra_id = userInfo.id;
+		user.username = userInfo.login;
+		user.img_url = userInfo.image.link;
 		user.rank_score = 100;
 		const newUser = this.userRepository.create(user);
-		return this.userRepository.save(newUser);
+		return await this.userRepository.save(newUser);
 	}
 	async getAllUsers() {
 		const userList = await this.itemsService.getAllUsers();

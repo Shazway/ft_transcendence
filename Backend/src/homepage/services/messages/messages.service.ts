@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { MessageEntity } from 'src/entities';
 import { Repository } from 'typeorm';
 import { ItemsService } from '../items/items.service';
-import { MessageDto } from 'src/homepage/dtos/MessageDto.dto';
+import { Message } from 'src/homepage/dtos/Message.dto';
 import { TokenManagerService } from '../token-manager/token-manager.service';
 import { ChannelsService } from '../channels/channels.service';
 import { User } from 'src/entities/users.entity';
@@ -39,7 +39,7 @@ export class MessagesService {
 		return { ret: true, msg: 'Valid User' };
 	}
 
-	async addMessageToChannel(msg: MessageDto, token: string, channel_id: number) {
+	async addMessageToChannel(msg: Message, token: string, channel_id: number) {
 		const message = new MessageEntity();
 		message.message_content = msg.message_content;
 

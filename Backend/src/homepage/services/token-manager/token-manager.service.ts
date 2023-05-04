@@ -26,6 +26,9 @@ export class TokenManagerService {
 		return keyClean;
 	}
 
+	public getUserFromToken(request: Request) {
+		return this.getToken(this.extractTokenFromHeader(request));
+	}
 	public getUsernameFromToken(request: Request) {
 		return this.getToken(this.extractTokenFromHeader(request)).name;
 	}

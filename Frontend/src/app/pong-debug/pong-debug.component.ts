@@ -2,7 +2,7 @@ import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { Socket, io } from 'socket.io-client';
 import { WebsocketService } from '../websocket.service';
 import { Application, Assets, Graphics, TextStyle, Text } from 'pixi.js';
-import { pongObjectDto, ballObjectDto, Move, VectorPos } from 'src/dtos/Pong.dto';
+import { pongObject, ballObject, Move, VectorPos } from 'src/dtos/Pong.dto';
 import { ActivatedRoute } from '@angular/router';
 import { MatchSetting } from 'src/dtos/MatchSetting.dto';
 import { right } from '@popperjs/core';
@@ -40,9 +40,9 @@ export class PongDebugComponent {
 				width: 1000,
 				antialias: true,
 			});
-			this.ball = new ballObjectDto(this.app.view.width, this.app.view.height);
-			this.player	= new pongObjectDto(this.app.view.width, this.app.view.height);
-			this.opponent = new pongObjectDto(this.app.view.width, this.app.view.height);
+			this.ball = new ballObject(this.app.view.width, this.app.view.height);
+			this.player	= new pongObject(this.app.view.width, this.app.view.height);
+			this.opponent = new pongObject(this.app.view.width, this.app.view.height);
 		this.initObjects();
 		this.pixiContainer.nativeElement.appendChild(this.app.view);
 		this.oldDate = new Date();

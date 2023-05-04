@@ -13,14 +13,14 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { UsersService } from '../../services/users/users.service';
-import { NewUserDto } from '../../dtos/UserDto.dto';
+import { NewUser } from '../../dtos/User.dto';
 import { AuthService } from 'src/homepage/services/auth/auth.service';
 import { ItemsService } from 'src/homepage/services/items/items.service';
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
 import { plainToClass } from 'class-transformer';
-import { AnyProfileUserDto } from 'src/homepage/dtos/UserDto.dto';
+import { AnyProfileUser } from 'src/homepage/dtos/User.dto';
 import { ChannelsService } from 'src/homepage/services/channels/channels.service';
-import { IntraInfo } from 'src/homepage/dtos/ApiDto.dto';
+import { IntraInfo } from 'src/homepage/dtos/Api.dto';
 
 @Controller('users')
 export class UsersController {
@@ -36,14 +36,14 @@ export class UsersController {
 	async getUsers(@Req() req: Request, @Res() res: Response) {
 		const userList = await this.usersService.getAllUsers();
 		if (!userList) res.status(HttpStatus.NO_CONTENT).send({ msg: 'No users registered' });
-		const serializedUsers = userList.map((user) => plainToClass(AnyProfileUserDto, user));
+		const serializedUsers = userList.map((user) => plainToClass(AnyProfileUser, user));
 		res.status(HttpStatus.OK).send(serializedUsers);
 	}
 
 	@Post('change_name')
 	async changeUsername(@Req() req: Request, @Res() res: Response, @Body() body: {username: string}) {
 		const checkUser = await this.itemsService.getUserByUsername(body.username);
-		const currentUser = this.tokenManager.getToken(req.headers.authorization);
+		const currentUser = this.tokenManager.getUserFromToken(req);
 
 		if (checkUser && checkUser.user_id == currentUser.sub)
 			return res.status(HttpStatus.NOT_MODIFIED);
@@ -54,18 +54,18 @@ export class UsersController {
 	}
 
 	@Post('create')
-	async createUser(@Req() req: Request, @Res() res: Response, @Body() newUserDto: IntraInfo) {
-		console.log(newUserDto);
-		const check_username = await this.usersService.checkUserByName(newUserDto.login);
-		if (check_username && check_username.user_id === newUserDto.id)
+	async createUser(@Req() req: Request, @Res() res: Response, @Body() newUser: IntraInfo) {
+		console.log(newUser);
+		const check_username = await this.usersService.checkUserByName(newUser.login);
+		if (check_username && check_username.user_id === newUser.id)
 			return res.status(HttpStatus.FORBIDDEN).send("You can't use the same username");
 		else if (check_username)
 			return res.status(HttpStatus.FORBIDDEN).send('Username is already taken');
-		const userEntity = await this.usersService.createUser(newUserDto);
-		newUserDto.id = userEntity.user_id;
+		const userEntity = await this.usersService.createUser(newUser);
+		newUser.id = userEntity.user_id;
 		return res.status(HttpStatus.OK).send({
 			msg: 'User created',
-			token: await this.authService.login(newUserDto, userEntity.user_id),
+			token: await this.authService.login(newUser, userEntity.user_id),
 			user_id: userEntity.user_id,
 			username: userEntity.username,
 		});
@@ -85,7 +85,6 @@ export class UsersController {
 		@Res() res: Response,
 	) {
 		const user_id = this.tokenManager.getIdFromToken(req);
-
 		console.log({FriendToAdd: friend_id});
 		this.itemsService.addFriendToUser(user_id, friend_id);
 		res.status(HttpStatus.OK).send('Friend added');
@@ -118,6 +117,20 @@ export class UsersController {
 			res.status(HttpStatus.ACCEPTED).send('User blocked');
 		else
 			res.status(HttpStatus.FORBIDDEN).send('Failed to block user');
+	}
+
+	@Get('friends')
+	async getFriends(@Param('username') us: string, @Req() req: Request, @Res() res: Response) {
+		const user = this.tokenManager.getUserFromToken(req);
+		if (!user)
+			res.status(HttpStatus.NOT_FOUND).send({ msg: 'User not found' });
+		const friends = await this.itemsService.getFriends(user.sub);
+		if (friends)
+		{
+			const userFriends = friends.map((user) => plainToClass(AnyProfileUser, user));
+			res.status(HttpStatus.OK).send(userFriends);
+		}
+		else res.status(HttpStatus.NOT_FOUND).send({ msg: 'No friends found' });
 	}
 
 	@Get(':username')

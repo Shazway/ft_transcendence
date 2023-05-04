@@ -13,7 +13,7 @@ import {
 import { Request, Response } from 'express';
 import { ChannelsService } from 'src/homepage/services/channels/channels.service';
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
-import { DeleteUserDto, NewChanDto, SerializedChanDto } from '../../dtos/ChanDto.dto';
+import { DeleteUser, NewChan, SerializedChan } from '../../dtos/Chan.dto';
 import { plainToClass } from 'class-transformer';
 import { MessagesService } from 'src/homepage/services/messages/messages.service';
 
@@ -32,7 +32,7 @@ export class ChannelsController {
 		if (!channelList)
 			return res.status(HttpStatus.NO_CONTENT).send({ msg: 'No channels registered' });
 		const serializedChannels = channelList.map((channel) =>
-			plainToClass(SerializedChanDto, channel),
+			plainToClass(SerializedChan, channel),
 		);
 		return res.status(HttpStatus.OK).send(serializedChannels);
 	}
@@ -69,10 +69,10 @@ export class ChannelsController {
 	async createChannel(
 		@Req() req: Request,
 		@Res() res: Response,
-		@Body() newChannelDto: NewChanDto,
+		@Body() newChannel: NewChan,
 	) {
 		const userId = this.tokenManager.getIdFromToken(req);
-		const channelEntity = await this.channelService.createChannel(newChannelDto, userId);
+		const channelEntity = await this.channelService.createChannel(newChannel, userId);
 		console.log(channelEntity);
 		res.status(HttpStatus.OK).send({ msg: 'Channel created' });
 	}
@@ -81,14 +81,14 @@ export class ChannelsController {
 	async kickUser(
 		@Req() req: Request,
 		@Res() res: Response,
-		@Body() deleteUserDto: DeleteUserDto,
+		@Body() deleteUser: DeleteUser,
 	) {
 		const userId = this.tokenManager.getIdFromToken(req);
-		console.log(deleteUserDto);
+		console.log(deleteUser);
 		await this.channelService.kickUser(
 			userId,
-			deleteUserDto.target_id,
-			deleteUserDto.channel_id,
+			deleteUser.target_id,
+			deleteUser.channel_id,
 		);
 		res.status(HttpStatus.OK).send({ msg: 'User kicked from channel' });
 	}
@@ -97,15 +97,15 @@ export class ChannelsController {
 	async unMuteUser(
 		@Req() req: Request,
 		@Res() res: Response,
-		@Body() deleteUserDto: DeleteUserDto,
+		@Body() deleteUser: DeleteUser,
 	) {
 		const userId = await this.tokenManager.getIdFromToken(req);
-		console.log(deleteUserDto);
+		console.log(deleteUser);
 		if (
 			!(await this.channelService.unMuteUser(
 				userId,
-				deleteUserDto.target_id,
-				deleteUserDto.channel_id,
+				deleteUser.target_id,
+				deleteUser.channel_id,
 			))
 		)
 			res.status(HttpStatus.FORBIDDEN).send({ msg: 'Not an admin' });

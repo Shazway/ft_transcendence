@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FetchService } from '../fetch.service';
-import { UserDto } from 'src/dtos/UserDto.dto';
 import { Router } from '@angular/router';
+import { User } from 'src/dtos/User.dto';
 
 @Component({
 	selector: 'app-login',
@@ -16,12 +16,12 @@ export class LoginComponent {
 			private router: Router,
 		) {}
 
-	async onClickSubmit(data: UserDto) {
+	async onClickSubmit(data: User) {
 		data.image = { link: data.img_url };
 		console.log(await this.loginService.createUser(data));
 	}
 
-	async onClickSubmitLogin(data: UserDto) {
+	async onClickSubmitLogin(data: User) {
 		console.log(await this.loginService.getUser(data));
 	}
 

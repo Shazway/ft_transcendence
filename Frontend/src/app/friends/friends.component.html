@@ -1,0 +1,23 @@
+<div class="container mt-3">
+	<h3>My friends</h3>
+	<table class="table table-hover">
+		<thead>
+			<tr>
+				<th>Username</th>
+				<th>status</th>
+				<th>ranking</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr *ngFor="let friend of friends">
+				<td>{{friend.username}}</td>
+				<td *ngIf="friend.activity_status == 0">offline</td>
+				<td *ngIf="friend.activity_status == 1">online</td>
+				<td *ngIf="friend.activity_status == 2">playing</td>
+				<td>{{friend.rank_score}}</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+<button type="button" class="btn btn-primary" (click)="addSystemFriend()">add System as friend</button>
+<app-chat></app-chat>

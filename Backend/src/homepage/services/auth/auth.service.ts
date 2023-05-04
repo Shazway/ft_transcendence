@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { IntraInfo } from 'src/homepage/dtos/ApiDto.dto';
+import { IntraInfo } from 'src/homepage/dtos/Api.dto';
 import { Transporter, createTransport } from 'nodemailer';
 import { varFetchService } from '../var_fetch/var_fetch.service';
 import { AuthOptions } from 'nodemailer-mailgun-transport';
