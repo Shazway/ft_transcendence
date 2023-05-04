@@ -44,7 +44,7 @@ export class ChatComponent implements OnInit {
 	}
 
 	setClientEvent() {
-		this.client.on('onMessage', (event) => { console.log('Message reveived ' + event); this.sortMessage(event) });
+		this.client.on('onMessage', (event) => { console.log('Message received ' + event); this.sortMessage(event) });
 		this.client.on('onError', (event) => { console.log('WebSocket error: ' + event); });
 		this.client.on('connection', () => { console.log('Connected to WebSocket server'); });
 		this.client.on('disconnect', () => { console.log('Disconnected from WebSocket server'); });

@@ -4,7 +4,6 @@ import { MatchEntity, MatchSettingEntity } from 'src/entities';
 import { Player } from 'src/homepage/dtos/Matchmaking.dto';
 import { Move, ballObject, pongObject } from 'src/homepage/dtos/Pong.dto';
 import { ItemsService } from '../items/items.service';
-import { Match } from 'src/homepage/dtos/Match.dto';
 
 @Injectable()
 export class GamesService {
@@ -88,12 +87,14 @@ export class GamesService {
 		});
 	}
 
+	
 	endMatch() {
 		this.match.is_ongoing = false;
 		this.itemsService.saveMatchState(this.match);
 		this.player1.player.client.emit('onEndMatch', this.player1.score == 10 ? this.WIN : this.LOSS);
 		if (this.player2.player.client)
 			this.player2.player.client.emit('onEndMatch', this.player2.score == 10 ? this.WIN : this.LOSS);
+		this.itemsService.updateRankScore(this.player1, this.player2);
 		this.endGame();
 	}
 
@@ -144,4 +145,5 @@ export class GamesService {
 		if (user_id == this.player1.player.user_id) return this.getInput(this.player1);
 		return this.getInput(this.player2);
 	}
+
 }
