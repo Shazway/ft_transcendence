@@ -61,11 +61,9 @@ export class GamesService {
 			this.ball.changeDirectionOpponent(this.player2);
 		if (this.oldDir != this.ball.direction) {
 			this.oldDir = this.ball.direction;
-			//console.log('Ballbefore' + this.ball.pos.x + ' ' + this.ball.pos.y);
 			this.player1.player.client.emit('onBallCollide', this.ball.getMovement());
 			if (this.player2.player.client)
 				this.player2.player.client.emit('onBallCollide', this.ball.getMovementMirrored());
-			//console.log('Ballafter' + this.ball.pos.x + ' ' + this.ball.pos.y);
 		}
 		this.ball.moveObject(delta);
 	}

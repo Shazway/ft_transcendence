@@ -5,6 +5,7 @@ import { Application } from 'pixi.js';
 import { pongObject, ballObject, Move, VectorPos } from 'src/dtos/Pong.dto';
 import { ActivatedRoute } from '@angular/router';
 import { MatchSetting } from 'src/dtos/MatchSetting.dto';
+import { Mutex } from 'async-mutex';
 
 @Component({
   selector: 'app-pong',
@@ -22,6 +23,7 @@ export class PongComponent {
 	private gamespeed = 13;
 	private timeoutId!: any;
 	private gameSettings!: MatchSetting;
+	private ballLock: Mutex;
 
 	constructor(
 		private websocketService: WebsocketService,
@@ -29,6 +31,7 @@ export class PongComponent {
 		private route: ActivatedRoute,
 		private elRef: ElementRef,
 		) {
+			this.ballLock = new Mutex();
 			this.app = new Application({
 				height: 600,
 				width: 1000,
@@ -91,12 +94,12 @@ export class PongComponent {
 			this.opponent.moveObject(this.opponent.position(0, -this.movespeed * delta));
 		if (this.opponent.inputs.ArrowDown)
 			this.opponent.moveObject(this.opponent.position(0, this.movespeed * delta));
-		if (this.closeEnoughPlayer() && this.ball.collidesWithPlayer(this.player))
-			this.ball.changeDirectionPlayer(this.player);
-		if (this.closeEnoughOpponent() && this.ball.collidesWithPlayer(this.opponent))
-			this.ball.changeDirectionOpponent(this.opponent);
-		this.ball.moveObject(delta);
-		//console.log('Ball' + this.ball.graphic.x + " " + this.ball.graphic.y);
+		this.ballLock.waitForUnlock().then(() => {
+			this.ballLock.acquire().then(() => {
+				this.ball.moveObject(delta);
+			})
+			this.ballLock.release();
+		});
 	}
 
 	updatePlayer(event: Move) {
@@ -109,11 +112,12 @@ export class PongComponent {
 		this.opponent.inputs.ArrowUp = event.ArrowUp;
 		this.opponent.inputs.ArrowDown = event.ArrowDown;
 	}
-	updateBall(event: VectorPos) {
-		//console.log("Ball before ", this.ball.graphic.x, this.ball.graphic.y);
-		this.ball.setPos(event.pos);
-		this.ball.setDir(event.dir);
-		//console.log("Ball after ", this.ball.graphic.x, this.ball.graphic.y);
+	async updateBall(event: VectorPos) {
+		await this.ballLock.acquire().then(() => {
+			this.ball.setPos(event.pos);
+			this.ball.setDir(event.dir);
+		});
+		this.ballLock.release();
 	}
 
 	initObjects() {
