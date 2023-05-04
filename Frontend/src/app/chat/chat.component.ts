@@ -44,7 +44,7 @@ export class ChatComponent implements OnInit {
 	}
 
 	setClientEvent() {
-		this.client.on('onMessage', (event) => { console.log('Message reveived ' + event); this.sortMessage(event) });
+		this.client.on('onMessage', (event) => { console.log('Message received ' + event); this.sortMessage(event) });
 		this.client.on('onError', (event) => { console.log('WebSocket error: ' + event); });
 		this.client.on('connection', () => { console.log('Connected to WebSocket server'); });
 		this.client.on('disconnect', () => { console.log('Disconnected from WebSocket server'); });
@@ -154,7 +154,7 @@ export class ChatComponent implements OnInit {
 				addFriendElm.setAttribute('title', 'Add friend');
 				blockUserElm.classList.add('show');
 				blockUserElm.setAttribute('title', 'Block User');
-				if (!data) {
+				if (data) {
 					muteUserElm.classList.add('show');
 					muteUserElm.setAttribute('title', 'Mute User');
 					kickUserElm.classList.add('show');
@@ -266,7 +266,7 @@ export class ChatComponent implements OnInit {
 			offCreateChan.classList.add('show');
 			offscreenElm.classList.remove('show');
 		}
-		// this.fetchService.createChannel({ channel_name: 'chan2' });
+		this.fetchService.createChannel({ channel_name: 'chan2' });
 	}
 
 	sortMessage(new_msg: Message) {

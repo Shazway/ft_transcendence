@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
 	ConnectedSocket,
 	MessageBody,
@@ -5,7 +6,7 @@ import {
 	OnGatewayDisconnect,
 	SubscribeMessage,
 	WebSocketGateway,
-	WebSocketServer,
+	WebSocketServer
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import { AchievementsEntity } from 'src/entities';
@@ -17,8 +18,8 @@ import { TokenManagerService } from 'src/homepage/services/token-manager/token-m
 
 @WebSocketGateway(3003, {
 	cors: {
-		origin: '*',
-	},
+		origin: '*'
+	}
 })
 export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	OFFLINE = 0;
@@ -29,10 +30,10 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		private tokenManager: TokenManagerService,
 		private notificationService: NotificationsService,
 		private itemsService: ItemsService,
-		private channelsService: ChannelsService,
-		) {
-			this.userList = new Map<number, Socket>();
-		}
+		private channelsService: ChannelsService
+	) {
+		this.userList = new Map<number, Socket>();
+	}
 
 	@WebSocketServer()
 	server;
@@ -50,24 +51,25 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 	}
 
 	sendMessage(user_tab: number[], message: any) {
-		user_tab.forEach(user => {
+		user_tab.forEach((user) => {
 			const client = this.userList.get(user);
 			if (client) client.emit('onNotif', message);
 		});
 	}
 
 	//Send achievements to user
-	async sendAchievement(user_id: number, achievement: AchievementsEntity)
-	{
+	async sendAchievement(user_id: number, achievement: AchievementsEntity) {
 		const client = this.userList.get(user_id);
-		if (!client)
-			return false;
+		if (!client) return false;
 		this.itemsService.addAchievementsToUser(user_id, achievement.achievement_id);
-		client.emit('newAchievement', 'Congratulations! You received the ' + achievement.achievement_name);
+		client.emit(
+			'newAchievement',
+			'Congratulations! You received the ' + achievement.achievement_name
+		);
 		return true;
 	}
 
-	buildAnswer(id: number, username: string, type: string, accept: boolean = false) {
+	buildAnswer(id: number, username: string, type: string, accept = false) {
 		const answer: NotificationResponse = {
 			source_id: id,
 			type: type,
@@ -81,18 +83,26 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 	//Answer and send friend requests
 
 	@SubscribeMessage('inviteRequest')
-	async handleInvite(@ConnectedSocket() client: Socket, @MessageBody() body: NotificationRequest) {
+	async handleInvite(
+		@ConnectedSocket() client: Socket,
+		@MessageBody() body: NotificationRequest
+	) {
 		body.sent_at = new Date();
 		const source = this.tokenManager.getToken(client.request.headers.authorization);
 		const answer = this.buildAnswer(source.sub, source.name, body.type);
-		const target = await this.itemsService.getUser(body.target_id);
-		const user = this.userList.get(target.user_id);
+		const user = this.userList.get(body.target_id);
 
-		if (target.blacklistEntry.find((user) => user.user_id === source.sub))
-			return client.emit('notAllowed', "User blocked, they cannot interact with this user");
-		else
-			if (user)
-				user.emit(body.type + 'Invite', {notification: answer});
+		if (body.type == 'friend') {
+			if (this.itemsService.requestExists(source.sub, body.target_id))
+				client.emit('alreadySent', 'Already pending request');
+			else if (!this.itemsService.addFriendRequestToUsers(source.sub, body.target_id))
+				client.emit('refusedRequest', 'Friend request refused');
+		}
+		else if (user)
+		{
+			client.emit('pendingRequest', 'Request sent');
+			user.emit(body.type + 'Invite', { notification: answer });
+		}
 	}
 
 	@SubscribeMessage('inviteAnswer')
@@ -105,9 +115,10 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 			if (body.type == 'friend')
 				await this.itemsService.addFriendToUser(source.sub, body.target_id);
 			if (body.type == 'channel')
-					await this.channelsService.addUserToChannel(body.target_id, body.channel_id);
+				await this.channelsService.addUserToChannel(body.target_id, body.channel_id);
 			//if(body.type == 'match')?
 		}
-		user.emit(body.type + 'Answer', {notification: answer});
+		client.emit('success', 'Answer sent');
+		user.emit(body.type + 'Answer', { notification: answer });
 	}
 }

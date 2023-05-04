@@ -3,6 +3,7 @@ import { HttpStatus, Injectable, Res } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AchievementsEntity, ChannelEntity, ChannelUserRelation, FriendrequestRelation, MatchEntity, MatchSettingEntity, MessageEntity, UserEntity } from 'src/entities';
 import { ChannelUser } from 'src/entities/channel_user.entity';
+import { pongObject } from 'src/homepage/dtos/Pong.dto';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -138,6 +139,7 @@ export class ItemsService {
 		const channels = await this.chanRepo.createQueryBuilder('channel')
 			.innerJoin('channel.us_channel', 'channel_user')
 			.where('channel_user.user = :id', { id })
+			.orWhere('channel.is_channel_private = false')
 			.orderBy('channel.is_channel_private')
 			.getMany();
 		return channels;
@@ -252,6 +254,8 @@ export class ItemsService {
 		const user = await this.getUser(user_id);
 		const friend = await this.getUser(friend_id);
 
+		user.sentFriendRequests = user.sentFriendRequests.filter((User) => User.receiver.user_id == friend.user_id);
+		friend.receivedFriendRequests = user.receivedFriendRequests.filter((User) => User.sender.user_id == user.user_id);
 		user.friend.push(friend);
 		friend.friend.push(user);
 		await this.userRepo.save([user, friend]);
@@ -322,21 +326,52 @@ export class ItemsService {
 		await this.chan_userRepo.save(chan_user);
 	}
 
-	public async addUserToMatch(user: UserEntity, match: MatchEntity)
-	{
-		if (!match.is_ongoing)
-		return false;
-		match.user.push(user);
-		this.matchRepo.save(match);
-	}
-	
-	public async endMatch(match: MatchEntity)
-	{
-		match.is_ongoing = false;
-		match.is_victory[0] = (match.round_won[0] > match.round_won[1]);
-		match.is_victory[1] = !match.is_victory[0];
-		match.user[0].match_history.push(match);
-		match.user[1].match_history.push(match);
+	public createFriendRequest() {
+		return this.friend_requestRepo.create();
 	}
 
+	public async requestExists(sourceId: number, targetId: number) {
+		const sourceEntity = await this.getUser(sourceId);
+
+		if (sourceEntity.sentFriendRequests.find((request) => request.receiver.user_id == targetId))
+			return false;
+		return true;
+	}
+
+	public async addFriendRequestToUsers(sourceId: number, targetId: number) {
+		const friendRequest = this.createFriendRequest();
+		const targetEntity = await this.getUser(targetId);
+		const sourceEntity = await this.getUser(sourceId);
+
+		if (targetEntity.blacklistEntry.find((user) => user.user_id === sourceId))
+			return null;
+		friendRequest.receiver = targetEntity;
+		friendRequest.sender = sourceEntity;
+		targetEntity.receivedFriendRequests.push();
+		sourceEntity.sentFriendRequests.push();
+		await this.userRepo.save([sourceEntity, targetEntity]);
+		return (await this.friend_requestRepo.save(friendRequest));
+	}
+
+	async updateRankScore(player1: pongObject, player2: pongObject)
+	{
+		const scoreOne = player1.score;
+		const userOne = await this.getUser(player1.player.user_id);
+		const scoreTwo = player2.score;
+		const userTwo = await this.getUser(player2.player.user_id);
+
+		if (scoreOne == 10)
+			userOne.rank_score += 10;
+		else
+			userOne.rank_score -= 10;
+		if (scoreTwo == 10)
+			userTwo.rank_score += 10;
+		else
+			userTwo.rank_score -= 10;
+		if (userOne.rank_score < 0)
+			userOne.rank_score = 0;
+		if (userTwo.rank_score < 0)
+			userTwo.rank_score = 0;
+		await this.userRepo.save([userOne, userTwo]);
+	}
 }
