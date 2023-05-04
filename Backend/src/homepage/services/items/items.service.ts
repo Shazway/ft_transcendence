@@ -33,6 +33,10 @@ export class ItemsService {
 		res.status(HttpStatus.NO_CONTENT).send();
 	}
 
+	public async saveMatchState(match: MatchEntity) {
+		await this.matchRepo.save(match);
+	}
+
 	public async getAllUsers() {
 		const user = await this.userRepo
 			.createQueryBuilder('user')

@@ -33,6 +33,7 @@ export class WowText {
 	private colorIndex = 0;
 	private colorTime = 0;
 	private colorDuration = 5;
+	private isReverse = false;
 
 	constructor(content: string, style: TextStyle, posX: number, posY: number, app: Application) {
 		this.text = new Array();
@@ -40,7 +41,31 @@ export class WowText {
 		this.startPosX = posX;
 		this.startPosY = posY;
 		this.style = style;
-		this.buildText(content);
+		this.setText(content);
+	}
+
+	setReverse(rev: boolean) {
+		this.isReverse = rev;
+		this.resetSpacing();
+	}
+
+	setText(newText: string) {
+		let index = 0;
+		const newTxt = newText.split('');
+		for (; index < this.text.length; index++) {
+			if (index < newText.length)
+				this.text[this.text.length - index - 1].text = newTxt[newText.length - index - 1];
+			else {
+				this.text.splice(index);
+				break;
+			}
+		}
+		for (; index < newText.length; index++) {
+			const charac = new Text(newTxt[newText.length - index - 1], this.style);
+			this.text.push(charac);
+			this.app.stage.addChild(charac);
+		}
+		this.resetSpacing();
 	}
 	
 	LerpRGB (a: Color,b: Color,t: number)
@@ -77,6 +102,19 @@ export class WowText {
 			}
 			index++;
 		});
+	}
+
+	resetSpacing() {
+		let arr;
+		let len = 0;
+		if (this.isReverse) arr = this.text;
+		else arr = this.text.reverse();
+		arr.forEach((charac) => {
+			charac.x = this.startPosX + len;
+			charac.y = this.startPosY;
+			if (this.isReverse) len -= PIXI.TextMetrics.measureText(charac.text, charac.style).width;
+			else len += PIXI.TextMetrics.measureText(charac.text, charac.style).width;
+		})
 	}
 
 	buildText(content: string) {

@@ -1,11 +1,19 @@
+/* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
-import { MatchSettingEntity } from 'src/entities';
+import { MatchEntity, MatchSettingEntity } from 'src/entities';
 import { Player } from 'src/homepage/dtos/Matchmaking.dto';
 import { Move, ballObject, pongObject } from 'src/homepage/dtos/Pong.dto';
+import { ItemsService } from '../items/items.service';
+import { Match } from 'src/homepage/dtos/Match.dto';
 
 @Injectable()
 export class GamesService {
+	LEFT = 0;
+	RIGHT = 1;
+	LOSS = 0;
+	WIN = 1;
 	private interval: NodeJS.Timeout;
+
 	private matchSetting: MatchSettingEntity;
 	private player1: pongObject;
 	private player2: pongObject;
@@ -14,8 +22,11 @@ export class GamesService {
 	private movespeed = 5;
 	private gamespeed = 13;
 	private oldDir = 0;
-
-	constructor() {
+	public match: MatchEntity;
+	constructor(
+		private itemsService: ItemsService,
+	) {
+		this.match = new MatchEntity();
 		this.player1 = new pongObject(1000, 600);
 		this.player2 = new pongObject(1000, 600);
 		this.ball = new ballObject(1000, 600);
@@ -50,24 +61,61 @@ export class GamesService {
 	closeEnoughOpponent() {
 		return this.ball.pos.x >= this.player2.upperLeftCorner.x - this.ball.DIAMETER;
 	}
-
-	update(delta: number) {
-		if (!this.player1.player.isReady || !this.player2.player.isReady) return;
-		this.applyPlayerMove(this.player1, delta);
-		this.applyPlayerMove(this.player2, delta);
-		if (this.closeEnoughPlayer() && this.ball.collidesWithPlayer(this.player1))
-			this.ball.changeDirectionPlayer(this.player1);
-		else if (this.closeEnoughOpponent() && this.ball.collidesWithPlayer(this.player2))
-			this.ball.changeDirectionOpponent(this.player2);
+	
+	checkDirectionChange()
+	{
 		if (this.oldDir != this.ball.direction) {
 			this.oldDir = this.ball.direction;
 			this.player1.player.client.emit('onBallCollide', this.ball.getMovement());
 			if (this.player2.player.client)
 				this.player2.player.client.emit('onBallCollide', this.ball.getMovementMirrored());
 		}
-		this.ball.moveObject(delta);
+	}
+		
+	async sendScoreChange(pointChecker: {state: boolean, side: number})
+	{
+		if (pointChecker.side == this.RIGHT)
+			this.match.current_score[1]++;
+		else
+			this.match.current_score[0]++;
+		await this.itemsService.saveMatchState(this.match);
+		this.player1.player.client.emit('onScoreChange', {
+			side: pointChecker.side == this.LEFT ? 1 : 0
+		});
+		if (this.player2.player.client)
+		this.player2.player.client.emit('onScoreChange', {
+			side: pointChecker.side == this.RIGHT ? 1 : 0
+		});
 	}
 
+	endMatch() {
+		this.match.is_ongoing = false;
+		this.itemsService.saveMatchState(this.match);
+		this.player1.player.client.emit('onEndMatch', this.player1.score == 10 ? this.WIN : this.LOSS);
+		if (this.player2.player.client)
+			this.player2.player.client.emit('onEndMatch', this.player2.score == 10 ? this.WIN : this.LOSS);
+		this.endGame();
+	}
+
+	update(delta: number) {
+		if (!this.player1.player.isReady || !this.player2.player.isReady) return;
+
+		this.applyPlayerMove(this.player1, delta);
+		this.applyPlayerMove(this.player2, delta);
+
+		if (this.closeEnoughPlayer() && this.ball.collidesWithPlayer(this.player1))
+			this.ball.changeDirectionPlayer(this.player1);
+		else if (this.closeEnoughOpponent() && this.ball.collidesWithPlayer(this.player2))
+			this.ball.changeDirectionOpponent(this.player2);
+
+		this.checkDirectionChange();
+		const pointChecker = this.ball.moveObject(delta, this.player1, this.player2);
+		if (pointChecker.state)
+			this.sendScoreChange(pointChecker);
+		if (this.player1.score == 10 || this.player2.score == 10)
+			this.endMatch();
+	}
+		
 	applyPlayerMove(player: pongObject, delta: number) {
 		if (player.inputs.ArrowUp) player.moveObject(player.position(0, -this.movespeed * delta));
 		if (player.inputs.ArrowDown) player.moveObject(player.position(0, this.movespeed * delta));

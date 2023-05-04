@@ -221,12 +221,14 @@ export class pongObject {
 	public color = 0xFFFFFF;
 	public gameDim: Position;
 	public objDim: Position;
+	public score: number;
 	constructor(
 		private gameWidth: number,
 		private gameHeight: number,
-		) {
-			this.gameDim = this.position(gameWidth / 2, gameHeight / 2);
+	) {
+		this.gameDim = this.position(gameWidth / 2, gameHeight / 2);
 		this.objDim = this.position(this.graphic.width, this.graphic.height);
+		this.score = 0;
 	}
 
 	init(posX: number, posY: number, width: number, height: number, color: number) {

@@ -20,6 +20,8 @@ export class Move {
 }
 
 export class ballObject {
+	LEFT = 0;
+	RIGHT = 1;
 	DIAMETER: number;
 	RADIUS: number;
 	public speed = 4;
@@ -50,11 +52,13 @@ export class ballObject {
 	}
 
 	checkWallCollision(newPos: Position) {
-		if (newPos.x - (this.RADIUS / 2) <= 0 || newPos.x + (this.RADIUS / 2) >= this.gameDim.x)
-		this.direction = Math.PI -this.direction;
-
+		if (newPos.x - (this.RADIUS / 2) <= 0)
+			return ({state: true, side: this.LEFT});
+		else if(newPos.x + (this.RADIUS / 2) >= this.gameDim.x)
+			return ({state: true, side: this.RIGHT});
 		if (newPos.y - (this.RADIUS / 2) <= 0 || newPos.y + (this.RADIUS / 2) >= this.gameDim.y)
-		this.direction = -this.direction;
+			this.direction = -this.direction;
+		return {state: false, side: -1};
 	}
 	
 	hypothenuse(x : number, y : number)
@@ -161,11 +165,22 @@ export class ballObject {
 		return this.vec;
 	}
 
-	moveObject(delta: number) {
-		this.checkWallCollision(this.updateVec(delta));
-		this.direction = this.direction % (Math.PI * 2);
+	newPoint(side: number,  player: pongObject, opponent: pongObject) {
+		this.init(500, 300, 10);
+		if (side == this.LEFT)
+			opponent.score += 1;
+		if (side == this.RIGHT)
+			player.score += 1;
+
+	}
+
+	moveObject(delta: number, player: pongObject, opponent: pongObject) {
+		const checkWallCollide = this.checkWallCollision(this.updateVec(delta));
+		if (checkWallCollide.state)
+			this.newPoint(checkWallCollide.side, player, opponent);
 		this.applyMove(this.updateVec(delta));
 		this.updateVec(delta);
+		return checkWallCollide;
 	}
 
 	getMovement(): VectorPos {
@@ -193,6 +208,7 @@ export class pongObject {
 	public objDim = new Position();
 	public pos = new Position();
 	public player: Player;
+	public score: number;
 	public upperRightCorner = new Position();
 	public upperLeftCorner = new Position();
 	public lowerCorner = new Position();

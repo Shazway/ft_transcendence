@@ -80,9 +80,10 @@ export class PongGateway {
 	}
 
 	initMatch(match: Match, setting: MatchSettingEntity) {
-		match.gameService = new GamesService();
+		match.gameService = new GamesService(this.itemsService);
 		match.gameService.initObjects(match.players[0], match.players[1]);
 		match.gameService.startGame(setting);
+		match.gameService.match = match.entity;
 	}
 
 	async handleDisconnect(client: Socket) {

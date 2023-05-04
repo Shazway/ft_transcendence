@@ -24,8 +24,8 @@ export class PongDebugComponent {
 	private gamespeed = 13;
 	private timeoutId!: any;
 	private gameSettings!: MatchSetting;
-	private scoreP1!: PlainText;
-	private scoreP2!: PlainText;
+	private scoreP1!: WowText;
+	private scoreP2!: WowText;
 	private funkyText!: WowText;
 	private i = 0;
 	bouncenumber: number = 0;
@@ -89,11 +89,10 @@ export class PongDebugComponent {
 			return {
 				p1: new TextStyle({ fontFamily: 'PixeloidSansBold', fontSize: 70, fill: 'white', align: 'right' }),
 				p2: new TextStyle({ fontFamily: 'PixeloidSansBold', fontSize: 70, fill: 'white' }),
-				funText: new TextStyle({ fontFamily: 'PixeloidSansBold' }),
+				funText: new TextStyle({ fontFamily: 'PixeloidSansBold', fontSize: 30, fill: 'white' }),
 			}
 		});
 	}
-
 
 	async initObjects() {
 		this.player.init(10, 250, 200, 100, 0x83d0c9);
@@ -105,8 +104,9 @@ export class PongDebugComponent {
 		graphicElm.drawRect(490, 350, 20, 250);
 		graphicElm.endFill();
 		const style = await this.initAssets();
-		this.scoreP1 = new PlainText('0', style.p1, 402, 50, this.app);
-		this.scoreP2 = new PlainText('0', style.p2, 550, 50, this.app);
+		this.scoreP1 = new WowText('0', style.p1, 402, 50, this.app);
+		this.scoreP1.setReverse(true);
+		this.scoreP2 = new WowText('0', style.p2, 550, 50, this.app);
 		this.funkyText = new WowText('this is my fun text', style.funText, 100, 200, this.app);
 		this.funkyText.setRGB(true, 5000, 20);
 		this.funkyText.setWavy(true, 2000, 10, 10);
@@ -151,7 +151,13 @@ export class PongDebugComponent {
 			this.opponent.inputs.ArrowUp = true;
 		if (key == 's' && !this.opponent.inputs.ArrowDown)
 			this.opponent.inputs.ArrowDown = true;
-		if (key == '+' && !this.opponent.inputs.ArrowDown)
-			this.scoreP1.text.text = (++this.i).toString();
+		if (key == '+' && !this.opponent.inputs.ArrowDown) {
+			this.player.score++;
+			this.scoreP1.setText(this.player.score.toString());
+		}
+		if (key == '-' && !this.opponent.inputs.ArrowDown) {
+			this.opponent.score++;
+			this.scoreP1.setText(this.opponent.score.toString());
+		}
 	}
 }
