@@ -265,6 +265,13 @@ export class ItemsService {
 		return true;
 	}
 
+	public async getFriends(user_id: number) {
+		const user = await this.getUser(user_id);
+		if (user && user.friend && user.friend.length)
+			return user.friend;
+		return null;
+	}
+
 	public async blockUser(source_id: number, target_id: number)
 	{
 		const sourceUser = await this.getUser(source_id);

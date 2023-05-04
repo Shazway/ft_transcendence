@@ -8,11 +8,4 @@ import { Injectable } from '@angular/core';
 export class UsersService {
 
   constructor(private httpClient: HttpClient) { }
-
-  getUsers() {
-    console.log('pass getUser');
-    let head = new HttpHeaders;
-
-    return this.httpClient.get('http://localhost:3001/leaderboard', options: {header: });
-  }
 }

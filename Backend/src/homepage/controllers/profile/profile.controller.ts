@@ -12,8 +12,8 @@ import { TokenManagerService } from 'src/homepage/services/token-manager/token-m
 import { ItemsService } from 'src/homepage/services/items/items.service';
 import { UsersService } from 'src/homepage/services/users/users.service';
 import { plainToClass } from 'class-transformer';
-import { MyProfileUserDto } from 'src/homepage/dtos/UserDto.dto';
-import { AnyProfileUserDto } from 'src/homepage/dtos/UserDto.dto';
+import { MyProfileUser } from 'src/homepage/dtos/User.dto';
+import { AnyProfileUser } from 'src/homepage/dtos/User.dto';
 
 @Controller('profile')
 export class ProfileController {
@@ -30,8 +30,8 @@ export class ProfileController {
 			this.tokenManager.getIdFromToken(req),
 		);
 		if (user && user.username === us)
-			serializedUser = plainToClass(MyProfileUserDto, user);
-		else if (user) serializedUser = plainToClass(AnyProfileUserDto, user);
+			serializedUser = plainToClass(MyProfileUser, user);
+		else if (user) serializedUser = plainToClass(AnyProfileUser, user);
 		else res.status(HttpStatus.NOT_FOUND).send({ msg: 'User not found' });
 		if (user) res.status(HttpStatus.OK).send(serializedUser);
 	}

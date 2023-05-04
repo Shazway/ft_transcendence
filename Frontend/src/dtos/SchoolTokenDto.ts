@@ -1,6 +1,6 @@
-import { UserDto } from "./UserDto.dto";
+import { User } from "./User.dto";
 
-export interface SchoolTokenDto {
+export interface SchoolToken {
 	access_token : string;
 	token_type : string;
 	expires_in : number;

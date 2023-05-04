@@ -1,4 +1,4 @@
-export interface AuthDto {
+export interface Auth {
 	resource_owner_id: number;
 	scopes: string[];
 	expires_in_seconds: number;
@@ -7,7 +7,7 @@ export interface AuthDto {
 	};
 	created_at: Date;
 }
-export interface LogInReturnDto {
+export interface LogInReturn {
 	tokenInfo: TokenInfo;
 	jwt_token: string;
 	intraInfo: IntraInfo;

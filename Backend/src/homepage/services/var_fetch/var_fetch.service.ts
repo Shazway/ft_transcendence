@@ -5,7 +5,7 @@ import {
 import entities from 'src/entities/index';
 import { JwtModuleOptions } from '@nestjs/jwt';
 import { DataSourceOptions } from 'typeorm';
-import { ApiDto } from 'src/homepage/dtos/ApiDto.dto';
+import { Api } from 'src/homepage/dtos/Api.dto';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
@@ -78,7 +78,7 @@ export class VarFetchService {
 			signOptions: { expiresIn: this.getValue('JWT_TIMEOUT') },
 		};
 	}
-	public getAPIKeys(): ApiDto {
+	public getAPIKeys(): Api {
 		return {
 			s_key: this.getValue('SECRET_KEY'),
 			u_key: this.getValue('UID_KEY'),

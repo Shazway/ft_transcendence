@@ -19,7 +19,7 @@ export interface Move {
 	posY: number;
 }
 
-export class ballObjectDto {
+export class ballObject {
 	DIAMETER!: number;
 	RADIUS!: number;
 	public speed = 4;
@@ -92,7 +92,7 @@ export class ballObjectDto {
 		return math.distance([pos1.x, pos1.y], [pos2.x, pos2.y]);
 	}
 
-	collidesWithPlayer(player: pongObjectDto): boolean { //Check collision for player (left side player)
+	collidesWithPlayer(player: pongObject): boolean { //Check collision for player (left side player)
 		const pos: Position = {x: this.graphic.x, y: this.graphic.y};
 
 		const ret = (pos.x >= player.upperLeftCorner.x - (this.RADIUS / 2)
@@ -102,7 +102,7 @@ export class ballObjectDto {
 		return ret;
 	}
 
-	changeDirectionOpponent(opponent: pongObjectDto)
+	changeDirectionOpponent(opponent: pongObject)
 	{
 		const maxSinus = -0.8;
 		const minSinus = -maxSinus;
@@ -146,7 +146,7 @@ export class ballObjectDto {
 		console.log("vexY: " + this.vec.y);
 	}
 
-	changeDirectionPlayer(player: pongObjectDto)
+	changeDirectionPlayer(player: pongObject)
 	{
 		//if (Number.isNaN(this.direction)) this.printGameState('1');
 		const maxSinus = 0.8;
@@ -208,7 +208,7 @@ export class ballObjectDto {
 	}
 }
 
-export class pongObjectDto {
+export class pongObject {
 	public graphic = new Graphics();
 	public paddleSize: Position = this.position(0, 0);
 	public upperRightCorner: Position = this.position(0, 0);

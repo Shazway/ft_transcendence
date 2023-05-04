@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import axios from 'axios';
-import { LogInReturnDto } from 'src/dtos/AuthDto';
+import { LogInReturn } from 'src/dtos/Auth';
 import { TwoFacAuth } from 'src/dtos/TwoFacAuth.dto';
 
 @Component({
@@ -25,8 +25,8 @@ export class ValidateComponent {
 
 	async getCode(mdp: TwoFacAuth) {
 		let statusCode = 0;
-		let loginReturn: LogInReturnDto;
-		await axios.post<LogInReturnDto>('http://localhost:3001/login/callback', {
+		let loginReturn: LogInReturn;
+		await axios.post<LogInReturn>('http://localhost:3001/login/callback', {
 			mail_code: mdp.code,
 			id: this.bodyid,
 			api_code: this.code

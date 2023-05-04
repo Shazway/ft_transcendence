@@ -8,8 +8,8 @@ import {
 	WebSocketServer
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
-import { MessageDto } from 'src/homepage/dtos/MessageDto.dto';
-import { PunishmentDto } from 'src/homepage/dtos/PunishmentDto.dto';
+import { Message } from 'src/homepage/dtos/Message.dto';
+import { Punishment } from 'src/homepage/dtos/Punishment.dto';
 import { ChannelsService } from 'src/homepage/services/channels/channels.service';
 import { MessagesService } from 'src/homepage/services/messages/messages.service';
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
@@ -78,7 +78,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		});
 	}
 
-	sendMessageToChannel(channel_id: number, message: MessageDto, dest = 'onMessage') {
+	sendMessageToChannel(channel_id: number, message: Message, dest = 'onMessage') {
 		const channel = this.channelList.get(channel_id);
 		if (!channel) return false;
 		channel.forEach((user) => this.socketEmit(user, dest, message));
@@ -149,7 +149,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		});
 	}
 
-	async channelLeaveMsg(channel_id: number, target: PunishmentDto) {
+	async channelLeaveMsg(channel_id: number, target: Punishment) {
 		const user = await this.itemService.getUser(target.target_id);
 		this.sendMessageToChannel(channel_id, {
 			message_id: 0,
@@ -169,7 +169,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	}
 
 	@SubscribeMessage('mute')
-	async handleMute(@ConnectedSocket() client: Socket, @MessageBody() body: PunishmentDto) {
+	async handleMute(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
 		const channel_id = Number(client.handshake.query.channel_id);
 		const ret = await this.channelService.checkPrivileges(user.sub, body.target_id, channel_id);
@@ -187,7 +187,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	}
 
 	@SubscribeMessage('ban')
-	async handleBan(@ConnectedSocket() client: Socket, @MessageBody() body: PunishmentDto) {
+	async handleBan(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
 		const channel_id = Number(client.handshake.query.channel_id);
 		const ret = await this.channelService.checkPrivileges(user.sub, body.target_id, channel_id);
@@ -206,7 +206,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	}
 
 	@SubscribeMessage('kick')
-	async handleKick(@ConnectedSocket() client: Socket, @MessageBody() body: PunishmentDto) {
+	async handleKick(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
 		const channel_id = Number(client.handshake.query.channel_id);
 		const ret = await this.channelService.checkPrivileges(user.sub, body.target_id, channel_id);
@@ -230,7 +230,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	}
 
 	@SubscribeMessage('message')
-	async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() body: MessageDto) {
+	async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() body: Message) {
 		body.createdAt = new Date();
 		console.log(body);
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
@@ -251,7 +251,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	}
 
 	@SubscribeMessage('checkPrivileges')
-	async checkPrivileges(@ConnectedSocket() client: Socket, @MessageBody() body: MessageDto) {
+	async checkPrivileges(@ConnectedSocket() client: Socket, @MessageBody() body: Message) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
 		const channel_id = Number(client.handshake.query.channel_id);
 		const rights = await this.channelService.checkPrivileges(
@@ -263,7 +263,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	}
 
 	@SubscribeMessage('delMessage')
-	async deleteMessage(@ConnectedSocket() client: Socket, @MessageBody() body: MessageDto) {
+	async deleteMessage(@ConnectedSocket() client: Socket, @MessageBody() body: Message) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
 		const channel_id = Number(client.handshake.query.channel_id);
 		console.log(body);

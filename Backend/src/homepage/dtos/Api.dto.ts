@@ -1,10 +1,10 @@
-export class LogInReturnDto {
+export class LogInReturn {
 	tokenInfo: TokenInfo;
 	jwt_token: string;
 	intraInfo: IntraInfo;
 	created: boolean;
 }
-export class ApiDto {
+export class Api {
 	s_key: string;
 	u_key: string;
 }

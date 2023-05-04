@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { NewChanDto } from 'src/homepage/dtos/ChanDto.dto';
+import { NewChan } from 'src/homepage/dtos/Chan.dto';
 import { Repository } from 'typeorm';
 import { ItemsService } from '../items/items.service';
 import { ChannelEntity, ChannelUserRelation } from 'src/entities';
@@ -30,8 +30,8 @@ export class ChannelsService {
 		return this.itemsService.getChannel(channel_id);
 	}
 
-	async createChannel(chanDto: NewChanDto, user_id: number) {
-		const newChan = this.chan_repo.create(chanDto);
+	async createChannel(chan: NewChan, user_id: number) {
+		const newChan = this.chan_repo.create(chan);
 		const ret = await this.chan_repo.save(newChan);
 		await this.addUserToChannel(user_id, newChan.channel_id, newChan.channel_password, true, true);
 		return ret;

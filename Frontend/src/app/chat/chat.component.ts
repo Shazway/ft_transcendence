@@ -1,10 +1,10 @@
-import { Component, OnInit, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
-import { LessMessageDto, MessageDto } from '../../dtos/message'
-import { ChannelDto } from '../../dtos/Channel.dto'
+import { Component, OnInit, ElementRef } from '@angular/core';
+import { LessMessage, Message } from '../../dtos/message'
+import { Channel } from '../../dtos/Channel.dto'
 import { FetchService } from '../fetch.service';
 import { WebsocketService } from '../websocket.service';
 import { Socket, io } from 'socket.io-client';
-import { fromEvent, lastValueFrom } from 'rxjs';
+import { fromEvent } from 'rxjs';
 import { NgbModal  } from '@ng-bootstrap/ng-bootstrap';
 import { PunishmentPopup } from '../popup-component/popup-component.component';
 
@@ -15,9 +15,9 @@ import { PunishmentPopup } from '../popup-component/popup-component.component';
 })
 export class ChatComponent implements OnInit {
 	client: Socket;
-	channels$: ChannelDto[] = [];
-	msgs$: MessageDto[] = [];
-	test_msgs$ = new Array<Array<MessageDto>>;
+	channels$: Channel[] = [];
+	msgs$: Message[] = [];
+	test_msgs$ = new Array<Array<Message>>;
 	icone_list = {
 		add_friend: "https://static.vecteezy.com/system/resources/previews/020/936/584/original/add-friend-icon-for-your-website-design-logo-app-ui-free-vector.jpg",
 		block_user: "https://static.thenounproject.com/png/45218-200.png",
@@ -60,7 +60,7 @@ export class ChatComponent implements OnInit {
 		this.channels$ = await this.fetchService.getChannels();
 	}
 
-	deleteMessage(msg: MessageDto) {
+	deleteMessage(msg: Message) {
 		console.log('deleting message');
 		this.test_msgs$.forEach(element => {
 			const index = element.findIndex(mess => mess.message_id == msg.message_id)
@@ -95,7 +95,7 @@ export class ChatComponent implements OnInit {
 		}
 	}
 
-	onDropdownDel(msg: MessageDto) {
+	onDropdownDel(msg: Message) {
 		const delMsgElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-del');
 		if (!delMsgElm)
 			return;
@@ -127,7 +127,7 @@ export class ChatComponent implements OnInit {
 		}
 	}
 
-	async  onDropdrownMessage(msg: MessageDto) {
+	async  onDropdrownMessage(msg: Message) {
 		const addFriendElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-add');
 		const blockUserElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-block');
 		const muteUserElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-mute');
@@ -174,9 +174,9 @@ export class ChatComponent implements OnInit {
 		return await modalRef.result;
 	}
 
-	addFriend(msg: MessageDto) {}
-	blockUser(msg: MessageDto) {}
-	async muteUser(msg: MessageDto) {
+	addFriend(msg: Message) {}
+	blockUser(msg: Message) {}
+	async muteUser(msg: Message) {
 		const muteUserElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-mute');
 		if (!muteUserElm.classList.contains('show'))
 			return;
@@ -189,7 +189,7 @@ export class ChatComponent implements OnInit {
 			message: "You have been muted",
 		})
 	}
-	kickUser(msg: MessageDto) {
+	kickUser(msg: Message) {
 		const kickUserElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-kick');
 		if (!kickUserElm.classList.contains('show'))
 			return;
@@ -198,7 +198,7 @@ export class ChatComponent implements OnInit {
 			message: "You have been kicked",
 		})
 	}
-	async banUser(msg: MessageDto) {
+	async banUser(msg: Message) {
 		const banUserElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-ban');
 		if (!banUserElm.classList.contains('show'))
 			return;
@@ -210,7 +210,7 @@ export class ChatComponent implements OnInit {
 			message: "You have been banned",
 		})
 	}
-	delMsg(msg: MessageDto) {
+	delMsg(msg: Message) {
 		const banUserElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-del');
 		if (!banUserElm.classList.contains('show'))
 			return;
@@ -269,38 +269,38 @@ export class ChatComponent implements OnInit {
 		// this.fetchService.createChannel({ channel_name: 'chan2' });
 	}
 
-	sortMessage(new_msg: MessageDto) {
+	sortMessage(new_msg: Message) {
 		console.log(new_msg)
 		if (this.test_msgs$.length && this.test_msgs$[this.test_msgs$.length - 1][0].author.user_id == new_msg.author.user_id) {
 			this.test_msgs$[this.test_msgs$.length - 1].push(new_msg);
 			return;
 		}
-		const arr = new Array<MessageDto>;
+		const arr = new Array<Message>;
 		arr.push(new_msg);
 		this.test_msgs$.push(arr);
 		const chat = document.querySelector('scrollbar');
 	}
 
-	isMe(msg : MessageDto) : boolean {
+	isMe(msg : Message) : boolean {
 		return (msg.author.user_id === Number(localStorage.getItem('id')));
 	};
 
-	getTime(msgList: Array<MessageDto>) {
+	getTime(msgList: Array<Message>) {
 		const newDate = new Date (msgList[msgList.length - 1].createdAt);
 		const hour = newDate.getHours() < 10 ? '0' + newDate.getHours() : newDate.getHours();
 		const min = newDate.getMinutes() < 10 ? '0' + newDate.getMinutes() : newDate.getMinutes();
 		return (hour + ':' + min);
 	}
 
-	getName(msgList: Array<MessageDto>) {
+	getName(msgList: Array<Message>) {
 		return (msgList[0].author.username);
 	}
 
-	isSystem(msg : MessageDto) {
+	isSystem(msg : Message) {
 		return (msg.author.user_id == 0)
 	}
 
-	async onClickChat(data: LessMessageDto) {
+	async onClickChat(data: LessMessage) {
 		if (!this.client || data.message_content.trim().length == 0)
 			return false;
 		this.elRef.nativeElement.querySelector('.text-input').value = '';

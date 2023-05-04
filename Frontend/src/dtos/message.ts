@@ -1,14 +1,15 @@
-import { UserDto } from "./UserDto.dto";
+import { User } from "./User.dto";
 
-export interface MessageDto {
+
+export interface Message {
 	message_id : number;
-	author : UserDto;
+	author : User;
 	createdAt : Date;
 	message_content : string;
-	0: MessageDto;
+	0: Message;
 }
 
-export interface LessMessageDto {
+export interface LessMessage {
 	message_id : number;
 	author : {
 		username: string,

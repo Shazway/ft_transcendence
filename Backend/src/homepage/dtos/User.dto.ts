@@ -5,14 +5,14 @@ import { Friendrequest } from 'src/entities/friend_request.entity';
 import { Match } from 'src/entities/matchs.entity';
 import { User } from 'src/entities/users.entity';
 
-export class NewUserDto {
+export class NewUser {
 	login: string;
 	id: number;
 	email: string;
 	image: {link: string};
 }
 
-export class AnyProfileUserDto {
+export class AnyProfileUser {
 	username: string;
 	img_url: string;
 	match_history: Match[];
@@ -35,7 +35,7 @@ export class AnyProfileUserDto {
 	reveivedFriendRequests: Friendrequest[];
 }
 
-export class MyProfileUserDto {
+export class MyProfileUser {
 	username: string;
 	img_url: string;
 	match_history: Match[];

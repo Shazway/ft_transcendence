@@ -19,7 +19,7 @@ export class Move {
 	posY: number;
 }
 
-export class ballObjectDto {
+export class ballObject {
 	DIAMETER: number;
 	RADIUS: number;
 	public speed = 4;
@@ -75,7 +75,7 @@ export class ballObjectDto {
 		return math.distance([pos1.x, pos1.y], [pos2.x, pos2.y]);
 	}
 
-	collidesWithPlayer(player: pongObjectDto): boolean { //Check collision for player (left side player)
+	collidesWithPlayer(player: pongObject): boolean { //Check collision for player (left side player)
 		const pos: Position = {x: this.pos.x, y: this.pos.y};
 
 		const ret = (pos.x >= player.upperLeftCorner.x - (this.RADIUS / 2)
@@ -86,7 +86,7 @@ export class ballObjectDto {
 	}
 
 	
-	changeDirectionOpponent(opponent: pongObjectDto)
+	changeDirectionOpponent(opponent: pongObject)
 	{
 		const maxSinus = -0.8;
 		const minSinus = -maxSinus;
@@ -121,7 +121,7 @@ export class ballObjectDto {
 		this.direction = Math.PI - Math.asin(sinus);
 	}
 	
-	changeDirectionPlayer(player: pongObjectDto)
+	changeDirectionPlayer(player: pongObject)
 	{
 		const maxSinus = 0.8;
 		const minSinus = -maxSinus;
@@ -183,7 +183,7 @@ export class ballObjectDto {
 	}
 }
 
-export class pongObjectDto {
+export class pongObject {
 	public inputs = {
 		ArrowUp: false,
 		ArrowDown: false

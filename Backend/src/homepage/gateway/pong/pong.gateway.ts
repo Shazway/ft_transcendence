@@ -9,7 +9,7 @@ import {
 import { ItemsService } from 'src/homepage/services/items/items.service';
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
 import { Socket } from 'socket.io';
-import { MatchDto } from 'src/homepage/dtos/MatchDto.dto';
+import { Match } from 'src/homepage/dtos/Match.dto';
 import { Player } from 'src/homepage/dtos/Matchmaking.dto';
 import { GamesService } from 'src/homepage/services/game/game.service';
 import { MatchSettingEntity } from 'src/entities';
@@ -21,7 +21,7 @@ import { MatchsService } from 'src/homepage/services/matchs/matchs.service';
 	}
 })
 export class PongGateway {
-	private matchs: Map<number, MatchDto>;
+	private matchs: Map<number, Match>;
 	UP = 1;
 	DOWN = 0;
 	VELOCITY = 1;
@@ -30,7 +30,7 @@ export class PongGateway {
 		private itemsService: ItemsService,
 		private matchService: MatchsService
 	) {
-		this.matchs = new Map<number, MatchDto>();
+		this.matchs = new Map<number, Match>();
 	}
 
 	@WebSocketServer()
@@ -47,7 +47,7 @@ export class PongGateway {
 		
 		console.log({ new_player: user });
 		if (!match) {
-			match = new MatchDto();
+			match = new Match();
 			match.players = new Array<Player>();
 			match.entity = await this.itemsService.getMatch(match_id);
 			match.players.push(this.buildPlayer(client, user.sub, user.name));
@@ -79,7 +79,7 @@ export class PongGateway {
 			);
 	}
 
-	initMatch(match: MatchDto, setting: MatchSettingEntity) {
+	initMatch(match: Match, setting: MatchSettingEntity) {
 		match.gameService = new GamesService();
 		match.gameService.initObjects(match.players[0], match.players[1]);
 		match.gameService.startGame(setting);
@@ -124,7 +124,7 @@ export class PongGateway {
 		else return;
 	}
 
-	emitToMatch(event: string, content: any, match: MatchDto) {
+	emitToMatch(event: string, content: any, match: Match) {
 		match.players.forEach((user) => {
 			if (user.user_id == 0) {}
 			else

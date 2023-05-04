@@ -1,11 +1,11 @@
 import { HttpClient, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import axios from 'axios';
-import { ResponseDto } from 'src/dtos/Response.dto';
-import { UserDto } from 'src/dtos/UserDto.dto';
-import { MessageDto } from 'src/dtos/message';
-import { NewChanDto } from 'src/dtos/NewChan.dto';
-import { ChannelDto } from 'src/dtos/Channel.dto'
+import { Response } from 'src/dtos/Response.dto';
+import { Message } from 'src/dtos/message';
+import { NewChan } from 'src/dtos/NewChan.dto';
+import { Channel } from 'src/dtos/Channel.dto'
+import { AnyProfileUser, User } from 'src/dtos/User.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -47,9 +47,9 @@ export class FetchService {
 		return res;
 	}
 
-	async createUser(param: UserDto) {
+	async createUser(param: User) {
 		let res;
-		await axios.post<ResponseDto>('http://localhost:3001/users/create', param, this.getHeader())
+		await axios.post<Response>('http://localhost:3001/users/create', param, this.getHeader())
 		.then(function (response) {
 			res = response.data;
 			console.log(res);
@@ -62,9 +62,9 @@ export class FetchService {
 		return res;
 	}
 
-	async getUser(param: UserDto) {
+	async getUser(param: User) {
 		let res;
-		await axios.get<ResponseDto>('http://localhost:3001/users/' + param.login, this.getHeader())
+		await axios.get<Response>('http://localhost:3001/users/' + param.login, this.getHeader())
 		.then(function (response) {
 			res = response.data;
 			console.log(res);
@@ -77,8 +77,32 @@ export class FetchService {
 		return res;
 	}
 
-	async getMessages(channel_id: number, page: number): Promise<MessageDto[]> {
-		let res: MessageDto[] = [];
+	async getFriends() {
+		let res: AnyProfileUser[] = [];
+		await axios.get<Array<AnyProfileUser>>('http://localhost:3001/users/friends', this.getHeader())
+		.then(function (response) {
+			res = response.data;
+			console.log(res);
+		})
+		.catch(function (error) { console.log(error); })
+		.finally(function () {});
+		return res;
+	}
+
+	async addFriends(friend_id: number) {
+		let res;
+		await axios.get('http://localhost:3001/users/add_friend/' + friend_id, this.getHeader())
+		.then(function (response) {
+			res = response.data;
+			console.log(res);
+		})
+		.catch(function (error) { console.log(error); })
+		.finally(function () {});
+		return res;
+	}
+
+	async getMessages(channel_id: number, page: number): Promise<Message[]> {
+		let res: Message[] = [];
 		await axios.get('http://localhost:3001/channels/' + channel_id + '/messages/' + page, this.getHeader())
 		.then(function (response) {
 		res = response.data;
@@ -89,7 +113,7 @@ export class FetchService {
 		return res;
 	}
 
-	async createChannel(param: NewChanDto) {
+	async createChannel(param: NewChan) {
 		let res;
 		console.log(param);
 		await axios.post('http://localhost:3001/channels/create', param, this.getHeader())
@@ -102,8 +126,8 @@ export class FetchService {
 		return res;
 	}
 
-	async getChannels(): Promise<ChannelDto[]> {
-		let res: ChannelDto[] = [];
+	async getChannels(): Promise<Channel[]> {
+		let res: Channel[] = [];
 		await axios.get('http://localhost:3001/channels/all', this.getHeader())
 		.then(function (response) {
 			res = response.data;

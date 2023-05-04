@@ -1,3 +1,3 @@
-export interface NewChanDto {
+export interface NewChan {
 	channel_name: string;
 }

@@ -68,7 +68,7 @@ export class MatchmakingGateway {
 		}
 	}
 
-	buildMatchDto(opponent: string, matchId: number): FoundMatch {
+	buildMatch(opponent: string, matchId: number): FoundMatch {
 		return {
 			match_id: matchId,
 			username: opponent
@@ -108,11 +108,11 @@ export class MatchmakingGateway {
 						);
 						this.matchMaker[0].client.emit(
 							'foundMatch',
-							this.buildMatchDto(this.matchMaker[1].username, match.match_id)
+							this.buildMatch(this.matchMaker[1].username, match.match_id)
 						);
 						this.matchMaker[1].client.emit(
 							'foundMatch',
-							this.buildMatchDto(this.matchMaker[0].username, match.match_id)
+							this.buildMatch(this.matchMaker[0].username, match.match_id)
 						);
 						console.log(
 							this.matchMaker[0].username + ' + ' + this.matchMaker[1].username

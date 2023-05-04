@@ -4,10 +4,11 @@ import { UsersService } from 'src/homepage/services/users/users.service';
 import { Response } from 'express';
 import { varFetchService } from 'src/homepage/services/var_fetch/var_fetch.service';
 import { HttpService } from '@nestjs/axios';
-import { AuthCode, AuthPair, IntraInfo, TokenInfo } from 'src/homepage/dtos/ApiDto.dto';
+import { AuthCode, AuthPair, IntraInfo, TokenInfo } from 'src/homepage/dtos/Api.dto';
 import { ItemsService } from 'src/homepage/services/items/items.service';
 import { AuthService } from 'src/homepage/services/auth/auth.service';
 import { ChannelsService } from 'src/homepage/services/channels/channels.service';
+import axios from 'axios';
 
 @Controller('login')
 export class LoginController {
@@ -45,13 +46,17 @@ export class LoginController {
 
 	@Post('')
 	async authFortyTwo(@Res() res: Response, @Body() body: AuthCode) {
-		const resToken = await this.httpClient
-			.post<TokenInfo>('https://api.intra.42.fr/oauth/token', this.getTokenBody(body.api_code))
-			.toPromise();
+		let resToken;
+		await axios.post<TokenInfo>('https://api.intra.42.fr/oauth/token', this.getTokenBody(body.api_code))
+		.then(function (response) {
+			resToken = response.data;
+		})
+		.catch(function (error) { console.log(error); })
+		.finally(function () {});
 		if (resToken)
 		{
-			console.log({TokenInfo: resToken.data});
-			const intraInfo = await this.usersService.fetcIntraInfo(resToken.data.access_token);
+			console.log({TokenInfo: resToken});
+			const intraInfo = await this.usersService.fetcIntraInfo(resToken.access_token);
 			console.log({ Id: intraInfo.data.id, Login: intraInfo.data.login});
 			const user = await this.itemsService.getUserByIntraId(intraInfo.data.id);
 			if (user)
@@ -59,9 +64,9 @@ export class LoginController {
 				console.log('Logging in');
 				console.log({email: intraInfo.data.email});
 				if (!user.double_auth)
-					return res.status(HttpStatus.OK).send(await this.buildLoginBody(resToken.data, intraInfo.data, user.user_id));
+					return res.status(HttpStatus.OK).send(await this.buildLoginBody(resToken, intraInfo.data, user.user_id));
 				const TwoFASecret = this.authService.generateSec()
-				this.twoFaMap.set(user.user_id, { secret: TwoFASecret, intra_token: resToken.data});
+				this.twoFaMap.set(user.user_id, { secret: TwoFASecret, intra_token: resToken});
 				this.authService.createMail(this.authService.generateCode(TwoFASecret), intraInfo.data);
 				console.log('Sending: user_id:' + user.user_id);
 				res.status(HttpStatus.ACCEPTED).send({user_id: user.user_id});
@@ -70,7 +75,7 @@ export class LoginController {
 			{
 				console.log('Signing in');
 				const user = await this.usersService.createUser(intraInfo.data);
-				res.status(HttpStatus.CREATED).send(await this.buildLoginBody(resToken.data, intraInfo.data, user.user_id));
+				res.status(HttpStatus.CREATED).send(await this.buildLoginBody(resToken, intraInfo.data, user.user_id));
 			}
 		}
 		else

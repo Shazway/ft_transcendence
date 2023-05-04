@@ -1,4 +1,4 @@
-export interface ChannelDto {
+export interface Channel {
 	channel_id: number;
 	channel_name: string;
 }

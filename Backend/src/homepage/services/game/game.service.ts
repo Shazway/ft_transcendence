@@ -1,24 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { MatchSettingEntity } from 'src/entities';
 import { Player } from 'src/homepage/dtos/Matchmaking.dto';
-import { Move, ballObjectDto, pongObjectDto } from 'src/homepage/dtos/Pong.dto';
+import { Move, ballObject, pongObject } from 'src/homepage/dtos/Pong.dto';
 
 @Injectable()
 export class GamesService {
 	private interval: NodeJS.Timeout;
 	private matchSetting: MatchSettingEntity;
-	private player1: pongObjectDto;
-	private player2: pongObjectDto;
-	private ball: ballObjectDto;
+	private player1: pongObject;
+	private player2: pongObject;
+	private ball: ballObject;
 	private oldDate: Date;
 	private movespeed = 5;
 	private gamespeed = 13;
 	private oldDir = 0;
 
 	constructor() {
-		this.player1 = new pongObjectDto(1000, 600);
-		this.player2 = new pongObjectDto(1000, 600);
-		this.ball = new ballObjectDto(1000, 600);
+		this.player1 = new pongObject(1000, 600);
+		this.player2 = new pongObject(1000, 600);
+		this.ball = new ballObject(1000, 600);
 		this.oldDate = new Date();
 	}
 
@@ -70,7 +70,7 @@ export class GamesService {
 		this.ball.moveObject(delta);
 	}
 
-	applyPlayerMove(player: pongObjectDto, delta: number) {
+	applyPlayerMove(player: pongObject, delta: number) {
 		if (player.inputs.ArrowUp) player.moveObject(player.position(0, -this.movespeed * delta));
 		if (player.inputs.ArrowDown) player.moveObject(player.position(0, this.movespeed * delta));
 	}
@@ -85,7 +85,7 @@ export class GamesService {
 		}
 	}
 
-	getInput(player: pongObjectDto): Move {
+	getInput(player: pongObject): Move {
 		return {
 			ArrowUp: player.inputs.ArrowUp,
 			ArrowDown: player.inputs.ArrowDown,
