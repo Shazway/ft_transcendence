@@ -20,8 +20,8 @@
 					</div>
 				</td>
 				<td *ngIf="friend.activity_status == 0">offline</td>
-				<td *ngIf="friend.activity_status == 1">online</td>
-				<td *ngIf="friend.activity_status == 2">playing</td> <!--transformer playing en lien pour spectate la partie-->
+				<td (click)="challenge(friend)" *ngIf="friend.activity_status == 1">online</td> <!--transformer online en lien pour challenge-->
+				<td (click)="spectate(friend)" *ngIf="friend.activity_status == 2">playing</td> <!--transformer playing en lien pour spectate la partie-->
 				<td>{{friend.rank_score}}</td>
 			</tr>
 		</tbody>

@@ -1,6 +1,8 @@
 import { Component, ElementRef } from '@angular/core';
 import { FetchService } from '../fetch.service';
 import { AnyProfileUser } from 'src/dtos/User.dto';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { PunishmentPopup } from '../popup-component/popup-component.component';
 
 @Component({
   selector: 'app-friends',
@@ -19,8 +21,16 @@ export class FriendsComponent {
 	public friends: AnyProfileUser[] = [];
 	constructor(
 		private elRef: ElementRef,
+		private modalService: NgbModal,
 		private fetchService: FetchService
 	) {}
+
+	async createPopup(title: string, label: string) {
+		const modalRef = this.modalService.open(PunishmentPopup);
+		modalRef.componentInstance.title = title;
+		modalRef.componentInstance.label = label;
+		return await modalRef.result;
+	}
 	
 	async ngOnInit() {
 		this.friends = await this.fetchService.getFriends();
@@ -83,5 +93,15 @@ export class FriendsComponent {
 
 		//add a pop-up to confirm
 		
+	}
+
+	async challenge(friend: AnyProfileUser)
+	{
+		const test = await this.createPopup("Challenge", "friend");
+	}
+
+	async spectate(friend: AnyProfileUser)
+	{
+		const test = await this.createPopup("Spectate", "friend");
 	}
 }
