@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PongDebugComponent } from './pong-debug.component';
+import { AssetManager } from 'src/dtos/GraphElem.dto';
 
 
 
@@ -9,7 +10,7 @@ import { PongDebugComponent } from './pong-debug.component';
     PongDebugComponent
   ],
   imports: [
-    CommonModule
+    CommonModule,
   ]
 })
 export class PongDebugModule { }

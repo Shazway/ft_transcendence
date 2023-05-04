@@ -6,7 +6,7 @@ import { pongObject, ballObject, Move, VectorPos } from 'src/dtos/Pong.dto';
 import { ActivatedRoute } from '@angular/router';
 import { MatchSetting } from 'src/dtos/MatchSetting.dto';
 import { right } from '@popperjs/core';
-import { PlainText, WowText } from 'src/dtos/GraphElem.dto';
+import { AssetManager, WowText } from 'src/dtos/GraphElem.dto';
 
 @Component({
   selector: 'app-pong-debug',
@@ -34,6 +34,7 @@ export class PongDebugComponent {
 		private pixiContainer: ElementRef,
 		private route: ActivatedRoute,
 		private elRef: ElementRef,
+		private assetManager: AssetManager,
 		) {
 			this.app = new Application({
 				height: 600,
@@ -74,52 +75,29 @@ export class PongDebugComponent {
 			this.ball.changeDirectionPlayer(this.player);
 		else if (this.closeEnoughOpponent() && this.ball.collidesWithPlayer(this.opponent))
 			this.ball.changeDirectionOpponent(this.opponent);
-		this.ball.moveObject(delta);
+		// this.ball.moveObject(delta);
 		if (this.funkyText)
 			this.funkyText.update();
 	}
 
-	async initAssets() {
-		Assets.addBundle('fonts', {
-			PixeloidSans: 'assets/PixeloidMono.ttf',
-			PixeloidMono: 'assets/PixeloidMono.ttf',
-			PixeloidSansBold: 'assets/PixeloidSansBold.ttf',
-		});
-		return await Assets.loadBundle('fonts').then(() => {
-			return {
-				p1: new TextStyle({ fontFamily: 'PixeloidSansBold', fontSize: 70, fill: 'white', align: 'right' }),
-				p2: new TextStyle({ fontFamily: 'PixeloidSansBold', fontSize: 70, fill: 'white' }),
-				funText: new TextStyle({ fontFamily: 'PixeloidSansBold', fontSize: 30, fill: 'white' }),
-			}
-		});
-	}
-
 	async initObjects() {
-		this.player.init(10, 250, 200, 100, 0x83d0c9);
-		this.opponent.init(this.app.view.width - (10 + 200), 250, 200, 100, 0xFF0000);
+		this.player.init(10, 250, 20, 100, 0x83d0c9);
+		this.opponent.init(this.app.view.width - (10 + 20), 250, 20, 100, 0xFF0000);
 		this.ball.init(500, 300, 10, 0xFFFFFF);
 		const graphicElm = new Graphics();
 		graphicElm.beginFill(0xFFFFFF, 0.8);
 		graphicElm.drawRect(490, 0, 20, 250);
 		graphicElm.drawRect(490, 350, 20, 250);
 		graphicElm.endFill();
-		const style = await this.initAssets();
-		this.scoreP1 = new WowText('0', style.p1, 402, 50, this.app);
+		const style = await this.assetManager.initAssets();
+		this.scoreP1 = new WowText('0', style.p1, 450, 50, this.app);
 		this.scoreP1.setReverse(true);
-		this.scoreP2 = new WowText('0', style.p2, 550, 50, this.app);
+		this.scoreP2 = new WowText('0', style.p2, 560, 50, this.app);
 		this.funkyText = new WowText('this is my fun text', style.funText, 100, 200, this.app);
 		this.funkyText.setRGB(true, 5000, 20);
-		this.funkyText.setWavy(true, 2000, 10, 10);
+		this.funkyText.setWavy(true, 50, 50);
 		this.app.stage.addChild(graphicElm, this.ball.graphic, this.player.graphic, this.opponent.graphic);
-		// const ruler = new Graphics();
-		// for (let index = 0; index < 12; index++) {
-		// 	for (let index2 = 0; index2 < 8; index2++) {
-		// 		ruler.beginFill(0xFF0000);
-		// 		ruler.drawRect(index * 100, index2 * 100, 2, 2);
-		// 		ruler.endFill();
-		// 	}
-		// }
-		// this.app.stage.addChild(ruler);
+		this.assetManager.addRuler(this.app);
 	}
 
 	@HostListener('window:keyup', ['$event'])
@@ -157,7 +135,7 @@ export class PongDebugComponent {
 		}
 		if (key == '-' && !this.opponent.inputs.ArrowDown) {
 			this.opponent.score++;
-			this.scoreP1.setText(this.opponent.score.toString());
+			this.scoreP2.setText(this.opponent.score.toString());
 		}
 	}
 }

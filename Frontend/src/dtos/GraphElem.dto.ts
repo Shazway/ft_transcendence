@@ -1,6 +1,38 @@
-import { forEach } from "mathjs";
+import { Injectable } from "@angular/core";
 import { TextStyle, Text, Application, Color } from "pixi.js";
 import * as PIXI from "pixi.js";
+
+@Injectable({
+	providedIn: 'root'
+})
+export class AssetManager {
+	async initAssets() {
+		PIXI.Assets.addBundle('fonts', {
+			PixeloidSans: 'assets/PixeloidMono.ttf',
+			PixeloidMono: 'assets/PixeloidMono.ttf',
+			PixeloidSansBold: 'assets/PixeloidSansBold.ttf',
+		});
+		return await PIXI.Assets.loadBundle('fonts').then(() => {
+			return {
+				p1: new TextStyle({ fontFamily: 'PixeloidSansBold', fontSize: 70, fill: 0xaaaaaa, align: 'right' }),
+				p2: new TextStyle({ fontFamily: 'PixeloidSansBold', fontSize: 70, fill: 0xaaaaaa }),
+				funText: new TextStyle({ fontFamily: 'PixeloidSansBold', fontSize: 30, fill: 0x660077 }),
+			}
+		});
+	}
+
+	addRuler(app: Application) {
+		const ruler = new PIXI.Graphics();
+		for (let index = 0; index < 120; index++) {
+			for (let index2 = 0; index2 < 80; index2++) {
+				ruler.beginFill(0x555555);
+				ruler.drawRect(index * 10, index2 * 10, 1, 1);
+				ruler.endFill();
+			}
+		}
+		app.stage.addChild(ruler);
+	}
+}
 
 export class PlainText {
 	public text: Text;
@@ -30,9 +62,6 @@ export class WowText {
 	private isWavyOrigin = 0;
 	private isWavyamplitude = 10;
 	private colorArray = [[255, 0, 0], [0, 255, 0], [0, 0, 255]];
-	private colorIndex = 0;
-	private colorTime = 0;
-	private colorDuration = 5;
 	private isReverse = false;
 
 	constructor(content: string, style: TextStyle, posX: number, posY: number, app: Application) {
@@ -47,11 +76,18 @@ export class WowText {
 	setReverse(rev: boolean) {
 		this.isReverse = rev;
 		this.resetSpacing();
+		return this;
 	}
 
 	setText(newText: string) {
 		let index = 0;
 		const newTxt = newText.split('');
+		while (this.text.length < newText.length) {
+			const charac = new Text('0', this.style);
+			charac.zIndex = 1;
+			this.text.push(charac);
+			this.app.stage.addChildAt(charac, 0);
+		}
 		for (; index < this.text.length; index++) {
 			if (index < newText.length)
 				this.text[this.text.length - index - 1].text = newTxt[newText.length - index - 1];
@@ -60,12 +96,8 @@ export class WowText {
 				break;
 			}
 		}
-		for (; index < newText.length; index++) {
-			const charac = new Text(newTxt[newText.length - index - 1], this.style);
-			this.text.push(charac);
-			this.app.stage.addChild(charac);
-		}
 		this.resetSpacing();
+		return this;
 	}
 	
 	LerpRGB (a: Color,b: Color,t: number)
@@ -105,16 +137,21 @@ export class WowText {
 	}
 
 	resetSpacing() {
-		let arr;
 		let len = 0;
-		if (this.isReverse) arr = this.text;
-		else arr = this.text.reverse();
-		arr.forEach((charac) => {
-			charac.x = this.startPosX + len;
-			charac.y = this.startPosY;
-			if (this.isReverse) len -= PIXI.TextMetrics.measureText(charac.text, charac.style).width;
-			else len += PIXI.TextMetrics.measureText(charac.text, charac.style).width;
-		})
+		if (this.isReverse) {
+			this.text.reverse().forEach((charac) => {
+				len -= PIXI.TextMetrics.measureText(charac.text, charac.style).width;
+				charac.x = this.startPosX + len;
+				charac.y = this.startPosY;
+			})
+		} else {
+			this.text.forEach((charac) => {
+				charac.x = this.startPosX + len;
+				charac.y = this.startPosY;
+				len += PIXI.TextMetrics.measureText(charac.text, charac.style).width;
+			})
+		}
+		return this;
 	}
 
 	buildText(content: string) {
@@ -130,6 +167,7 @@ export class WowText {
 			this.app.stage.addChild(charac);
 			len += PIXI.TextMetrics.measureText(charac.text, charac.style).width;
 		})
+		return this;
 	}
 
 	setRGB(isRGB: boolean, frequency: number, delay: number) {
@@ -138,15 +176,15 @@ export class WowText {
 		this.isRGBFrequency = frequency / this.colorArray.length;
 		if (frequency < 500)
 			this.isRGBFrequency = (500 / this.colorArray.length);
+		return this;
 	}
 
-	setWavy(isWavy: boolean, frequency: number, delay: number, amplitude: number) {
+	setWavy(isWavy: boolean, delay: number, amplitude: number) {
 		this.isWavy = isWavy;
 		this.isWavyDelay = delay;
 		this.isWavyOrigin = this.text[0].y;
-		this.isWavyFrequency = frequency * 1000;
+		this.isWavyFrequency = 2000 * 1000;
 		this.isWavyamplitude = amplitude;
-		if (frequency < 0.5)
-			this.isWavyFrequency = 500;
+		return this;
 	}
 }
