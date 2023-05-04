@@ -89,7 +89,7 @@ export class ballObjectDto {
 	}
 
 	distancePos(pos1: Position, pos2: Position) { //Easier to write distance comparing
-		return math.distance([pos1.x, pos1.y], [pos2.x, pos2.y]);
+		return Number(math.distance([pos1.x, pos1.y], [pos2.x, pos2.y]));
 	}
 
 	collidesWithPlayer(player: pongObjectDto): boolean { //Check collision for player (left side player)
