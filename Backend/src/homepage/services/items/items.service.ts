@@ -337,6 +337,13 @@ export class ItemsService {
 			return false;
 		return true;
 	}
+	public async addUserToMatch(user: UserEntity, match: MatchEntity)
+	{
+		if (!match.is_ongoing)
+			return false;
+		match.user.push(user);
+		await this.matchRepo.save(match);
+	}
 
 	public async addFriendRequestToUsers(sourceId: number, targetId: number) {
 		const friendRequest = this.createFriendRequest();
