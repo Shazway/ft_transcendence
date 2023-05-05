@@ -13,8 +13,8 @@ import { Mutex } from 'async-mutex';
 	styleUrls: ['./pong.component.css']
 })
 export class PongComponent {
-	OPPONENT_SCORED = 1;
-	PLAYER_SCORED = 0;
+	PLAYER_SCORED = 1;
+	OPPONENT_SCORED = 0;
 	LOSS = 0;
 	WIN = 1;
 	private client!: Socket;
@@ -97,7 +97,7 @@ export class PongComponent {
 		this.app.stop();
 	}
 
-	async updateScore(event: ScoreChange) {
+	updateScore(event: ScoreChange) {
 		if (event.side == this.PLAYER_SCORED)
 		{
 			this.player.score++;
@@ -108,11 +108,13 @@ export class PongComponent {
 			this.opponent.score++;
 			console.log('Your opponent scored a point: ' + this.opponent.score);
 		}
-		this.ballLock.acquire().then(() => {
-			this.ball.init(500, 300, 10, 0xFFFFFF);
-			this.ball.direction = event.dir;
+		this.ballLock.waitForUnlock().then(() => {
+			this.ballLock.acquire().then(() => {
+				this.ball.init(500, 300, 10, 0xFFFFFF);
+				this.ball.direction = event.dir;
+			});
+			this.ballLock.release();
 		});
-		this.ballLock.release();
 		//<--Mettre à jour graphiquement le score?
 	}
 

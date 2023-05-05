@@ -79,19 +79,22 @@ export class GamesService {
 			this.match.current_score[1]++;
 		else
 			this.match.current_score[0]++;
+		this.emitScore(pointChecker);
 		await this.itemsService.saveMatchState(this.match);
-
-		this.player1.player.client.emit('onScoreChange',
-		this.buildScoreChangeEvent(this.player1, pointChecker.side));
-
-		if (this.player2.player.client)
-			this.player2.player.client.emit('onScoreChange',
-				this.buildScoreChangeEvent(this.player2, pointChecker.side));
 	}
 
-	buildScoreChangeEvent(player: pongObject, side: number): ScoreChange
+	emitScore(pointChecker: {state: boolean, side: number})
 	{
-		return (side == this.LEFT ? {side: this.LEFT, dir: Math.PI / 4} : {side: this.RIGHT, dir: Math.PI - (Math.PI / 4)})
+		if (pointChecker.side == this.LEFT)
+		{
+			this.player1.player.client.emit('onScoreChange', {side: this.LEFT, dir: Math.PI - (Math.PI / 4)});
+			this.player2.player.client.emit('onScoreChange', {side: this.RIGHT, dir: Math.PI / 4});
+		}
+		else if (pointChecker.side == this.RIGHT)
+		{
+			this.player1.player.client.emit('onScoreChange', {side: this.RIGHT, dir: Math.PI / 4});
+			this.player2.player.client.emit('onScoreChange', {side: this.LEFT, dir: Math.PI - (Math.PI / 4)});
+		}
 	}
 	buildEndEvent(player: pongObject): GameEnd
 	{
@@ -118,7 +121,6 @@ export class GamesService {
 			this.ball.changeDirectionPlayer(this.player1);
 		else if (this.closeEnoughOpponent() && this.ball.collidesWithPlayer(this.player2))
 			this.ball.changeDirectionOpponent(this.player2);
-
 		this.checkDirectionChange();
 		const pointChecker = this.ball.moveObject(delta, this.player1, this.player2);
 		if (pointChecker.state)
