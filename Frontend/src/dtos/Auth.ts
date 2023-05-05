@@ -22,7 +22,12 @@ export interface IntraInfo {
 	id: number;
 	login: string;
 	email: string;
-	image: {link: string;}
+	image: {
+		link: string,
+		versions: {
+			large: string,
+		},
+	};
 }
 
 export interface TokenInfo {

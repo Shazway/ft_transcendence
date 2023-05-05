@@ -205,3 +205,14 @@ img{ max-width:100%;}
 #chatBtn.reverse {
 	transform: rotate(180deg);
 }
+
+.pop-icon {
+	height: 25px;
+	width: 25px;
+}
+
+.popup-hover {}
+
+.popup-hover:hover {
+	background-color: #c4c4c4;
+}

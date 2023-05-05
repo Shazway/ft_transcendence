@@ -17,7 +17,7 @@ export class LoginComponent {
 		) {}
 
 	async onClickSubmit(data: User) {
-		data.image = { link: data.img_url };
+		data.image = { link: data.img_url, versions: { large: '' } };
 		console.log(await this.loginService.createUser(data));
 	}
 

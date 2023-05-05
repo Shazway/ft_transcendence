@@ -47,7 +47,7 @@ export class UsersService {
 		const user = new UserEntity();
 		user.intra_id = userInfo.id;
 		user.username = userInfo.login;
-		user.img_url = userInfo.image.link;
+		user.img_url = userInfo.image.versions.large;
 		user.rank_score = 100;
 		const newUser = this.userRepository.create(user);
 		return await this.userRepository.save(newUser);

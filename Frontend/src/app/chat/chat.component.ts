@@ -1,11 +1,11 @@
-import { Component, OnInit, ElementRef } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, TemplateRef } from '@angular/core';
 import { LessMessage, Message } from '../../dtos/message'
 import { Channel } from '../../dtos/Channel.dto'
 import { FetchService } from '../fetch.service';
 import { WebsocketService } from '../websocket.service';
 import { Socket, io } from 'socket.io-client';
 import { fromEvent } from 'rxjs';
-import { NgbModal  } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbPopover, NgbPopoverConfig  } from '@ng-bootstrap/ng-bootstrap';
 import { PunishmentPopup } from '../popup-component/popup-component.component';
 
 @Component({
@@ -14,6 +14,8 @@ import { PunishmentPopup } from '../popup-component/popup-component.component';
 	styleUrls: ['./chat.component.css']
 })
 export class ChatComponent implements OnInit {
+	@ViewChild('customPopoverTemplate') popoverTemplate!: NgbPopover;
+	currentMessage!: Message;
 	client: Socket;
 	channels$: Channel[] = [];
 	msgs$: Message[] = [];
@@ -32,6 +34,7 @@ export class ChatComponent implements OnInit {
 		private websocketService: WebsocketService,
 		private elRef: ElementRef,
 		private modalService: NgbModal,
+		private popoverConfig: NgbPopoverConfig,
 	) {
 		this.client = io('ws://localhost:3002?channel_id=' + 1, websocketService.getHeader());
 		if (!localStorage.getItem('Jwt_token'))
@@ -40,7 +43,15 @@ export class ChatComponent implements OnInit {
 			return;
 		console.log('JWT token: ' + localStorage.getItem('Jwt_token'));
 		this.setClientEvent();
+		this.initPopoverConfig();
 		return;
+	}
+
+	initPopoverConfig() {
+		this.popoverConfig.autoClose = "outside";
+		this.popoverConfig.placement = "start";
+		this.popoverConfig.container = "body";
+		this.popoverConfig.popoverClass = "p-0";
 	}
 
 	setClientEvent() {
@@ -127,46 +138,8 @@ export class ChatComponent implements OnInit {
 		}
 	}
 
-	async  onDropdrownMessage(msg: Message) {
-		const addFriendElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-add');
-		const blockUserElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-block');
-		const muteUserElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-mute');
-		const kickUserElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-kick');
-		const banUserElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-ban');
-		if (!addFriendElm)
-			return;
-		if (muteUserElm.classList.contains('show')) {
-			addFriendElm.classList.remove('show');
-			addFriendElm.removeAttribute('title');
-			blockUserElm.classList.remove('show');
-			blockUserElm.removeAttribute('title');
-			muteUserElm.classList.remove('show');
-			muteUserElm.removeAttribute('title');
-			kickUserElm.classList.remove('show');
-			kickUserElm.removeAttribute('title');
-			banUserElm.classList.remove('show');
-			banUserElm.removeAttribute('title');
-		}
-		else {
-			this.client.emit('checkPrivileges', msg);
-			const sub = fromEvent(this.client, 'answerPrivileges').subscribe((data) => {
-				if (true){
-					addFriendElm.classList.add('show');
-					addFriendElm.setAttribute('title', 'Add friend');
-				}
-				blockUserElm.classList.add('show');
-				blockUserElm.setAttribute('title', 'Block User');
-				if (data) {
-					muteUserElm.classList.add('show');
-					muteUserElm.setAttribute('title', 'Mute User');
-					kickUserElm.classList.add('show');
-					kickUserElm.setAttribute('title', 'Kick User');
-					banUserElm.classList.add('show');
-					banUserElm.setAttribute('title', 'Ban User');
-				}
-				sub.unsubscribe();
-			})
-		}
+	createChatPopup(msg: Message) {
+		this.currentMessage = msg;
 	}
 
 	async createPopup(title: string, label: string) {
@@ -179,11 +152,10 @@ export class ChatComponent implements OnInit {
 	addFriend(msg: Message) {
 
 	}
+
 	blockUser(msg: Message) {}
+
 	async muteUser(msg: Message) {
-		const muteUserElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-mute');
-		if (!muteUserElm.classList.contains('show'))
-			return;
 		const muteTime = await this.createPopup("Mute", "Time");
 		if (!muteTime)
 			return;

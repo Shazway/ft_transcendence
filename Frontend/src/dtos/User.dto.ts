@@ -7,7 +7,12 @@ export interface User
 	login: string;
 	username: string;
 	img_url: string;
-	image: {link: string};
+	image: {
+		link: string,
+		versions: {
+			large: string,
+		},
+	};
 }
 
 export interface Achievement {
