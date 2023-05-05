@@ -54,6 +54,8 @@ export class ItemsService {
 			.leftJoinAndSelect('user.blacklistEntry', 'blacklistEntry')
 			.leftJoinAndSelect('user.channel', 'channel')
 			.leftJoinAndSelect('user.match_history', 'match_history')
+			.leftJoinAndSelect('user.sentFriendRequests', 'sentFriendRequests')
+			.leftJoinAndSelect('user.receivedFriendRequests', 'receivedFriendRequests')
 			.where('user.user_id = :id', { id })
 			.getOne();
 		return user;
@@ -333,11 +335,6 @@ export class ItemsService {
 	public async requestExists(sourceId: number, targetId: number) {
 		const sourceEntity = await this.getUser(sourceId);
 
-		if (!sourceEntity)
-		{
-			console.log({SourceId: sourceId});
-			return false;
-		}
 		if (sourceEntity.sentFriendRequests.find((request) => request.receiver.user_id == targetId))
 			return true;
 		return false;

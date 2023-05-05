@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, JoinTable, ManyToMany, OneToMany, CreateDateColumn } from 'typeorm';
+import {
+	Entity,
+	PrimaryGeneratedColumn,
+	Column,
+	JoinTable,
+	ManyToMany,
+	OneToMany,
+	CreateDateColumn
+} from 'typeorm';
 import { Friendrequest } from './friend_request.entity';
 import { ChannelUser } from './channel_user.entity';
 import { Match } from './matchs.entity';
