@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef } from '@angular/core';
+import { Component, OnInit, ElementRef, Input } from '@angular/core';
 import { LessMessage, Message } from '../../dtos/message'
 import { Channel } from '../../dtos/Channel.dto'
 import { FetchService } from '../fetch.service';
@@ -7,6 +7,7 @@ import { Socket, io } from 'socket.io-client';
 import { fromEvent } from 'rxjs';
 import { NgbModal  } from '@ng-bootstrap/ng-bootstrap';
 import { PunishmentPopup } from '../popup-component/popup-component.component';
+import { NotificationRequest } from 'src/dtos/Notification.dto';
 
 @Component({
 	selector: 'app-chat',
@@ -18,6 +19,7 @@ export class ChatComponent implements OnInit {
 	channels$: Channel[] = [];
 	msgs$: Message[] = [];
 	test_msgs$ = new Array<Array<Message>>;
+
 	icone_list = {
 		add_friend: "https://static.vecteezy.com/system/resources/previews/020/936/584/original/add-friend-icon-for-your-website-design-logo-app-ui-free-vector.jpg",
 		block_user: "https://static.thenounproject.com/png/45218-200.png",
@@ -134,7 +136,7 @@ export class ChatComponent implements OnInit {
 		const kickUserElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-kick');
 		const banUserElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-ban');
 		if (!addFriendElm)
-			return;
+		return;
 		if (muteUserElm.classList.contains('show')) {
 			addFriendElm.classList.remove('show');
 			addFriendElm.removeAttribute('title');
@@ -176,9 +178,17 @@ export class ChatComponent implements OnInit {
 		return await modalRef.result;
 	}
 
-	addFriend(msg: Message) {
-
+	buildNotif(type: string, target_name: string, target_id: number) : NotificationRequest {
+		return {type : type, target_id : target_id, target_name : target_name};
 	}
+
+	addFriend(msg: Message) {
+		const addFriendElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-add');
+		if (!addFriendElm.classList.contains('show'))
+			return;
+		this.client.emit('addFriend', this.buildNotif("friend", msg.author.username, msg.author.user_id));
+	}
+
 	blockUser(msg: Message) {}
 	async muteUser(msg: Message) {
 		const muteUserElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-mute');

@@ -1,4 +1,7 @@
 import { Component, ElementRef } from '@angular/core';
+import { Socket, io } from 'socket.io-client';
+import { WebsocketService } from './websocket.service';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',

@@ -92,6 +92,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		const answer = this.buildAnswer(source.sub, source.name, body.type);
 		const user = this.userList.get(body.target_id);
 
+		console.log('request from ' + source.name + ' to ' + body.target_id);
 		if (body.type == 'friend') {
 			if (this.itemsService.requestExists(source.sub, body.target_id))
 				client.emit('alreadySent', 'Already pending request');
