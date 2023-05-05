@@ -333,9 +333,14 @@ export class ItemsService {
 	public async requestExists(sourceId: number, targetId: number) {
 		const sourceEntity = await this.getUser(sourceId);
 
-		if (sourceEntity.sentFriendRequests.find((request) => request.receiver.user_id == targetId))
+		if (!sourceEntity)
+		{
+			console.log({SourceId: sourceId});
 			return false;
-		return true;
+		}
+		if (sourceEntity.sentFriendRequests.find((request) => request.receiver.user_id == targetId))
+			return true;
+		return false;
 	}
 	public async addUserToMatch(user: UserEntity, match: MatchEntity)
 	{
