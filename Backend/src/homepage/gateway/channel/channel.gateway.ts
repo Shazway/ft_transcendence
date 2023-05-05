@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
 	ConnectedSocket,
 	MessageBody,
@@ -16,7 +17,7 @@ import { TokenManagerService } from 'src/homepage/services/token-manager/token-m
 import { NotificationsGateway } from '../notifications/notifications.gateway';
 import { ItemsService } from 'src/homepage/services/items/items.service';
 import { ChannelUserRelation } from 'src/entities';
-import { cp } from 'fs';
+import { NotificationRequest } from 'src/homepage/dtos/Notifications.dto';
 
 @WebSocketGateway(3002, {
 	cors: {
@@ -166,6 +167,11 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			if (!this.deleteUserFromList(client, user))
 				return client.emit('onError', 'Channel does not exist');
 		}
+	}
+
+	@SubscribeMessage('addFriend')
+	async handleInvite(@ConnectedSocket() client: Socket, @MessageBody() body: NotificationRequest) {
+		await this.notificationGateway.handleInvite(client, body);
 	}
 
 	@SubscribeMessage('mute')

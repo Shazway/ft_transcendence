@@ -93,16 +93,14 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		const user = this.userList.get(body.target_id);
 
 		if (body.type == 'friend') {
-			if (this.itemsService.requestExists(source.sub, body.target_id))
-				client.emit('alreadySent', 'Already pending request');
-			else if (!this.itemsService.addFriendRequestToUsers(source.sub, body.target_id))
-				client.emit('refusedRequest', 'Friend request refused');
+			if (await this.itemsService.requestExists(source.sub, body.target_id))
+				return client.emit('alreadySent', 'Already pending request');
+			else if (!(await this.itemsService.addFriendRequestToUsers(source.sub, body.target_id)))
+				return client.emit('refusedRequest', 'Friend request refused');
 		}
-		else if (user)
-		{
-			client.emit('pendingRequest', 'Request sent');
+		if (user)
 			user.emit(body.type + 'Invite', { notification: answer });
-		}
+		client.emit('pendingRequest', 'Request sent');
 	}
 
 	@SubscribeMessage('inviteAnswer')
