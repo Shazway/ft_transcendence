@@ -135,7 +135,7 @@ export class ChatComponent implements OnInit {
 		const banUserElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-ban');
 		if (!addFriendElm)
 			return;
-		if (addFriendElm.classList.contains('show')) {
+		if (muteUserElm.classList.contains('show')) {
 			addFriendElm.classList.remove('show');
 			addFriendElm.removeAttribute('title');
 			blockUserElm.classList.remove('show');
@@ -150,8 +150,10 @@ export class ChatComponent implements OnInit {
 		else {
 			this.client.emit('checkPrivileges', msg);
 			const sub = fromEvent(this.client, 'answerPrivileges').subscribe((data) => {
-				addFriendElm.classList.add('show');
-				addFriendElm.setAttribute('title', 'Add friend');
+				if (true){
+					addFriendElm.classList.add('show');
+					addFriendElm.setAttribute('title', 'Add friend');
+				}
 				blockUserElm.classList.add('show');
 				blockUserElm.setAttribute('title', 'Block User');
 				if (data) {
@@ -174,7 +176,9 @@ export class ChatComponent implements OnInit {
 		return await modalRef.result;
 	}
 
-	addFriend(msg: Message) {}
+	addFriend(msg: Message) {
+
+	}
 	blockUser(msg: Message) {}
 	async muteUser(msg: Message) {
 		const muteUserElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-mute');
