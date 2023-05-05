@@ -2,7 +2,7 @@
 import { Injectable } from '@nestjs/common';
 import { MatchEntity, MatchSettingEntity } from 'src/entities';
 import { Player } from 'src/homepage/dtos/Matchmaking.dto';
-import { Move, ballObject, pongObject } from 'src/homepage/dtos/Pong.dto';
+import { GameEnd, Move, ScoreChange, ballObject, pongObject } from 'src/homepage/dtos/Pong.dto';
 import { ItemsService } from '../items/items.service';
 
 @Injectable()
@@ -80,22 +80,30 @@ export class GamesService {
 		else
 			this.match.current_score[0]++;
 		await this.itemsService.saveMatchState(this.match);
-		this.player1.player.client.emit('onScoreChange', {
-			side: pointChecker.side == this.LEFT ? 1 : 0
-		});
+
+		this.player1.player.client.emit('onScoreChange',
+		this.buildScoreChangeEvent(this.player1, pointChecker.side));
+
 		if (this.player2.player.client)
-		this.player2.player.client.emit('onScoreChange', {
-			side: pointChecker.side == this.RIGHT ? 1 : 0
-		});
+			this.player2.player.client.emit('onScoreChange',
+				this.buildScoreChangeEvent(this.player2, pointChecker.side));
 	}
 
-	
+	buildScoreChangeEvent(player: pongObject, side: number): ScoreChange
+	{
+		return (side == this.LEFT ? {side: this.LEFT, dir: Math.PI / 4} : {side: this.RIGHT, dir: Math.PI - (Math.PI / 4)})
+	}
+	buildEndEvent(player: pongObject): GameEnd
+	{
+		return (player.score >= 10 ? {state: this.WIN} : {state: this.LOSS})
+	}
+
 	endMatch() {
 		this.match.is_ongoing = false;
 		this.itemsService.saveMatchState(this.match);
-		this.player1.player.client.emit('onMatchEnd', {state: this.player1.score == 10 ? this.WIN : this.LOSS});
+		this.player1.player.client.emit('onMatchEnd', this.buildEndEvent(this.player1));
 		if (this.player2.player.client)
-			this.player2.player.client.emit('onMatchEnd', {state: this.player2.score == 10 ? this.WIN : this.LOSS});
+			this.player2.player.client.emit('onMatchEnd', this.buildEndEvent(this.player2));
 		this.itemsService.updateRankScore(this.player1, this.player2);
 		this.endGame();
 	}

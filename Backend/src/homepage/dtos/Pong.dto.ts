@@ -7,6 +7,17 @@ export class Position {
 	y: number;
 }
 
+
+export class ScoreChange {
+	side: number;
+	dir: number;
+}
+
+export class GameEnd {
+	state: number;
+}
+
+
 export class VectorPos {
 	pos: Position;
 	dir: number;

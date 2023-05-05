@@ -8,6 +8,7 @@ export interface Position {
 
 export interface ScoreChange {
 	side: number;
+	dir: number;
 }
 
 export interface GameEnd {

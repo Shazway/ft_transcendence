@@ -8,9 +8,9 @@ import { MatchSetting } from 'src/dtos/MatchSetting.dto';
 import { Mutex } from 'async-mutex';
 
 @Component({
-  selector: 'app-pong',
-  templateUrl: './pong.component.html',
-  styleUrls: ['./pong.component.css']
+	selector: 'app-pong',
+	templateUrl: './pong.component.html',
+	styleUrls: ['./pong.component.css']
 })
 export class PongComponent {
 	OPPONENT_SCORED = 1;
@@ -84,7 +84,7 @@ export class PongComponent {
 		if (event.state == this.WIN)
 		{
 			console.log('You win');
-		} //<-- faire des trucs
+		} //<-- faire des trucs avec un affichage mieux
 		else if (event.state == this.LOSS)
 		{
 			console.log('You lose');
@@ -110,10 +110,10 @@ export class PongComponent {
 		}
 		this.ballLock.acquire().then(() => {
 			this.ball.init(500, 300, 10, 0xFFFFFF);
-			this.ball.direction = Math.PI / 4;
+			this.ball.direction = event.dir;
 		});
 		this.ballLock.release();
-		//<--Mettre à jour graphiquement
+		//<--Mettre à jour graphiquement le score?
 	}
 
 	closeEnoughPlayer() {
