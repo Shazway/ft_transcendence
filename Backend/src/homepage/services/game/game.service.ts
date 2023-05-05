@@ -2,7 +2,7 @@
 import { Injectable } from '@nestjs/common';
 import { MatchEntity, MatchSettingEntity } from 'src/entities';
 import { Player } from 'src/homepage/dtos/Matchmaking.dto';
-import { GameEnd, Move, ScoreChange, ballObject, pongObject } from 'src/homepage/dtos/Pong.dto';
+import { GameEnd, Move, ballObject, pongObject } from 'src/homepage/dtos/Pong.dto';
 import { ItemsService } from '../items/items.service';
 
 @Injectable()
@@ -76,9 +76,15 @@ export class GamesService {
 	async sendScoreChange(pointChecker: {state: boolean, side: number})
 	{
 		if (pointChecker.side == this.RIGHT)
+		{
 			this.match.current_score[1]++;
+			this.ball.direction = 3 * (Math.PI / 4);
+		}
 		else
+		{
 			this.match.current_score[0]++;
+			this.ball.direction = Math.PI / 4;
+		}
 		this.emitScore(pointChecker);
 		await this.itemsService.saveMatchState(this.match);
 	}
@@ -87,13 +93,13 @@ export class GamesService {
 	{
 		if (pointChecker.side == this.LEFT)
 		{
-			this.player1.player.client.emit('onScoreChange', {side: this.LEFT, dir: Math.PI - (Math.PI / 4)});
-			this.player2.player.client.emit('onScoreChange', {side: this.RIGHT, dir: Math.PI / 4});
+			this.player1.player.client.emit('onScoreChange', {side: this.LEFT});
+			this.player2.player.client.emit('onScoreChange', {side: this.RIGHT});
 		}
 		else if (pointChecker.side == this.RIGHT)
 		{
-			this.player1.player.client.emit('onScoreChange', {side: this.RIGHT, dir: Math.PI / 4});
-			this.player2.player.client.emit('onScoreChange', {side: this.LEFT, dir: Math.PI - (Math.PI / 4)});
+			this.player1.player.client.emit('onScoreChange', {side: this.RIGHT});
+			this.player2.player.client.emit('onScoreChange', {side: this.LEFT});
 		}
 	}
 	buildEndEvent(player: pongObject): GameEnd
