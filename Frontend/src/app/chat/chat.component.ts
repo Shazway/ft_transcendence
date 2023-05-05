@@ -7,6 +7,8 @@ import { Socket, io } from 'socket.io-client';
 import { fromEvent } from 'rxjs';
 import { NgbModal, NgbPopover, NgbPopoverConfig  } from '@ng-bootstrap/ng-bootstrap';
 import { PunishmentPopup } from '../popup-component/popup-component.component';
+import { NotificationRequest } from 'src/dtos/Notification.dto';
+import { NotificationService } from '../notification.service';
 
 @Component({
 	selector: 'app-chat',
@@ -20,6 +22,7 @@ export class ChatComponent implements OnInit {
 	channels$: Channel[] = [];
 	msgs$: Message[] = [];
 	test_msgs$ = new Array<Array<Message>>;
+
 	icone_list = {
 		add_friend: "https://static.vecteezy.com/system/resources/previews/020/936/584/original/add-friend-icon-for-your-website-design-logo-app-ui-free-vector.jpg",
 		block_user: "https://static.thenounproject.com/png/45218-200.png",
@@ -35,6 +38,7 @@ export class ChatComponent implements OnInit {
 		private elRef: ElementRef,
 		private modalService: NgbModal,
 		private popoverConfig: NgbPopoverConfig,
+		private notificationService: NotificationService
 	) {
 		this.client = io('ws://localhost:3002?channel_id=' + 1, websocketService.getHeader());
 		if (!localStorage.getItem('Jwt_token'))
@@ -69,6 +73,7 @@ export class ChatComponent implements OnInit {
 		for (let index = this.msgs$.length; index > 0; index--)
 			this.sortMessage(this.msgs$[index - 1]);
 		this.channels$ = await this.fetchService.getChannels();
+		//this.notificationService.connectSocket();
 	}
 
 	deleteMessage(msg: Message) {
@@ -149,8 +154,15 @@ export class ChatComponent implements OnInit {
 		return await modalRef.result;
 	}
 
-	addFriend(msg: Message) {
+	buildNotif(type: string, target_name: string, target_id: number) : NotificationRequest {
+		return {type : type, target_id : target_id, target_name : target_name};
+	}
 
+	addFriend(msg: Message) {
+		const addFriendElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-add');
+		if (!addFriendElm.classList.contains('show'))
+			return;
+		this.client.emit('addFriend', this.buildNotif("friend", msg.author.username, msg.author.user_id));
 	}
 
 	blockUser(msg: Message) {}

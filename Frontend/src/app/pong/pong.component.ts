@@ -89,10 +89,12 @@ export class PongComponent {
 		{
 			console.log('You lose');
 		} //<-- faire des trucs aussi x)
-		this.ballLock.acquire().then(() => {
-			this.ball.init(500, 300, 10, 0xFFFFFF);
+		this.ballLock.waitForUnlock().then(() => {
+			this.ballLock.acquire().then(() => {
+				this.ball.setPos(this.ball.position(500, 300));
+			})
+			this.ballLock.release();
 		});
-		this.ballLock.release();
 		this.app.ticker.stop();
 		this.app.stop();
 	}
@@ -110,9 +112,8 @@ export class PongComponent {
 		}
 		this.ballLock.waitForUnlock().then(() => {
 			this.ballLock.acquire().then(() => {
-				this.ball.init(500, 300, 10, 0xFFFFFF);
-				this.ball.direction = event.dir;
-			});
+				this.ball.setPos(this.ball.position(500, 300));
+			})
 			this.ballLock.release();
 		});
 		//<--Mettre à jour graphiquement le score?

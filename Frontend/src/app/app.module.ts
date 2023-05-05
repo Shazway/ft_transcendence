@@ -14,6 +14,7 @@ import { AuthModule } from './auth/auth.module';
 import { ValidateModule } from './validate/validate.module';
 import { MatchMakingComponent } from './match-making/match-making.component';
 import { ChatPopup, PunishmentPopup } from './popup-component/popup-component.component';
+import { NotificationService } from './notification.service';
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { ChatPopup, PunishmentPopup } from './popup-component/popup-component.co
   providers: [
     FetchService,
     WebsocketService,
+	NotificationService,
   ],
   bootstrap: [
 	AppComponent,
