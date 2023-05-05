@@ -6,6 +6,7 @@ import { Token } from '@angular/compiler';
 import { Response } from 'src/dtos/Response.dto';
 import { LogInReturn } from 'src/dtos/Auth';
 import { User } from 'src/dtos/User.dto';
+import { NotificationService } from '../notification.service';
 
 @Component({
 	selector: 'app-auth',
@@ -15,7 +16,7 @@ import { User } from 'src/dtos/User.dto';
 export class AuthComponent {
 	constructor(
 		private route: ActivatedRoute,
-		private router: Router
+		private router: Router,
 		) {}
 
 		getHeader(authorization : string) {
@@ -53,7 +54,8 @@ export class AuthComponent {
 			}
 		});
 		if (statusCode == 202)
-			this.router.navigateByUrl('validate?bodyId=' + bodyId + '&code=' + code);
-		else this.router.navigateByUrl('');
+		this.router.navigateByUrl('validate?bodyId=' + bodyId + '&code=' + code);
+		else
+			this.router.navigateByUrl('');
 	}
 }

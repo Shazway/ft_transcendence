@@ -42,12 +42,14 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
 		this.userList.set(user.sub, client);
 		await this.notificationService.setUserStatus(user.sub, this.ONLINE);
+		console.log(user.name + "Connected");
 	}
-
+	
 	async handleDisconnect(client: Socket) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
 		this.userList.delete(user.sub);
 		await this.notificationService.setUserStatus(user.sub, this.OFFLINE);
+		console.log(user.name + "Disconnected");
 	}
 
 	sendMessage(user_tab: number[], message: any) {
@@ -91,8 +93,10 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		const source = this.tokenManager.getToken(client.request.headers.authorization);
 		const answer = this.buildAnswer(source.sub, source.name, body.type);
 		const user = this.userList.get(body.target_id);
+		const notifClient = this.userList.get(source.sub);
 
-		console.log('request from ' + source.name + ' to ' + body.target_id);
+		console.log('request from ' + source.name + ' to: ');
+		console.log(body);
 		if (body.type == 'friend') {
 			if (await this.itemsService.requestExists(source.sub, body.target_id))
 				return client.emit('alreadySent', 'Already pending request');
@@ -101,7 +105,11 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		}
 		if (user)
 			user.emit(body.type + 'Invite', { notification: answer });
-		client.emit('pendingRequest', 'Request sent');
+		else
+		{
+			console.log('?');
+		}
+		notifClient.emit('pendingRequest', 'Request sent and waiting for answer');
 	}
 
 	@SubscribeMessage('inviteAnswer')

@@ -335,8 +335,15 @@ export class ItemsService {
 	public async requestExists(sourceId: number, targetId: number) {
 		const sourceEntity = await this.getUser(sourceId);
 
-		if (sourceEntity.sentFriendRequests.find((request) => request.receiver.user_id == targetId))
-			return true;
+		if (!sourceEntity.sentFriendRequests.length)
+			return false;
+		else
+		{
+			sourceEntity.sentFriendRequests.forEach((request) => {
+				if (request.receiver.user_id == targetId)
+					return true;
+			});
+		}
 		return false;
 	}
 	public async addUserToMatch(user: UserEntity, match: MatchEntity)
@@ -354,12 +361,13 @@ export class ItemsService {
 
 		if (targetEntity.blacklistEntry.find((user) => user.user_id === sourceId))
 			return null;
+
 		friendRequest.receiver = targetEntity;
 		friendRequest.sender = sourceEntity;
 		targetEntity.receivedFriendRequests.push();
 		sourceEntity.sentFriendRequests.push();
-		await this.userRepo.save([sourceEntity, targetEntity]);
-		return (await this.friend_requestRepo.save(friendRequest));
+		await this.friend_requestRepo.save(friendRequest);
+		return (await this.userRepo.save([sourceEntity, targetEntity]));
 	}
 
 	async updateRankScore(player1: pongObject, player2: pongObject)

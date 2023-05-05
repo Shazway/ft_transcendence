@@ -8,6 +8,7 @@ import { fromEvent } from 'rxjs';
 import { NgbModal  } from '@ng-bootstrap/ng-bootstrap';
 import { PunishmentPopup } from '../popup-component/popup-component.component';
 import { NotificationRequest } from 'src/dtos/Notification.dto';
+import { NotificationService } from '../notification.service';
 
 @Component({
 	selector: 'app-chat',
@@ -34,6 +35,7 @@ export class ChatComponent implements OnInit {
 		private websocketService: WebsocketService,
 		private elRef: ElementRef,
 		private modalService: NgbModal,
+		private notificationService: NotificationService
 	) {
 		this.client = io('ws://localhost:3002?channel_id=' + 1, websocketService.getHeader());
 		if (!localStorage.getItem('Jwt_token'))
@@ -60,6 +62,7 @@ export class ChatComponent implements OnInit {
 		for (let index = this.msgs$.length; index > 0; index--)
 			this.sortMessage(this.msgs$[index - 1]);
 		this.channels$ = await this.fetchService.getChannels();
+		//this.notificationService.connectSocket();
 	}
 
 	deleteMessage(msg: Message) {
