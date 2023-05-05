@@ -2,7 +2,7 @@ import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { Socket, io } from 'socket.io-client';
 import { WebsocketService } from '../websocket.service';
 import { Application } from 'pixi.js';
-import { pongObject, ballObject, Move, VectorPos } from 'src/dtos/Pong.dto';
+import { pongObject, ballObject, Move, VectorPos, ScoreChange, GameEnd } from 'src/dtos/Pong.dto';
 import { ActivatedRoute } from '@angular/router';
 import { MatchSetting } from 'src/dtos/MatchSetting.dto';
 import { Mutex } from 'async-mutex';
@@ -13,6 +13,10 @@ import { Mutex } from 'async-mutex';
   styleUrls: ['./pong.component.css']
 })
 export class PongComponent {
+	OPPONENT_SCORED = 1;
+	PLAYER_SCORED = 0;
+	LOSS = 0;
+	WIN = 1;
 	private client!: Socket;
 	private app;
 	private player;
@@ -61,6 +65,8 @@ export class PongComponent {
 		this.client.on('startMatch', (event) => { console.log('Match is starting ' + event); this.startMatch(event); });
 		this.client.on('onPlayerReady', (event) => { console.log('You are ready '); });
 		this.client.on('onOpponentReady', (event) => { console.log('Opponent is ready '); });
+		this.client.on('onScoreChange', (event) => { this.updateScore(event); });
+		this.client.on('onMatchEnd', (event) => { this.endMatch(event); });
 	}
 
 	startMatch(settings: MatchSetting) {
@@ -72,7 +78,42 @@ export class PongComponent {
 		if (removeElm)
 			removeElm.remove();
 		this.client.emit('ready');
+	}
 
+	endMatch(event: GameEnd) {
+		if (event.state == this.WIN)
+		{
+			console.log('You win');
+		} //<-- faire des trucs
+		else if (event.state == this.LOSS)
+		{
+			console.log('You lose');
+		} //<-- faire des trucs aussi x)
+		this.ballLock.acquire().then(() => {
+			this.ball.init(500, 300, 10, 0xFFFFFF);
+		});
+		this.ballLock.release();
+		this.app.ticker.stop();
+		this.app.stop();
+	}
+
+	async updateScore(event: ScoreChange) {
+		if (event.side == this.PLAYER_SCORED)
+		{
+			this.player.score++;
+			console.log('You scored a point: ' + this.player.score);
+		}
+		else if (event.side == this.OPPONENT_SCORED)
+		{
+			this.opponent.score++;
+			console.log('Your opponent scored a point: ' + this.opponent.score);
+		}
+		this.ballLock.acquire().then(() => {
+			this.ball.init(500, 300, 10, 0xFFFFFF);
+			this.ball.direction = Math.PI / 4;
+		});
+		this.ballLock.release();
+		//<--Mettre à jour graphiquement
 	}
 
 	closeEnoughPlayer() {

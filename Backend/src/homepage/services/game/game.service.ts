@@ -52,6 +52,8 @@ export class GamesService {
 	endGame() {
 		clearTimeout(this.interval);
 		this.interval = null;
+		this.player1.player.client.disconnect();
+		this.player2.player.client.disconnect();
 	}
 
 	closeEnoughPlayer() {
@@ -91,9 +93,9 @@ export class GamesService {
 	endMatch() {
 		this.match.is_ongoing = false;
 		this.itemsService.saveMatchState(this.match);
-		this.player1.player.client.emit('onEndMatch', this.player1.score == 10 ? this.WIN : this.LOSS);
+		this.player1.player.client.emit('onMatchEnd', {state: this.player1.score == 10 ? this.WIN : this.LOSS});
 		if (this.player2.player.client)
-			this.player2.player.client.emit('onEndMatch', this.player2.score == 10 ? this.WIN : this.LOSS);
+			this.player2.player.client.emit('onMatchEnd', {state: this.player2.score == 10 ? this.WIN : this.LOSS});
 		this.itemsService.updateRankScore(this.player1, this.player2);
 		this.endGame();
 	}
@@ -113,7 +115,7 @@ export class GamesService {
 		const pointChecker = this.ball.moveObject(delta, this.player1, this.player2);
 		if (pointChecker.state)
 			this.sendScoreChange(pointChecker);
-		if (this.player1.score == 10 || this.player2.score == 10)
+		if (this.player1.score >= 10 || this.player2.score >= 10)
 			this.endMatch();
 	}
 		

@@ -167,6 +167,7 @@ export class ballObject {
 
 	newPoint(side: number,  player: pongObject, opponent: pongObject) {
 		this.init(500, 300, 10);
+		this.direction = Math.PI / 4;
 		if (side == this.LEFT)
 			opponent.score += 1;
 		if (side == this.RIGHT)
@@ -208,7 +209,7 @@ export class pongObject {
 	public objDim = new Position();
 	public pos = new Position();
 	public player: Player;
-	public score: number;
+	public score = 0;
 	public upperRightCorner = new Position();
 	public upperLeftCorner = new Position();
 	public lowerCorner = new Position();

@@ -1,10 +1,17 @@
-import { ThisReceiver } from "@angular/compiler";
 import { Graphics } from "pixi.js";
 import * as math from "mathjs"
 
 export interface Position {
 	x: number;
 	y: number;
+}
+
+export interface ScoreChange {
+	side: number;
+}
+
+export interface GameEnd {
+	state: number;
 }
 
 export interface VectorPos {

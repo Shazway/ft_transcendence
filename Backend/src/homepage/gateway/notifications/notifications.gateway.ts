@@ -116,7 +116,6 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 				await this.itemsService.addFriendToUser(source.sub, body.target_id);
 			if (body.type == 'channel')
 				await this.channelsService.addUserToChannel(body.target_id, body.channel_id);
-			//if(body.type == 'match')?
 		}
 		client.emit('success', 'Answer sent');
 		user.emit(body.type + 'Answer', { notification: answer });
