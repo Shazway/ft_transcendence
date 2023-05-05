@@ -11,7 +11,7 @@
 		<tbody>
 			<tr *ngFor="let friend of friends">
 				<td>
-					<div class="d-flex align-items-end">
+					<div class="d-flex align-items-end ">
 						<p class="small ms-3 mb-0 text-muted" (click)="onClickFriend(friend)">{{ friend.username }}</p>
 						<img (click)="goToProfile(friend)" class="rounded-circle border border-2 m-0 ms-2 m-auto hidden_icon" id="img-{{friend.user_id}}-profile" src="{{icone_list.go_to_profile}}" alt="profile">
 						<img (click)="goToMessages(friend)" class="rounded-circle border border-2 m-0 ms-2 m-auto hidden_icon" id="img-{{friend.user_id}}-message" src="{{icone_list.go_to_messages}}" alt="message">
