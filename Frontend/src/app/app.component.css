@@ -1,5 +1,11 @@
 @import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
 
+@font-face {
+	font-family: 'Pixeloid';
+	src: url('assets/PixeloidSansBold.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+  }
 
 .wrapper {
     display: flex;

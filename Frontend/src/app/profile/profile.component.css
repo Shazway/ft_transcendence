@@ -1,0 +1,23 @@
+.profile-card {
+	border-radius: 15px;
+}
+
+.card-profile-pic {
+	width: 180px;
+	border-radius: 10px;
+}
+
+.stat-box {
+	background-color: #efefef;
+	width: 100%;
+}
+
+.rank-label {
+	font-family: 'Pixeloid', sans-serif;
+}
+
+.status-dot {
+	height: 10px;
+	width: 8px;
+	font-size: 8px;
+}
