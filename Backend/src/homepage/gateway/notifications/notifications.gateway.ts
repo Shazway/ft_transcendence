@@ -6,7 +6,8 @@ import {
 	OnGatewayDisconnect,
 	SubscribeMessage,
 	WebSocketGateway,
-	WebSocketServer
+	WebSocketServer,
+	WsException
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import { AchievementsEntity } from 'src/entities';
@@ -73,7 +74,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 	//Send achievements to user
 	async sendAchievement(user_id: number, achievement: AchievementsEntity) {
 		const client = this.userList.get(user_id);
-		if (!client) return false;
+		if (!client) throw new WsException('Client not connected');
 		this.itemsService.addAchievementsToUser(user_id, achievement.achievement_id);
 		client.emit(
 			'newAchievement',
@@ -102,14 +103,12 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 	) {
 		body.sent_at = new Date();
 		const source = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		if (!source)
-			return client.disconnect();
 		const answer = this.buildAnswer(source.sub, source.name, body.type);
 		const user = this.userList.get(body.target_id);
 		const notifClient = this.userList.get(source.sub);
 
 		if (!user || !notifClient)
-			return client.disconnect();
+			throw new WsException('User or Target not found');
 		console.log('request from ' + source.name + ' to: ');
 		console.log(body);
 		if (body.type == 'friend') {
@@ -134,7 +133,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		const user = this.userList.get(body.target_id);
 
 		if (!user)
-			return client.disconnect();
+			throw new WsException('User disconnected');
 		if (body.accepted) {
 			if (body.type == 'friend')
 				await this.itemsService.addFriendToUser(source.sub, body.target_id);

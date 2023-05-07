@@ -6,7 +6,8 @@ import {
 	OnGatewayDisconnect,
 	SubscribeMessage,
 	WebSocketGateway,
-	WebSocketServer
+	WebSocketServer,
+	WsException
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import { Message } from 'src/homepage/dtos/Message.dto';
@@ -95,14 +96,14 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const channel_id = Number(client.handshake.query.channel_id);
 		if (this.channelList.get(channel_id).get(user.sub)) {
 			if (!this.deleteUserFromList(client, user))
-				return client.emit('onError', 'Channel does not exist');
+				return client.disconnect();
 		}
 	}
 
 	addUserToList(client: Socket, user: any) {
 		const query = client.handshake.query;
 		if (!query || !query.channel_id) {
-			client.disconnect();
+			client.emit('onError', 'Channel does not exist');
 			return false;
 		}
 		let channel = this.channelList.get(Number(query.channel_id));
@@ -120,7 +121,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const query = client.handshake.query;
 		const channel_id = Number(query.channel_id);
 		const channel = this.channelList.get(channel_id);
-		if (!channel) return false;
+		if (!channel) throw new WsException('Channel does not exist');
 		let users = channel.get(user.sub);
 		channel.set(
 			user.sub,
@@ -141,7 +142,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	sendMessageToChannel(channel_id: number, message: Message, dest = 'onMessage') {
 		const channel = this.channelList.get(channel_id);
-		if (!channel) return false;
+		if (!channel) throw new WsException('Channel does not exist');
 		channel.forEach((user) => this.socketEmit(user, dest, message));
 		return true;
 	}
@@ -158,7 +159,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		chan_user.is_creator = is_creator;
 		chan_user.is_admin = is_admin;
 		const channel = await this.itemService.getChannel(chan_id);
-		if (!channel) return false;
+		if (!channel) throw new WsException('Channel does not exist');
 		else if (!channel.channel_password)
 			await this.itemService.addUserToChannel(chan_user, chan_id, user_id);
 		else if (pass === channel.channel_password)
@@ -176,7 +177,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const user = await this.itemService.getUser(target.target_id);
 
 		if (!user)
-			return false;
+		throw new WsException('User does not exist');
 		this.sendMessageToChannel(channel_id, {
 			message_id: 0,
 			message_content: user.username + ' left the channel',

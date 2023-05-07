@@ -147,16 +147,16 @@ export class ChatComponent implements OnInit {
 		}
 	}
 
-	getPopover(msg: Message) {
-		// let ret;
-		// this.currentMessage = msg;
-		// this.client.emit('checkPrivileges', msg);
-		// const sub = fromEvent(this.client, 'answerPrivileges').subscribe((data) => {
-		// 	sub.unsubscribe();
-		// 	ret = data;
-		// });
-		// return ret;
-		return false;
+	async getPopover(msg: Message) {
+		this.currentMessage = msg;
+		this.client.emit('checkPrivileges', msg);
+		const data = await new Promise((resolve, reject) => {
+			const sub = fromEvent(this.client, 'answerPrivileges').subscribe((data) => {
+				sub.unsubscribe();
+				resolve(data);
+			});
+		});
+		return data;
 	}
 
 	async createPopup(title: string, label: string) {

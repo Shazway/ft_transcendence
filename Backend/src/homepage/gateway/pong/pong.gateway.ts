@@ -4,7 +4,8 @@ import {
 	MessageBody,
 	SubscribeMessage,
 	WebSocketGateway,
-	WebSocketServer
+	WebSocketServer,
+	WsException
 } from '@nestjs/websockets';
 import { ItemsService } from 'src/homepage/services/items/items.service';
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
@@ -159,7 +160,7 @@ export class PongGateway {
 		const match_id = Number(client.handshake.query.match_id);
 		const match = this.matchs.get(match_id);
 
-		if (!match ||!match.gameService) return;
+		if (!match ||!match.gameService) throw new WsException('Match/GameService aren\'t available');
 		match.gameService.changeInput(user.sub, 'ArrowDown', body);
 		const move = match.gameService.getMove(user.sub);
 		match.players.forEach((player) => {
@@ -173,11 +174,10 @@ export class PongGateway {
 	@SubscribeMessage('ArrowUp')
 	handleUp(@ConnectedSocket() client: Socket, @MessageBody() body: boolean) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		if (!user)
-			client.disconnect();
+
 		const match_id = Number(client.handshake.query.match_id);
 		const match = this.matchs.get(match_id);
-		if (!match.gameService) return;
+		if (!match.gameService) throw new WsException('No game service up');
 
 		// console.log('user ' + user.sub + ' pressed ArrowUp');
 		match.gameService.changeInput(user.sub, 'ArrowUp', body);
@@ -196,7 +196,7 @@ export class PongGateway {
 		const match_id = Number(client.handshake.query.match_id);
 		const match = this.matchs.get(match_id);
 
-		if (!match || !match.gameService) return;
+		if (!match || !match.gameService) throw new WsException('Match/GameService aren\'t available');
 		match.players.forEach((player) => {
 			if (player.user_id == 0){
 			}
