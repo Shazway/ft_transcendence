@@ -47,15 +47,17 @@ export class MatchmakingGateway {
 			return ;
 		}
 		console.log({ new_player: user });
-		const player_rank = (await this.itemsService.getUser(user.sub)).rank_score;
-		const rankFork = this.getRankFork(player_rank);
+		const player = (await this.itemsService.getUser(user.sub));
+		if (!player)
+			return client.disconnect();
+		const rankFork = this.getRankFork(player.rank_score);
 		let bracket = this.userQueue.get(rankFork);
 		if (!bracket) {
 			this.userQueue.set(rankFork, new Map<number, Player>());
 			bracket = this.userQueue.get(rankFork);
 		}
-		const player = this.buildPlayer(client, user.sub, user.name);
-		bracket.set(user.sub, player);
+		const newPlayer = this.buildPlayer(client, user.sub, user.name);
+		bracket.set(user.sub, newPlayer);
 
 		if (!this.interval) await this.handleStartTimer();
 	}
@@ -68,8 +70,11 @@ export class MatchmakingGateway {
 			client.disconnect();
 			return ;
 		}
-		const player_rank = (await this.itemsService.getUser(user.sub)).rank_score;
-		const rankFork = this.getRankFork(player_rank);
+		const player = (await this.itemsService.getUser(user.sub));
+
+		if (!player)
+			return client.disconnect();
+		const rankFork = this.getRankFork(player.rank_score);
 		const bracket = this.userQueue.get(rankFork);
 		this.matchMaker = this.matchMaker.filter((player) => player.user_id != user.sub);
 		if (bracket) {
@@ -89,10 +94,14 @@ export class MatchmakingGateway {
 	}
 
 	async addUserTobracket(user_id: number, player: Player) {
-		const player_rank = (await this.itemsService.getUser(user_id)).rank_score;
-		const rankFork = this.getRankFork(player_rank);
+		const user = (await this.itemsService.getUser(user_id));
+
+		if (!user)
+			return false;
+		const rankFork = this.getRankFork(user.rank_score);
 		const bracket = this.userQueue.get(rankFork);
 		bracket.set(user_id, player);
+		return true;
 	}
 
 	secureMatchMaker(user: Player) {

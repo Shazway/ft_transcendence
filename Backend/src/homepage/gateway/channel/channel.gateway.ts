@@ -74,7 +74,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				});
 			else return client.disconnect();
 		}
-		await this.channelService.isMuted(user.sub, channel_id);
+		await this.channelService.isMuted(user.sub, channel_id); //Unmutes if time is up
 		if (
 			(await this.channelService.isBanned(user.sub, channel_id)) ||
 			!this.addUserToList(client, user)
@@ -158,7 +158,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		chan_user.is_creator = is_creator;
 		chan_user.is_admin = is_admin;
 		const channel = await this.itemService.getChannel(chan_id);
-		if (!channel) false;
+		if (!channel) return false;
 		else if (!channel.channel_password)
 			await this.itemService.addUserToChannel(chan_user, chan_id, user_id);
 		else if (pass === channel.channel_password)
@@ -174,12 +174,16 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	async channelLeaveMsg(channel_id: number, target: Punishment) {
 		const user = await this.itemService.getUser(target.target_id);
+
+		if (!user)
+			return false;
 		this.sendMessageToChannel(channel_id, {
 			message_id: 0,
 			message_content: user.username + ' left the channel',
 			author: { username: 'System', user_id: 0 },
 			createdAt: new Date()
 		});
+		return true;
 	}
 
 	@SubscribeMessage('addFriend')
@@ -190,8 +194,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@SubscribeMessage('mute')
 	async handleMute(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		if (!user)
-			client.disconnect();
+
 		const channel_id = Number(client.handshake.query.channel_id);
 		const ret = await this.channelService.checkPrivileges(user.sub, body.target_id, channel_id);
 		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
@@ -209,10 +212,9 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@SubscribeMessage('unmute')
 	async handleUnmute(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		if (!user)
-			client.disconnect();
 		const channel_id = Number(client.handshake.query.channel_id);
 		const ret = await this.channelService.checkPrivileges(user.sub, body.target_id, channel_id);
+
 		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
 		if (!this.channelService.unMuteUser(user.sub, body.target_id, channel_id))
 			return client.emit('onError', 'Error while unmuting some dude');
@@ -228,10 +230,9 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@SubscribeMessage('ban')
 	async handleBan(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		if (!user)
-			client.disconnect();
 		const channel_id = Number(client.handshake.query.channel_id);
 		const ret = await this.channelService.checkPrivileges(user.sub, body.target_id, channel_id);
+
 		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
 			this.channelService.banUser(user.sub, body.target_id, channel_id, body.time);
 		const targets = this.channelList.get(channel_id).get(body.target_id);
@@ -248,10 +249,9 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@SubscribeMessage('unban')
 	async handleUnban(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		if (!user)
-			client.disconnect();
 		const channel_id = Number(client.handshake.query.channel_id);
 		const ret = await this.channelService.checkPrivileges(user.sub, body.target_id, channel_id);
+
 		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
 			this.channelService.unBanUser(user.sub, body.target_id, channel_id);
 		const targets = this.channelList.get(channel_id).get(body.target_id);
@@ -268,10 +268,9 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@SubscribeMessage('kick')
 	async handleKick(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		if (!user)
-			client.disconnect();
 		const channel_id = Number(client.handshake.query.channel_id);
 		const ret = await this.channelService.checkPrivileges(user.sub, body.target_id, channel_id);
+
 		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
 		const target = this.channelList.get(channel_id).get(body.target_id);
 		if (user.sub === body.target_id) {
@@ -295,14 +294,13 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		body.createdAt = new Date();
 		console.log(body);
 		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		if (!user)
-			client.disconnect();
 		const channel_id = Number(client.handshake.query.channel_id);
 		const Validity = await this.messageService.addMessageToChannel(
 			body,
 			client.request.headers.authorization,
 			Number(client.handshake.query.channel_id)
 		);
+
 		body.author.username = user.name;
 		body.author.user_id = user.sub;
 		body.message_id = Validity.message.message_id;
@@ -316,22 +314,21 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@SubscribeMessage('checkPrivileges')
 	async checkPrivileges(@ConnectedSocket() client: Socket, @MessageBody() body: Message) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-
 		const channel_id = Number(client.handshake.query.channel_id);
 		const rights = await this.channelService.checkPrivileges(
 			user.sub,
 			body.author.user_id,
 			channel_id
 		);
+
 		client.emit('answerPrivileges', rights.ret);
 	}
 
 	@SubscribeMessage('delMessage')
 	async deleteMessage(@ConnectedSocket() client: Socket, @MessageBody() body: Message) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		if (!user)
-			client.disconnect();
 		const channel_id = Number(client.handshake.query.channel_id);
+
 		console.log(body);
 		const ret = await this.channelService.checkPrivileges(
 			user.sub,

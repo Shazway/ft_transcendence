@@ -16,7 +16,7 @@
 					<div class="card-body p-0" data-mdb-perfect-scrollbar="true" style="position: relative; " *ngFor="let msg_list of test_msgs$">
 <!-- Start of not current user field -->
 						<div *ngIf="!isMe(msg_list[0]) && !isSystem(msg_list[0])" class="d-flex flex-row justify-content-start" id="group-{{msg_list[0].message_id}}">
-							<img id="img-{{msg_list[0].message_id}}" class="rounded-circle" (click)="createChatPopup(msg_list[0])" src="{{msg_list[0].author.img_url}}" [ngbPopover]="customPopoverTemplate" popoverTitle="{{getName(msg_list)}}" alt="avatar 1" style="width: 45px; height: 100%;">
+							<img id="img-{{msg_list[0].message_id}}" class="rounded-circle" src="{{msg_list[0].author.img_url}}" [ngbPopover]="getPopover(msg_list[0]) ? customPopoverTemplate : customPopoverAdminTemplate" popoverTitle="{{getName(msg_list)}}" alt="avatar 1" style="width: 45px; height: 100%;">
 							<div>
 								<div class="d-flex align-items-end">
 									<p class="small ms-3 mb-0 text-muted">{{ getName(msg_list) }}</p>
@@ -83,6 +83,7 @@
 
 <ng-template #customPopoverTemplate>
 	<div class="d-grid">
+		<button type="button" class="row btn btn-block popup-hover">User Profile</button>
 		<button (click)="addFriend(currentMessage)" type="button" class="row btn btn-block popup-hover">Add Friend</button>
 		<button (click)="blockUser(currentMessage)" type="button" class="row btn btn-block popup-hover">Block User</button>
 	</div>
@@ -90,6 +91,7 @@
 
 <ng-template #customPopoverAdminTemplate>
 	<div class="d-grid">
+		<button type="button" class="row btn btn-block popup-hover">User Profile</button>
 		<button (click)="addFriend(currentMessage)" type="button" class="row btn btn-block popup-hover">Add Friend</button>
 		<button (click)="blockUser(currentMessage)" type="button" class="row btn btn-block popup-hover">Block User</button>
 		<button (click)="muteUser(currentMessage)" type="button" class="row btn btn-block popup-hover">Mute User</button>

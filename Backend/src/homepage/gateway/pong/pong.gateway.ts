@@ -102,6 +102,8 @@ export class PongGateway {
 			return ;
 		}
 		const userEntity = await this.itemsService.getUser(user.sub);
+		if (!userEntity)
+			return ;
 		const matchEntity = userEntity.match_history[userEntity.match_history.length - 1];
 		if (!matchEntity)
 			return ;
@@ -115,7 +117,7 @@ export class PongGateway {
 			});
 			if (!match.players.length) this.matchs.delete(matchEntity.match_id);
 		}
-		if (!matchEntity.is_ongoing) 
+		if (!matchEntity.is_ongoing)
 		{
 			match.players = match.players.filter((player) => 
 			{
@@ -154,13 +156,10 @@ export class PongGateway {
 	@SubscribeMessage('ArrowDown')
 	handleDown(@ConnectedSocket() client: Socket, @MessageBody() body: boolean) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		if (!user)
-			client.disconnect();
 		const match_id = Number(client.handshake.query.match_id);
 		const match = this.matchs.get(match_id);
-		if (!match.gameService) return;
 
-		// console.log('user ' + user.sub + ' pressed ArrowDown');
+		if (!match ||!match.gameService) return;
 		match.gameService.changeInput(user.sub, 'ArrowDown', body);
 		const move = match.gameService.getMove(user.sub);
 		match.players.forEach((player) => {
@@ -194,11 +193,10 @@ export class PongGateway {
 	@SubscribeMessage('ready')
 	async playerReady(@ConnectedSocket() client: Socket) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		if (!user)
-			client.disconnect();
 		const match_id = Number(client.handshake.query.match_id);
 		const match = this.matchs.get(match_id);
-		if (!match.gameService) return;
+
+		if (!match || !match.gameService) return;
 		match.players.forEach((player) => {
 			if (player.user_id == 0){
 			}

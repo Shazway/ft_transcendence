@@ -103,11 +103,13 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		body.sent_at = new Date();
 		const source = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		if (!source)
-			client.disconnect();
+			return client.disconnect();
 		const answer = this.buildAnswer(source.sub, source.name, body.type);
 		const user = this.userList.get(body.target_id);
 		const notifClient = this.userList.get(source.sub);
 
+		if (!user || !notifClient)
+			return client.disconnect();
 		console.log('request from ' + source.name + ' to: ');
 		console.log(body);
 		if (body.type == 'friend') {
@@ -128,11 +130,11 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 	@SubscribeMessage('inviteAnswer')
 	async handeAnswer(@ConnectedSocket() client: Socket, @MessageBody() body: NotificationRequest) {
 		const source = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		if (!source)
-			client.disconnect();
 		const answer = this.buildAnswer(source.sub, source.name, body.type, body.accepted);
 		const user = this.userList.get(body.target_id);
 
+		if (!user)
+			return client.disconnect();
 		if (body.accepted) {
 			if (body.type == 'friend')
 				await this.itemsService.addFriendToUser(source.sub, body.target_id);

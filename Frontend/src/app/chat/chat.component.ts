@@ -147,21 +147,16 @@ export class ChatComponent implements OnInit {
 		}
 	}
 
-	getPopover() {
-		return "customPopoverTemplate";
-	}
-
-	is_chat_admin() {
-		return this.is_admin;
-	}
-
-	createChatPopup(msg: Message) {
-		this.currentMessage = msg;
-		this.client.emit('checkPrivileges', msg);
-		const sub = fromEvent(this.client, 'answerPrivileges').subscribe((data) => {
-			this.is_admin = data;
-			sub.unsubscribe();
-		});
+	getPopover(msg: Message) {
+		// let ret;
+		// this.currentMessage = msg;
+		// this.client.emit('checkPrivileges', msg);
+		// const sub = fromEvent(this.client, 'answerPrivileges').subscribe((data) => {
+		// 	sub.unsubscribe();
+		// 	ret = data;
+		// });
+		// return ret;
+		return false;
 	}
 
 	async createPopup(title: string, label: string) {
