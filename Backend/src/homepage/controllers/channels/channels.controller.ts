@@ -28,7 +28,7 @@ export class ChannelsController {
 	async getUsersChannel(@Req() req: Request, @Res() res: Response) {
 		const user = this.tokenManager.getUserFromToken(req);
 		const channelList = await this.channelService.getAllChannelsFromUser(
-			this.tokenManager.getIdFromToken(req),
+			user.sub,
 		);
 		if (!channelList)
 			return res.status(HttpStatus.NO_CONTENT).send({ msg: 'No channels registered' });
@@ -44,8 +44,9 @@ export class ChannelsController {
 		@Res() res: Response,
 		@Param('id', ParseIntPipe) chan_id: number,
 	) {
+		const user = this.tokenManager.getUserFromToken(req);
 		const isCreated = await this.channelService.addUserToChannel(
-			this.tokenManager.getIdFromToken(req),
+			user.sub,
 			chan_id,
 		);
 		if (!isCreated) res.status(HttpStatus.NOT_FOUND).send({ msg: 'user not added to channel' });
@@ -72,8 +73,8 @@ export class ChannelsController {
 		@Res() res: Response,
 		@Body() newChannel: NewChan,
 	) {
-		const userId = this.tokenManager.getIdFromToken(req);
-		const channelEntity = await this.channelService.createChannel(newChannel, userId);
+		const user = this.tokenManager.getUserFromToken(req);
+		const channelEntity = await this.channelService.createChannel(newChannel, user.sub);
 		console.log(channelEntity);
 		res.status(HttpStatus.OK).send({ msg: 'Channel created' });
 	}
@@ -82,10 +83,10 @@ export class ChannelsController {
 	async deleteChannel(
 		@Param('id', ParseIntPipe) chan_id: number,
 		@Req() req: Request,
-		@Res() res: Response,
-	) {
-		const userId = this.tokenManager.getIdFromToken(req);
-		await this.channelService.deleteChannel(chan_id, userId);
+		@Res() res: Response,)
+	{
+		const user = this.tokenManager.getUserFromToken(req);
+		await this.channelService.deleteChannel(chan_id, user.sub);
 		res.status(HttpStatus.OK).send({ msg: 'Channel deleted' });
 	}
 
