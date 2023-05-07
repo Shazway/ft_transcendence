@@ -147,16 +147,19 @@ export class ChatComponent implements OnInit {
 		}
 	}
 
-	async getPopover(msg: Message) {
+	is_chat_admin() {
+		return this.is_admin;
+	}
+
+	createChatPopup(msg: Message) {
 		this.currentMessage = msg;
 		this.client.emit('checkPrivileges', msg);
-		const data = await new Promise((resolve, reject) => {
-			const sub = fromEvent(this.client, 'answerPrivileges').subscribe((data) => {
-				sub.unsubscribe();
-				resolve(data);
-			});
+		console.log("pass");
+		const sub = fromEvent(this.client, 'answerPrivileges').subscribe((data) => {
+			console.log(data);
+			this.is_admin = data;
+			sub.unsubscribe();
 		});
-		return data;
 	}
 
 	async createPopup(title: string, label: string) {
@@ -242,6 +245,7 @@ export class ChatComponent implements OnInit {
 	}
 
 	async openChannel(channelId: number) {
+		this.is_admin = false;
 		this.client.close();
 		this.msgs$.splice(0, this.msgs$.length);
 		this.test_msgs$.splice(0, this.test_msgs$.length);

@@ -94,10 +94,12 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			return ;
 		}
 		const channel_id = Number(client.handshake.query.channel_id);
-		if (this.channelList.get(channel_id).get(user.sub)) {
-			if (!this.deleteUserFromList(client, user))
-				return client.disconnect();
-		}
+		const channel = this.channelList.get(channel_id)
+		if (!channel)
+			return client.disconnect();
+		const chanUser = channel.get(user.sub);
+		if(chanUser)
+			this.deleteUserFromList(client, chanUser);
 	}
 
 	addUserToList(client: Socket, user: any) {
@@ -123,6 +125,8 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const channel = this.channelList.get(channel_id);
 		if (!channel) throw new WsException('Channel does not exist');
 		let users = channel.get(user.sub);
+		if (!users)
+			throw new WsException('UserList does not exist');
 		channel.set(
 			user.sub,
 			users.filter((user) => user !== client)
