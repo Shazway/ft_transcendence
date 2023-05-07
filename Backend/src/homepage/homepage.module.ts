@@ -30,6 +30,7 @@ import { PongGateway } from './gateway/pong/pong.gateway';
 import { GamesService } from './services/game/game.service';
 import { HttpexceptionFilter } from './filters/httpexception/httpexception.filter';
 import { APP_FILTER } from '@nestjs/core';
+import { WsexceptionFilter } from './filters/wsexception/wsexception.filter';
 
 @Module({
 	imports: [
@@ -58,6 +59,10 @@ import { APP_FILTER } from '@nestjs/core';
 		{
 			provide: APP_FILTER,
 			useClass: HttpexceptionFilter,
+		},
+		{
+			provide: APP_FILTER,
+			useClass: WsexceptionFilter,
 		},
 		VarFetchService,
 		ItemsService,
