@@ -15,10 +15,11 @@ export class TokenManagerService {
 	public throwException(type: string, msg: string) {
 		if (type == 'Http')
 			throw new HttpException(msg, HttpStatus.UNAUTHORIZED);
-		throw new WsException(msg);
+		else
+			throw new WsException(msg);
 	}
 
-	public getToken(token: string, type: string) 
+	public getToken(token: string, type: string)
 	{
 		let keyClean: {sub: any, name: any};
 
@@ -26,7 +27,7 @@ export class TokenManagerService {
 			this.throwException(type, 'No authentication token provided');
 
 		try {keyClean = this.jwtService.verify(token);}
-		catch (error) 
+		catch (error)
 		{
 			this.throwException(type, 'Wrong token');
 		}

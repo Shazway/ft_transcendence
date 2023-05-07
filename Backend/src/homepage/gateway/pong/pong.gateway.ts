@@ -41,9 +41,14 @@ export class PongGateway {
 	}
 
 	async handleConnection(client: Socket) {
-		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		if (!user)
+		let user;
+		try {
+			user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
+		} catch(error) {
+			console.log(error);
 			client.disconnect();
+			return ;
+		}
 		const match_id = Number(client.handshake.query.match_id);
 		let match = this.matchs.get(match_id);
 		
@@ -89,9 +94,13 @@ export class PongGateway {
 	}
 
 	async handleDisconnect(client: Socket) {
-		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		if (!user)
+		let user;
+		try {
+			user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
+		} catch(error) {
 			client.disconnect();
+			return ;
+		}
 		const userEntity = await this.itemsService.getUser(user.sub);
 		const matchEntity = userEntity.match_history[userEntity.match_history.length - 1];
 		if (!matchEntity)

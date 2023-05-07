@@ -15,7 +15,7 @@ export class HttpexceptionFilter implements ExceptionFilter {
 			statusCode: status,
 			message,
 		})
-		console.log('Note that the server is still up and running');
+		console.log('Note that the server is still up and running ✅');
 	}
 
 }

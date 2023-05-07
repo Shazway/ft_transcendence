@@ -9,6 +9,7 @@ import { NgbModal, NgbPopover, NgbPopoverConfig  } from '@ng-bootstrap/ng-bootst
 import { PunishmentPopup } from '../popup-component/popup-component.component';
 import { NotificationRequest } from 'src/dtos/Notification.dto';
 import { NotificationService } from '../notification.service';
+import { Router } from '@angular/router';
 
 @Component({
 	selector: 'app-chat',
@@ -18,10 +19,11 @@ import { NotificationService } from '../notification.service';
 export class ChatComponent implements OnInit {
 	@ViewChild('customPopoverTemplate') popoverTemplate!: NgbPopover;
 	currentMessage!: Message;
-	client: Socket;
+	client!: Socket;
 	channels$: Channel[] = [];
 	msgs$: Message[] = [];
 	test_msgs$ = new Array<Array<Message>>;
+	is_admin = false;
 
 	icone_list = {
 		add_friend: "https://static.vecteezy.com/system/resources/previews/020/936/584/original/add-friend-icon-for-your-website-design-logo-app-ui-free-vector.jpg",
@@ -38,13 +40,15 @@ export class ChatComponent implements OnInit {
 		private elRef: ElementRef,
 		private modalService: NgbModal,
 		private popoverConfig: NgbPopoverConfig,
-		private notificationService: NotificationService
+		private notificationService: NotificationService,
+		private router: Router,
 	) {
 		this.client = io('ws://localhost:3002?channel_id=' + 1, websocketService.getHeader());
-		if (!localStorage.getItem('Jwt_token'))
-			return;
 		if (!this.client)
+		{
+			this.router.navigateByUrl('login');
 			return;
+		}
 		console.log('JWT token: ' + localStorage.getItem('Jwt_token'));
 		this.setClientEvent();
 		this.initPopoverConfig();
@@ -143,8 +147,21 @@ export class ChatComponent implements OnInit {
 		}
 	}
 
+	getPopover() {
+		return "customPopoverTemplate";
+	}
+
+	is_chat_admin() {
+		return this.is_admin;
+	}
+
 	createChatPopup(msg: Message) {
 		this.currentMessage = msg;
+		this.client.emit('checkPrivileges', msg);
+		const sub = fromEvent(this.client, 'answerPrivileges').subscribe((data) => {
+			this.is_admin = data;
+			sub.unsubscribe();
+		});
 	}
 
 	async createPopup(title: string, label: string) {

@@ -147,15 +147,6 @@ export class ItemsService {
 		return channels;
 	}
 
-	// public async getPublicChannelsFromUser(id: number) {
-	// 	const pb_channels = this.chanRepo.createQueryBuilder('channel')
-	// 	.innerJoin('channel.us_channel', 'channel_user')
-	// 	.where('channel_user.channel_user_id = :userId', { id })
-	// 	.andWhere('channel.is_channel_private = false')
-	// 	.getMany();
-	// 	return pb_channels
-	// }
-
 	public async getPvChannelsFromUser(id: number) {
 		const pv_channels = await this.chanRepo.createQueryBuilder('channel')
 		.innerJoin('channel.us_channel', 'channel_user')
@@ -245,6 +236,9 @@ export class ItemsService {
 			achievement_id,
 		});
 
+		if (!user ||!achievement)
+			return null;
+
 		user.achievement.push(achievement);
 		await this.userRepo.save(user);
 	}
@@ -256,6 +250,8 @@ export class ItemsService {
 		const user = await this.getUser(user_id);
 		const friend = await this.getUser(friend_id);
 
+		if (!user || !friend)
+			return null;
 		user.sentFriendRequests = user.sentFriendRequests.filter((User) => User.receiver.user_id == friend.user_id);
 		friend.receivedFriendRequests = user.receivedFriendRequests.filter((User) => User.sender.user_id == user.user_id);
 		user.friend.push(friend);
@@ -267,12 +263,11 @@ export class ItemsService {
 		source: UserEntity,
 		friend: UserEntity,
 	) {
-		if (!(source && friend))
-			return false;
+		if (!source || !friend)
+			return null;
 		source.friend = source.friend.filter((source) => source.user_id === friend.user_id);
 		friend.friend = friend.friend.filter((user) => user.user_id === source.user_id);
-		await this.userRepo.save([source, friend]);
-		return true;
+		return await this.userRepo.save([source, friend]);
 	}
 
 	public async getFriends(user_id: number) {
@@ -287,7 +282,7 @@ export class ItemsService {
 		const sourceUser = await this.getUser(source_id);
 		const targetUser = await this.getUser(target_id);
 
-		if (!(sourceUser && targetUser))
+		if (!sourceUser || !targetUser)
 			return false;
 		if (sourceUser.friend.find((user) => user.user_id === targetUser.user_id))
 			await this.removeFriendFromUsers(sourceUser, targetUser);
@@ -315,9 +310,9 @@ export class ItemsService {
 	{
 		const user = await this.getUser(user_id);
 		const channel = await this.getChannel(channel_id);
-
 		const chanUser = (await this.getUserChan(user_id, channel_id))
-		if (chanUser.length)
+
+		if (!user || !channel || !chanUser)
 			return ;
 		chan_user.user = user;
 		chan_user.channel = channel;
@@ -335,7 +330,7 @@ export class ItemsService {
 	public async requestExists(sourceId: number, targetId: number) {
 		const sourceEntity = await this.getUser(sourceId);
 
-		if (!sourceEntity.sentFriendRequests.length)
+		if (!sourceEntity)
 			return false;
 		else
 		{
@@ -348,7 +343,7 @@ export class ItemsService {
 	}
 	public async addUserToMatch(user: UserEntity, match: MatchEntity)
 	{
-		if (!match.is_ongoing)
+		if (!match ||!match.is_ongoing)
 			return false;
 		match.user.push(user);
 		await this.matchRepo.save(match);
@@ -359,6 +354,8 @@ export class ItemsService {
 		const targetEntity = await this.getUser(targetId);
 		const sourceEntity = await this.getUser(sourceId);
 
+		if (!friendRequest || !targetEntity || !sourceEntity)
+			return null;
 		if (targetEntity.blacklistEntry.find((user) => user.user_id === sourceId))
 			return null;
 
@@ -377,6 +374,8 @@ export class ItemsService {
 		const scoreTwo = player2.score;
 		const userTwo = await this.getUser(player2.player.user_id);
 
+		if (!userOne || !userTwo)
+			return null;
 		if (scoreOne == 10)
 			userOne.rank_score += 10;
 		else

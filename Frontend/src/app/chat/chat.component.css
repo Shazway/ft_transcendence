@@ -211,8 +211,14 @@ img{ max-width:100%;}
 	width: 25px;
 }
 
-.popup-hover {}
-
 .popup-hover:hover {
 	background-color: #c4c4c4;
+}
+
+.admin-only {
+  display: none;
+}
+
+.admin-only.show {
+  display: block;
 }

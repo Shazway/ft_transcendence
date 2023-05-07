@@ -209,7 +209,7 @@ export class ballObject {
 	}
 
 	moveObject(delta: number) {
-		this.checkWallCollision(this.updateVec(delta));
+		//this.checkWallCollision(this.updateVec(delta));
 		this.applyMove(this.updateVec(delta));
 		this.updateVec(delta);
 	}

@@ -58,11 +58,11 @@ import { WsexceptionFilter } from './filters/wsexception/wsexception.filter';
 		},
 		{
 			provide: APP_FILTER,
-			useClass: HttpexceptionFilter,
+			useClass: WsexceptionFilter,
 		},
 		{
 			provide: APP_FILTER,
-			useClass: WsexceptionFilter,
+			useClass: HttpexceptionFilter,
 		},
 		VarFetchService,
 		ItemsService,

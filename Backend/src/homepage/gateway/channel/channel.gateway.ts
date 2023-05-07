@@ -39,6 +39,66 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@WebSocketServer()
 	server;
 
+	async handleConnection(client: Socket) {
+		let user;
+		try {
+			user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
+		} catch(error) {
+			console.log(error);
+			client.disconnect();
+			return ;
+		}
+		const channel_id = Number(client.handshake.query.channel_id);
+		const channel = await this.channelService.getChannelById(channel_id);
+		if (!channel) {
+			client.emit('onError', 'Channel does not exist');
+			client.disconnect();
+			return;
+		}
+		if (!(await this.channelService.isUserMember(user.sub, channel_id))) {
+			if (
+				!channel.is_channel_private &&
+				((!channel.channel_password &&
+					(await this.addUserToChannel(user.sub, channel_id))) ||
+					(await this.addUserToChannel(
+						user.sub,
+						channel_id,
+						client.handshake.query.channel_pass
+					)))
+			)
+				this.sendMessageToChannel(channel_id, {
+					message_id: 0,
+					message_content: user.name + ' joined the channel',
+					author: { username: 'System', user_id: 0 },
+					createdAt: new Date()
+				});
+			else return client.disconnect();
+		}
+		await this.channelService.isMuted(user.sub, channel_id);
+		if (
+			(await this.channelService.isBanned(user.sub, channel_id)) ||
+			!this.addUserToList(client, user)
+		) {
+			client.emit('onError', 'User is banned');
+			return client.disconnect();
+		}
+	}
+
+	handleDisconnect(client: Socket) {
+		let user;
+		try {
+			user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
+		} catch(error) {
+			client.disconnect();
+			return ;
+		}
+		const channel_id = Number(client.handshake.query.channel_id);
+		if (this.channelList.get(channel_id).get(user.sub)) {
+			if (!this.deleteUserFromList(client, user))
+				return client.emit('onError', 'Channel does not exist');
+		}
+	}
+
 	addUserToList(client: Socket, user: any) {
 		const query = client.handshake.query;
 		if (!query || !query.channel_id) {
@@ -106,44 +166,6 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		return true;
 	}
 
-	async handleConnection(client: Socket) {
-		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		const channel_id = Number(client.handshake.query.channel_id);
-		const channel = await this.channelService.getChannelById(channel_id);
-		if (!channel) {
-			client.emit('onError', 'Channel does not exist');
-			client.disconnect();
-			return;
-		}
-		if (!(await this.channelService.isUserMember(user.sub, channel_id))) {
-			if (
-				!channel.is_channel_private &&
-				((!channel.channel_password &&
-					(await this.addUserToChannel(user.sub, channel_id))) ||
-					(await this.addUserToChannel(
-						user.sub,
-						channel_id,
-						client.handshake.query.channel_pass
-					)))
-			)
-				this.sendMessageToChannel(channel_id, {
-					message_id: 0,
-					message_content: user.name + ' joined the channel',
-					author: { username: 'System', user_id: 0 },
-					createdAt: new Date()
-				});
-			else return client.disconnect();
-		}
-		await this.channelService.isMuted(user.sub, channel_id);
-		if (
-			(await this.channelService.isBanned(user.sub, channel_id)) ||
-			!this.addUserToList(client, user)
-		) {
-			client.emit('onError', 'User is banned');
-			return client.disconnect();
-		}
-	}
-
 	socketEmit(clients: Array<Socket>, eventDest: string, ...content: any[]) {
 		clients.forEach((client) => {
 			client.emit(eventDest, content[0]);
@@ -158,15 +180,6 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			author: { username: 'System', user_id: 0 },
 			createdAt: new Date()
 		});
-	}
-
-	handleDisconnect(client: Socket) {
-		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		const channel_id = Number(client.handshake.query.channel_id);
-		if (this.channelList.get(channel_id).get(user.sub)) {
-			if (!this.deleteUserFromList(client, user))
-				return client.emit('onError', 'Channel does not exist');
-		}
 	}
 
 	@SubscribeMessage('addFriend')
@@ -303,8 +316,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@SubscribeMessage('checkPrivileges')
 	async checkPrivileges(@ConnectedSocket() client: Socket, @MessageBody() body: Message) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		if (!user)
-			client.disconnect();
+
 		const channel_id = Number(client.handshake.query.channel_id);
 		const rights = await this.channelService.checkPrivileges(
 			user.sub,

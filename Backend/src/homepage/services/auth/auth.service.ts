@@ -1,13 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { IntraInfo, TokenInfo } from 'src/homepage/dtos/Api.dto';
-import { Transporter, createTransport } from 'nodemailer';
 import { varFetchService } from '../var_fetch/var_fetch.service';
-import { AuthOptions } from 'nodemailer-mailgun-transport';
 import { totp } from 'notp';
 import { authenticator } from 'otplib';
 import axios from 'axios';
-import { Response } from 'express';
 
 @Injectable()
 export class AuthService {

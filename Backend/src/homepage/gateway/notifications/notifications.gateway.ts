@@ -39,21 +39,28 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 	server;
 
 	async handleConnection(client: Socket) {
-		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		if (!user)
+		let user;
+		try {
+			user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
+		} catch(error) {
+			console.log(error);
 			client.disconnect();
+			return ;
+		}
 		this.userList.set(user.sub, client);
 		await this.notificationService.setUserStatus(user.sub, this.ONLINE);
-		console.log(user.name + "Connected");
 	}
 	
 	async handleDisconnect(client: Socket) {
-		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		if (!user)
+		let user;
+		try {
+			user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
+		} catch(error) {
 			client.disconnect();
+			return ;
+		}
 		this.userList.delete(user.sub);
 		await this.notificationService.setUserStatus(user.sub, this.OFFLINE);
-		console.log(user.name + "Disconnected");
 	}
 
 	sendMessage(user_tab: number[], message: any) {

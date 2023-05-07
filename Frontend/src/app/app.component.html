@@ -13,7 +13,7 @@
     <!-- Sidebar -->
     <nav id="sidebar" class="offscreen">
         <div class="sidebar-header">
-            <a class="inox" href="#">Inox_Transcendence</a>
+            <a class="inox" href="#">Transcendence</a>
         </div>
 		<ul class="list-group active">
             <li class="active" aria-owns="#homeSubmenu">
@@ -49,14 +49,51 @@
     </nav>
 
 	<div class="w-100"><router-outlet></router-outlet></div>
+    <div *ngIf="isConnected()"><app-chat></app-chat></div>
 
 </div>
 
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * The content above * * * * * * * * * * * -->
-<!-- * * * * * * * * * * is only a placeholder * * * * * * * * * * -->
-<!-- * * * * * * * * * * and can be replaced. * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * End of Placeholder * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+<ng-template #toastFriendRequest>
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="position: relative; min-height: 200px;">
+        <div class="toast-header">
+        <strong class="mr-auto">Friend request</strong>
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+        <div class="toast-body">
+        <!-- {{user_name}} wants to be your friend! -->
+        XXX wants to be you friend!
+        </div>
+    </div>
+</ng-template>
 
+<ng-template #toastChallenge>
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="position: relative; min-height: 200px;">
+        <div class="toast-header">
+        <strong class="mr-auto">Challenge</strong>
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+        <div class="toast-body">
+        <!-- {{user_name}} challenges you -->
+        XXX challenges you
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #toastAchievement>
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="position: relative; min-height: 200px;">
+        <div class="toast-header">
+        <strong class="mr-auto">New acheivement</strong>
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+        <div class="toast-body">
+        <!-- You won the acheivement {{acheivement_name}}, congratulations -->
+            You won the acheivement XXX, congratulations
+        </div>
+    </div>
+</ng-template>

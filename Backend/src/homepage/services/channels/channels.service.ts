@@ -62,7 +62,7 @@ export class ChannelsService {
 		const channel = await this.itemsService.getChannel(chan_id);
 		if (!channel) return false;
 		if (!channel.channel_password) await this.itemsService.addUserToChannel(chan_user, chan_id, user_id);
-		else if (pass === (await this.itemsService.getChannel(chan_id)).channel_password)
+		else if (pass === channel.channel_password)
 			await this.itemsService.addUserToChannel(chan_user, chan_id, user_id);
 		else return false;
 		return true;
@@ -74,6 +74,8 @@ export class ChannelsService {
 		if (!(await this.isUserMember(target_id, chan_id)))
 			return false;
 		const target = await this.itemsService.getUserChan(target_id, chan_id);
+		if (!target)
+			return false;
 		target[0].is_admin = true;
 		await this.chan_userRepo.save(target[0]);
 		return true;
@@ -84,9 +86,11 @@ export class ChannelsService {
 		if (!(await this.isUserMember(target_id, chan_id)))
 			return true;
 		const target = await this.itemsService.getUserChan(target_id, chan_id);
+		const setter = await this.itemsService.getUserChan(setter_id, chan_id);
+		if (!target || !setter)
+			return false;
 		target[0].is_admin = true;
 		target[0].is_creator = true;
-		const setter = await this.itemsService.getUserChan(setter_id, chan_id);
 		setter[0].is_creator = false;
 		await this.chan_userRepo.save(target[0]);
 		await this.chan_userRepo.save(setter[0]);
@@ -110,6 +114,8 @@ export class ChannelsService {
 		if (!(await (this.checkPrivileges(user_id, target_id, chan_id))).ret)
 			return false;
 		const target = await this.itemsService.getUserChan(target_id, chan_id);
+		if (!target)
+			return false;
 		await this.chan_userRepo.delete(target[0].channel_user_id);
 		return true;
 	}
@@ -118,6 +124,8 @@ export class ChannelsService {
 		if (!(await (this.checkPrivileges(user_id, target_id, channel_id))).ret)
 			return false;
 		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
+		if (!target_chan)
+			return false;
 		target_chan[0].muteUser(1000 * timer); //Multiply 1000 to the number of seconds you want to mute someone todo: to be changed to a parameter given
 		await this.chan_userRepo.save(target_chan[0]);
 		return true;
@@ -126,6 +134,8 @@ export class ChannelsService {
 		if (!(await (this.checkPrivileges(user_id, target_id, channel_id))).ret)
 			return false;
 		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
+		if (!target_chan)
+			return false;
 		target_chan[0].unmuteUser();
 		await this.chan_userRepo.save(target_chan[0]);
 		return true;
@@ -135,6 +145,8 @@ export class ChannelsService {
 		if (!(await (this.checkPrivileges(user_id, target_id, channel_id))).ret)
 			return false;
 		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
+		if (!target_chan)
+			return false;
 		target_chan[0].banUser(1000 * timer); //Multiply 1000 to the number of seconds you want to mute someone todo: to be changed to a parameter given
 		await this.chan_userRepo.save(target_chan[0]);
 		return true;
@@ -143,22 +155,30 @@ export class ChannelsService {
 		if (!(await (this.checkPrivileges(user_id, target_id, channel_id))).ret)
 			return false;
 		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
+		if (!target_chan)
+			return false;
 		target_chan[0].unBanUser();
 		await this.chan_userRepo.save(target_chan[0]);
 		return true;
 	}
 	async isUserAdmin(user_id: number, chan_id: number) {
 		const chan_user = await this.itemsService.getUserChan(user_id, chan_id);
+		if (!chan_user)
+			return false;
 		if (chan_user.length > 0 && chan_user[0].is_admin) return true;
 		return false;
 	}
 	async isUserOwner(user_id: number, chan_id: number) {
 		const chan_user = await this.itemsService.getUserChan(user_id, chan_id);
+		if (!chan_user)
+			return false;
 		if (chan_user.length && chan_user[0].is_creator) return true;
 		return false;
 	}
 	async isMuted(user_id: number, chan_id: number) {
 		const chan_user = await this.itemsService.getUserChan(user_id, chan_id);
+		if (!chan_user)
+			return false;
 		const time = new Date();
 
 		if (
@@ -175,6 +195,8 @@ export class ChannelsService {
 	}
 	async isBanned(user_id: number, chan_id: number) {
 		const chan_user = await this.itemsService.getUserChan(user_id, chan_id);
+		if (!chan_user)
+			return false;
 		const time = new Date();
 		if (!chan_user)
 			return false;
@@ -192,6 +214,8 @@ export class ChannelsService {
 
 	async isUserMember(user_id: number, chan_id: number) {
 		const chan_user = await this.itemsService.getUserChan(user_id, chan_id);
+		if (!chan_user)
+			return false;
 		if (chan_user.length > 0 && !chan_user[0].is_banned) return true;
 		return false;
 	}

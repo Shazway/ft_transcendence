@@ -85,13 +85,15 @@
 	<div class="d-grid">
 		<button (click)="addFriend(currentMessage)" type="button" class="row btn btn-block popup-hover">Add Friend</button>
 		<button (click)="blockUser(currentMessage)" type="button" class="row btn btn-block popup-hover">Block User</button>
+	</div>
+</ng-template>
+
+<ng-template #customPopoverAdminTemplate>
+	<div class="d-grid">
+		<button (click)="addFriend(currentMessage)" type="button" class="row btn btn-block popup-hover">Add Friend</button>
+		<button (click)="blockUser(currentMessage)" type="button" class="row btn btn-block popup-hover">Block User</button>
 		<button (click)="muteUser(currentMessage)" type="button" class="row btn btn-block popup-hover">Mute User</button>
 		<button (click)="kickUser(currentMessage)" type="button" class="row btn btn-block popup-hover">Kick User</button>
 		<button (click)="banUser(currentMessage)" type="button" class="row btn btn-block popup-hover">Ban User</button>
-		<!-- <img (click)="addFriend(currentMessage)" class="rounded-circle border border-2 m-0 ms-2 m-auto pop-icon" id="img-{{currentMessage.message_id}}-add" src="{{icone_list.add_friend}}" alt="add_friend">
-		<img (click)="blockUser(currentMessage)" class="rounded-circle border border-2 m-0 ms-2 m-auto pop-icon" id="img-{{currentMessage.message_id}}-block" src="{{icone_list.block_user}}" alt="block_user">
-		<img (click)="muteUser(currentMessage)" class="rounded-circle border border-2 m-0 ms-2 m-auto pop-icon" id="img-{{currentMessage.message_id}}-mute" src="{{icone_list.mute_user}}" alt="mute_user">
-		<img (click)="kickUser(currentMessage)" class="rounded-circle border border-2 m-0 ms-2 m-auto pop-icon" id="img-{{currentMessage.message_id}}-kick" src="{{icone_list.kick_user}}" alt="kick_user">
-		<img (click)="banUser(currentMessage)" class="rounded-circle border border-2 m-0 ms-2 m-auto pop-icon" id="img-{{currentMessage.message_id}}-ban" src="{{icone_list.ban_user}}" alt="ban_user"> -->
 	</div>
 </ng-template>

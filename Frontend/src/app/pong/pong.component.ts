@@ -1,11 +1,12 @@
 import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { Socket, io } from 'socket.io-client';
 import { WebsocketService } from '../websocket.service';
-import { Application } from 'pixi.js';
+import { Application, Graphics } from 'pixi.js';
 import { pongObject, ballObject, Move, VectorPos, ScoreChange, GameEnd } from 'src/dtos/Pong.dto';
 import { ActivatedRoute } from '@angular/router';
 import { MatchSetting } from 'src/dtos/MatchSetting.dto';
 import { Mutex } from 'async-mutex';
+import { AssetManager, WowText } from 'src/dtos/GraphElem.dto';
 
 @Component({
 	selector: 'app-pong',
@@ -28,13 +29,19 @@ export class PongComponent {
 	private timeoutId!: any;
 	private gameSettings!: MatchSetting;
 	private ballLock: Mutex;
+	private isMatchOngoing = true;
+
+	private scoreP1!: WowText;
+	private scoreP2!: WowText;
+	private funkyText!: WowText;
 
 	constructor(
 		private websocketService: WebsocketService,
 		private pixiContainer: ElementRef,
 		private route: ActivatedRoute,
 		private elRef: ElementRef,
-		) {
+		private assetManager: AssetManager,
+	) {
 			this.ballLock = new Mutex();
 			this.app = new Application({
 				height: 600,
@@ -66,7 +73,7 @@ export class PongComponent {
 		this.client.on('onPlayerReady', (event) => { console.log('You are ready '); });
 		this.client.on('onOpponentReady', (event) => { console.log('Opponent is ready '); });
 		this.client.on('onScoreChange', (event) => { this.updateScore(event); });
-		this.client.on('onMatchEnd', (event) => { this.endMatch(event); });
+		this.client.on('onMatchEnd', (event) => {this.endMatch(event);});
 	}
 
 	startMatch(settings: MatchSetting) {
@@ -83,40 +90,37 @@ export class PongComponent {
 	endMatch(event: GameEnd) {
 		if (event.state == this.WIN)
 		{
+			this.scoreP1.setText("10");
 			console.log('You win');
 		} //<-- faire des trucs avec un affichage mieux
 		else if (event.state == this.LOSS)
 		{
+			this.scoreP2.setText("10");
 			console.log('You lose');
 		} //<-- faire des trucs aussi x)
 		this.ballLock.waitForUnlock().then(() => {
 			this.ballLock.acquire().then(() => {
-				this.ball.setPos(this.ball.position(500, 300));
+				this.ball.setPos(this.ball.position(250, 150));
 			})
 			this.ballLock.release();
 		});
-		this.app.ticker.stop();
-		this.app.stop();
+		this.isMatchOngoing = false;
 	}
 
 	updateScore(event: ScoreChange) {
 		if (event.side == this.PLAYER_SCORED)
-		{
 			this.player.score++;
-			console.log('You scored a point: ' + this.player.score);
-		}
 		else if (event.side == this.OPPONENT_SCORED)
-		{
 			this.opponent.score++;
-			console.log('Your opponent scored a point: ' + this.opponent.score);
-		}
 		this.ballLock.waitForUnlock().then(() => {
 			this.ballLock.acquire().then(() => {
-				this.ball.setPos(this.ball.position(500, 300));
+				this.ball.graphic.clear();
+				this.ball.setPos(this.ball.position(250, 150));
 			})
 			this.ballLock.release();
 		});
-		//<--Mettre à jour graphiquement le score?
+		this.scoreP1.setText(this.player.score.toString());
+		this.scoreP2.setText(this.opponent.score.toString());
 	}
 
 	closeEnoughPlayer() {
@@ -130,20 +134,22 @@ export class PongComponent {
 	update(delta: number) {
 		if (!this.gameSettings)
 			return;
-		if (this.player.inputs.ArrowUp)
-			this.player.moveObject(this.player.position(0, -this.movespeed * delta));
-		if (this.player.inputs.ArrowDown)
-			this.player.moveObject(this.player.position(0, this.movespeed * delta));
-		if (this.opponent.inputs.ArrowUp)
-			this.opponent.moveObject(this.opponent.position(0, -this.movespeed * delta));
-		if (this.opponent.inputs.ArrowDown)
-			this.opponent.moveObject(this.opponent.position(0, this.movespeed * delta));
-		this.ballLock.waitForUnlock().then(() => {
-			this.ballLock.acquire().then(() => {
-				this.ball.moveObject(delta);
-			})
-			this.ballLock.release();
-		});
+		if (this.isMatchOngoing) {
+			if (this.player.inputs.ArrowUp)
+				this.player.moveObject(this.player.position(0, -this.movespeed * delta));
+			if (this.player.inputs.ArrowDown)
+				this.player.moveObject(this.player.position(0, this.movespeed * delta));
+			if (this.opponent.inputs.ArrowUp)
+				this.opponent.moveObject(this.opponent.position(0, -this.movespeed * delta));
+			if (this.opponent.inputs.ArrowDown)
+				this.opponent.moveObject(this.opponent.position(0, this.movespeed * delta));
+			this.ballLock.waitForUnlock().then(() => {
+				this.ballLock.acquire().then(() => {
+					this.ball.moveObject(delta);
+				})
+				this.ballLock.release();
+			});
+		}
 	}
 
 	updatePlayer(event: Move) {
@@ -164,20 +170,24 @@ export class PongComponent {
 		this.ballLock.release();
 	}
 
-	initObjects() {
+	async initObjects() {
 		this.player.init(10, 250, 20, 100, 0x83d0c9);
 		this.opponent.init(this.app.view.width - 30, 250, 20, 100, 0xFF0000);
 		this.ball.init(500, 300, 10, 0xFFFFFF);
-		this.app.stage.addChild(this.ball.graphic, this.player.graphic, this.opponent.graphic);
-		// const ruler = new Graphics();
-		// for (let index = 0; index < 12; index++) {
-		// 	for (let index2 = 0; index2 < 8; index2++) {
-		// 		ruler.beginFill(0xFF0000);
-		// 		ruler.drawRect(index * 100, index2 * 100, 2, 2);
-		// 		ruler.endFill();
-		// 	}
-		// }
-		// this.app.stage.addChild(ruler);
+		const graphicElm = new Graphics();
+		graphicElm.beginFill(0xFFFFFF, 0.8);
+		graphicElm.drawRect(490, 0, 20, 250);
+		graphicElm.drawRect(490, 350, 20, 250);
+		graphicElm.endFill();
+		const style = await this.assetManager.initAssets();
+		this.scoreP1 = new WowText('0', style.p1, 450, 50, this.app);
+		this.scoreP1.setReverse(true);
+		this.scoreP2 = new WowText('0', style.p2, 560, 50, this.app);
+		// this.funkyText = new WowText('this is my fun text', style.funText, 100, 200, this.app);
+		// this.funkyText.setRGB(true, 5000, 20);
+		// this.funkyText.setWavy(true, 50, 50);
+		this.app.stage.addChild(graphicElm, this.ball.graphic, this.player.graphic, this.opponent.graphic);
+		// this.assetManager.addRuler(this.app);
 	}
 
 	@HostListener('window:keyup', ['$event'])

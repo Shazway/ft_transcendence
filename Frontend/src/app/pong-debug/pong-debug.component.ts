@@ -27,7 +27,6 @@ export class PongDebugComponent {
 	private scoreP1!: WowText;
 	private scoreP2!: WowText;
 	private funkyText!: WowText;
-	private i = 0;
 	bouncenumber: number = 0;
 
 	constructor(

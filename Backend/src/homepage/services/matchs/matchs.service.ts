@@ -1,9 +1,8 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MatchEntity, MatchSettingEntity, UserEntity } from 'src/entities';
 import { Repository } from 'typeorm';
 import { ItemsService } from '../items/items.service';
-import { User } from 'src/entities/users.entity';
 import { MatchSetting } from 'src/entities/match_setting.entity';
 
 @Injectable()
@@ -45,7 +44,11 @@ export class MatchsService {
 	async createFullMatch(playerOne: number, playerTwo: number, isCustom: boolean) {
 		const userOne = await this.itemsService.getUser(playerOne);
 		const userTwo = await this.itemsService.getUser(playerOne);
+		if (!userOne || !userTwo)
+			return null;
 		const match = await this.createMatch(userOne, userTwo, isCustom);
+		if (!match)
+			return null;
 		await this.createRankedMatchSetting();
 		userOne.match_history.push(match);
 		userTwo.match_history.push(match);
@@ -58,9 +61,9 @@ export class MatchsService {
 		const user = await this.itemsService.getUser(user_id);
 		const match = await this.itemsService.getMatch(match_id);
 
-		if (!match) return false;
-		else if (!user) return false;
-		else if (!(await this.itemsService.addUserToMatch(user, match)))
+		if (!user || !match)
+			return false;
+		if (!(await this.itemsService.addUserToMatch(user, match)))
 			return false;
 		return true;
 	}

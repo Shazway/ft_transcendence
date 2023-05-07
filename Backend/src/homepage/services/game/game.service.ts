@@ -134,7 +134,7 @@ export class GamesService {
 		if (this.player1.score >= 10 || this.player2.score >= 10)
 			this.endMatch();
 	}
-		
+
 	applyPlayerMove(player: pongObject, delta: number) {
 		if (player.inputs.ArrowUp) player.moveObject(player.position(0, -this.movespeed * delta));
 		if (player.inputs.ArrowDown) player.moveObject(player.position(0, this.movespeed * delta));

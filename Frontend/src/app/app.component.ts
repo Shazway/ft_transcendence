@@ -15,6 +15,10 @@ export class AppComponent {
 	private elRef: ElementRef
   ){}
 
+  isConnected() {
+	return localStorage.getItem('Jwt_token') ? true : false;
+  }
+
   togglePlay() {
 	const offscreenElm = this.elRef.nativeElement.querySelector('#play');
 	if (!offscreenElm)
