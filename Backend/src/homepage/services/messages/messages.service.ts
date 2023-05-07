@@ -44,7 +44,7 @@ export class MessagesService {
 		message.message_content = msg.message_content;
 
 		const channel = await this.itemsService.getChannel(channel_id);
-		const user = await this.itemsService.getUser(this.tokenManager.getToken(token).sub);
+		const user = await this.itemsService.getUser(this.tokenManager.getToken(token, 'ws').sub);
 		if (!user)
 			return { check: {ret: false, msg: 'User not found'}, message: null};
 		const isValid = await this.isValidUserChannel(user, channel);

@@ -107,7 +107,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	}
 
 	async handleConnection(client: Socket) {
-		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		const channel_id = Number(client.handshake.query.channel_id);
 		const channel = await this.channelService.getChannelById(channel_id);
 		if (!channel) {
@@ -161,7 +161,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	}
 
 	handleDisconnect(client: Socket) {
-		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		const channel_id = Number(client.handshake.query.channel_id);
 		if (this.channelList.get(channel_id).get(user.sub)) {
 			if (!this.deleteUserFromList(client, user))
@@ -176,7 +176,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('mute')
 	async handleMute(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
-		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		if (!user)
 			client.disconnect();
 		const channel_id = Number(client.handshake.query.channel_id);
@@ -195,7 +195,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('unmute')
 	async handleUnmute(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
-		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		if (!user)
 			client.disconnect();
 		const channel_id = Number(client.handshake.query.channel_id);
@@ -214,7 +214,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('ban')
 	async handleBan(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
-		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		if (!user)
 			client.disconnect();
 		const channel_id = Number(client.handshake.query.channel_id);
@@ -234,7 +234,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('unban')
 	async handleUnban(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
-		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		if (!user)
 			client.disconnect();
 		const channel_id = Number(client.handshake.query.channel_id);
@@ -254,7 +254,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('kick')
 	async handleKick(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
-		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		if (!user)
 			client.disconnect();
 		const channel_id = Number(client.handshake.query.channel_id);
@@ -281,7 +281,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() body: Message) {
 		body.createdAt = new Date();
 		console.log(body);
-		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		if (!user)
 			client.disconnect();
 		const channel_id = Number(client.handshake.query.channel_id);
@@ -302,7 +302,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('checkPrivileges')
 	async checkPrivileges(@ConnectedSocket() client: Socket, @MessageBody() body: Message) {
-		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		if (!user)
 			client.disconnect();
 		const channel_id = Number(client.handshake.query.channel_id);
@@ -316,7 +316,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('delMessage')
 	async deleteMessage(@ConnectedSocket() client: Socket, @MessageBody() body: Message) {
-		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		if (!user)
 			client.disconnect();
 		const channel_id = Number(client.handshake.query.channel_id);

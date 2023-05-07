@@ -41,7 +41,7 @@ export class PongGateway {
 	}
 
 	async handleConnection(client: Socket) {
-		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		if (!user)
 			client.disconnect();
 		const match_id = Number(client.handshake.query.match_id);
@@ -89,7 +89,7 @@ export class PongGateway {
 	}
 
 	async handleDisconnect(client: Socket) {
-		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		if (!user)
 			client.disconnect();
 		const userEntity = await this.itemsService.getUser(user.sub);
@@ -144,7 +144,7 @@ export class PongGateway {
 
 	@SubscribeMessage('ArrowDown')
 	handleDown(@ConnectedSocket() client: Socket, @MessageBody() body: boolean) {
-		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		if (!user)
 			client.disconnect();
 		const match_id = Number(client.handshake.query.match_id);
@@ -164,7 +164,7 @@ export class PongGateway {
 
 	@SubscribeMessage('ArrowUp')
 	handleUp(@ConnectedSocket() client: Socket, @MessageBody() body: boolean) {
-		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		if (!user)
 			client.disconnect();
 		const match_id = Number(client.handshake.query.match_id);
@@ -184,7 +184,7 @@ export class PongGateway {
 
 	@SubscribeMessage('ready')
 	async playerReady(@ConnectedSocket() client: Socket) {
-		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		if (!user)
 			client.disconnect();
 		const match_id = Number(client.handshake.query.match_id);

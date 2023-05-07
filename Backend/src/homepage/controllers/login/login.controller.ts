@@ -8,7 +8,6 @@ import { AuthCode, AuthPair, IntraInfo, TokenInfo } from 'src/homepage/dtos/Api.
 import { ItemsService } from 'src/homepage/services/items/items.service';
 import { AuthService } from 'src/homepage/services/auth/auth.service';
 import { ChannelsService } from 'src/homepage/services/channels/channels.service';
-import axios from 'axios';
 
 @Controller('login')
 export class LoginController {

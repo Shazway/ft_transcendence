@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { WsException } from '@nestjs/websockets';
 import { Request } from 'express';
 
 @Injectable()
@@ -11,28 +12,34 @@ export class TokenManagerService {
 		return type === 'Bearer' ? token : undefined;
 	}
 
-	public getToken(token: string) {
+	public throwException(type: string, msg: string) {
+		if (type == 'Http')
+			throw new HttpException(msg, HttpStatus.UNAUTHORIZED);
+		throw new WsException(msg);
+	}
+
+	public getToken(token: string, type: string) 
+	{
 		let keyClean: {sub: any, name: any};
+
 		if (!token)
-				throw new HttpException(
-						'No authentication token provided',
-						HttpStatus.UNAUTHORIZED,
-					);
-		try {
-			keyClean = this.jwtService.verify(token);
-		} catch (error) {
-				throw new HttpException('Wrong token', HttpStatus.UNAUTHORIZED);
+			this.throwException(type, 'No authentication token provided');
+
+		try {keyClean = this.jwtService.verify(token);}
+		catch (error) 
+		{
+			this.throwException(type, 'Wrong token');
 		}
 		return keyClean;
 	}
 
-	public getUserFromToken(request: Request) {
-		return this.getToken(this.extractTokenFromHeader(request));
+	public getUserFromToken(request: Request, type: string = 'Http') {
+		return this.getToken(this.extractTokenFromHeader(request), type);
 	}
-	public getUsernameFromToken(request: Request) {
-		return this.getToken(this.extractTokenFromHeader(request)).name;
+	public getUsernameFromToken(request: Request, type: string = 'Http') {
+		return this.getToken(this.extractTokenFromHeader(request), type).name;
 	}
-	public getIdFromToken(request: Request) {
-		return this.getToken(this.extractTokenFromHeader(request)).sub;
+	public getIdFromToken(request: Request, type: string = 'Http') {
+		return this.getToken(this.extractTokenFromHeader(request), type).sub;
 	}
 }

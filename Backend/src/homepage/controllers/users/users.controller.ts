@@ -4,7 +4,6 @@ import {
 	Controller,
 	Get,
 	HttpStatus,
-	Options,
 	Param,
 	ParseIntPipe,
 	Post,
@@ -13,7 +12,6 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { UsersService } from '../../services/users/users.service';
-import { NewUser } from '../../dtos/User.dto';
 import { AuthService } from 'src/homepage/services/auth/auth.service';
 import { ItemsService } from 'src/homepage/services/items/items.service';
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
@@ -32,21 +30,11 @@ export class UsersController {
 		private channelService: ChannelsService,
 	) {}
 
-	@Get('')
-	async getUsers(@Req() req: Request, @Res() res: Response) {
-		const userList = await this.usersService.getAllUsers();
-		if (!userList) res.status(HttpStatus.NO_CONTENT).send({ msg: 'No users registered' });
-		const serializedUsers = userList.map((user) => plainToClass(AnyProfileUser, user));
-		res.status(HttpStatus.OK).send(serializedUsers);
-	}
-
 	@Post('change_name')
 	async changeUsername(@Req() req: Request, @Res() res: Response, @Body() body: {username: string}) {
 		const checkUser = await this.itemsService.getUserByUsername(body.username);
 		const currentUser = this.tokenManager.getUserFromToken(req);
 
-		if (!currentUser)
-			return res.status(HttpStatus.UNAUTHORIZED).send('No token provided');
 		if (checkUser && checkUser.user_id == currentUser.sub)
 			return res.status(HttpStatus.NOT_MODIFIED).send('Username taken');
 		if (checkUser && checkUser.user_id != currentUser.sub)
