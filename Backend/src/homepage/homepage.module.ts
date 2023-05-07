@@ -1,8 +1,6 @@
 import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { ChannelsController } from './controllers/channels/channels.controller';
-import { RootController } from './controllers/root/root.controller';
 import { ProfileController } from './controllers/profile/profile.controller';
-import { PlayController } from './controllers/play/play.controller';
 import { LoginController } from './controllers/login/login.controller';
 import { LeaderboardController } from './controllers/leaderboard/leaderboard.controller';
 import { ShopController } from './controllers/shop/shop.controller';
@@ -30,6 +28,8 @@ import { HttpModule } from '@nestjs/axios';
 import { MatchmakingGateway } from './gateway/matchmaking/matchmaking.gateway';
 import { PongGateway } from './gateway/pong/pong.gateway';
 import { GamesService } from './services/game/game.service';
+import { HttpexceptionFilter } from './filters/httpexception/httpexception.filter';
+import { APP_FILTER } from '@nestjs/core';
 
 @Module({
 	imports: [
@@ -40,9 +40,7 @@ import { GamesService } from './services/game/game.service';
 	],
 	controllers: [
 		ChannelsController,
-		RootController,
 		ProfileController,
-		PlayController,
 		LoginController,
 		LeaderboardController,
 		ShopController,
@@ -56,6 +54,10 @@ import { GamesService } from './services/game/game.service';
 		{
 			provide: APP_INTERCEPTOR,
 			useClass: HeaderInterceptor,
+		},
+		{
+			provide: APP_FILTER,
+			useClass: HttpexceptionFilter,
 		},
 		VarFetchService,
 		ItemsService,

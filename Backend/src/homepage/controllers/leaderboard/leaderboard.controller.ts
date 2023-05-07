@@ -11,9 +11,11 @@ export class LeaderboardController {
 	@Get('')
 	public async getLeaderboard(@Req() req: Request, @Res() res: Response) {
 		const userList = await this.serv.getLeaderboard();
+		if (!userList)
+			return res.status(HttpStatus.NOT_FOUND).send('No users in leaderboard yet');
 		const leaderboard = userList.map((user) =>
 			plainToClass(LeaderBoardUser, user),
 		);
-		res.status(HttpStatus.ACCEPTED).send(leaderboard);
+		return res.status(HttpStatus.ACCEPTED).send(leaderboard);
 	}
 }

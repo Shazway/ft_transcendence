@@ -58,10 +58,10 @@ export class MatchsService {
 		const user = await this.itemsService.getUser(user_id);
 		const match = await this.itemsService.getMatch(match_id);
 
-		if (!match) throw new HttpException('Match does not exist', HttpStatus.NOT_FOUND);
-		else if (!user) throw new HttpException('User does not exist', HttpStatus.NOT_FOUND);
+		if (!match) return false;
+		else if (!user) return false;
 		else if (!(await this.itemsService.addUserToMatch(user, match)))
-			throw new HttpException('Failed to add user', HttpStatus.NOT_ACCEPTABLE);
+			return false;
 		return true;
 	}
 

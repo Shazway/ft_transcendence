@@ -14,14 +14,17 @@ export class TokenManagerService {
 	public getToken(token: string) {
 		let keyClean: {sub: any, name: any};
 		if (!token)
-			throw new HttpException(
-				'No authentication token provided',
-				HttpStatus.UNPROCESSABLE_ENTITY,
-			);
+		{
+				throw new HttpException(
+						'No authentication token provided',
+						HttpStatus.UNAUTHORIZED,
+					);
+		}
+				
 		try {
 			keyClean = this.jwtService.verify(token);
 		} catch (error) {
-			throw new HttpException('Wrong token', HttpStatus.UNAUTHORIZED);
+				throw new HttpException('Wrong token', HttpStatus.UNAUTHORIZED);
 		}
 		return keyClean;
 	}

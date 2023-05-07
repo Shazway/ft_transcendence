@@ -26,6 +26,7 @@ export class ChannelsController {
 	) {}
 	@Get('')
 	async getUsersChannel(@Req() req: Request, @Res() res: Response) {
+		const user = this.tokenManager.getUserFromToken(req);
 		const channelList = await this.channelService.getAllChannelsFromUser(
 			this.tokenManager.getIdFromToken(req),
 		);
@@ -75,41 +76,6 @@ export class ChannelsController {
 		const channelEntity = await this.channelService.createChannel(newChannel, userId);
 		console.log(channelEntity);
 		res.status(HttpStatus.OK).send({ msg: 'Channel created' });
-	}
-
-	@Post('kick')
-	async kickUser(
-		@Req() req: Request,
-		@Res() res: Response,
-		@Body() deleteUser: DeleteUser,
-	) {
-		const userId = this.tokenManager.getIdFromToken(req);
-		console.log(deleteUser);
-		await this.channelService.kickUser(
-			userId,
-			deleteUser.target_id,
-			deleteUser.channel_id,
-		);
-		res.status(HttpStatus.OK).send({ msg: 'User kicked from channel' });
-	}
-
-	@Post('unmute')
-	async unMuteUser(
-		@Req() req: Request,
-		@Res() res: Response,
-		@Body() deleteUser: DeleteUser,
-	) {
-		const userId = await this.tokenManager.getIdFromToken(req);
-		console.log(deleteUser);
-		if (
-			!(await this.channelService.unMuteUser(
-				userId,
-				deleteUser.target_id,
-				deleteUser.channel_id,
-			))
-		)
-			res.status(HttpStatus.FORBIDDEN).send({ msg: 'Not an admin' });
-		else res.status(HttpStatus.OK).send({ msg: 'User unmuted' });
 	}
 
 	@Delete('delete/:id')

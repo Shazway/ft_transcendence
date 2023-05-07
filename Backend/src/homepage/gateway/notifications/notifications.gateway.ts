@@ -40,6 +40,8 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 
 	async handleConnection(client: Socket) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		if (!user)
+			client.disconnect();
 		this.userList.set(user.sub, client);
 		await this.notificationService.setUserStatus(user.sub, this.ONLINE);
 		console.log(user.name + "Connected");
@@ -47,6 +49,8 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 	
 	async handleDisconnect(client: Socket) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		if (!user)
+			client.disconnect();
 		this.userList.delete(user.sub);
 		await this.notificationService.setUserStatus(user.sub, this.OFFLINE);
 		console.log(user.name + "Disconnected");
@@ -91,6 +95,8 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 	) {
 		body.sent_at = new Date();
 		const source = this.tokenManager.getToken(client.request.headers.authorization);
+		if (!source)
+			client.disconnect();
 		const answer = this.buildAnswer(source.sub, source.name, body.type);
 		const user = this.userList.get(body.target_id);
 		const notifClient = this.userList.get(source.sub);
@@ -115,6 +121,8 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 	@SubscribeMessage('inviteAnswer')
 	async handeAnswer(@ConnectedSocket() client: Socket, @MessageBody() body: NotificationRequest) {
 		const source = this.tokenManager.getToken(client.request.headers.authorization);
+		if (!source)
+			client.disconnect();
 		const answer = this.buildAnswer(source.sub, source.name, body.type, body.accepted);
 		const user = this.userList.get(body.target_id);
 

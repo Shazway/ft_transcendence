@@ -45,10 +45,12 @@ export class UsersController {
 		const checkUser = await this.itemsService.getUserByUsername(body.username);
 		const currentUser = this.tokenManager.getUserFromToken(req);
 
+		if (!currentUser)
+			return res.status(HttpStatus.UNAUTHORIZED).send('No token provided');
 		if (checkUser && checkUser.user_id == currentUser.sub)
-			return res.status(HttpStatus.NOT_MODIFIED);
+			return res.status(HttpStatus.NOT_MODIFIED).send('Username taken');
 		if (checkUser && checkUser.user_id != currentUser.sub)
-			return res.status(HttpStatus.UNAUTHORIZED);
+			return res.status(HttpStatus.UNAUTHORIZED).send('Trying to change someone elses username ?');
 		this.usersService.changeUserName(body.username, currentUser.sub);
 		return res.status(HttpStatus.ACCEPTED).send('Username changed');
 	}
@@ -57,6 +59,7 @@ export class UsersController {
 	async createUser(@Req() req: Request, @Res() res: Response, @Body() newUser: IntraInfo) {
 		console.log(newUser);
 		const check_username = await this.usersService.checkUserByName(newUser.login);
+
 		if (check_username && check_username.user_id === newUser.id)
 			return res.status(HttpStatus.FORBIDDEN).send("You can't use the same username");
 		else if (check_username)
@@ -73,9 +76,10 @@ export class UsersController {
 
 	@Get('add_achievement')
 	async addAchievement(@Req() req: Request, @Res() res: Response) {
-		const user_id = await this.tokenManager.getIdFromToken(req);
-		this.itemsService.addAchievementsToUser(user_id, 1);
-		res.status(HttpStatus.OK).send('Achievement added');
+		const user = this.tokenManager.getUserFromToken(req);
+
+		this.itemsService.addAchievementsToUser(user.sub, 1);
+		return res.status(HttpStatus.OK).send('Achievement added');
 	}
 
 	@Get('add_friend/:id')
@@ -84,10 +88,10 @@ export class UsersController {
 		@Req() req: Request,
 		@Res() res: Response,
 	) {
-		const user_id = this.tokenManager.getIdFromToken(req);
+		const user = this.tokenManager.getUserFromToken(req);
 		console.log({FriendToAdd: friend_id});
-		this.itemsService.addFriendToUser(user_id, friend_id);
-		res.status(HttpStatus.OK).send('Friend added');
+		this.itemsService.addFriendToUser(user.sub, friend_id);
+		return res.status(HttpStatus.OK).send('Friend added');
 	}
 	@Get('block/:id')
 	async blockUser(
@@ -95,10 +99,10 @@ export class UsersController {
 		@Req() req: Request,
 		@Res() res: Response,
 	) {
-		const user_id = this.tokenManager.getIdFromToken(req);
+		const user = this.tokenManager.getUserFromToken(req);
 
 		console.log({UserToBlock: target_id});
-		if ((await this.itemsService.blockUser(user_id, target_id)))
+		if ((await this.itemsService.blockUser(user.sub, target_id)))
 			res.status(HttpStatus.ACCEPTED).send('User blocked');
 		else
 			res.status(HttpStatus.FORBIDDEN).send('Failed to block user');
@@ -110,10 +114,10 @@ export class UsersController {
 		@Req() req: Request,
 		@Res() res: Response,
 	) {
-		const user_id = this.tokenManager.getIdFromToken(req);
+		const user = this.tokenManager.getUserFromToken(req);
 
 		console.log({UserToBlock: target_id});
-		if ((await this.itemsService.unblockUser(user_id, target_id)))
+		if ((await this.itemsService.unblockUser(user.sub, target_id)))
 			res.status(HttpStatus.ACCEPTED).send('User blocked');
 		else
 			res.status(HttpStatus.FORBIDDEN).send('Failed to block user');
@@ -122,8 +126,6 @@ export class UsersController {
 	@Get('friends')
 	async getFriends(@Param('username') us: string, @Req() req: Request, @Res() res: Response) {
 		const user = this.tokenManager.getUserFromToken(req);
-		if (!user)
-			res.status(HttpStatus.NOT_FOUND).send({ msg: 'User not found' });
 		const friends = await this.itemsService.getFriends(user.sub);
 		if (friends)
 		{

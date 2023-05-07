@@ -46,19 +46,14 @@ export class LoginController {
 
 	@Post('')
 	async authFortyTwo(@Res() res: Response, @Body() body: AuthCode) {
-		let resToken;
-		await axios.post<TokenInfo>('https://api.intra.42.fr/oauth/token', this.getTokenBody(body.api_code))
-		.then(function (response) {
-			resToken = response.data;
-		})
-		.catch(function (error) { console.log(error); })
-		.finally(function () {});
+		const resToken = await this.authService.getAccessToken(body.api_code);
 		if (resToken)
 		{
 			console.log({TokenInfo: resToken});
 			const intraInfo = await this.usersService.fetcIntraInfo(resToken.access_token);
 			console.log({ Id: intraInfo.data.id, Login: intraInfo.data.login});
 			const user = await this.itemsService.getUserByIntraId(intraInfo.data.id);
+
 			if (user)
 			{
 				console.log('Logging in');

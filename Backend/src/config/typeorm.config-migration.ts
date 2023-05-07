@@ -2,5 +2,5 @@ import { varFetchService } from 'src/homepage/services/var_fetch/var_fetch.servi
 import { DataSource } from 'typeorm';
 
 export const connectionSource = new DataSource(
-	varFetchService.getDatasourceConfig(),
+		varFetchService.getDatasourceConfig(),
 );

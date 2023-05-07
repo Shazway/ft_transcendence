@@ -1,15 +1,39 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { IntraInfo } from 'src/homepage/dtos/Api.dto';
+import { IntraInfo, TokenInfo } from 'src/homepage/dtos/Api.dto';
 import { Transporter, createTransport } from 'nodemailer';
 import { varFetchService } from '../var_fetch/var_fetch.service';
 import { AuthOptions } from 'nodemailer-mailgun-transport';
 import { totp } from 'notp';
 import { authenticator } from 'otplib';
+import axios from 'axios';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
 	constructor(private jwtService: JwtService,) {}
+
+	getTokenBody(code: string) {
+		const authWorker = varFetchService.getAPIKeys();
+		return {
+			grant_type: 'authorization_code',
+			client_id: authWorker.u_key,
+			client_secret: authWorker.s_key,
+			code: code,
+			redirect_uri: 'http://localhost:4200/auth'
+		};
+	}
+
+	async getAccessToken(code: string) {
+		let resToken: TokenInfo;
+		await axios.post<TokenInfo>('https://api.intra.42.fr/oauth/token', this.getTokenBody(code))
+		.then(function (response) {
+			resToken = response.data;
+		})
+		.catch(function (error) { console.log(error); })
+		.finally(function () {});
+		return resToken;
+	}
 
 	async login(user: IntraInfo, user_id: number) {
 		const payload = {

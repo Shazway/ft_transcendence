@@ -39,6 +39,8 @@ export class MatchmakingGateway {
 
 	async handleConnection(client: Socket) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		if (!user)
+			client.disconnect();
 		console.log({ new_player: user });
 		const player_rank = (await this.itemsService.getUser(user.sub)).rank_score;
 		const rankFork = this.getRankFork(player_rank);
@@ -55,6 +57,8 @@ export class MatchmakingGateway {
 
 	async handleDisconnect(client: Socket) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		if (!user)
+			client.disconnect();
 		const player_rank = (await this.itemsService.getUser(user.sub)).rank_score;
 		const rankFork = this.getRankFork(player_rank);
 		const bracket = this.userQueue.get(rankFork);

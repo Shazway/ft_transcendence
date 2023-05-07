@@ -177,6 +177,8 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@SubscribeMessage('mute')
 	async handleMute(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		if (!user)
+			client.disconnect();
 		const channel_id = Number(client.handshake.query.channel_id);
 		const ret = await this.channelService.checkPrivileges(user.sub, body.target_id, channel_id);
 		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
@@ -194,6 +196,8 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@SubscribeMessage('unmute')
 	async handleUnmute(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		if (!user)
+			client.disconnect();
 		const channel_id = Number(client.handshake.query.channel_id);
 		const ret = await this.channelService.checkPrivileges(user.sub, body.target_id, channel_id);
 		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
@@ -211,6 +215,8 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@SubscribeMessage('ban')
 	async handleBan(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		if (!user)
+			client.disconnect();
 		const channel_id = Number(client.handshake.query.channel_id);
 		const ret = await this.channelService.checkPrivileges(user.sub, body.target_id, channel_id);
 		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
@@ -229,6 +235,8 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@SubscribeMessage('unban')
 	async handleUnban(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		if (!user)
+			client.disconnect();
 		const channel_id = Number(client.handshake.query.channel_id);
 		const ret = await this.channelService.checkPrivileges(user.sub, body.target_id, channel_id);
 		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
@@ -247,6 +255,8 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@SubscribeMessage('kick')
 	async handleKick(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		if (!user)
+			client.disconnect();
 		const channel_id = Number(client.handshake.query.channel_id);
 		const ret = await this.channelService.checkPrivileges(user.sub, body.target_id, channel_id);
 		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
@@ -272,6 +282,8 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		body.createdAt = new Date();
 		console.log(body);
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		if (!user)
+			client.disconnect();
 		const channel_id = Number(client.handshake.query.channel_id);
 		const Validity = await this.messageService.addMessageToChannel(
 			body,
@@ -291,6 +303,8 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@SubscribeMessage('checkPrivileges')
 	async checkPrivileges(@ConnectedSocket() client: Socket, @MessageBody() body: Message) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		if (!user)
+			client.disconnect();
 		const channel_id = Number(client.handshake.query.channel_id);
 		const rights = await this.channelService.checkPrivileges(
 			user.sub,
@@ -303,6 +317,8 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@SubscribeMessage('delMessage')
 	async deleteMessage(@ConnectedSocket() client: Socket, @MessageBody() body: Message) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization);
+		if (!user)
+			client.disconnect();
 		const channel_id = Number(client.handshake.query.channel_id);
 		console.log(body);
 		const ret = await this.channelService.checkPrivileges(
