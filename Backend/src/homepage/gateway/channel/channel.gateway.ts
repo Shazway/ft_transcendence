@@ -19,6 +19,7 @@ import { NotificationsGateway } from '../notifications/notifications.gateway';
 import { ItemsService } from 'src/homepage/services/items/items.service';
 import { ChannelUserRelation } from 'src/entities';
 import { NotificationRequest } from 'src/homepage/dtos/Notifications.dto';
+import { UsersService } from 'src/homepage/services/users/users.service';
 
 @WebSocketGateway(3002, {
 	cors: {
@@ -32,7 +33,8 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		private tokenManager: TokenManagerService,
 		private channelService: ChannelsService,
 		private itemService: ItemsService,
-		private notificationGateway: NotificationsGateway
+		private notificationGateway: NotificationsGateway,
+		private usersService: UsersService,
 	) {
 		this.channelList = new Map<number, Map<number, Array<Socket>>>();
 	}
@@ -195,6 +197,15 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@SubscribeMessage('addFriend')
 	async handleInvite(@ConnectedSocket() client: Socket, @MessageBody() body: NotificationRequest) {
 		await this.notificationGateway.handleInvite(client, body);
+	}
+
+	@SubscribeMessage('block')
+	async handleBlock(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
+		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
+
+		if ((await this.usersService.blockUser(user.sub, body.target_id)))
+			return client.emit('User blocked successfully');
+		client.emit('An error has occured');
 	}
 
 	@SubscribeMessage('mute')

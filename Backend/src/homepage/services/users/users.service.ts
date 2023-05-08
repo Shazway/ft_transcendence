@@ -57,4 +57,15 @@ export class UsersService {
 		if (userList.length === 0) return null;
 		return userList;
 	}
+
+	async blockUser(sourceId: number, targetId: number)
+	{
+		const sourceUser = await this.itemsService.getUser(sourceId);
+		const targetUser = await this.itemsService.getUser(targetId);
+
+		if (!sourceUser || !targetUser)
+			return null;
+		sourceUser.blacklistEntry.push(targetUser);
+		return await this.userRepository.save(sourceUser);
+	}
 }
