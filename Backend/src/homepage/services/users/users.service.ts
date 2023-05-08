@@ -58,14 +58,19 @@ export class UsersService {
 		return userList;
 	}
 
-	async blockUser(sourceId: number, targetId: number)
+	async isBlockedCheck(sourceId: number, suspectId: number) 
 	{
+		if (sourceId == 0)
+			return false;
 		const sourceUser = await this.itemsService.getUser(sourceId);
-		const targetUser = await this.itemsService.getUser(targetId);
+		const targetUser = await this.itemsService.getUser(suspectId);
 
 		if (!sourceUser || !targetUser)
-			return null;
-		sourceUser.blacklistEntry.push(targetUser);
-		return await this.userRepository.save(sourceUser);
+			return true;
+		sourceUser.blacklistEntry.forEach((blockedUser) => {
+			if (blockedUser.user_id == suspectId)
+				return true;
+		});
+		return false;
 	}
 }

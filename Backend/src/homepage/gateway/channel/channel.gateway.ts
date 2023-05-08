@@ -69,7 +69,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 						client.handshake.query.channel_pass
 					)))
 			)
-				this.sendMessageToChannel(channel_id, {
+				this.sendMessageToChannel(0, channel_id, {
 					message_id: 0,
 					message_content: user.name + ' joined the channel',
 					author: { username: 'System', user_id: 0 },
@@ -147,10 +147,13 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		});
 	}
 
-	sendMessageToChannel(channel_id: number, message: Message, dest = 'onMessage') {
+	async sendMessageToChannel(sourceId: number, channel_id: number, message: Message, dest = 'onMessage') {
 		const channel = this.channelList.get(channel_id);
 		if (!channel) throw new WsException('Channel does not exist');
-		channel.forEach((user) => this.socketEmit(user, dest, message));
+		channel.forEach(async (userSockets, key) => {
+			if (!(await this.usersService.isBlockedCheck(sourceId, key)))
+				this.socketEmit(userSockets, dest, message);
+		});
 		return true;
 	}
 
@@ -185,7 +188,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 		if (!user)
 		throw new WsException('User does not exist');
-		this.sendMessageToChannel(channel_id, {
+		await this.sendMessageToChannel(0, channel_id, {
 			message_id: 0,
 			message_content: user.username + ' left the channel',
 			author: { username: 'System', user_id: 0 },
@@ -203,7 +206,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	async handleBlock(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
 		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 
-		if ((await this.usersService.blockUser(user.sub, body.target_id)))
+		if ((await this.itemService.blockUser(user.sub, body.target_id)))
 			return client.emit('User blocked successfully');
 		client.emit('An error has occured');
 	}
@@ -339,7 +342,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		body.author.username = user.name;
 		body.author.user_id = user.sub;
 		body.message_id = Validity.message.message_id;
-		if (Validity.check.ret) this.sendMessageToChannel(channel_id, body);
+		if (Validity.check.ret) this.sendMessageToChannel(user.sub, channel_id, body);
 		else {
 			client.emit('onMessage', Validity.check.msg);
 			if (Validity.check.msg === 'User is banned') this.deleteUserFromList(client, user);
@@ -373,7 +376,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		if (user.sub != body.author.user_id && !ret.ret)
 			return client.emit('onError', 'Lacking privileges');
 		if (this.messageService.delMessage(body.message_id)) {
-			this.sendMessageToChannel(channel_id, body, 'delMessage');
+			this.sendMessageToChannel(user.sub, channel_id, body, 'delMessage');
 			console.log('message deleted: ' + body.message_id);
 		} else {
 			console.log('message not deleted: ' + body.message_id);

@@ -98,9 +98,9 @@ export class UsersController {
 
 		console.log({UserToBlock: target_id});
 		if ((await this.itemsService.unblockUser(user.sub, target_id)))
-			res.status(HttpStatus.ACCEPTED).send('User blocked');
+			res.status(HttpStatus.ACCEPTED).send('User unblocked');
 		else
-			res.status(HttpStatus.FORBIDDEN).send('Failed to block user');
+			res.status(HttpStatus.FORBIDDEN).send('Failed to unblock user');
 	}
 
 	@Get('friends')
