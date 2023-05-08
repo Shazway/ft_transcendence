@@ -18,7 +18,7 @@ import { MatchsService } from 'src/homepage/services/matchs/matchs.service';
 
 @WebSocketGateway(3005, {
 	cors: {
-		origin: '*'
+		origin: 'http://localhost:4200'
 	}
 })
 export class PongGateway {

@@ -22,7 +22,7 @@ import { NotificationRequest } from 'src/homepage/dtos/Notifications.dto';
 
 @WebSocketGateway(3002, {
 	cors: {
-		origin: '*'
+		origin: 'http://localhost:4200'
 	}
 })
 export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -114,7 +114,8 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			channel = this.channelList.get(Number(query.channel_id));
 		}
 		const users = channel.get(user.sub);
-		if (!users) channel.set(user.sub, new Array<Socket>());
+		if (!users)
+			channel.set(user.sub, new Array<Socket>());
 		channel.get(user.sub).push(client);
 		return true;
 	}
@@ -202,10 +203,15 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 		const channel_id = Number(client.handshake.query.channel_id);
 		const ret = await this.channelService.checkPrivileges(user.sub, body.target_id, channel_id);
-		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
+		const channel = this.channelList.get(channel_id);
+		if (!channel)
+			throw new WsException('Channel no longer exists');
+		if (!ret.ret)
+			return client.emit('onError', 'Lacking privileges');
 		if (!this.channelService.muteUser(user.sub, body.target_id, channel_id, body.time))
 			return client.emit('onError', 'Error while muting some dude');
-		const users = this.channelList.get(channel_id).get(body.target_id);
+
+		const users = channel.get(body.target_id);
 		this.socketEmit(
 			users,
 			'onMessage',
@@ -219,11 +225,13 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		const channel_id = Number(client.handshake.query.channel_id);
 		const ret = await this.channelService.checkPrivileges(user.sub, body.target_id, channel_id);
-
+		const channel = this.channelList.get(channel_id);
+		if (!channel)
+			throw new WsException('Channel no longer exists');
 		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
 		if (!this.channelService.unMuteUser(user.sub, body.target_id, channel_id))
 			return client.emit('onError', 'Error while unmuting some dude');
-		const users = this.channelList.get(channel_id).get(body.target_id);
+		const users = channel.get(body.target_id);
 		this.socketEmit(
 			users,
 			'onMessage',
@@ -237,10 +245,14 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		const channel_id = Number(client.handshake.query.channel_id);
 		const ret = await this.channelService.checkPrivileges(user.sub, body.target_id, channel_id);
+		const channel = this.channelList.get(channel_id);
+		if (!channel)
+			throw new WsException('Channel no longer exists');
 
 		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
 			this.channelService.banUser(user.sub, body.target_id, channel_id, body.time);
-		const targets = this.channelList.get(channel_id).get(body.target_id);
+
+		const targets = channel.get(body.target_id);
 		this.socketEmit(
 			targets,
 			'onMessage',
@@ -256,10 +268,14 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		const channel_id = Number(client.handshake.query.channel_id);
 		const ret = await this.channelService.checkPrivileges(user.sub, body.target_id, channel_id);
+		const channel = this.channelList.get(channel_id);
+		if (!channel)
+			throw new WsException('Channel no longer exists');
 
 		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
 			this.channelService.unBanUser(user.sub, body.target_id, channel_id);
-		const targets = this.channelList.get(channel_id).get(body.target_id);
+
+		const targets = channel.get(body.target_id);
 		this.socketEmit(
 			targets,
 			'onMessage',
@@ -275,20 +291,23 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		const channel_id = Number(client.handshake.query.channel_id);
 		const ret = await this.channelService.checkPrivileges(user.sub, body.target_id, channel_id);
+		const channel = this.channelList.get(channel_id);
+		if (!channel)
+			throw new WsException('Channel no longer exists');
 
 		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
-		const target = this.channelList.get(channel_id).get(body.target_id);
+		const targets = channel.get(body.target_id);
 		if (user.sub === body.target_id) {
 			this.channelLeaveMsg(channel_id, body);
 			return this.notificationGateway.sendMessage([user.sub], 'You have left the room');
 		}
-		if (target) {
+		if (targets) {
 			this.socketEmit(
-				target,
+				targets,
 				'onMessage',
 				'You have been kicked by ' + user.name + ' for reason: ' + body.message
 			);
-			this.socketDisconnect(target);
+			this.socketDisconnect(targets);
 		}
 		this.channelLeaveMsg(channel_id, body);
 		this.notificationGateway.sendMessage([user.sub], 'Successful kick');

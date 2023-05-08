@@ -62,14 +62,6 @@ export class UsersController {
 		});
 	}
 
-	@Get('add_achievement')
-	async addAchievement(@Req() req: Request, @Res() res: Response) {
-		const user = this.tokenManager.getUserFromToken(req);
-
-		this.itemsService.addAchievementsToUser(user.sub, 1);
-		return res.status(HttpStatus.OK).send('Achievement added');
-	}
-
 	@Get('add_friend/:id')
 	async addFriend(
 		@Param('id', ParseIntPipe) friend_id: number,

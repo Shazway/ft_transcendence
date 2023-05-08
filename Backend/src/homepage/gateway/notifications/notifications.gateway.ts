@@ -19,7 +19,7 @@ import { TokenManagerService } from 'src/homepage/services/token-manager/token-m
 
 @WebSocketGateway(3003, {
 	cors: {
-		origin: '*'
+		origin: 'http://localhost:4200'
 	}
 })
 export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisconnect {
