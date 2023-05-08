@@ -93,3 +93,8 @@ ul ul a {
 	font-size: 1.4rem;
 	font-weight: bold;
 }
+
+.body-text {
+	color: red;
+	padding: 5px;
+}

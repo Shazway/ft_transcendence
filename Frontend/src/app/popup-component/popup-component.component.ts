@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { AfterViewInit, Component, Input, TemplateRef, ViewChild } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -12,7 +12,7 @@ export class ChatPopup {
 	constructor(public activeModal: NgbActiveModal) {}
 
 	onSubmit(pun: any) {
-	this.activeModal.close(pun);
+		this.activeModal.close(pun);
 	}
 }
 
@@ -27,6 +27,6 @@ export class PunishmentPopup {
 	constructor(public activeModal: NgbActiveModal) {}
 
 	onSubmit(pun: any) {
-	this.activeModal.close(pun);
+		this.activeModal.close(pun);
 	}
 }

@@ -15,6 +15,8 @@ import { ValidateModule } from './validate/validate.module';
 import { MatchMakingComponent } from './match-making/match-making.component';
 import { ChatPopup, PunishmentPopup } from './popup-component/popup-component.component';
 import { NotificationService } from './notification.service';
+import { ProfileModule } from './profile/profile.module';
+import { ProfilePopupModule } from './profile-popup/profile-popup.module';
 
 @NgModule({
   declarations: [
@@ -32,6 +34,8 @@ import { NotificationService } from './notification.service';
 	FormsModule,
     AuthModule,
     ValidateModule,
+	ProfileModule,
+	ProfilePopupModule,
   ],
   providers: [
     FetchService,

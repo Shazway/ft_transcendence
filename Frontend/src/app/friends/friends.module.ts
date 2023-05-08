@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FriendsComponent } from './friends.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
-import { ChatModule } from '../chat/chat.module';
 
 
 
@@ -18,7 +17,6 @@ import { ChatModule } from '../chat/chat.module';
 		CommonModule,
 		FormsModule,
 		NgbModule,
-		ChatModule,
 	]
 })
 export class FriendsModule { }

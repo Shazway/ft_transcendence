@@ -1,22 +1,22 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ProfileComponent } from './profile.component';
+import { ProfilePopupComponent } from './profile-popup.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 
 
 @NgModule({
   declarations: [
-    ProfileComponent,
+    ProfilePopupComponent
   ],
   exports: [
-	ProfileComponent,
+	ProfilePopupComponent,
   ],
   imports: [
     CommonModule,
 	NgbModule,
   ],
   providers: [],
-  bootstrap: [ProfileComponent],
+  bootstrap: [ProfilePopupComponent],
 })
-export class ProfileModule { }
+export class ProfilePopupModule { }

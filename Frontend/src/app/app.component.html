@@ -49,8 +49,7 @@
     </nav>
 
 	<div class="w-100"><router-outlet></router-outlet></div>
-    <div *ngIf="isConnected()"><app-chat></app-chat></div>
-
+    <!-- <div *ngIf="isConnected()"><app-chat></app-chat></div> -->
 </div>
 
 <ng-template #toastFriendRequest>
@@ -96,4 +95,9 @@
             You won the acheivement XXX, congratulations
         </div>
     </div>
+</ng-template>
+
+<ng-template let-data="data" #popoverContent>
+	<!-- <p>{{ data.msg }}</p> -->
+	<app-profile-popup></app-profile-popup>
 </ng-template>
