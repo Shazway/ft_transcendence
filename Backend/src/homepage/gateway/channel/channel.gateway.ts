@@ -42,66 +42,82 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@WebSocketServer()
 	server;
 
-	async handleConnection(client: Socket) {
+	async handleConnection(client: Socket) 
+	{
 		let user;
-		try {
+		try
+		{
 			user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		} catch(error) {
+			const channel_id = Number(client.handshake.query.channel_id);
+			const channel = await this.channelService.getChannelById(channel_id);
+			if (!channel) {
+				client.emit('onError', 'Channel does not exist');
+				client.disconnect();
+				return;
+			}
+			if (!(await this.channelService.isUserMember(user.sub, channel_id))) 
+			{
+				if (
+					!channel.is_channel_private &&
+					((!channel.channel_password &&
+					(await this.addUserToChannel(user.sub, channel_id))) ||
+					(await this.addUserToChannel(
+					user.sub,
+					channel_id,
+					client.handshake.query.channel_pass
+					)))
+					)
+					await this.sendMessageToChannel(0, channel_id, 
+					{
+						message_id: 0,
+						message_content: user.name + ' joined the channel',
+						author: { username: 'System', user_id: 0 },
+						createdAt: new Date()
+					});
+					else return client.disconnect();
+			}
+			await this.channelService.isMuted(user.sub, channel_id); //Unmutes if time is up
+			if (
+				(await this.channelService.isBanned(user.sub, channel_id)) ||
+				!this.addUserToList(client, user)
+				)
+				{
+					client.emit('onError', 'User is banned');
+					return client.disconnect();
+				}
+		}
+		catch(error) {
 			console.log(error);
 			client.disconnect();
 			return ;
 		}
-		const channel_id = Number(client.handshake.query.channel_id);
-		const channel = await this.channelService.getChannelById(channel_id);
-		if (!channel) {
-			client.emit('onError', 'Channel does not exist');
-			client.disconnect();
-			return;
-		}
-		if (!(await this.channelService.isUserMember(user.sub, channel_id))) {
-			if (
-				!channel.is_channel_private &&
-				((!channel.channel_password &&
-					(await this.addUserToChannel(user.sub, channel_id))) ||
-					(await this.addUserToChannel(
-						user.sub,
-						channel_id,
-						client.handshake.query.channel_pass
-					)))
-			)
-				this.sendMessageToChannel(0, channel_id, {
-					message_id: 0,
-					message_content: user.name + ' joined the channel',
-					author: { username: 'System', user_id: 0 },
-					createdAt: new Date()
-				});
-			else return client.disconnect();
-		}
-		await this.channelService.isMuted(user.sub, channel_id); //Unmutes if time is up
-		if (
-			(await this.channelService.isBanned(user.sub, channel_id)) ||
-			!this.addUserToList(client, user)
-		) {
-			client.emit('onError', 'User is banned');
-			return client.disconnect();
-		}
 	}
 
-	handleDisconnect(client: Socket) {
+	handleDisconnect(client: Socket)
+	{
 		let user;
-		try {
+		try
+		{
 			user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		} catch(error) {
+			const channel_id = Number(client.handshake.query.channel_id);
+			const channel = this.channelList.get(channel_id)
+			if (!channel)
+				return client.disconnect();
+			const chanUser = channel.get(user.sub);
+			if(chanUser)
+			{
+				try {
+					this.deleteUserFromList(client, chanUser);
+				}
+				catch(error) {
+					console.log(error) ;
+				}
+			}
+		}
+		catch(error) {
 			client.disconnect();
 			return ;
 		}
-		const channel_id = Number(client.handshake.query.channel_id);
-		const channel = this.channelList.get(channel_id)
-		if (!channel)
-			return client.disconnect();
-		const chanUser = channel.get(user.sub);
-		if(chanUser)
-			this.deleteUserFromList(client, chanUser);
 	}
 
 	addUserToList(client: Socket, user: any) {
@@ -128,8 +144,6 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const channel = this.channelList.get(channel_id);
 		if (!channel) throw new WsException('Channel does not exist');
 		let users = channel.get(user.sub);
-		if (!users)
-			throw new WsException('UserList does not exist');
 		channel.set(
 			user.sub,
 			users.filter((user) => user !== client)
@@ -188,7 +202,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 		if (!user)
 		throw new WsException('User does not exist');
-		await this.sendMessageToChannel(0, channel_id, {
+		await await this.sendMessageToChannel(0, channel_id, {
 			message_id: 0,
 			message_content: user.username + ' left the channel',
 			author: { username: 'System', user_id: 0 },
@@ -342,7 +356,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		body.author.username = user.name;
 		body.author.user_id = user.sub;
 		body.message_id = Validity.message.message_id;
-		if (Validity.check.ret) this.sendMessageToChannel(user.sub, channel_id, body);
+		if (Validity.check.ret) await await this.sendMessageToChannel(user.sub, channel_id, body);
 		else {
 			client.emit('onMessage', Validity.check.msg);
 			if (Validity.check.msg === 'User is banned') this.deleteUserFromList(client, user);
@@ -376,7 +390,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		if (user.sub != body.author.user_id && !ret.ret)
 			return client.emit('onError', 'Lacking privileges');
 		if (this.messageService.delMessage(body.message_id)) {
-			this.sendMessageToChannel(user.sub, channel_id, body, 'delMessage');
+			await this.sendMessageToChannel(user.sub, channel_id, body, 'delMessage');
 			console.log('message deleted: ' + body.message_id);
 		} else {
 			console.log('message not deleted: ' + body.message_id);

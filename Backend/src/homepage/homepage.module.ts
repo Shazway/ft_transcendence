@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { ChannelsController } from './controllers/channels/channels.controller';
 import { ProfileController } from './controllers/profile/profile.controller';
