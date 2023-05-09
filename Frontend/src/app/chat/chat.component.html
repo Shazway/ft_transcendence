@@ -40,7 +40,7 @@
 								</div>
 								<p class="small me-3 mb-0 rounded-3 text-muted float-end">{{ getTime(msg_list) }}</p>
 							</div>
-							<img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp" alt="avatar 1" style="width: 45px; height: 100%;">
+							<img src="{{msg_list[0].author.img_url}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp';" alt="avatar 1" style="width: 45px; height: 100%;">
 						</div>
 <!-- End of current user field -->
 <!-- Start of System field -->
