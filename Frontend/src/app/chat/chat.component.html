@@ -40,7 +40,7 @@
 								</div>
 								<p class="small me-3 mb-0 rounded-3 text-muted float-end">{{ getTime(msg_list) }}</p>
 							</div>
-							<img src="{{msg_list[0].author.img_url}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp';" alt="avatar 1" style="width: 45px; height: 100%;">
+							<img class="rounded-circle" src="{{msg_list[0].author.img_url}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp';" alt="avatar 1" style="width: 45px; height: 100%;">
 						</div>
 <!-- End of current user field -->
 <!-- Start of System field -->
@@ -71,7 +71,7 @@
 
 			<form #userChatBox="ngForm" (ngSubmit)="onClickChat(userChatBox.value)" >
 				<div class="card-footer text-muted d-flex justify-content-start align-items-center p-3 gap-3">
-					<img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp" alt="avatar 3" style="width: 40px; height: 100%;">
+					<img src="{{getAvatar()}}" class="rounded-circle" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp';" alt="avatar 3" style="width: 40px; height: 100%;">
 					<input type="text" name="message_content" autocomplete="off" class="form-control form-control-lg text-input" id="exampleFormControlInput1" placeholder="Type message" ngModel>
 					<input type = "submit" class="btn btn-outline-secondary btn-sm rounded-5" value = "submit">
 				</div>

@@ -275,6 +275,10 @@ export class ChatComponent implements OnInit {
 		this.fetchService.createChannel({ channel_name: 'chan2' });
 	}
 
+	getAvatar() {
+		return localStorage.getItem('img_url');
+	}
+
 	sortMessage(new_msg: Message) {
 		console.log(new_msg)
 		if (this.test_msgs$.length && this.test_msgs$[this.test_msgs$.length - 1][0].author.user_id == new_msg.author.user_id) {

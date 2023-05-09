@@ -26,6 +26,9 @@ export interface IntraInfo {
 		link: string,
 		versions: {
 			large: string,
+			small: string,
+			medium: string,
+			micro: string,
 		},
 	};
 }
