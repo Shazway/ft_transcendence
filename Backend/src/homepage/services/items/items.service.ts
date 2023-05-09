@@ -377,13 +377,25 @@ export class ItemsService {
 		if (!userOne || !userTwo)
 			return null;
 		if (scoreOne == 10)
+		{
 			userOne.rank_score += 10;
+			userOne.wins += 1;
+		}
 		else
+		{
 			userOne.rank_score -= 10;
+			userOne.losses += 1;
+		}
 		if (scoreTwo == 10)
+		{
 			userTwo.rank_score += 10;
+			userTwo.wins += 1;
+		}
 		else
+		{
 			userTwo.rank_score -= 10;
+			userTwo.losses += 1;
+		}
 		if (userOne.rank_score < 0)
 			userOne.rank_score = 0;
 		if (userTwo.rank_score < 0)

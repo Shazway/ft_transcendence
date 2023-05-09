@@ -23,7 +23,7 @@ import { UsersService } from 'src/homepage/services/users/users.service';
 
 @WebSocketGateway(3002, {
 	cors: {
-		origin: 'http://localhost:4200'
+		origin: 'http://10.11.3.2:4200'
 	}
 })
 export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -209,7 +209,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 		if (!user)
 		throw new WsException('User does not exist');
-		await await this.sendMessageToChannel(0, channel_id, {
+		await this.sendMessageToChannel(0, channel_id, {
 			message_id: 0,
 			message_content: user.username + ' left the channel',
 			author: { username: 'System', user_id: 0 },
@@ -363,7 +363,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		body.author.username = user.name;
 		body.author.user_id = user.sub;
 		body.message_id = Validity.message.message_id;
-		if (Validity.check.ret) await await this.sendMessageToChannel(user.sub, channel_id, body);
+		if (Validity.check.ret) await this.sendMessageToChannel(user.sub, channel_id, body);
 		else {
 			client.emit('onMessage', Validity.check.msg);
 			if (Validity.check.msg === 'User is banned') this.deleteUserFromList(client, user);

@@ -17,6 +17,8 @@ import { ChatPopup, PunishmentPopup } from './popup-component/popup-component.co
 import { NotificationService } from './notification.service';
 import { ProfileModule } from './profile/profile.module';
 import { ProfilePopupModule } from './profile-popup/profile-popup.module';
+import { ToastComponent } from './toast/toast.component';
+import { ToastsContainer } from './toast/toast.container';
 
 @NgModule({
   declarations: [
@@ -36,6 +38,8 @@ import { ProfilePopupModule } from './profile-popup/profile-popup.module';
     ValidateModule,
 	ProfileModule,
 	ProfilePopupModule,
+	ToastComponent,
+	ToastsContainer,
   ],
   providers: [
     FetchService,

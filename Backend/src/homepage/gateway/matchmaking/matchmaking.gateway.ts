@@ -9,7 +9,7 @@ import { FoundMatch, Player } from 'src/homepage/dtos/Matchmaking.dto';
 
 @WebSocketGateway(3004, {
 	cors: {
-		origin: 'http://localhost:4200'
+		origin: 'http://10.11.3.2:4200'
 	}
 })
 export class MatchmakingGateway {
@@ -41,15 +41,14 @@ export class MatchmakingGateway {
 		let user;
 		try {
 			user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		} catch(error) {
+		} catch (error) {
 			console.log(error);
 			client.disconnect();
-			return ;
+			return;
 		}
 		console.log({ new_player: user });
-		const player = (await this.itemsService.getUser(user.sub));
-		if (!player)
-			throw new WsException('Player does not exist');
+		const player = await this.itemsService.getUser(user.sub);
+		if (!player) throw new WsException('Player does not exist');
 		const rankFork = this.getRankFork(player.rank_score);
 		let bracket = this.userQueue.get(rankFork);
 		if (!bracket) {
@@ -66,14 +65,13 @@ export class MatchmakingGateway {
 		let user;
 		try {
 			user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		} catch(error) {
+		} catch (error) {
 			client.disconnect();
-			return ;
+			return;
 		}
-		const player = (await this.itemsService.getUser(user.sub));
+		const player = await this.itemsService.getUser(user.sub);
 
-		if (!player)
-			throw new WsException('Player does not exist');
+		if (!player) return client.disconnect();
 		const rankFork = this.getRankFork(player.rank_score);
 		const bracket = this.userQueue.get(rankFork);
 		this.matchMaker = this.matchMaker.filter((player) => player.user_id != user.sub);
@@ -94,10 +92,9 @@ export class MatchmakingGateway {
 	}
 
 	async addUserTobracket(user_id: number, player: Player) {
-		const user = (await this.itemsService.getUser(user_id));
+		const user = await this.itemsService.getUser(user_id);
 
-		if (!user)
-			throw new WsException('User does not exist');
+		if (!user) throw new WsException('User does not exist');
 		const rankFork = this.getRankFork(user.rank_score);
 		const bracket = this.userQueue.get(rankFork);
 		bracket.set(user_id, player);
