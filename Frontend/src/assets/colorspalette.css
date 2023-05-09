@@ -1,0 +1,47 @@
+
+/*--Colors--*/
+.gunmetal {
+	background-color: #092327;
+	color: white;
+}
+.gunmetal.hoverable:hover {
+	background-color: #4E8098;
+}
+.darkslategrey {
+	background-color: #0B5351;
+	color: white;
+}
+.darkslategrey.hoverable:hover {
+	background-color: #4E8098;
+}
+.airforceblue {
+	background-color: #4E8098;
+	color: white;
+}
+.airforceblue.hoverable:hover {
+	background-color: #4E8098;
+	color: white;
+}
+.midnightgreen {
+	background-color: #0F3C43;
+	border-color: #4E8098 !important;
+	color: white;
+}
+.midnightgreen.hoverable:hover {
+	background-color:#4E8098 !important;
+	color: white !important;
+}
+.prussianblue {
+	background-color: #183E63;
+}
+.prussianblue.hoverable:hover {
+	background-color:#4E8098 !important;
+	color: white !important;
+}
+.lapislazuli {
+	background-color: #245C94 !important;
+}
+.lapislazuli.hoverable:hover {
+	background-color:#4E8098 !important;
+	color: white !important;
+}

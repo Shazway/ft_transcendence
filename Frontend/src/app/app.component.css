@@ -53,14 +53,12 @@ a, a:hover, a:focus {
     max-width: 250px;
     min-height: 100vh;
     /* don't forget to add all the previously mentioned styles here too */
-    background: #7386D5;
     color: #fff;
     transition: all 0.3s;
 }
 
 #sidebar .sidebar-header {
     padding: 20px;
-    background: #6d7fcc;
 }
 
 #sidebar ul.components {
