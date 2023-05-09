@@ -49,6 +49,7 @@ export class AuthComponent {
 				console.log("Expires in: " + loginReturn.tokenInfo.expires_in);
 				console.log("Intra ID: " + loginReturn.intraInfo.id);
 				console.log("User login: " + loginReturn.intraInfo.login);
+				console.log('img_url: ' + loginReturn.intraInfo.image.versions.large);
 			} else if (statusCode == 202) {
 				console.log(loginReturn);
 				bodyId = loginReturn.user_id;
