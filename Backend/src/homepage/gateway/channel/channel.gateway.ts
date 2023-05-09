@@ -55,7 +55,9 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				client.disconnect();
 				return;
 			}
-			if (!(await this.channelService.isUserMember(user.sub, channel_id))) 
+			else if (channel && !this.channelList.get(channel_id))
+				this.channelList.set(channel_id, new Map<number, Array<Socket>>);
+			if (!(await this.channelService.isUserMember(user.sub, channel_id)))
 			{
 				if (
 					!channel.is_channel_private &&
@@ -67,7 +69,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 					client.handshake.query.channel_pass
 					)))
 					)
-					await this.sendMessageToChannel(0, channel_id, 
+					await this.sendMessageToChannel(0, channel_id,
 					{
 						message_id: 0,
 						message_content: user.name + ' joined the channel',
