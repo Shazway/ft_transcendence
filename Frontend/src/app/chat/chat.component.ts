@@ -10,6 +10,8 @@ import { PunishmentPopup } from '../popup-component/popup-component.component';
 import { NotificationRequest } from 'src/dtos/Notification.dto';
 import { NotificationService } from '../notification.service';
 import { Router } from '@angular/router';
+import { AppComponent } from '../app.component';
+import { PopoverConfig } from 'src/dtos/Popover.dto';
 
 @Component({
 	selector: 'app-chat',
@@ -18,6 +20,7 @@ import { Router } from '@angular/router';
 })
 export class ChatComponent implements OnInit {
 	@ViewChild('customPopoverTemplate') popoverTemplate!: NgbPopover;
+	@ViewChild('chanBody') chatBody!: ElementRef;
 	currentMessage!: Message;
 	client!: Socket;
 	channels$: Channel[] = [];
@@ -39,9 +42,9 @@ export class ChatComponent implements OnInit {
 		private websocketService: WebsocketService,
 		private elRef: ElementRef,
 		private modalService: NgbModal,
-		private popoverConfig: NgbPopoverConfig,
 		private notificationService: NotificationService,
 		private router: Router,
+		private parent: AppComponent,
 	) {
 		this.client = io('ws://localhost:3002?channel_id=' + 1, websocketService.getHeader());
 		if (!this.client)
@@ -51,15 +54,7 @@ export class ChatComponent implements OnInit {
 		}
 		console.log('JWT token: ' + localStorage.getItem('Jwt_token'));
 		this.setClientEvent();
-		this.initPopoverConfig();
 		return;
-	}
-
-	initPopoverConfig() {
-		this.popoverConfig.autoClose = "outside";
-		this.popoverConfig.placement = "start";
-		this.popoverConfig.container = "body";
-		this.popoverConfig.popoverClass = "p-0";
 	}
 
 	setClientEvent() {
@@ -152,14 +147,20 @@ export class ChatComponent implements OnInit {
 	}
 
 	createChatPopup(msg: Message) {
-		this.currentMessage = msg;
-		this.client.emit('checkPrivileges', msg);
-		console.log("pass");
-		const sub = fromEvent(this.client, 'answerPrivileges').subscribe((data) => {
-			console.log(data);
-			this.is_admin = data;
-			sub.unsubscribe();
-		});
+		this.parent.openPopover('profile', new PopoverConfig(
+			this.chatBody.nativeElement,
+			'profile',
+			'outside',
+			'start',
+		));
+		// this.currentMessage = msg;
+		// this.client.emit('checkPrivileges', msg);
+		// console.log("pass");
+		// const sub = fromEvent(this.client, 'answerPrivileges').subscribe((data) => {
+		// 	console.log(data);
+		// 	this.is_admin = data;
+		// 	sub.unsubscribe();
+		// });
 	}
 
 	async createPopup(title: string, label: string) {
