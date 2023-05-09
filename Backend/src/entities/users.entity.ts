@@ -24,6 +24,9 @@ export class User {
 	@Column({ nullable: false, length: 20, unique: true })
 	username: string;
 
+	@Column({ default: null, length: 30, unique: false })
+	title: string;
+
 	@Column({ default: null, length: 255 })
 	img_url!: string;
 

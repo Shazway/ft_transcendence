@@ -9,7 +9,7 @@ export class NewUser {
 	login: string;
 	id: number;
 	email: string;
-	image: {link: string};
+	image: { link: string };
 }
 
 export class AnyProfileUser {
@@ -25,6 +25,7 @@ export class AnyProfileUser {
 	friend: User[];
 	user_id: number;
 	intra_id!: number;
+	title: string;
 	@Exclude()
 	channel: ChannelUser[];
 	@Exclude()
@@ -52,6 +53,7 @@ export class MyProfileUser {
 	receivedFriendRequests: Friendrequest[];
 	user_id: number;
 	intra_id!: number;
+	title: string;
 }
 
 export class LeaderBoardUser {
