@@ -16,6 +16,7 @@ import { TokenManagerService } from 'src/homepage/services/token-manager/token-m
 import { DeleteUser, NewChan, SerializedChan } from '../../dtos/Chan.dto';
 import { plainToClass } from 'class-transformer';
 import { MessagesService } from 'src/homepage/services/messages/messages.service';
+import { ItemsService } from 'src/homepage/services/items/items.service';
 
 @Controller('channels')
 export class ChannelsController {
@@ -23,6 +24,7 @@ export class ChannelsController {
 		private channelService: ChannelsService,
 		private tokenManager: TokenManagerService,
 		private messageService: MessagesService,
+		private itemsService: ItemsService
 	) {}
 	@Get('')
 	async getUsersChannel(@Req() req: Request, @Res() res: Response) {
@@ -97,7 +99,15 @@ export class ChannelsController {
 		@Req() req: Request,
 		@Res() res: Response,
 	) {
-		const messages = await this.messageService.getPage(chan_id, page_num);
+		const user = this.tokenManager.getUserFromToken(req);
+		let messages = await this.messageService.getPage(chan_id, page_num);
+
+		const userEntity = await this.itemsService.getUser(user.sub);
+		if (!userEntity)
+			res.status(HttpStatus.NOT_FOUND).send('You don\'t exist wtf');
+		messages = messages.filter((message) => {
+			userEntity.blacklistEntry.find(user => user.user_id == message.author.user_id)
+		});
 		if (!messages)
 			res.status(HttpStatus.NOT_FOUND).send({ msg: 'No message in the channel: ' + chan_id });
 		else res.status(HttpStatus.OK).send(messages);

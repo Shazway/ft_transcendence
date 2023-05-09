@@ -17,7 +17,7 @@ export class NotificationsService {
 		if (!user)
 			return null;
 		user.activity_status = status;
-		return this.user_repo.save(user);
+		return await this.user_repo.save(user);
 	}
 
 	async getUserStatus(user_id: number) {

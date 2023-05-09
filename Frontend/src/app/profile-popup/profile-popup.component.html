@@ -1,23 +1,24 @@
-<div class="card-body p-4">
+<div *ngIf="!(user | async)" class="spinner-border text-primary"></div>
+<div *ngIf="user | async" class="card-body p-4">
 	<div class="d-flex text-black">
 		<div class="flex-shrink-0">
-			<img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp" alt="Generic placeholder image" class="img-fluid card-profile-pic">
+			<img *ngIf="user | async as userConf" src="{{userConf.img_url}}" alt="Generic placeholder image" class="img-fluid card-profile-pic">
 		</div>
 		<div class="flex-grow-1 ms-3">
 
 			<div class="d-flex gap-2">
 				<div class="w-100">
-					<h5 class="mb-1 text-center">{{userConfirmed.username}}</h5>
+					<h5 *ngIf="user | async as userConf" class="mb-1 text-center">{{userConf.username}}</h5>
 					<p class="mb-2 pb-1 text-center">mettre ici un titre a acheter ?</p>
 					<div class="d-flex justify-content-start rounded-3 p-2 mb-2 stat-box">
 						<div class="col justify-content-center">
 							<p class="small text-muted mb-1 text-center">Wins / Losses</p>
-							<p class="mb-0 text-center">{{userConfirmed.wins}} / {{userConfirmed.losses}}</p>
+							<p *ngIf="user | async as userConf" class="mb-0 text-center">{{userConf.wins}} / {{userConf.losses}}</p>
 						</div>
 						<div class="col justify-content-center">
 							<p class="small text-muted mb-1 text-center">Status</p>
 							<div class="d-flex justify-content-center">
-								<p class="mb-0 text-center pe-1">{{userConfirmed.activity_status ? 'offline' : 'online'}}</p>
+								<p *ngIf="user | async as userConf" class="mb-0 text-center pe-1">{{userConf.activity_status ? 'online' : 'offline'}}</p>
 								<span class="badge bg-success dot rounded-circle status-dot">&nbsp;</span>
 							</div>
 						</div>
@@ -26,8 +27,8 @@
 
 				<div class="d-flex justify-content-start rounded-3 p-2 mb-2 stat-box">
 					<div class="col justify-content-center">
-						<p class="small text-muted mb-1 text-center">Rank</p>
-						<p class="mb-0 text-center font-weight-bold display-2 rank-label">127</p>
+						<p class="small text-muted mb-1 text-center">Rank score</p>
+						<p *ngIf="user | async as userConf" class="mb-0 text-center font-weight-bold display-2 rank-label">{{userConf.rank_score}}</p>
 					</div>
 				</div>
 			</div>

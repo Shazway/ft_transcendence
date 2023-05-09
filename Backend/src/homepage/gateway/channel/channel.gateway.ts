@@ -144,6 +144,11 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const channel = this.channelList.get(channel_id);
 		if (!channel) throw new WsException('Channel does not exist');
 		let users = channel.get(user.sub);
+		if (!users)
+		{
+			client.disconnect();
+			return true;
+		}
 		channel.set(
 			user.sub,
 			users.filter((user) => user !== client)
