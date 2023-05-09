@@ -33,7 +33,7 @@ export class AuthComponent {
 		let user_data: User;
 		let statusCode = 0;
 		let bodyId = 0;
-		await axios.post<LogInReturn>('http://localhost:3001/login', {api_code: code})
+		await axios.post<LogInReturn>('http://10.11.3.2:3001/login', {api_code: code})
 		.then(function (response) {
 			statusCode = response.status;
 			loginReturn = response.data;
@@ -43,6 +43,7 @@ export class AuthComponent {
 				localStorage.setItem('Jwt_token', loginReturn.jwt_token);
 				localStorage.setItem('id', "" + loginReturn.user_id);
 				localStorage.setItem('username', loginReturn.intraInfo.login);
+				localStorage.setItem('img_url', loginReturn.intraInfo.image.versions.large);
 				console.log("Jwt token: " + loginReturn.jwt_token);
 				console.log("42 token: " + loginReturn.tokenInfo.access_token);
 				console.log("Expires in: " + loginReturn.tokenInfo.expires_in);

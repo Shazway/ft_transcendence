@@ -13,7 +13,7 @@ export class NotificationService {
 		private websocketService: WebsocketService,
 
 	) { 
-		this.client = io('ws://localhost:3003', this.websocketService.getHeader());
+		this.client = io('ws://10.11.3.2:3003', this.websocketService.getHeader());
 		this.setClientEvent();
 	}
 
