@@ -42,6 +42,6 @@ export class AppComponent {
 		this.popover.popoverClass = config.classId;
 		this.popover.popoverTitle = config.title;
 		this.popover.positionTarget = config.positionTarget;
-		this.popover.open({ data: config.data});
+		this.popover.open({ data: config.data });
 	}
 }

@@ -25,12 +25,13 @@ export class ProfileController {
 
 	@Get(':username')
 	async getProfile(@Param('username') us: string, @Req() req: Request, @Res() res: Response) {
-		const user = await this.itemService.getUser(this.tokenManager.getIdFromToken(req));
+		const user = this.tokenManager.getUserFromToken(req);
+		const targetUser = await this.itemService.getUserByUsername(us);
 		let serializedUser: MyProfileUser | AnyProfileUser;
 
-		if (user && user.username === us)
-			serializedUser = plainToClass(MyProfileUser, user);
-		else if (user) serializedUser = plainToClass(AnyProfileUser, user);
+		if (user && targetUser && user.name === targetUser.username)
+			serializedUser = plainToClass(MyProfileUser, targetUser);
+		else if (user && targetUser) serializedUser = plainToClass(AnyProfileUser, targetUser);
 		else res.status(HttpStatus.NOT_FOUND).send({ msg: 'User not found' });
 		if (user) res.status(HttpStatus.OK).send(serializedUser);
 	}

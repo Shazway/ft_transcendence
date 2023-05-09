@@ -22,7 +22,7 @@ export class LoginComponent {
 	}
 
 	async onClickSubmitLogin(data: User) {
-		console.log(await this.loginService.getUser(data));
+		console.log(await this.loginService.getUser(data.login));
 	}
 
 	async onClickAuth() {

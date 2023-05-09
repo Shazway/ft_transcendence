@@ -6,6 +6,7 @@ import { Message } from 'src/dtos/message';
 import { NewChan } from 'src/dtos/NewChan.dto';
 import { Channel } from 'src/dtos/Channel.dto'
 import { AnyProfileUser, User } from 'src/dtos/User.dto';
+import { isUndefined } from 'mathjs';
 
 @Injectable({
   providedIn: 'root'
@@ -62,9 +63,9 @@ export class FetchService {
 		return res;
 	}
 
-	async getUser(param: User) {
+	async getUser(login: string) {
 		let res;
-		await axios.get<Response>('http://localhost:3001/users/' + param.login, this.getHeader())
+		await axios.get<Response>('http://localhost:3001/users/' + login, this.getHeader())
 		.then(function (response) {
 			res = response.data;
 			console.log(res);
@@ -75,6 +76,20 @@ export class FetchService {
 		.catch(function (error) { console.log(error); })
 		.finally(function () {});
 		return res;
+	}
+
+	async getProfile(login: string): Promise<AnyProfileUser | null> {
+		let res: AnyProfileUser | undefined;
+		await axios.get<AnyProfileUser>('http://localhost:3001/profile/' + login, this.getHeader())
+		.then(function (response) {
+			res = response.data;
+			console.log(res);
+		})
+		.catch(function (error) { console.log(error); })
+		.finally(function () {});
+		if (res)
+			return res;
+		return null;
 	}
 
 	async getFriends() {

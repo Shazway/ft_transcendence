@@ -1,4 +1,4 @@
-.popover.hide .popover-arrow { display: none; }
+.popover.arrow-hide .popover-arrow { display: none; }
 
 .popover.profile { max-width: 800px; }
 .popover.profile .popover-header { }

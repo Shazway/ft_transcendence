@@ -98,6 +98,5 @@
 </ng-template>
 
 <ng-template let-data="data" #popoverContent>
-	<!-- <p>{{ data.msg }}</p> -->
-	<app-profile-popup></app-profile-popup>
+	<app-profile-popup [data]="data"></app-profile-popup>
 </ng-template>

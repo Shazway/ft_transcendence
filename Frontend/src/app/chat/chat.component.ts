@@ -149,9 +149,10 @@ export class ChatComponent implements OnInit {
 	createChatPopup(msg: Message) {
 		this.parent.openPopover('profile', new PopoverConfig(
 			this.chatBody.nativeElement,
-			'profile',
+			'profile arrow-hide',
 			'outside',
 			'start',
+			msg,
 		));
 		// this.currentMessage = msg;
 		// this.client.emit('checkPrivileges', msg);
