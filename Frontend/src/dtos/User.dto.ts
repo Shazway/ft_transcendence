@@ -32,5 +32,5 @@ export interface AnyProfileUser {
 	friend: User[];
 	user_id: number;
 	intra_id: number;
-
+	title: string;
 }

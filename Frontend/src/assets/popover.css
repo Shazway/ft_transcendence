@@ -2,4 +2,4 @@
 
 .popover.profile { max-width: 800px; }
 .popover.profile .popover-header { }
-.popover.profile .popover-body { }
+.popover.profile .popover-body { padding: 0; }

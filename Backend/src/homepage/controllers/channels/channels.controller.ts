@@ -106,7 +106,7 @@ export class ChannelsController {
 		if (!userEntity)
 			res.status(HttpStatus.NOT_FOUND).send('You don\'t exist wtf');
 		messages = messages.filter((message) => {
-			userEntity.blacklistEntry.find(user => user.user_id == message.author.user_id)
+			return !userEntity.blacklistEntry.find(blockedUser => blockedUser.user_id == message.author.user_id);
 		});
 		if (!messages)
 			res.status(HttpStatus.NOT_FOUND).send({ msg: 'No message in the channel: ' + chan_id });
