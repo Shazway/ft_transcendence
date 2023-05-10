@@ -1,58 +1,90 @@
 <div class="w-100">
 	<div class="container pt-3 pb-5 h-100">
-	  <div class="row d-flex justify-content-center align-items-center h-100">
-		<div class="col">
-		  <div class="card profile-card">
-			<div class="card-body p-4">
-			  <div class="d-flex text-black">
-				<div class="flex-shrink-0">
-				  <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp"
-					alt="Generic placeholder image" class="img-fluid card-profile-pic">
-				</div>
-				<div class="flex-grow-1 ms-3">
+		<div class="row d-flex justify-content-center align-items-center h-100">
+			<div class="col">
+				<div class="card profile-card">
+					<div class="card-body p-4">
+						<div class="d-flex text-black">
+							<div class="flex-shrink-0">
+							<img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp"
+								alt="Generic placeholder image" class="img-fluid card-profile-pic">
+							</div>
+							<div class="flex-grow-1 ms-3">
 
-				  <div class="d-flex gap-2">
-					<div class="w-100">
-						<h5 class="mb-1 text-center">Mr. Connasse</h5>
-						<p class="mb-2 pb-1 text-center">mettre ici un titre a acheter ?</p>
-						<div class="d-flex justify-content-start rounded-3 p-2 mb-2 stat-box">
-							<div class="col justify-content-center">
-								<p class="small text-muted mb-1 text-center">Wins / Losses</p>
-								<p class="mb-0 text-center">41 / 72</p>
-							</div>
-							<div class="col justify-content-center">
-								<p class="small text-muted mb-1 text-center">Achievements</p>
-								<p class="mb-0 text-center">72%</p>
-							</div>
-							<div class="col justify-content-center">
-								<p class="small text-muted mb-1 text-center">Status</p>
-								<div class="d-flex justify-content-center">
-									<p class="mb-0 text-center pe-1">online</p>
-									<span class="badge bg-success dot rounded-circle status-dot">&nbsp;</span>
+							<div class="d-flex gap-2">
+								<div class="w-100">
+									<h5 class="mb-1 text-center">Mr. Connasse</h5>
+									<p class="mb-2 pb-1 text-center">mettre ici un titre a acheter ?</p>
+									<div class="d-flex justify-content-start rounded-3 p-2 mb-2 stat-box">
+										<div class="col justify-content-center">
+											<p class="small text-muted mb-1 text-center">Wins / Losses</p>
+											<p class="mb-0 text-center">41 / 72</p>
+										</div>
+										<div class="col justify-content-center">
+											<p class="small text-muted mb-1 text-center">Achievements</p>
+											<p class="mb-0 text-center">72%</p>
+										</div>
+										<div class="col justify-content-center">
+											<p class="small text-muted mb-1 text-center">Status</p>
+											<div class="d-flex justify-content-center">
+												<p class="mb-0 text-center pe-1">online</p>
+												<span class="badge bg-success dot rounded-circle status-dot">&nbsp;</span>
+											</div>
+										</div>
+									</div>
 								</div>
+
+								<div class="d-flex justify-content-start rounded-3 p-2 mb-2 stat-box">
+									<div class="col justify-content-center">
+										<p class="small text-muted mb-1 text-center">Rank</p>
+										<p class="mb-0 text-center font-weight-bold display-2 rank-label">127</p>
+									</div>
+								</div>
+								</div>
+
+							<div class="d-flex pt-1 gap-2">
+								<button type="button" class="btn btn-outline-primary flex-grow-1">Chat</button>
+								<button type="button" class="btn btn-outline-primary flex-grow-1">Challenge</button>
+								<button type="button" class="btn btn-primary" style="flex-grow: 5;">Add Friend</button>
+							</div>
 							</div>
 						</div>
 					</div>
-
-					<div class="d-flex justify-content-start rounded-3 p-2 mb-2 stat-box">
-						<div class="col justify-content-center">
-							<p class="small text-muted mb-1 text-center">Rank</p>
-							<p class="mb-0 text-center font-weight-bold display-2 rank-label">127</p>
-						</div>
-					</div>
-					</div>
-
-				  <div class="d-flex pt-1 gap-2">
-					<button type="button" class="btn btn-outline-primary flex-grow-1">Chat</button>
-					<button type="button" class="btn btn-outline-primary flex-grow-1">Challenge</button>
-					<button type="button" class="btn btn-primary" style="flex-grow: 5;">Add Friend</button>
-				  </div>
 				</div>
-			  </div>
 			</div>
-		  </div>
 		</div>
-	  </div>
 	</div>
-  </div>
-<button type="button" class="btn btn-outline-primary" style="margin-left: 400px; margin-top: 300px;" (click)="showPopover()" #customId>Click me</button>
+	<div class="row gap-3 px-5 mx-2" style="height: 33vw;">
+		<div class="col border rounded-3 white"></div>
+		<div class="col border rounded-3 white"></div>
+		<div class="col border rounded-3 white h-100 p-0">
+			<table class="w-100 h-100">
+				<thead class="w-100">
+					<div class="d-flex w-100 justify-content-center">
+						<h2 class="m-auto mt-2">Match History</h2>
+					</div>
+				</thead>
+				<hr class="mb-0">
+				<div class="w-100" style="height: 95%; overflow-y: auto;">
+					<div *ngFor="let match of matchHistory" class="d-flex w-100 p-1 border-bottom">
+						<img class="rounded-circle versus-img player" src="{{match.P1URL}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 1">
+						<div class="flex-grow-1">
+							<div class="d-flex align-items-center justify-content-center px-2">
+								<h4 class="m-0">{{isVictory(match) ? 'Victory' : 'Defeat'}}</h4>
+							</div>
+							<div class="row">
+								<div class="col d-flex align-items-center justify-content-center px-2"><p class="m-0 small">{{match.Player1}}</p></div>
+								<div class="col-3 d-flex align-items-center justify-content-center px-2"><p class="m-0 small">{{match.P1score}} / {{match.P2score}}</p></div>
+								<div class="col d-flex align-items-center justify-content-center px-2"><p class="m-0 small">{{match.Player2}}</p></div>
+							</div>
+							<div class="d-flex align-items-center justify-content-center px-2">
+								<p class="m-0 small text-muted">{{getTimeDiff(match.date)}}</p>
+							</div>
+						</div>
+						<img class="rounded-circle versus-img opponent" src="{{match.P2URL}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 2">
+					</div>
+				</div>
+			</table>
+		</div>
+	</div>
+</div>

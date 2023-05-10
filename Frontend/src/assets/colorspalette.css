@@ -1,5 +1,12 @@
 
 /*--Colors--*/
+.white {
+	background-color: white;
+	color: black;
+}
+.white.hoverable:hover {
+	background-color: #4E8098;
+}
 .gunmetal {
 	background-color: #092327;
 	color: white;
@@ -33,6 +40,7 @@
 }
 .prussianblue {
 	background-color: #183E63;
+	color: white !important;
 }
 .prussianblue.hoverable:hover {
 	background-color:#4E8098 !important;
