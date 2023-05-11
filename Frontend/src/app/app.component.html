@@ -51,7 +51,9 @@
 	<div class="w-100 gunmetal">
 		<router-outlet></router-outlet>
 		<!-- <ngbd-toast-global></ngbd-toast-global> -->
-		<Button class="btn btn-primary" (click)="showFriendReq()">nice</Button>
+		<Button class="btn btn-primary" (click)="showFriendReq()">Friend Req</Button>
+		<Button class="btn btn-primary" (click)="showAchievements()">Achievements</Button>
+		<Button class="btn btn-primary" (click)="showChallenge()">Challenge</Button>
 	</div>
     <!-- <div *ngIf="isConnected()"><app-chat></app-chat></div> -->
 	<app-toasts></app-toasts>
@@ -61,7 +63,7 @@
     <div role="alert" aria-live="assertive" aria-atomic="true" style="position: relative; min-height: 200px;">
         <div class="toast-header">
         <strong class="mr-auto">Friend request</strong>
-        <button type="button" class="ml-2 mb-1 close" (click)="notifDismiss(toast)" aria-label="Close">
+        <button type="button" class="btn ml-2 mb-1 close" (click)="notifDismiss(toast)" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
         </div>
@@ -75,13 +77,13 @@
     <div role="alert" aria-live="assertive" aria-atomic="true" style="position: relative; min-height: 200px;">
         <div class="toast-header">
         <strong class="mr-auto">Challenge</strong>
-        <button type="button" class="ml-2 mb-1 close" (click)="notifDismiss(toast)" aria-label="Close">
+        <button type="button" class="btn ml-2 mb-1 close" (click)="notifDismiss(toast)" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
         </div>
         <div class="toast-body">
         <!-- {{user_name}} challenges you -->
-        XXX challenges you
+        {{context}} challenges you
         </div>
     </div>
 </ng-template>
@@ -90,13 +92,13 @@
     <div role="alert" aria-live="assertive" aria-atomic="true" style="position: relative; min-height: 200px;">
         <div class="toast-header">
         <strong class="mr-auto">New acheivement</strong>
-        <button type="button" class="ml-2 mb-1 close" (click)="notifDismiss(toast)" aria-label="Close">
+        <button type="button" class="btn ml-2 mb-1 close" (click)="notifDismiss(toast)" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
         </div>
         <div class="toast-body">
-        <!-- You won the acheivement {{acheivement_name}}, congratulations -->
-            You won the acheivement XXX, congratulations
+        <!-- You won the achievement {{achievement_name}}, congratulations -->
+            You won the achievements {{context}}, congratulations
         </div>
     </div>
 </ng-template>

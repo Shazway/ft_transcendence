@@ -37,6 +37,14 @@ export class NotificationService {
 		this.toastService.show(this.toastFriendRequest, { classname: 'bg-success text-light p-0', delay: 10000, context: 'Nyehehe' });
 	}
 
+	showAchievements() {
+		this.toastService.show(this.toastAchievement, { classname: 'p-0', delay: 10000, context: 'Nyehehe' });
+	}
+
+	showChallenge() {
+		this.toastService.show(this.toastChallenge, { classname: 'bg-primary text-light p-0', delay: 10000, context: 'Nyehehe' });
+	}
+
 	initTemplates(toastFriendRequest: TemplateRef<any>, toastChallenge: TemplateRef<any>, toastAchievement: TemplateRef<any>) {
 		this.toastFriendRequest = toastFriendRequest;
 		this.toastChallenge = toastChallenge;

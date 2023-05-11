@@ -58,6 +58,14 @@ export class AppComponent implements AfterViewInit {
 		this.notifService.showFriendRequest();
 	}
 
+	showAchievements() {
+		this.notifService.showAchievements();
+	}
+
+	showChallenge() {
+		this.notifService.showChallenge();
+	}
+
 	notifDismiss(toast: any) {
 		this.notifService.notifDismiss(toast);
 	}
