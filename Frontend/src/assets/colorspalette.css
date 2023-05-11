@@ -53,3 +53,6 @@
 	background-color:#4E8098 !important;
 	color: white !important;
 }
+.toast-body {
+	padding: 0 !important;
+}

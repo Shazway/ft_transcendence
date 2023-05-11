@@ -1,4 +1,4 @@
-import { Component, OnDestroy, TemplateRef } from '@angular/core';
+import { Component, OnDestroy, TemplateRef, ViewChild } from '@angular/core';
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { ToastService } from './toast.service';
@@ -18,7 +18,7 @@ export class ToastComponent implements OnDestroy {
 	}
 
 	showSuccess() {
-		this.toastService.show('I am a success toast', { classname: 'bg-success text-light', delay: 10000 });
+		this.toastService.show('ye', { classname: 'bg-success text-light', delay: 10000, type: 'toastFriendRequest' });
 	}
 
 	showDanger(dangerTpl: string | TemplateRef<any>) {

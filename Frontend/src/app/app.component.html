@@ -48,29 +48,31 @@
         </ul>
     </nav>
 
-	<div class="w-100 gunmetal"><router-outlet></router-outlet></div>
+	<div class="w-100 gunmetal">
+		<router-outlet></router-outlet>
+		<!-- <ngbd-toast-global></ngbd-toast-global> -->
+		<Button class="btn btn-primary" (click)="showFriendReq()">nice</Button>
+	</div>
     <!-- <div *ngIf="isConnected()"><app-chat></app-chat></div> -->
-	<!-- <ngbd-toast-global></ngbd-toast-global> -->
-	<!-- <app-toasts></app-toasts> -->
+	<app-toasts></app-toasts>
 </div>
 
-<ng-template #toastFriendRequest>
-    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="position: relative; min-height: 200px;">
+<ng-template let-toast="toast" let-context="context" #toastFriendRequest>
+    <div role="alert" aria-live="assertive" aria-atomic="true" style="position: relative; min-height: 200px;">
         <div class="toast-header">
         <strong class="mr-auto">Friend request</strong>
-        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+        <button type="button" class="ml-2 mb-1 close" (click)="notifDismiss(toast)" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
         </div>
         <div class="toast-body">
-        <!-- {{user_name}} wants to be your friend! -->
-        XXX wants to be you friend!
+        {{context}} wants to be your friend!
         </div>
     </div>
 </ng-template>
 
 <ng-template #toastChallenge>
-    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="position: relative; min-height: 200px;">
+    <div role="alert" aria-live="assertive" aria-atomic="true" style="position: relative; min-height: 200px;">
         <div class="toast-header">
         <strong class="mr-auto">Challenge</strong>
         <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
@@ -85,7 +87,7 @@
 </ng-template>
 
 <ng-template #toastAchievement>
-    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="position: relative; min-height: 200px;">
+    <div role="alert" aria-live="assertive" aria-atomic="true" style="position: relative; min-height: 200px;">
         <div class="toast-header">
         <strong class="mr-auto">New acheivement</strong>
         <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">

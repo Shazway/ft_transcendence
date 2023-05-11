@@ -46,7 +46,7 @@ export class ChatComponent implements OnInit {
 		private router: Router,
 		private parent: AppComponent,
 	) {
-		this.client = io('ws://10.11.3.2:3002?channel_id=' + 1, websocketService.getHeader());
+		this.client = io('ws://localhost:3002?channel_id=' + 1, websocketService.getHeader());
 		if (!this.client)
 		{
 			this.router.navigateByUrl('login');
@@ -256,7 +256,7 @@ export class ChatComponent implements OnInit {
 			return;
 		for (let index = this.msgs$.length; index > 0; index--)
 			this.sortMessage(this.msgs$[index - 1]);
-		this.client = io('ws://10.11.3.2:3002?channel_id=' + channelId, this.websocketService.getHeader());
+		this.client = io('ws://localhost:3002?channel_id=' + channelId, this.websocketService.getHeader());
 		this.setClientEvent();
 		this.slideChan();
 	}

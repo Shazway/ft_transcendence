@@ -23,7 +23,7 @@ import { UsersService } from 'src/homepage/services/users/users.service';
 
 @WebSocketGateway(3002, {
 	cors: {
-		origin: 'http://10.11.3.2:4200'
+		origin: 'http://localhost:4200'
 	}
 })
 export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect {

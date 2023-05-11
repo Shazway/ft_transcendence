@@ -1,6 +1,7 @@
-import { Component, ElementRef, TemplateRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, TemplateRef, ViewChild } from '@angular/core';
 import { AutoClose, Placement, PopoverConfig, Target } from '../dtos/Popover.dto';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
+import { NotificationService } from './notification.service';
 
 
 @Component({
@@ -9,15 +10,23 @@ import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
   styleUrls: ['./app.component.css'],
   providers: [NgbPopover],
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit {
 	@ViewChild('popoverContent') profileTemplate!: TemplateRef<any>;
+	@ViewChild('toastFriendRequest') toastFriendRequest!: TemplateRef<any>;
+	@ViewChild('toastChallenge') toastChallenge!: TemplateRef<any>;
+	@ViewChild('toastAchievement') toastAchievement!: TemplateRef<any>;
 	title = 'Frontend';
 	isExpanded = false;
 
 	constructor(
 		private elRef: ElementRef,
 		private popover: NgbPopover,
+		private notifService: NotificationService,
 	){}
+
+	ngAfterViewInit(): void {
+		this.notifService.initTemplates(this.toastFriendRequest, this.toastChallenge, this.toastAchievement)
+	}
 
 	isConnected() {
 		return localStorage.getItem('Jwt_token') ? true : false;
@@ -43,5 +52,13 @@ export class AppComponent {
 		this.popover.popoverTitle = config.title;
 		this.popover.positionTarget = config.positionTarget;
 		this.popover.open({ data: config.data });
+	}
+
+	showFriendReq() {
+		this.notifService.showFriendRequest();
+	}
+
+	notifDismiss(toast: any) {
+		this.notifService.notifDismiss(toast);
 	}
 }

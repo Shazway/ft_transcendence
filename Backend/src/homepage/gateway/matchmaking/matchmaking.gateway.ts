@@ -9,7 +9,7 @@ import { FoundMatch, Player } from 'src/homepage/dtos/Matchmaking.dto';
 
 @WebSocketGateway(3004, {
 	cors: {
-		origin: 'http://10.11.3.2:4200'
+		origin: 'http://localhost:4200'
 	}
 })
 export class MatchmakingGateway {

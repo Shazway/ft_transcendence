@@ -33,7 +33,7 @@ export class AuthComponent {
 		let user_data: User;
 		let statusCode = 0;
 		let bodyId = 0;
-		await axios.post<LogInReturn>('http://10.11.3.2:3001/login', {api_code: code})
+		await axios.post<LogInReturn>('http://localhost:3001/login', {api_code: code})
 		.then(function (response) {
 			statusCode = response.status;
 			loginReturn = response.data;

@@ -1,19 +1,22 @@
-import { Injectable } from '@angular/core';
+import { Injectable, TemplateRef, ViewChild } from '@angular/core';
 import { Socket, io } from 'socket.io-client';
 import { WebsocketService } from './websocket.service';
+import { ToastService } from './toast/toast.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotificationService {
-
 	public client: Socket;
+	toastFriendRequest!: TemplateRef<any>;
+	toastChallenge!: TemplateRef<any>;
+	toastAchievement!: TemplateRef<any>;
 
 	constructor(
 		private websocketService: WebsocketService,
-
+		private toastService: ToastService,
 	) { 
-		this.client = io('ws://10.11.3.2:3003', this.websocketService.getHeader());
+		this.client = io('ws://localhost:3003', this.websocketService.getHeader());
 		this.setClientEvent();
 	}
 
@@ -28,5 +31,19 @@ export class NotificationService {
 		this.client.on('friendAnswer', (event) => { console.log('Answer ' + event);});
 		this.client.on('pendingRequest', (event) => { console.log('pendingRequest' + event); });
 		this.client.on('friendInvite', (event) => { console.log('friendInvite ', event); });
+	}
+
+	showFriendRequest() {
+		this.toastService.show(this.toastFriendRequest, { classname: 'bg-success text-light p-0', delay: 30000, context: 'Nyehehe' });
+	}
+
+	initTemplates(toastFriendRequest: TemplateRef<any>, toastChallenge: TemplateRef<any>, toastAchievement: TemplateRef<any>) {
+		this.toastFriendRequest = toastFriendRequest;
+		this.toastChallenge = toastChallenge;
+		this.toastAchievement = toastAchievement;
+	}
+
+	notifDismiss(toast: any) {
+		this.toastService.remove(toast);
 	}
 }
