@@ -71,11 +71,11 @@
     </div>
 </ng-template>
 
-<ng-template #toastChallenge>
+<ng-template let-toast="toast" let-context="context" #toastChallenge>
     <div role="alert" aria-live="assertive" aria-atomic="true" style="position: relative; min-height: 200px;">
         <div class="toast-header">
         <strong class="mr-auto">Challenge</strong>
-        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+        <button type="button" class="ml-2 mb-1 close" (click)="notifDismiss(toast)" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
         </div>
@@ -86,11 +86,11 @@
     </div>
 </ng-template>
 
-<ng-template #toastAchievement>
+<ng-template let-toast="toast" let-context="context" #toastAchievement>
     <div role="alert" aria-live="assertive" aria-atomic="true" style="position: relative; min-height: 200px;">
         <div class="toast-header">
         <strong class="mr-auto">New acheivement</strong>
-        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+        <button type="button" class="ml-2 mb-1 close" (click)="notifDismiss(toast)" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
         </div>
