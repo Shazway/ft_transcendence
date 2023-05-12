@@ -29,8 +29,8 @@ export class NotificationService {
 
 	setClientEvent() {
 		this.client.on('friendAnswer', (event) => { console.log('Answer ' + event);});
-		this.client.on('pendingRequest', (event) => { console.log('pendingRequest' + event); });
-		this.client.on('friendInvite', (event) => { console.log('friendInvite ', event); });
+		this.client.on('pendingRequest', (event) => {  console.log('pendingRequest' + event); });
+		this.client.on('friendInvite', (event) => { this.showFriendRequest(); console.log('friendInvite ', event); });
 	}
 
 	showFriendRequest() {
