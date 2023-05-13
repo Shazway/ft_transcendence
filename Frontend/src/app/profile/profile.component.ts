@@ -1,5 +1,6 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component } from '@angular/core';
 import { floor, random, round } from 'mathjs';
+import { Chart, ChartConfiguration, ChartConfigurationCustomTypesPerDataset } from 'chart.js/auto';
 
 interface MatchHistory {
 	Player1: string;
@@ -16,8 +17,10 @@ interface MatchHistory {
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css'],
 })
-export class ProfileComponent {
+export class ProfileComponent implements AfterViewInit {
 	matchHistory: Array<MatchHistory>;
+	matchChart!: Chart;
+
 	constructor() {
 		this.matchHistory = new Array;
 		let time = new Date();
@@ -39,6 +42,41 @@ export class ProfileComponent {
 				date: time,
 			});
 		}
+	}
+
+	ngAfterViewInit(): void {
+		this.matchChart = new Chart(document.getElementById('matchChart') as HTMLCanvasElement, this.getMatchChartConfig())
+	}
+
+	getMatchChartConfig(): ChartConfiguration {
+		return {
+			type: 'doughnut',
+			data: {
+				labels: ['wins', 'losses'],
+				datasets: [
+				  {
+					label: '',
+					data: [72, 41],
+					backgroundColor: [
+						'rgba(255, 99, 132, 1)',
+						'rgba(54, 162, 235, 1)'
+					],
+				  }
+				]
+			  },
+			options: {
+				responsive: true,
+				plugins: {
+					legend: {
+						position: 'center',
+					},
+					title: {
+						display: true,
+						text: 'Wins / Losses'
+					}
+				}
+			}
+		};
 	}
 
 	forgeDate(date: Date, d: number, h: number, m: number) {

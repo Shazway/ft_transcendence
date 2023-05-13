@@ -55,8 +55,13 @@
 		</div>
 	</div>
 	<div class="row gap-3 px-5 mx-2" style="height: 33vw;">
+
 		<div class="col border rounded-3 white"></div>
-		<div class="col border rounded-3 white"></div>
+
+		<div class="col border rounded-3 white">
+			<canvas id="matchChart"></canvas>
+		</div>
+
 		<div class="col border rounded-3 white h-100 p-0">
 			<table class="w-100 h-100">
 				<thead class="w-100">
@@ -67,24 +72,25 @@
 				<hr class="mb-0">
 				<div class="w-100" style="height: 95%; overflow-y: auto;">
 					<div *ngFor="let match of matchHistory" class="d-flex w-100 p-1 border-bottom">
-						<img class="rounded-circle versus-img player" src="{{match.P1URL}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 1">
+						<img class="rounded-circle versus-img player" src="{{match.P2URL}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 1">
 						<div class="flex-grow-1">
 							<div class="d-flex align-items-center justify-content-center px-2">
 								<h4 class="m-0">{{isVictory(match) ? 'Victory' : 'Defeat'}}</h4>
 							</div>
 							<div class="row">
-								<div class="col d-flex align-items-center justify-content-center px-2"><p class="m-0 small">{{match.Player1}}</p></div>
-								<div class="col-3 d-flex align-items-center justify-content-center px-2"><p class="m-0 small">{{match.P1score}} / {{match.P2score}}</p></div>
 								<div class="col d-flex align-items-center justify-content-center px-2"><p class="m-0 small">{{match.Player2}}</p></div>
+								<div class="col-3 d-flex align-items-center justify-content-center px-2"><p class="m-0 small">{{match.P2score}} / {{match.P1score}}</p></div>
+								<div class="col d-flex align-items-center justify-content-center px-2"><p class="m-0 small">{{match.Player1}}</p></div>
 							</div>
 							<div class="d-flex align-items-center justify-content-center px-2">
 								<p class="m-0 small text-muted">{{getTimeDiff(match.date)}}</p>
 							</div>
 						</div>
-						<img class="rounded-circle versus-img opponent" src="{{match.P2URL}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 2">
+						<img class="rounded-circle versus-img opponent" src="{{match.P1URL}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 2">
 					</div>
 				</div>
 			</table>
 		</div>
+
 	</div>
 </div>
