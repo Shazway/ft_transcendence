@@ -81,13 +81,13 @@
 	</div>
 </div>
 
-<ng-template #chatInteractionTemplate>
+<ng-template let-data="data" #chatInteractionTemplate>
 	<div class="d-grid">
 		<button type="button" class="row btn btn-block popup-hover">User Profile</button>
-		<button (click)="addFriend(currentMessage)" type="button" class="row btn btn-block popup-hover">Add Friend</button>
-		<button (click)="blockUser(currentMessage)" type="button" class="row btn btn-block popup-hover">Block User</button>
-		<button *ngIf="is_chat_admin()" (click)="muteUser(currentMessage)" type="button" class="row btn btn-block popup-hover">Mute User</button>
-		<button *ngIf="is_chat_admin()" (click)="kickUser(currentMessage)" type="button" class="row btn btn-block popup-hover">Kick User</button>
-		<button *ngIf="is_chat_admin()" (click)="banUser(currentMessage)" type="button" class="row btn btn-block popup-hover">Ban User</button>
+		<button (click)="addFriend(data)" type="button" class="row btn btn-block popup-hover">Add Friend</button>
+		<button (click)="blockUser(data)" type="button" class="row btn btn-block popup-hover">Block User</button>
+		<button *ngIf="is_chat_admin()" (click)="muteUser(data)" type="button" class="row btn btn-block popup-hover">Mute User</button>
+		<button *ngIf="is_chat_admin()" (click)="kickUser(data)" type="button" class="row btn btn-block popup-hover">Kick User</button>
+		<button *ngIf="is_chat_admin()" (click)="banUser(data)" type="button" class="row btn btn-block popup-hover">Ban User</button>
 	</div>
 </ng-template>

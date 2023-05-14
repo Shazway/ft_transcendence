@@ -107,6 +107,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		const user = this.userList.get(body.target_id);
 		const notifClient = this.userList.get(source.sub);
 
+		console.log("on est dans handle invite");
 		if (!user || !notifClient)
 			throw new WsException('User or Target not found');
 		console.log('request from ' + source.name + ' to: ');

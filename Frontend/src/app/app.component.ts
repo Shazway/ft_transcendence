@@ -2,6 +2,7 @@ import { AfterViewInit, Component, ElementRef, TemplateRef, ViewChild } from '@a
 import { AutoClose, Placement, PopoverConfig, Target } from '../dtos/Popover.dto';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { NotificationService } from './notification.service';
+import { NotificationResponse } from 'src/dtos/Notification.dto';
 
 
 @Component({
@@ -58,8 +59,9 @@ export class AppComponent implements AfterViewInit {
 		this.popover.open({ data: config.data });
 	}
 
-	showFriendReq() {
-		this.notifService.showFriendRequest();
+	showFriendReq(notif : {notification: NotificationResponse}) {
+		console.log(notif);
+		this.notifService.showFriendRequest(notif.notification);
 	}
 
 	showAchievements() {

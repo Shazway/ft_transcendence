@@ -2,6 +2,8 @@ import { Injectable, TemplateRef, ViewChild } from '@angular/core';
 import { Socket, io } from 'socket.io-client';
 import { WebsocketService } from './websocket.service';
 import { ToastService } from './toast/toast.service';
+import { NotificationResponse } from '../dtos/Notification.dto';
+
 
 @Injectable({
   providedIn: 'root'
@@ -30,11 +32,11 @@ export class NotificationService {
 	setClientEvent() {
 		this.client.on('friendAnswer', (event) => { console.log('Answer ' + event);});
 		this.client.on('pendingRequest', (event) => {  console.log('pendingRequest' + event); });
-		this.client.on('friendInvite', (event) => { this.showFriendRequest(); console.log('friendInvite ', event); });
+		this.client.on('friendInvite', (event) => { this.showFriendRequest(event.notification); console.log('friendInvite ', event); });
 	}
 
-	showFriendRequest() {
-		this.toastService.show(this.toastFriendRequest, { classname: 'bg-success text-light p-0', delay: 10000, context: 'Nyehehe' });
+	showFriendRequest(notification: NotificationResponse) {
+		this.toastService.show(this.toastFriendRequest, { classname: 'bg-success text-light p-0', delay: 10000, context: notification });
 	}
 
 	showAchievements() {
