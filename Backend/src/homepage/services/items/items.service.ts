@@ -353,7 +353,7 @@ export class ItemsService {
 		const friendRequest = this.createFriendRequest();
 		const targetEntity = await this.getUser(targetId);
 		const sourceEntity = await this.getUser(sourceId);
-
+		console.log("source id = " + sourceId + " target id = " + targetId);
 		if (!friendRequest || !targetEntity || !sourceEntity)
 			return null;
 		if (targetEntity.blacklistEntry.find((user) => user.user_id === sourceId))
@@ -361,8 +361,8 @@ export class ItemsService {
 
 		friendRequest.receiver = targetEntity;
 		friendRequest.sender = sourceEntity;
-		targetEntity.receivedFriendRequests.push();
-		sourceEntity.sentFriendRequests.push();
+		targetEntity.receivedFriendRequests.push(friendRequest);
+		sourceEntity.sentFriendRequests.push(friendRequest);
 		await this.friend_requestRepo.save(friendRequest);
 		return (await this.userRepo.save([sourceEntity, targetEntity]));
 	}
