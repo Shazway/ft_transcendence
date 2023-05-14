@@ -10,6 +10,7 @@ import { PongComponent } from './pong/pong.component';
 import { PongDebugComponent } from './pong-debug/pong-debug.component';
 import { FriendsComponent } from './friends/friends.component';
 import { ProfileComponent } from './profile/profile.component';
+import { ShopComponent } from './shop/shop.component';
 
 const routes: Routes = [
 	{ path: 'users', component: UsersComponent },
@@ -22,6 +23,7 @@ const routes: Routes = [
 	{ path: 'pong_debug', component: PongDebugComponent },
 	{ path: 'friends', component: FriendsComponent },
 	{ path: 'profile', component: ProfileComponent },
+	{ path: 'shop', component: ShopComponent },
 ];
 
 @NgModule({

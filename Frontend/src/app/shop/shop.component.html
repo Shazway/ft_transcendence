@@ -1,0 +1,15 @@
+<div class="container">
+	<h2 *ngIf="items">Shop</h2>
+	<div class="row row-cols-1 row-cols-md-3" >
+		<div class="col mb-4" *ngFor="let item of items">
+			<div class="card">
+				<img src="{{item.image}}" class="card-image">
+				<div class="card-body" style="color: black;">
+					<h5 class="card-title">{{item.name}}</h5>
+					<p class="card-text">{{item.description}}</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
