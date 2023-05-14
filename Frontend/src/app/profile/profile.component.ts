@@ -1,6 +1,7 @@
 import { AfterViewInit, Component } from '@angular/core';
 import { floor, random, round } from 'mathjs';
-import { Chart, ChartConfiguration, ChartConfigurationCustomTypesPerDataset } from 'chart.js/auto';
+import { Chart, ChartConfiguration } from 'chart.js/auto';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 interface MatchHistory {
 	Player1: string;
@@ -22,6 +23,7 @@ export class ProfileComponent implements AfterViewInit {
 	matchChart!: Chart;
 
 	constructor() {
+		Chart.register(ChartDataLabels);
 		this.matchHistory = new Array;
 		let time = new Date();
 		for (let index = 0; index < 20; index++) {
@@ -52,16 +54,45 @@ export class ProfileComponent implements AfterViewInit {
 		return {
 			type: 'doughnut',
 			data: {
-				labels: ['wins', 'losses'],
+				labels: ['0 points', '1 points', '2 points', '3 points', '4 points', '5 points', '6 points', '7 points', '8 points', '9 points', '10 points'],
 				datasets: [
-				  {
-					label: '',
-					data: [72, 41],
-					backgroundColor: [
-						'rgba(255, 99, 132, 1)',
-						'rgba(54, 162, 235, 1)'
-					],
-				  }
+					{
+						label: 'Scores',
+						data: this.countScores(),
+						backgroundColor: [
+							'rgba(255, 20, 132, 1)',
+							'rgba(255, 40, 132, 1)',
+							'rgba(255, 60, 132, 1)',
+							'rgba(255, 80, 132, 1)',
+							'rgba(255, 100, 132, 1)',
+							'rgba(255, 120, 132, 1)',
+							'rgba(255, 140, 132, 1)',
+							'rgba(255, 160, 132, 1)',
+							'rgba(255, 180, 132, 1)',
+							'rgba(255, 200, 132, 1)',
+							'rgba(54, 162, 235, 1)'
+						],
+						// datalabels: {
+						// 	formatter: function (value, context) {
+						// 		return context.dataIndex;
+						// 	},
+						// }
+					},
+					{
+						label: 'Wins & Losses',
+						data: this.getRatio(),
+						backgroundColor: [
+							'rgba(255, 20, 132, 1)',
+							'rgba(54, 162, 235, 1)'
+						],
+						datalabels: {
+							formatter: function (value, context) {
+								if (context.dataIndex == 0)
+									return 'Losses';
+								return 'Wins';
+							},
+						}
+					},
 				]
 			  },
 			options: {
@@ -72,11 +103,40 @@ export class ProfileComponent implements AfterViewInit {
 					},
 					title: {
 						display: true,
-						text: 'Wins / Losses'
+						text: 'Wins / Losses',
+					},
+					subtitle: {
+						display: true,
+						text: 'Custom Chart Subtitle'
+					},
+					datalabels: {
+						anchor: 'center',
+						display: function(context): boolean {
+							return (context.dataset.data[context.dataIndex] != 0); // display labels with an odd index
+						},
 					}
 				}
 			}
 		};
+	}
+
+	countScores() {
+		let ret = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+		this.matchHistory.forEach(match => {
+			if (match.Player1 == 'Mr. Connasse')
+				ret[match.P1score]++;
+			else
+				ret[match.P2score]++;
+		})
+		return ret;
+	}
+
+	getRatio() {
+		let ret = [0, 0];
+		const score = this.countScores();
+		ret[0] = (this.matchHistory.length - score[10]);
+		ret[1] = score[10];
+		return ret;
 	}
 
 	forgeDate(date: Date, d: number, h: number, m: number) {

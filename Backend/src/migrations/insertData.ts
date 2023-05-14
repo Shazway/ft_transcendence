@@ -28,6 +28,14 @@ export class insertData666666666666666666 implements MigrationInterface {
 				achievement_description: 'Lose your first match',
 			},
 			{
+				achievement_name: 'Social Butterfly',
+				achievement_description: 'Have a lot of friends',
+			},
+			{
+				achievement_name: 'Whale',
+				achievement_description: 'Make the money rain',
+			},
+			{
 				achievement_name: 'Oof',
 				achievement_description: '???',
 			},
