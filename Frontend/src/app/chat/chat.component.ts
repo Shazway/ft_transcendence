@@ -19,7 +19,7 @@ import { PopoverConfig } from 'src/dtos/Popover.dto';
 	styleUrls: ['./chat.component.css']
 })
 export class ChatComponent implements OnInit {
-	@ViewChild('customPopoverTemplate') popoverTemplate!: NgbPopover;
+	@ViewChild('chatInteractionTemplate') chatInteractionTemplate!: TemplateRef<any>;
 	@ViewChild('chanBody') chatBody!: ElementRef;
 	currentMessage!: Message;
 	client!: Socket;
@@ -147,6 +147,12 @@ export class ChatComponent implements OnInit {
 	}
 
 	createChatPopup(msg: Message) {
+		this.parent.openPopover(this.chatInteractionTemplate, new PopoverConfig(
+			this.chatBody.nativeElement,
+			'',
+			'outside',
+			'start',
+		));
 		this.parent.openPopover('profile', new PopoverConfig(
 			this.chatBody.nativeElement,
 			'profile arrow-hide',
@@ -154,14 +160,6 @@ export class ChatComponent implements OnInit {
 			'start',
 			msg,
 		));
-		// this.currentMessage = msg;
-		// this.client.emit('checkPrivileges', msg);
-		// console.log("pass");
-		// const sub = fromEvent(this.client, 'answerPrivileges').subscribe((data) => {
-		// 	console.log(data);
-		// 	this.is_admin = data;
-		// 	sub.unsubscribe();
-		// });
 	}
 
 	async createPopup(title: string, label: string) {

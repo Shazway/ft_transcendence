@@ -12,6 +12,7 @@ import { NotificationService } from './notification.service';
 })
 export class AppComponent implements AfterViewInit {
 	@ViewChild('popoverContent') profileTemplate!: TemplateRef<any>;
+	@ViewChild('chatInteractionTemplate') chatInteractionTemplate!: TemplateRef<any>;
 	@ViewChild('toastFriendRequest') toastFriendRequest!: TemplateRef<any>;
 	@ViewChild('toastChallenge') toastChallenge!: TemplateRef<any>;
 	@ViewChild('toastAchievement') toastAchievement!: TemplateRef<any>;
@@ -43,9 +44,12 @@ export class AppComponent implements AfterViewInit {
 		}
 	}
 
-	openPopover(popoverTemplate: string, config: PopoverConfig) {
-		if (popoverTemplate == "profile") this.popover.ngbPopover = this.profileTemplate;
-		else return;
+	openPopover(popoverTemplate: string | TemplateRef<any>, config: PopoverConfig) {
+		if (typeof popoverTemplate === 'string') {
+			if (popoverTemplate == "profile") this.popover.ngbPopover = this.profileTemplate;
+			else return;
+		}
+		else this.popover.ngbPopover = popoverTemplate;
 		this.popover.placement = config.placement;
 		this.popover.autoClose = config.autoClose;
 		this.popover.popoverClass = config.classId;
