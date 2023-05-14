@@ -1,5 +1,5 @@
 import { AfterViewInit, Component } from '@angular/core';
-import { floor, random, round } from 'mathjs';
+import { floor, number, random, round } from 'mathjs';
 import { Chart, ChartConfiguration } from 'chart.js/auto';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
@@ -24,9 +24,10 @@ export class ProfileComponent implements AfterViewInit {
 
 	constructor() {
 		Chart.register(ChartDataLabels);
+		const nbGenerate = 100;
 		this.matchHistory = new Array;
 		let time = new Date();
-		for (let index = 0; index < 20; index++) {
+		for (let index = 0; index < nbGenerate; index++) {
 			const chooseWinner = round(random(0,1));
 			const randScore = round(random(0,9));
 			const randTime = random(20, 200);
@@ -51,10 +52,11 @@ export class ProfileComponent implements AfterViewInit {
 	}
 
 	getMatchChartConfig(): ChartConfiguration {
+		let delayed: boolean;
 		return {
 			type: 'doughnut',
 			data: {
-				labels: ['0 points', '1 points', '2 points', '3 points', '4 points', '5 points', '6 points', '7 points', '8 points', '9 points', '10 points'],
+				labels: [''],
 				datasets: [
 					{
 						label: 'Scores',
@@ -70,20 +72,34 @@ export class ProfileComponent implements AfterViewInit {
 							'rgba(255, 160, 132, 1)',
 							'rgba(255, 180, 132, 1)',
 							'rgba(255, 200, 132, 1)',
-							'rgba(54, 162, 235, 1)'
+							'rgba(54, 20, 235, 1)',
+							'rgba(54, 40, 235, 1)',
+							'rgba(54, 60, 235, 1)',
+							'rgba(54, 80, 235, 1)',
+							'rgba(54, 100, 235, 1)',
+							'rgba(54, 120, 235, 1)',
+							'rgba(54, 140, 235, 1)',
+							'rgba(54, 160, 235, 1)',
+							'rgba(54, 180, 235, 1)',
+							'rgba(54, 200, 235, 1)',
 						],
-						// datalabels: {
-						// 	formatter: function (value, context) {
-						// 		return context.dataIndex;
-						// 	},
-						// }
+						datalabels: {
+							formatter: function (value, context) {
+								const total = context.dataset.data.reduce((a, b) => ((a as number) + (b as number)), 0);
+								if (!total || total == 0)
+									return;
+								const percentage = Math.round((value / (total as number)) * 100);
+								return percentage + "%";
+								// return context.dataIndex;
+							},
+						}
 					},
 					{
 						label: 'Wins & Losses',
 						data: this.getRatio(),
 						backgroundColor: [
 							'rgba(255, 20, 132, 1)',
-							'rgba(54, 162, 235, 1)'
+							'rgba(54, 200, 235, 1)',
 						],
 						datalabels: {
 							formatter: function (value, context) {
@@ -99,15 +115,43 @@ export class ProfileComponent implements AfterViewInit {
 				responsive: true,
 				plugins: {
 					legend: {
+						display: false,
 						position: 'center',
 					},
 					title: {
-						display: true,
+						display: false,
 						text: 'Wins / Losses',
 					},
 					subtitle: {
-						display: true,
+						display: false,
 						text: 'Custom Chart Subtitle'
+					},
+					tooltip: {
+						callbacks: {
+							label: function(context) {
+								let label = context.dataset.label || '';
+								if (label == 'Scores') {
+									if (context.dataIndex >= 10)
+										return context.dataset.data[context.dataIndex] + ' matches won with ' + (context.dataIndex - 10) + ' points for the opponent';
+									return context.dataset.data[context.dataIndex] + ' matches lost with ' + context.dataIndex + ' points';
+								}
+								else {
+									if (context.dataIndex == 0)
+										return context.dataset.data[context.dataIndex] + ' losses'
+									return context.dataset.data[context.dataIndex] + ' wins'
+								}
+								return label;
+							},
+							title: function(context) { return ''; },
+							labelColor: function(context) { return; },
+							labelPointStyle: function(context) {
+								return {
+									pointStyle: 'triangle',
+									rotation: 0
+								};
+							}
+						},
+						displayColors: false,
 					},
 					datalabels: {
 						anchor: 'center',
@@ -115,18 +159,36 @@ export class ProfileComponent implements AfterViewInit {
 							return (context.dataset.data[context.dataIndex] != 0); // display labels with an odd index
 						},
 					}
-				}
+				},
+				animation: {
+					onComplete: () => {
+						delayed = true;
+					},
+					delay: (context) => {
+						let delay = 0;
+						if (context.type === 'data' && context.mode === 'default' && !delayed) {
+							delay = context.dataIndex * 150 + context.datasetIndex * 50;
+						}
+						return delay;
+					},
+				},
 			}
 		};
 	}
 
 	countScores() {
-		let ret = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+		let ret = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 		this.matchHistory.forEach(match => {
-			if (match.Player1 == 'Mr. Connasse')
-				ret[match.P1score]++;
-			else
-				ret[match.P2score]++;
+			if (match.Player1 == 'Mr. Connasse') {
+				if (match.P1score == 10)
+					ret[match.P2score + 10]++;
+				else ret[match.P1score]++;
+			}
+			else {
+				if (match.P2score == 10)
+					ret[match.P1score + 10]++;
+				else ret[match.P2score]++;
+			}
 		})
 		return ret;
 	}
@@ -134,8 +196,10 @@ export class ProfileComponent implements AfterViewInit {
 	getRatio() {
 		let ret = [0, 0];
 		const score = this.countScores();
-		ret[0] = (this.matchHistory.length - score[10]);
-		ret[1] = score[10];
+		for (let i = 0; i < 10; i++) {
+			ret[0] += score[i];
+		}
+		ret[1] = (this.matchHistory.length - ret[0]);
 		return ret;
 	}
 
