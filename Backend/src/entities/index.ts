@@ -6,6 +6,7 @@ import { Match as MatchEntity } from './matchs.entity';
 import { Channel as ChannelEntity } from './channels.entity';
 import { ChannelUser as ChannelUserRelation } from './channel_user.entity';
 import { Message as MessageEntity } from './messages.entity';
+import { Skin as SkinEntity } from './skins.entity';
 
 const entities = [
 	UserEntity,
@@ -16,6 +17,7 @@ const entities = [
 	ChannelEntity,
 	ChannelUserRelation,
 	MessageEntity,
+	SkinEntity,
 ];
 
 export {
@@ -27,6 +29,7 @@ export {
 	ChannelEntity,
 	ChannelUserRelation,
 	MessageEntity,
+	SkinEntity,
 };
 
 export default entities;

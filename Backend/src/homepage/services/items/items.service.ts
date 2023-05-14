@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { HttpStatus, Injectable, Res } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AchievementsEntity, ChannelEntity, ChannelUserRelation, FriendrequestRelation, MatchEntity, MatchSettingEntity, MessageEntity, UserEntity } from 'src/entities';
+import { AchievementsEntity, ChannelEntity, ChannelUserRelation, FriendrequestRelation, MatchEntity, MatchSettingEntity, MessageEntity, SkinEntity, UserEntity } from 'src/entities';
 import { ChannelUser } from 'src/entities/channel_user.entity';
 import { pongObject } from 'src/homepage/dtos/Pong.dto';
 import { Repository } from 'typeorm';
@@ -24,7 +24,9 @@ export class ItemsService {
 		@InjectRepository(MatchEntity)
 			private readonly matchRepo: Repository<MatchEntity>,
 		@InjectRepository(MessageEntity)
-			private readonly messageRepo: Repository<MessageEntity>,
+		private readonly messageRepo: Repository<MessageEntity>,
+		@InjectRepository(SkinEntity)
+		private readonly skinRepo: Repository<SkinEntity>,
 	) {}
 
 	public sendOptionRes(@Res() res) {
@@ -46,6 +48,12 @@ export class ItemsService {
 		return user;
 	}
 
+	public async getSkins() {
+		const skins = await this.skinRepo.createQueryBuilder('skin')
+		.getMany();
+		return skins;
+	}
+
 	public async getUser(id: number) {
 		const user = await this.userRepo
 			.createQueryBuilder('user')
@@ -56,6 +64,7 @@ export class ItemsService {
 			.leftJoinAndSelect('user.match_history', 'match_history')
 			.leftJoinAndSelect('user.sentFriendRequests', 'sentFriendRequests')
 			.leftJoinAndSelect('user.receivedFriendRequests', 'receivedFriendRequests')
+			.leftJoinAndSelect('user.skin', 'skin')
 			.where('user.user_id = :id', { id })
 			.getOne();
 		return user;
@@ -69,6 +78,7 @@ export class ItemsService {
 			.leftJoinAndSelect('user.blacklistEntry', 'blacklistEntry')
 			.leftJoinAndSelect('user.channel', 'channel')
 			.leftJoinAndSelect('user.match_history', 'match_history')
+			.leftJoinAndSelect('user.skin', 'skin')
 			.where('user.username = :username', { username })
 			.getOne();
 		return user;
@@ -82,6 +92,7 @@ export class ItemsService {
 			.leftJoinAndSelect('user.blacklistEntry', 'blacklistEntry')
 			.leftJoinAndSelect('user.channel', 'channel')
 			.leftJoinAndSelect('user.match_history', 'match_history')
+			.leftJoinAndSelect('user.skin', 'skin')
 			.where('user.intra_id = :intra_id', { intra_id })
 			.getOne();
 		return user;

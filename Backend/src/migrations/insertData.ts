@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { AchievementsEntity, ChannelEntity, UserEntity } from 'src/entities';
+import { AchievementsEntity, ChannelEntity, SkinEntity, UserEntity } from 'src/entities';
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class insertData666666666666666666 implements MigrationInterface {
@@ -45,6 +45,16 @@ export class insertData666666666666666666 implements MigrationInterface {
 			},
 		]);
 
+		const SkinRepo = queryRunner.manager.getRepository(SkinEntity);
+
+		await SkinRepo.insert([
+			{
+				type: 'Paddle',
+				name: 'Default',
+				img_url: 'Default',
+			}
+		]);
+
 		const ChannelRepo = queryRunner.manager.getRepository(ChannelEntity);
 
 		await ChannelRepo.insert([
@@ -52,6 +62,7 @@ export class insertData666666666666666666 implements MigrationInterface {
 				channel_name: 'Global',
 			},
 		]);
+
 
 		const UserRepo = queryRunner.manager.getRepository(UserEntity);
 

@@ -13,7 +13,7 @@ import {
 import { Request, Response } from 'express';
 import { ChannelsService } from 'src/homepage/services/channels/channels.service';
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
-import { DeleteUser, NewChan, SerializedChan } from '../../dtos/Chan.dto';
+import { NewChan, SerializedChan } from '../../dtos/Chan.dto';
 import { plainToClass } from 'class-transformer';
 import { MessagesService } from 'src/homepage/services/messages/messages.service';
 import { ItemsService } from 'src/homepage/services/items/items.service';

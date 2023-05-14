@@ -4,6 +4,7 @@ import { ChannelUser } from 'src/entities/channel_user.entity';
 import { Friendrequest } from 'src/entities/friend_request.entity';
 import { Match } from 'src/entities/matchs.entity';
 import { User } from 'src/entities/users.entity';
+import { Skin } from 'src/entities/skins.entity';
 
 export class NewUser {
 	login: string;
@@ -80,4 +81,30 @@ export class LeaderBoardUser {
 	receivedFriendRequests: Friendrequest[];
 	@Exclude()
 	currency: number;
+}
+
+export class AvailableSkins {
+	user_id: number;
+	username: string;
+	img_url: string;
+	currency: number;
+	skins: Skin[];
+	@Exclude()
+	match_history: Match[];
+	@Exclude()
+	channel: ChannelUser[];
+	@Exclude()
+	achievements: Achievement[];
+	@Exclude()
+	friend: User[];
+	@Exclude()
+	sentFriendRequests: Friendrequest[];
+	@Exclude()
+	receivedFriendRequests: Friendrequest[];
+	@Exclude()
+	wins: number;
+	@Exclude()
+	losses: number;
+	@Exclude()
+	intra_id!: number;
 }

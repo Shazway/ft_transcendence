@@ -12,6 +12,7 @@ import { ChannelUser } from './channel_user.entity';
 import { Match } from './matchs.entity';
 import Achievement from './achievements.entity';
 import { Message } from './messages.entity';
+import { Skin } from './skins.entity';
 
 @Entity({ name: 'user' })
 export class User {
@@ -85,4 +86,10 @@ export class User {
 	// ---------------------- Message -------------------------------
 	@OneToMany(() => Message, (message) => message.author)
 	message: Message[];
+
+	//------------------------Skins----------------------//
+	@ManyToMany(() => Skin, (skin) => skin.user, { onDelete: 'CASCADE' })
+	@JoinTable()
+	skin: Skin[];
+
 }
