@@ -152,6 +152,7 @@ export class ChatComponent implements OnInit {
 			'',
 			'outside',
 			'start',
+			msg,
 		));
 		this.parent.openPopover('profile', new PopoverConfig(
 			this.chatBody.nativeElement,
@@ -174,9 +175,8 @@ export class ChatComponent implements OnInit {
 	}
 
 	addFriend(msg: Message) {
+		console.log("on est dans addFriend Frontend");
 		const addFriendElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-add');
-		if (!addFriendElm.classList.contains('show'))
-			return;
 		this.client.emit('addFriend', this.buildNotif("friend", msg.author.username, msg.author.user_id));
 	}
 

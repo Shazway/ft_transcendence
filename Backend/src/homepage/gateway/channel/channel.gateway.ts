@@ -220,6 +220,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('addFriend')
 	async handleInvite(@ConnectedSocket() client: Socket, @MessageBody() body: NotificationRequest) {
+		console.log("on est dans addFriend");
 		await this.notificationGateway.handleInvite(client, body);
 	}
 

@@ -7,9 +7,9 @@ export interface NotificationRequest {
 	channel_id?: number;
 }
 export interface NotificationResponse {
+	source_id: number;
 	type: string;
 	source_name: string;
-	source_id: number;
 	sent_at: Date;
 	accepted: boolean;
 }
