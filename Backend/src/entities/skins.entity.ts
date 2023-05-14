@@ -16,5 +16,8 @@ export class Skin
 	@Column({nullable: false})
 	name!: string;
 
+	@Column({ default: 0, unsigned: true })
+	price!: number;
+
 	@ManyToMany(() => User, (user) => user.skin, { onDelete: 'CASCADE' }) user: User[];
 }

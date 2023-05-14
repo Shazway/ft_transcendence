@@ -390,6 +390,7 @@ export class ItemsService {
 		if (scoreOne == 10)
 		{
 			userOne.rank_score += 10;
+			userOne.currency += 10;
 			userOne.wins += 1;
 		}
 		else
