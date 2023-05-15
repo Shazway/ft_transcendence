@@ -13,6 +13,11 @@ interface MatchHistory {
 	date: Date;
 }
 
+interface Pair {
+	x: number;
+	y: number;
+}
+
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
@@ -21,10 +26,13 @@ interface MatchHistory {
 export class ProfileComponent implements AfterViewInit {
 	matchHistory: Array<MatchHistory>;
 	matchChart!: Chart;
+	rankChart!: Chart;
+	rank = 100;
+	maxScore = 100;
 
 	constructor() {
 		Chart.register(ChartDataLabels);
-		const nbGenerate = 100;
+		const nbGenerate = 1000;
 		this.matchHistory = new Array;
 		let time = new Date();
 		for (let index = 0; index < nbGenerate; index++) {
@@ -49,6 +57,95 @@ export class ProfileComponent implements AfterViewInit {
 
 	ngAfterViewInit(): void {
 		this.matchChart = new Chart(document.getElementById('matchChart') as HTMLCanvasElement, this.getMatchChartConfig())
+		this.rankChart = new Chart(document.getElementById('rankChart') as HTMLCanvasElement, this.getRankedChartConfig())
+	}
+
+	getRankedChartConfig(): ChartConfiguration {
+		let delayed: boolean;
+		const dateRange = this.getDateRange();
+		return {
+			type: 'line',
+			data: {
+				datasets: [
+					{
+						label: 'Data',
+						data: this.getMatchRankData(),
+						fill: false,
+						borderColor: 'rgba(75, 192, 192, 1)',
+						tension: 0,
+						pointRadius: 0,
+					},
+				],
+			},
+			options: {
+				responsive: true,
+				scales: {
+					x: {
+						type: 'linear',
+						min: 0,
+						max: 30,
+						ticks: {
+							stepSize: 1,
+						},
+						reverse: true,
+					},
+					y: {
+						type: 'linear',
+						min: 0,
+						max: this.maxScore + 20,
+						ticks: {
+							stepSize: 20,
+						},
+					},
+				},
+				plugins: {
+					legend: {
+						display: false,
+						position: 'center',
+					},
+					datalabels: {
+						formatter: function (value, context) {
+							return '';
+						}
+					}
+				}
+			},
+		}
+	}
+
+	getMatchRankData() {
+		const dateRange = this.getDateRange();
+		let ret = new Array<Pair>();
+		this.matchHistory.reverse().forEach((match) => {
+			if (ret.length == 0 && match.date.getTime() >= dateRange.past.getTime())
+				ret.push({x: this.getRealTimeDiff(dateRange.past, dateRange.today), y: this.rank})
+			if (this.isVictory(match)) this.rank += 10;
+			else this.rank -= 10;
+			if (this.rank < 0) this.rank = 0;
+			if (this.rank > this.maxScore) this.maxScore = this.rank;
+			if (match.date.getTime() >= dateRange.past.getTime()) {
+				console.log(this.getRealTimeDiff(match.date, dateRange.today));
+				ret.push({x: this.getRealTimeDiff(match.date, dateRange.today), y: this.rank})
+			}
+		});
+		this.matchHistory.reverse();
+		return ret;
+	}
+
+	getDateRange() {
+		const today = new Date();
+		today.setHours(0, 0, 0, 0);
+		today.setDate(today.getDate() + 1);
+		const past = new Date(today);
+		past.setDate(past.getDate() - 30);
+		return {today: today, past: past};
+	}
+
+	getRealTimeDiff(date1: Date, date2: Date) {
+		const diffInMilliseconds = Math.abs(date2.getTime() - date1.getTime());
+		const diffInDays = diffInMilliseconds / (1000 * 60 * 60 * 24);
+		const roundedDiffInDays = Math.round(diffInDays * 10000) / 10000;
+		return roundedDiffInDays;
 	}
 
 	getMatchChartConfig(): ChartConfiguration {
@@ -110,9 +207,13 @@ export class ProfileComponent implements AfterViewInit {
 						}
 					},
 				]
-			  },
+			},
 			options: {
 				responsive: true,
+				aspectRatio: 1.5,
+				layout: {
+					padding: 20,
+				},
 				plugins: {
 					legend: {
 						display: false,

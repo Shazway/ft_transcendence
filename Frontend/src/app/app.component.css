@@ -32,6 +32,8 @@ a[data-toggle="collapse"] {
 body {
     font-family: 'Poppins', sans-serif;
     background: #fafafa;
+	height: 100%;
+	display: flex;
 }
 
 p {
