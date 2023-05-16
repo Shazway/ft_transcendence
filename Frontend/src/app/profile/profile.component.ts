@@ -1,5 +1,5 @@
-import { AfterViewInit, Component } from '@angular/core';
-import { floor, number, random, round } from 'mathjs';
+import { AfterContentInit, AfterViewInit, ChangeDetectorRef, Component } from '@angular/core';
+import { floor, ceil, random, round } from 'mathjs';
 import { Chart, ChartConfiguration } from 'chart.js/auto';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
@@ -30,9 +30,9 @@ export class ProfileComponent implements AfterViewInit {
 	rank = 100;
 	maxScore = 100;
 
-	constructor() {
+	constructor(private cdr: ChangeDetectorRef) {
 		Chart.register(ChartDataLabels);
-		const nbGenerate = 1000;
+		const nbGenerate = 100;
 		this.matchHistory = new Array;
 		let time = new Date();
 		for (let index = 0; index < nbGenerate; index++) {
@@ -56,8 +56,11 @@ export class ProfileComponent implements AfterViewInit {
 	}
 
 	ngAfterViewInit(): void {
-		this.matchChart = new Chart(document.getElementById('matchChart') as HTMLCanvasElement, this.getMatchChartConfig())
-		this.rankChart = new Chart(document.getElementById('rankChart') as HTMLCanvasElement, this.getRankedChartConfig())
+		this.cdr.detach();
+		this.matchChart = new Chart(document.getElementById('matchChart') as HTMLCanvasElement, this.getMatchChartConfig());
+		this.rankChart = new Chart(document.getElementById('rankChart') as HTMLCanvasElement, this.getRankedChartConfig());
+		this.cdr.detectChanges();
+		this.cdr.reattach();
 	}
 
 	getRankedChartConfig(): ChartConfiguration {
@@ -73,17 +76,18 @@ export class ProfileComponent implements AfterViewInit {
 						fill: false,
 						borderColor: 'rgba(75, 192, 192, 1)',
 						tension: 0,
-						pointRadius: 0,
+						pointRadius: 1,
 					},
 				],
 			},
 			options: {
 				responsive: true,
+				aspectRatio: 1.6,
 				scales: {
 					x: {
 						type: 'linear',
 						min: 0,
-						max: 30,
+						max: this.getMaxDate(),
 						ticks: {
 							stepSize: 1,
 						},
@@ -107,8 +111,56 @@ export class ProfileComponent implements AfterViewInit {
 						formatter: function (value, context) {
 							return '';
 						}
+					},
+					tooltip: {
+						callbacks: {
+							title: function(context) {
+								const preValue: any = context;
+								console.log (preValue);
+								const value = Number(preValue.y);
+								return 'Rank Score: ' + value;
+							},
+							label: function(context) {
+								const preValue: any = context.dataset.data[context.dataIndex];
+								const value = Number(preValue.x);
+								const days = Math.floor(value);
+								const hours = Math.floor((value - days) * 24);
+								const minutes = Math.floor(((value - days) * 24 - hours) * 60);
+								
+								const secondDate = new Date(dateRange.today.getTime());
+								secondDate.setDate(dateRange.today.getDate() - days);
+								secondDate.setHours(dateRange.today.getHours() - hours);
+								secondDate.setMinutes(dateRange.today.getMinutes() - minutes);
+								const str_hours = secondDate.getHours().toString().padStart(2, '0');
+								const str_minutes = secondDate.getMinutes().toString().padStart(2, '0');
+								const str_day = secondDate.getDate().toString().padStart(2, '0');
+								const str_month = (secondDate.getMonth() + 1).toString().padStart(2, '0');
+								const str_year = secondDate.getFullYear().toString().slice(-2);
+								return str_hours+':'+str_minutes+' '+str_day+'/'+str_month+'/'+str_year;
+							},
+							labelColor: function(context) { return; },
+							labelPointStyle: function(context) {
+								return {
+									pointStyle: 'triangle',
+									rotation: 0
+								};
+							}
+						},
+						displayColors: false,
 					}
-				}
+				},
+				animation: {
+					onComplete: () => {
+						delayed = true;
+					},
+					delay: (context) => {
+						let delay = 0;
+						if (context.type === 'data' && context.mode === 'default' && !delayed) {
+							delay = context.dataIndex * 30;
+						}
+						return delay;
+					},
+				},
 			},
 		}
 	}
@@ -116,20 +168,27 @@ export class ProfileComponent implements AfterViewInit {
 	getMatchRankData() {
 		const dateRange = this.getDateRange();
 		let ret = new Array<Pair>();
-		this.matchHistory.reverse().forEach((match) => {
-			if (ret.length == 0 && match.date.getTime() >= dateRange.past.getTime())
+		this.matchHistory.reverse().forEach((match, index) => {
+			if (ret.length == 0 && index != 0 && match.date.getTime() >= dateRange.past.getTime())
 				ret.push({x: this.getRealTimeDiff(dateRange.past, dateRange.today), y: this.rank})
 			if (this.isVictory(match)) this.rank += 10;
 			else this.rank -= 10;
 			if (this.rank < 0) this.rank = 0;
-			if (this.rank > this.maxScore) this.maxScore = this.rank;
 			if (match.date.getTime() >= dateRange.past.getTime()) {
-				console.log(this.getRealTimeDiff(match.date, dateRange.today));
+				if (this.rank > this.maxScore) this.maxScore = this.rank;
 				ret.push({x: this.getRealTimeDiff(match.date, dateRange.today), y: this.rank})
 			}
 		});
 		this.matchHistory.reverse();
 		return ret;
+	}
+
+	getMaxDate() {
+		const lastDate = this.matchHistory[this.matchHistory.length - 1].date;
+		const diff = this.getRealTimeDiff(lastDate, this.getDateRange().today);
+		if (diff > 30)
+			return 30;
+		return (ceil(diff));
 	}
 
 	getDateRange() {
