@@ -32,20 +32,20 @@ export class ProfileComponent implements AfterViewInit {
 
 	constructor(private cdr: ChangeDetectorRef) {
 		Chart.register(ChartDataLabels);
-		const nbGenerate = 100;
+		const nbGenerate = 90;
 		this.matchHistory = new Array;
 		let time = new Date();
 		for (let index = 0; index < nbGenerate; index++) {
 			const chooseWinner = round(random(0,1));
 			const randScore = round(random(0,9));
-			const randTime = random(20, 200);
+			const randTime = random(20, 1000);
 			const min = floor(randTime % 60);
 			const hour = floor((randTime / 60) % 24);
 			const days = floor(randTime / 60 / 24);
 			time = this.forgeDate(time, days, hour, min);
 			this.matchHistory.push({
 				Player1: 'Mr. Connasse',
-				P1URL: 'https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp',
+				P1URL: 'https://i1.sndcdn.com/artworks-000329925816-3yu1fd-t500x500.jpg',
 				P1score: chooseWinner ? 10 : randScore,
 				Player2: 'Pedro',
 				P2URL: 'https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp',
@@ -115,8 +115,7 @@ export class ProfileComponent implements AfterViewInit {
 					tooltip: {
 						callbacks: {
 							title: function(context) {
-								const preValue: any = context;
-								console.log (preValue);
+								const preValue: any = context[0].dataset.data[context[0].dataIndex];
 								const value = Number(preValue.y);
 								return 'Rank Score: ' + value;
 							},
