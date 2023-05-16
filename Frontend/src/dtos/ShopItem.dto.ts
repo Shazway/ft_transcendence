@@ -4,4 +4,5 @@ export interface ShopItem {
 	description : string;
 	image : string;
 	type : string;
+	price : number;
 }
