@@ -64,8 +64,15 @@
 				</div>
 				<div class="card-body p-0 h-100 channel_create_pan p-3 bg-light" data-mdb-perfect-scrollbar="true">
 					<div class="w-100 d-flex mb-2">
-						<button type="button" (click)="createChannel()" class="btn btn-primary btn-sm m-auto" data-mdb-ripple-color="dark">back</button>
+						<button type="button" (click)="createChannel()" class="btn btn-primary btn-sm m-auto">back</button>
 					</div>
+					<form #createChannelBox="ngForm" (ngSubmit)="onClickCreateChannel(createChannelBox.value)">
+						<input type="text" name="channel_name" autocomplete="off" placeholder="Channel name" ngModel><br>
+						<input type="password" name="channel_password" class="chanPass show" autocomplete="off" placeholder="Password" ngModel><br>
+						<label for="privateCheckbox" class="text-black">Set channel private</label>
+						<input type="checkbox" value="false" name="is_channel_private" (change)="togglePrivate($event)" ngModel #privateCheckbox><br>
+						<input type="submit" class="btn btn-outline-secondary btn-sm rounded-5" value = "submit">
+					</form>
 				</div>
 			</div>
 
@@ -73,7 +80,7 @@
 				<div class="card-footer text-muted d-flex justify-content-start align-items-center p-3 gap-3">
 					<img src="{{getAvatar()}}" class="rounded-circle" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp';" alt="avatar 3" style="width: 40px; height: 100%;">
 					<input type="text" name="message_content" autocomplete="off" class="form-control form-control-lg text-input" id="exampleFormControlInput1" placeholder="Type message" ngModel>
-					<input type = "submit" class="btn btn-outline-secondary btn-sm rounded-5" value = "submit">
+					<input type="submit" class="btn btn-outline-secondary btn-sm rounded-5" value = "submit">
 				</div>
 			</form>
 		</div>

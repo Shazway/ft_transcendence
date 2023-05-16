@@ -222,3 +222,11 @@ img{ max-width:100%;}
 .admin-only.show {
   display: block;
 }
+
+.chanPass {
+	display: none;
+}
+
+.chanPass.show {
+	display: block;
+}

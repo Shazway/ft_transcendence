@@ -262,7 +262,7 @@ export class ChatComponent implements OnInit {
 	createChannel() {
 		const offCreateChan = this.elRef.nativeElement.querySelector('.channel_create_pan');
 		const offscreenElm = this.elRef.nativeElement.querySelector('.channel_pan');
-		if (!offCreateChan.classList.contains('show')) {
+		if (offCreateChan.classList.contains('show')) {
 			offCreateChan.classList.remove('show');
 			offscreenElm.classList.add('show');
 		}
@@ -270,7 +270,30 @@ export class ChatComponent implements OnInit {
 			offCreateChan.classList.add('show');
 			offscreenElm.classList.remove('show');
 		}
-		this.fetchService.createChannel({ channel_name: 'chan2' });
+		// this.fetchService.createChannel({ channel_name: 'chan2' });
+	}
+
+	togglePrivate(event: any) {
+		const offscreenElm = this.elRef.nativeElement.querySelector('.chanPass');
+		if (event.target.checked && offscreenElm.classList.contains('show')) {
+			offscreenElm.classList.remove('show');
+			offscreenElm.value = '';
+		}
+		else if (!event.target.checked && !offscreenElm.classList.contains('show'))
+			offscreenElm.classList.add('show');
+	}
+
+	onClickCreateChannel(data: any) {
+		if (data.is_channel_private == '')
+			data.is_channel_private = false;
+		if (data.channel_password == '')
+			data.channel_password = null;
+		console.log(data);
+		this.fetchService.createChannel({
+			channel_name: data.channel_name,
+			is_channel_private: data.is_channel_private,
+			channel_password: data.channel_password,
+		});
 	}
 
 	getAvatar() {
