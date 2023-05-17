@@ -32,6 +32,8 @@ export class ballObject {
 	public speed = 4;
 	public graphic = new Graphics();
 	public color = 0xFFFFFF;
+	public texture: Texture | undefined;
+	public matrix!: Matrix;
 	public gameDim: Position;
 	public direction: number;
 	public vec: Position;
@@ -48,22 +50,34 @@ export class ballObject {
 		return {x: newX, y: newY}
 	}
 
-	init(posX: number, posY: number, radius: number, color: number) {
+	init(posX: number, posY: number, radius: number, color: number | Texture) {
 		this.RADIUS = radius;
 		this.DIAMETER = radius * 2;
-		this.color = color;
+		if (typeof color == 'number')
+			this.color = color;
+		else {
+			this.texture = color;
+			this.matrix = new Matrix();
+			this.matrix.set(1, 0, 0, 1, posX / 2 - radius, posY / 2 - radius);
+		}
 		this.graphic.x = posX / 2;
 		this.graphic.y = posY / 2;
-		this.graphic.lineStyle(0);
-		this.graphic.beginFill(color);
+		if (this.texture)
+			this.graphic.beginTextureFill({texture: this.texture, matrix: this.matrix})
+		else
+			this.graphic.beginFill(this.color);
 		this.graphic.drawCircle(posX / 2, posY / 2, this.RADIUS);
 		this.graphic.endFill();
 	}
 
 	applyMove(newPos: Position) {
 		this.graphic.clear();
-		this.graphic.lineStyle(0);
-		this.graphic.beginFill(this.color);
+		if (this.texture) {
+			this.matrix.set(1, 0, 0, 1, newPos.x - this.RADIUS, newPos.y - this.RADIUS);
+			this.graphic.beginTextureFill({texture: this.texture, matrix: this.matrix});
+		}
+		else
+			this.graphic.beginFill(this.color);
 		this.graphic.drawCircle(newPos.x, newPos.y, this.RADIUS);
 		this.graphic.endFill();
 		this.graphic.x = newPos.x;

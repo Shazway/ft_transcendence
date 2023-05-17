@@ -17,6 +17,11 @@ export class AssetManager {
 		PIXI.Assets.add('SkinSwirl' ,'assets/Swirl.png');
 		PIXI.Assets.add('SkinPoele' ,'assets/raquette-poele.png');
 		PIXI.Assets.add('SkinBaguette' ,'assets/raquette-baguette.png');
+		PIXI.Assets.add('SkinEclair' ,'assets/raquette-eclairAuChocolat.png');
+		PIXI.Assets.add('SkinTorti' ,'assets/raquette-torti.png');
+		PIXI.Assets.add('balleBallon' ,'assets/balle-ballon.png');
+		PIXI.Assets.add('balleCitron' ,'assets/balle-tarteCitron.png');
+		PIXI.Assets.add('balleFraise' ,'assets/balle-tarteFraise.png');
 		return await PIXI.Assets.loadBundle('fonts').then(() => {
 			return {
 				p1: new TextStyle({ fontFamily: 'PixeloidSansBold', fontSize: 70, fill: 0xaaaaaa, align: 'right' }),

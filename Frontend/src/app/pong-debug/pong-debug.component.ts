@@ -81,9 +81,9 @@ export class PongDebugComponent {
 
 	async initObjects() {
 		const style = await this.assetManager.initAssets();
-		this.player.init(10, 250, 20, 100, await this.assetManager.getAsset('SkinBaguette'));
-		this.opponent.init(this.app.view.width - (10 + 20), 250, 20, 100, await this.assetManager.getAsset('SkinSwirl'));
-		this.ball.init(500, 300, 10, 0xFFFFFF);
+		this.player.init(10, 250, 20, 100, await this.assetManager.getAsset('SkinEclair'));
+		this.opponent.init(this.app.view.width - (10 + 20), 250, 20, 100, await this.assetManager.getAsset('SkinTorti'));
+		this.ball.init(500, 300, 10, await this.assetManager.getAsset('balleFraise'));
 		const graphicElm = new Graphics();
 		graphicElm.beginFill(0xFFFFFF, 0.8);
 		graphicElm.drawRect(490, 0, 20, 250);

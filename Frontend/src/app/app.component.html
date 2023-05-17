@@ -8,9 +8,9 @@
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
 
-<div style="height: 100vh; display: flex; flex-direction: column;">
+<div style="height: 100vh; max-height: 100vh; display: flex; flex-direction: column; overflow: hidden;">
 
-	<nav id="upperbar" class="navbar navbar-light bg-light">
+	<nav id="upperbar" class="navbar navbar-light bg-light navbar-fixed-top">
 		<div class="d-flex justify-content-between w-100 px-5">
 			<div class="sidebar-header">
 				<a class="inox" href="#">Transcendence</a>
@@ -68,7 +68,7 @@
 			</ul>
 		</nav>
 
-		<div class="w-100 gunmetal">
+		<div class="w-100 gunmetal pb-2" style="max-height: calc(100vh - 54px); overflow: auto;">
 			<router-outlet></router-outlet>
 			<!-- <ngbd-toast-global></ngbd-toast-global> -->
 			<!-- <Button class="btn btn-primary" (click)="showFriendReq()">Friend Req</Button>

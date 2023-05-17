@@ -32,7 +32,7 @@ export class ProfileComponent implements AfterViewInit {
 
 	constructor(private cdr: ChangeDetectorRef) {
 		Chart.register(ChartDataLabels);
-		const nbGenerate = 90;
+		const nbGenerate = 100;
 		this.matchHistory = new Array;
 		let time = new Date();
 		for (let index = 0; index < nbGenerate; index++) {
@@ -268,7 +268,7 @@ export class ProfileComponent implements AfterViewInit {
 			},
 			options: {
 				responsive: true,
-				aspectRatio: 1.5,
+				// aspectRatio: 1.5,
 				layout: {
 					padding: 20,
 				},
