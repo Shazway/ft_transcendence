@@ -12,6 +12,11 @@ export class AssetManager {
 			PixeloidMono: 'assets/PixeloidMono.ttf',
 			PixeloidSansBold: 'assets/PixeloidSansBold.ttf',
 		});
+		PIXI.Assets.add('SkinGradient' ,'assets/paddle-red-gradient.png');
+		PIXI.Assets.add('SkinHotDog' ,'assets/raquette-hotdog.png');
+		PIXI.Assets.add('SkinSwirl' ,'assets/Swirl.png');
+		PIXI.Assets.add('SkinPoele' ,'assets/raquette-poele.png');
+		PIXI.Assets.add('SkinBaguette' ,'assets/raquette-baguette.png');
 		return await PIXI.Assets.loadBundle('fonts').then(() => {
 			return {
 				p1: new TextStyle({ fontFamily: 'PixeloidSansBold', fontSize: 70, fill: 0xaaaaaa, align: 'right' }),
@@ -19,6 +24,12 @@ export class AssetManager {
 				funText: new TextStyle({ fontFamily: 'PixeloidSansBold', fontSize: 30, fill: 0x660077 }),
 			}
 		});
+	}
+
+	async getAsset(key: string | string[]) {
+		if (typeof key == 'string')
+			return await PIXI.Assets.load(key);
+		return await PIXI.Assets.load(key);
 	}
 
 	addRuler(app: Application) {

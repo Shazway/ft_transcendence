@@ -1,4 +1,4 @@
-import { Graphics } from "pixi.js";
+import { Graphics, Matrix, Texture } from "pixi.js";
 import * as math from "mathjs"
 
 export interface Position {
@@ -209,7 +209,7 @@ export class ballObject {
 	}
 
 	moveObject(delta: number) {
-		//this.checkWallCollision(this.updateVec(delta));
+		this.checkWallCollision(this.updateVec(delta));
 		this.applyMove(this.updateVec(delta));
 		this.updateVec(delta);
 	}
@@ -226,6 +226,8 @@ export class pongObject {
 		ArrowDown: false,
 	}
 	public color = 0xFFFFFF;
+	public texture: Texture | undefined;
+	public matrix!: Matrix;
 	public gameDim: Position;
 	public objDim: Position;
 	public score: number;
@@ -238,17 +240,26 @@ export class pongObject {
 		this.score = 0;
 	}
 
-	init(posX: number, posY: number, width: number, height: number, color: number) {
+	init(posX: number, posY: number, width: number, height: number, color: number | Texture) {
 		this.objDim.x = width;
 		this.objDim.y = height;
 		this.paddleSize = this.position(this.objDim.x / 2, this.objDim.y / 2);
-		this.color = color;
+		if (typeof color == 'number')
+			this.color = color;
+		else {
+			this.texture = color;
+			this.matrix = new Matrix();
+			this.matrix.set(1, 0, 0, 1, posX / 2, posY / 2);
+		}
 		this.graphic.x = posX / 2;
 		this.graphic.y = posY / 2;
 		this.upperLeftCorner = this.position(this.graphic.x, this.graphic.y);
 		this.upperRightCorner = this.position(this.graphic.x + this.paddleSize.x, this.graphic.y);
 		this.lowerCorner = this.position(this.graphic.x + this.paddleSize.x, this.graphic.y + this.paddleSize.y);
-		this.graphic.beginFill(color);
+		if (this.texture)
+			this.graphic.beginTextureFill({texture: this.texture, matrix: this.matrix});
+		else
+			this.graphic.beginFill(this.color);
 		this.graphic.drawRect(posX / 2, posY / 2, width, height);
 		this.graphic.endFill();
 	}
@@ -263,7 +274,12 @@ export class pongObject {
 
 	applyMove(newPos: Position) {
 		this.graphic.clear();
-		this.graphic.beginFill(this.color);
+		if (this.texture) {
+			this.matrix.set(1, 0, 0, 1, newPos.x, newPos.y);
+			this.graphic.beginTextureFill({texture: this.texture, matrix: this.matrix});
+		}
+		else
+			this.graphic.beginFill(this.color);
 		this.graphic.drawRect(newPos.x, newPos.y, this.objDim.x, this.objDim.y);
 		this.graphic.endFill();
 		this.graphic.x = newPos.x;

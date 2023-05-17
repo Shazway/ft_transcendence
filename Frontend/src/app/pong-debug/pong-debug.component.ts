@@ -74,21 +74,21 @@ export class PongDebugComponent {
 			this.ball.changeDirectionPlayer(this.player);
 		else if (this.closeEnoughOpponent() && this.ball.collidesWithPlayer(this.opponent))
 			this.ball.changeDirectionOpponent(this.opponent);
-		// this.ball.moveObject(delta);
+		this.ball.moveObject(delta);
 		if (this.funkyText)
 			this.funkyText.update();
 	}
 
 	async initObjects() {
-		this.player.init(10, 250, 20, 100, 0x83d0c9);
-		this.opponent.init(this.app.view.width - (10 + 20), 250, 20, 100, 0xFF0000);
+		const style = await this.assetManager.initAssets();
+		this.player.init(10, 250, 20, 100, await this.assetManager.getAsset('SkinBaguette'));
+		this.opponent.init(this.app.view.width - (10 + 20), 250, 20, 100, await this.assetManager.getAsset('SkinSwirl'));
 		this.ball.init(500, 300, 10, 0xFFFFFF);
 		const graphicElm = new Graphics();
 		graphicElm.beginFill(0xFFFFFF, 0.8);
 		graphicElm.drawRect(490, 0, 20, 250);
 		graphicElm.drawRect(490, 350, 20, 250);
 		graphicElm.endFill();
-		const style = await this.assetManager.initAssets();
 		this.scoreP1 = new WowText('0', style.p1, 450, 50, this.app);
 		this.scoreP1.setReverse(true);
 		this.scoreP2 = new WowText('0', style.p2, 560, 50, this.app);
