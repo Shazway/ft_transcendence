@@ -53,7 +53,7 @@ a, a:hover, a:focus {
 #sidebar {
 	min-width: 250px;
     max-width: 250px;
-    min-height: 100vh;
+    min-height: 100%;
     /* don't forget to add all the previously mentioned styles here too */
     color: #fff;
     transition: all 0.3s;
