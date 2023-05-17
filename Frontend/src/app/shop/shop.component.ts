@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { string } from 'mathjs';
 import { ShopItem } from 'src/dtos/ShopItem.dto';
+import { ConfirmBuyPopup } from '../popup-component/popup-component.component';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 
 //https://www.youtube.com/watch?v=Vy7ESjYNO_Y&list=PLrbLGOB571zeR7FUQifKmjUpT4ImldCPt&index=13
@@ -21,7 +23,7 @@ export class ShopComponent {
 	
 	playerWealth = 65;
 	
-	constructor() {
+	constructor(private modalService: NgbModal) {
 		this.items = new Array<ShopItem>;
 		this.items.push({price : 500, id : 1, name : "test", description : "ceci est un item test", image : "https://img.passeportsante.net/1200x675/2021-06-01/i107848-eduquer-un-chaton.jpeg", type : "kitten"});
 		this.items.push({price : 50, id : 2, name : "test2", description : "ceci est un item test", image : "https://mag.bullebleue.fr/sites/mag/files/img/articles/chat/arrivee-chaton-maison-bons-reflexes.jpg", type : "kitten"});
@@ -70,5 +72,26 @@ export class ShopComponent {
 	{
 		console.log("filtering");
 		this.filteredItems = this.items.filter(this.filter.bind(this));
+	}
+
+	async confirmBuy(item : ShopItem) {
+		const validate = await this.createPopup(item);
+		console.log(validate);
+		if (validate)
+			console.log("validated");
+		else
+			console.log("canceled");
+	}
+	
+	async createPopup(item : ShopItem) {
+		const modalRef = this.modalService.open(ConfirmBuyPopup);
+		modalRef.componentInstance.item = item;
+		return await modalRef.result;
+	}
+
+
+	notEnoughMoney()
+	{
+
 	}
 }
