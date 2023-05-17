@@ -8,55 +8,77 @@
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
 
-<div class="wrapper">
+<div>
 
-    <!-- Sidebar -->
-    <nav id="sidebar" class="offscreen airforceblue h-100">
-        <div class="sidebar-header">
-            <a class="inox" href="#">Transcendence</a>
-        </div>
-		<ul class="list-group active">
-            <li class="active" aria-owns="#homeSubmenu">
-                <a data-toggle="collapse" class="dropdown-toggle " (click)="togglePlay()">Home</a>
-                <ul class="collapse list-unstyled show " id="play">
-                    <li>
-                        <a href="matchmaking">Ranked match</a>
-                    </li>
-                    <li>
-                        <a href="pong_debug">Casual match</a>
-                    </li>
-                    <li>
-                        <a href="#">Challenge a friend</a>
-                    </li>
-                </ul>
-            </li>
-            <li>
-                <a href="profile">My profile</a>
-            </li>
-			<li>
-                <a href="chat">Chat</a>
-            </li>
-            <li>
-                <a href="shop">Shop</a>
-            </li>
-            <li>
-                <a href="friends">Friends</a>
-            </li>
-			<li>
-                <a href="login">Log in</a>
-            </li>
-        </ul>
-    </nav>
+	<nav id="upperbar" class="navbar navbar-light bg-light">
+		<div class="d-flex justify-content-between w-100 px-5">
+			<div class="sidebar-header">
+				<a class="inox" href="#">Transcendence</a>
+			</div>
+			<div *ngIf="isConnected()" class="d-flex justify-content-between">
+				<div aria-label="wealth" class="col text-muted align-items-center mx-5" >
+					<img src="../assets/DALL·E 2023-05-11 21.52.35 - coin icon minted with a wheat stalk.png" alt="Currency" width="30" height="24">
+					58
+				</div>
+				<div aria-label="user space" class="col dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
+					{{getUsername()}}
+					<img src="{{getAvatar()}}" alt="Avatar" width = 30>
+				</div>
+				<div class="dropdown-menu col">
+					<a class="dropdown-item" href="#">Action</a>
+					<a class="dropdown-item" href="#">Another action</a>
+					<a class="dropdown-item" href="#">Something else here</a>
+				</div>
+			</div>
+		</div>
+	</nav>
+	<div class="wrapper">
+		<!-- Sidebar -->
+		<nav id="sidebar" class="offscreen airforceblue h-100">
+			<ul class="list-group active">
+				<li class="active" aria-owns="#homeSubmenu">
+					<a data-toggle="collapse" class="dropdown-toggle " (click)="togglePlay()">Home</a>
+					<ul class="collapse list-unstyled show " id="play">
+						<li>
+							<a href="matchmaking">Ranked match</a>
+						</li>
+						<li>
+							<a href="pong_debug">Casual match</a>
+						</li>
+						<li>
+							<a href="#">Challenge a friend</a>
+						</li>
+					</ul>
+				</li>
+				<li>
+					<a href="profile">My profile</a>
+				</li>
+				<li>
+					<a href="chat">Chat</a>
+				</li>
+				<li>
+					<a href="shop">Shop</a>
+				</li>
+				<li>
+					<a href="friends">Friends</a>
+				</li>
+				<li>
+					<a href="login">Log in</a>
+				</li>
+			</ul>
+		</nav>
 
-	<div class="w-100 gunmetal">
-		<router-outlet></router-outlet>
-		<!-- <ngbd-toast-global></ngbd-toast-global> -->
-		<!-- <Button class="btn btn-primary" (click)="showFriendReq()">Friend Req</Button>
-		<Button class="btn btn-primary" (click)="showAchievements()">Achievements</Button>
-		<Button class="btn btn-primary" (click)="showChallenge()">Challenge</Button> -->
+		<div class="w-100 gunmetal">
+			<router-outlet></router-outlet>
+			<!-- <ngbd-toast-global></ngbd-toast-global> -->
+			<!-- <Button class="btn btn-primary" (click)="showFriendReq()">Friend Req</Button>
+			<Button class="btn btn-primary" (click)="showAchievements()">Achievements</Button>
+			<Button class="btn btn-primary" (click)="showChallenge()">Challenge</Button> -->
+		</div>
+
+		<!-- <div *ngIf="isConnected()"><app-chat></app-chat></div> -->
+		<app-toasts></app-toasts>
 	</div>
-    <!-- <div *ngIf="isConnected()"><app-chat></app-chat></div> -->
-	<app-toasts></app-toasts>
 </div>
 
 <ng-template let-toast="toast" let-context="context" #toastFriendRequest>

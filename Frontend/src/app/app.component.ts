@@ -75,4 +75,20 @@ export class AppComponent implements AfterViewInit {
 	notifDismiss(toast: any) {
 		this.notifService.notifDismiss(toast);
 	}
+
+	getAvatar()
+	{
+		return localStorage.getItem('img_url');
+	}
+
+	getUsername()
+	{
+		return localStorage.getItem('username');
+	}
+
+	displayUserChoices()
+	{
+		console.log("il faut deplier le dropdown");
+	}
+
 }
