@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { string } from 'mathjs';
 import { ShopItem } from 'src/dtos/ShopItem.dto';
 
 
@@ -13,8 +14,9 @@ import { ShopItem } from 'src/dtos/ShopItem.dto';
 export class ShopComponent {
 
 	items : Array<ShopItem>;
+	filteredItems : Array<ShopItem>;
 	existingTypes : Array<string>;
-	chosenType = "";
+	chosenType = "" ;
 	searching = "";
 	
 	playerWealth = 65;
@@ -31,6 +33,9 @@ export class ShopComponent {
 		this.items.push({price : 80, id : 2, name : "test2", description : "ceci est un item test", image : "https://mag.bullebleue.fr/sites/mag/files/img/articles/chat/arrivee-chaton-maison-bons-reflexes.jpg", type : "kitten"});
 		this.items.push({price : 95, id : 3, name : "test3", description : "ceci est un titre", image : "https://www.zooplus.fr/magazine/wp-content/uploads/2019/06/arriv%C3%A9e-dun-chaton-%C3%A0-la-maison.jpeg", type : "Title"});
 		
+		this.filteredItems = new Array<ShopItem>;
+		this.filteredItems = this.items;
+
 		this.existingTypes = new Array<string>;
 		this.existingTypes.push("kitten");
 		this.existingTypes.push("Skin");
@@ -41,6 +46,7 @@ export class ShopComponent {
 	onChange(value: any) {
         this.chosenType = value.target.value;
 		console.log("Le user a choisi " + this.chosenType);
+		this.filterItems("");
     }
 
 	onClickSearch(value: any)
@@ -48,11 +54,21 @@ export class ShopComponent {
 		this.searching = value;
 		console.log(value);
 		console.log("Le user cherche " + this.searching);
+		this.filterItems("");
+
 	}
 
-	filter(value: string)
+	filter(element : ShopItem, index : number)
 	{
-		if (this.chosenType=='' || value==this.chosenType) return false;
-		return true
+		console.log("fonction filter");
+		if ((this.chosenType == '' || element.type===this.chosenType) && (this.searching == '' || element.name.search(this.searching) != -1 || element.description.search(this.searching) != -1))
+			return true;
+		return false
+	}
+
+	filterItems(value: string)
+	{
+		console.log("filtering");
+		this.filteredItems = this.items.filter(this.filter.bind(this));
 	}
 }

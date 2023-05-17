@@ -4,7 +4,7 @@
 		<div class="d-flex justify-content-left">
 			<div class="m-4">
 				<select class="form-select" (change)="onChange($event)" aria-label="Default select example">
-					<option selected value="">Type</option>
+					<option selected value="">all</option>
 					<option *ngFor="let type of existingTypes "  value={{type}}> {{type}} </option>
 				</select>
 			</div>
@@ -22,8 +22,8 @@
 
 		</div>
 		<div class="d-flex row row-cols-1 row-cols-md-3 px-4 m-0" >
-			<div class="col-3 m-0 mb-4" *ngFor="let item of items">
-				<div class="card" *ngIf="chosenType === '' || item.type === chosenType" style="max-width: 30vw;">
+			<div class="col-3 m-0 mb-4" *ngFor="let item of filteredItems">
+				<div class="card" style="max-width: 30vw;">
 					<img src="{{item.image}}" class="card-image-top">
 					<div class="card-body" style="color: black;">
 						<h5 class="card-title">{{item.name}}</h5>
