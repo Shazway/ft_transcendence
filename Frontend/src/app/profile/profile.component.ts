@@ -1,7 +1,10 @@
-import { AfterContentInit, AfterViewInit, ChangeDetectorRef, Component } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ViewChild, TemplateRef, ElementRef } from '@angular/core';
 import { floor, ceil, random, round } from 'mathjs';
 import { Chart, ChartConfiguration } from 'chart.js/auto';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { AppComponent } from '../app.component';
+import { PopoverConfig } from 'src/dtos/Popover.dto';
+import { trigger, state, style, transition, animate } from '@angular/animations';
 
 interface MatchHistory {
 	Player1: string;
@@ -19,18 +22,77 @@ interface Pair {
 }
 
 @Component({
-  selector: 'app-profile',
-  templateUrl: './profile.component.html',
-  styleUrls: ['./profile.component.css'],
+	selector: 'app-profile',
+	templateUrl: './profile.component.html',
+	styleUrls: ['./profile.component.css'],
+	animations: [
+		trigger('slideFarLeft', [
+			state('right', style({ transform: 'translateX(340%) scale(2)' })),
+			transition('none => right', animate('300ms ease-out'))
+		]),
+		trigger('slideLeft', [
+			state('left', style({ transform: 'translateX(-235%) scale(0.5)' })),
+			state('right', style({ transform: 'translateX(235%) scale(2)' })),
+			transition('none => left, none => right', animate('300ms ease-out'))
+		]),
+		trigger('slideCenter', [
+			state('left', style({ transform: 'translateX(-115%) scale(0.5)' })),
+			state('right', style({ transform: 'translateX(115%) scale(0.5)' })),
+			transition('none => left, none => right', animate('300ms ease-out'))
+		]),
+		trigger('slideRight', [
+			state('left', style({ transform: 'translateX(-235%) scale(2)' })),
+			state('right', style({ transform: 'translateX(235%) scale(0.5)' })),
+			transition('none => left, none => right', animate('300ms ease-out'))
+		]),
+		trigger('slideFarRight', [
+			state('left', style({ transform: 'translateX(-340%) scale(2)' })),
+			transition('none => left', animate('300ms ease-out'))
+		]),
+	],
 })
 export class ProfileComponent implements AfterViewInit {
+	@ViewChild('userSettingsTemplate') userSettingsTemplate!: TemplateRef<any>;
+	@ViewChild('profileCard') profileCard!: ElementRef;
 	matchHistory: Array<MatchHistory>;
 	matchChart!: Chart;
 	rankChart!: Chart;
 	rank = 100;
 	maxScore = 100;
+	paddleSkins = [
+		{ src: 'assets/raquette-baguette.png' },
+		{ src: 'assets/raquette-eclairAuChocolat.png' },
+		{ src: 'assets/raquette-poele.png' },
+		{ src: 'assets/raquette-torti.png' },
+		{ src: 'assets/Swirl.png' },
+		{ src: 'assets/paddle-red-gradient.png' },
+	];
+	slideDirection = 'none';
+	
+	panLeft() {
+		this.slideDirection = 'left';
+		setTimeout(() => {
+			const shift = this.paddleSkins.shift();
+			if (shift)
+				this.paddleSkins.push(shift);
+			this.slideDirection = 'none';
+		}, 300);
+	}
+	
+	panRight() {
+		this.slideDirection = 'right';
+		setTimeout(() => {
+			const shift = this.paddleSkins.pop();
+			if (shift)
+				this.paddleSkins.unshift(shift);
+			this.slideDirection = 'none';
+		}, 300);
+	}
 
-	constructor(private cdr: ChangeDetectorRef) {
+	constructor(
+		private cdr: ChangeDetectorRef,
+		private parent: AppComponent,
+	) {
 		Chart.register(ChartDataLabels);
 		const nbGenerate = 100;
 		this.matchHistory = new Array;
@@ -61,6 +123,15 @@ export class ProfileComponent implements AfterViewInit {
 		this.rankChart = new Chart(document.getElementById('rankChart') as HTMLCanvasElement, this.getRankedChartConfig());
 		this.cdr.detectChanges();
 		this.cdr.reattach();
+	}
+
+	createSettingsPopup() {
+		this.parent.openPopover(this.userSettingsTemplate, new PopoverConfig(
+			this.profileCard.nativeElement,
+			'userSettings',
+			'outside',
+			'bottom',
+		));
 	}
 
 	getRankedChartConfig(): ChartConfiguration {

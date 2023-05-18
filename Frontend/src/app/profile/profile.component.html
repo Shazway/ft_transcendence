@@ -2,51 +2,54 @@
 	<div class="container pt-3 pb-5 h-100">
 		<div class="row d-flex justify-content-center align-items-center h-100">
 			<div class="col">
-				<div class="card profile-card">
+				<div class="card profile-card" #profileCard>
 					<div class="card-body p-4">
 						<div class="d-flex text-black">
 							<div class="flex-shrink-0">
 							<img src="https://i1.sndcdn.com/artworks-000329925816-3yu1fd-t500x500.jpg"
 								alt="Generic placeholder image" class="img-fluid card-profile-pic">
 							</div>
-							<div class="flex-grow-1 ms-3">
+							<div class="flex-grow-1 ms-3" style="display: flex; flex-direction: column;">
 
-							<div class="d-flex gap-2">
-								<div class="w-100">
-									<h5 class="mb-1 text-center">Mr. Connasse</h5>
-									<p class="mb-2 pb-1 text-center">mettre ici un titre a acheter ?</p>
-									<div class="d-flex justify-content-start rounded-3 p-2 mb-2 stat-box">
-										<div class="col justify-content-center">
-											<p class="small text-muted mb-1 text-center">Wins / Losses</p>
-											<p class="mb-0 text-center">{{getRatio()[1]}} / {{getRatio()[0]}}</p>
-										</div>
-										<div class="col justify-content-center">
-											<p class="small text-muted mb-1 text-center">Achievements</p>
-											<p class="mb-0 text-center">72%</p>
-										</div>
-										<div class="col justify-content-center">
-											<p class="small text-muted mb-1 text-center">Status</p>
-											<div class="d-flex justify-content-center">
-												<p class="mb-0 text-center pe-1">online</p>
-												<span class="badge bg-success dot rounded-circle status-dot">&nbsp;</span>
+								<div class="d-flex gap-2 flex-grow-1">
+									<div class="w-100" style="display: flex; flex-direction: column;">
+										<h5 class="mb-1 text-center">Mr. Connasse</h5>
+										<p class="mb-2 pb-1 text-center">mettre ici un titre a acheter ?</p>
+										<div class="d-flex justify-content-start rounded-3 p-2 mb-2 stat-box flex-grow-1">
+											<div class="col justify-content-center">
+												<p class="small text-muted mb-1 text-center">Wins / Losses</p>
+												<p class="mb-0 text-center">{{getRatio()[1]}} / {{getRatio()[0]}}</p>
+											</div>
+											<div class="col justify-content-center">
+												<p class="small text-muted mb-1 text-center">Achievements</p>
+												<p class="mb-0 text-center">72%</p>
+											</div>
+											<div class="col justify-content-center">
+												<p class="small text-muted mb-1 text-center">Status</p>
+												<div class="d-flex justify-content-center">
+													<p class="mb-0 text-center pe-1">online</p>
+													<span class="badge bg-success dot rounded-circle status-dot">&nbsp;</span>
+												</div>
 											</div>
 										</div>
 									</div>
-								</div>
 
-								<div class="d-flex justify-content-start rounded-3 p-2 mb-2 stat-box">
-									<div class="col justify-content-center">
-										<p class="small text-muted mb-1 text-center">Rank Score</p>
-										<p class="mb-0 text-center font-weight-bold display-2 rank-label">{{rank}}</p>
+									<div class="d-flex justify-content-start rounded-3 p-2 mb-2 stat-box">
+										<div class="col justify-content-center">
+											<p class="small text-muted mb-1 text-center">Rank Score</p>
+											<p class="mb-0 text-center font-weight-bold display-2 rank-label">{{rank}}</p>
+										</div>
 									</div>
 								</div>
-								</div>
 
-							<div class="d-flex pt-1 gap-2">
-								<button type="button" class="btn btn-outline-primary flex-grow-1">Chat</button>
-								<button type="button" class="btn btn-outline-primary flex-grow-1">Challenge</button>
-								<button type="button" class="btn btn-primary" style="flex-grow: 5;">Add Friend</button>
-							</div>
+								<div *ngIf="false" class="d-flex pt-1 gap-2">
+									<button type="button" class="btn btn-outline-primary flex-grow-1">Chat</button>
+									<button type="button" class="btn btn-outline-primary flex-grow-1">Challenge</button>
+									<button type="button" class="btn btn-primary" style="flex-grow: 5;">Add Friend</button>
+								</div>
+								<div *ngIf="true" class="d-flex pt-1 gap-2">
+									<button type="button" class="btn btn-outline-primary flex-grow-1" (click)="createSettingsPopup()">Settings</button>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -56,7 +59,11 @@
 	</div>
 	<div class="row gap-3 px-5 mx-2" style="height: 33vw;">
 
-		<div class="col border rounded-3 white"></div>
+		<div class="col d-flex border rounded-3 white">
+			<div class="" *ngFor="let skins of paddleSkins" style="height: 100px; width: 20px;">
+				<img src="{{skins.src}}" alt="Image" style="height: 100px; width: 20px;">
+			</div>
+		</div>
 
 		<div class="col border rounded-3 white">
 			<canvas id="matchChart"></canvas>
@@ -95,3 +102,17 @@
 
 	</div>
 </div>
+
+<ng-template #userSettingsTemplate>
+	<div class="d-flex gap-2">
+		<button class="btn arrow left flex-shrink-0" type="button" (click)="panLeft()">&lt;</button>
+		<div class="d-flex gap-3 align-items-center border bg-black" style="overflow: hidden;">
+			<img src="{{paddleSkins[0].src}}" style="height: 50px; width: 10px; margin-left: -10px;" alt="Skin" [@slideFarLeft]="slideDirection">
+			<img src="{{paddleSkins[1].src}}" style="margin-left: 5px;" alt="Skin" [@slideLeft]="slideDirection">
+			<img src="{{paddleSkins[2].src}}" style="height: 200px; width: 40px;" alt="Skin" [@slideCenter]="slideDirection">
+			<img src="{{paddleSkins[3].src}}" style="margin-right: 5px;" alt="Skin" [@slideRight]="slideDirection">
+			<img src="{{paddleSkins[4].src}}" style="height: 50px; width: 10px;" alt="Skin" [@slideFarRight]="slideDirection">
+		</div>
+		<button class="btn arrow right flex-shrink-0" type="button" (click)="panRight()">&gt;</button>
+	</div>
+</ng-template>
