@@ -26,6 +26,10 @@ interface Pair {
 	templateUrl: './profile.component.html',
 	styleUrls: ['./profile.component.css'],
 	animations: [
+		trigger('settingWindow', [
+			transition(':enter', [style({ height: '0', 'margin-bottom': '0' }), animate('300ms ease-out', style({ height: '*', 'margin-bottom': '*' }))]),
+			transition(':leave', animate('300ms ease-out', style({ height: '0', 'margin-bottom': '0' }))),
+		]),
 		trigger('slideFarLeft', [
 			state('right', style({ transform: 'translateX(340%) scale(2)' })),
 			transition('none => right', animate('300ms ease-out'))
@@ -68,6 +72,7 @@ export class ProfileComponent implements AfterViewInit {
 		{ src: 'assets/paddle-red-gradient.png' },
 	];
 	slideDirection = 'none';
+	settingState = 'closed';
 	
 	panLeft() {
 		this.slideDirection = 'left';
@@ -126,12 +131,16 @@ export class ProfileComponent implements AfterViewInit {
 	}
 
 	createSettingsPopup() {
-		this.parent.openPopover(this.userSettingsTemplate, new PopoverConfig(
-			this.profileCard.nativeElement,
-			'userSettings',
-			'outside',
-			'bottom',
-		));
+		if (this.settingState == 'closed')
+			this.settingState = 'open';
+		else
+			this.settingState = 'closed';
+		// this.parent.openPopover(this.userSettingsTemplate, new PopoverConfig(
+		// 	this.profileCard.nativeElement,
+		// 	'userSettings',
+		// 	'outside',
+		// 	'bottom',
+		// ));
 	}
 
 	getRankedChartConfig(): ChartConfiguration {

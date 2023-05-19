@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { Socket, io } from 'socket.io-client';
 import { WebsocketService } from '../websocket.service';
 import { Application, Assets, Graphics, TextStyle, Text } from 'pixi.js';
@@ -13,13 +13,16 @@ import { AssetManager, WowText } from 'src/dtos/GraphElem.dto';
   templateUrl: './pong-debug.component.html',
   styleUrls: ['./pong-debug.component.css']
 })
-export class PongDebugComponent {
+export class PongDebugComponent implements AfterViewInit {
+	@ViewChild('pixiContainer') pixiContainer!: ElementRef;
+	@ViewChild('announcementCanvas') announcementCanvas!: ElementRef;
 	private client!: Socket;
-	private app;
-	private player;
-	private ball;
-	private opponent;
-	private oldDate: Date;
+	private app!: Application;
+	private announce!: Application;
+	private player!: pongObject;
+	private ball!: ballObject;
+	private opponent!: pongObject;
+	private oldDate!: Date;
 	private movespeed = 5;
 	private gamespeed = 13;
 	private timeoutId!: any;
@@ -30,27 +33,49 @@ export class PongDebugComponent {
 	bouncenumber: number = 0;
 
 	constructor(
-		private pixiContainer: ElementRef,
 		private route: ActivatedRoute,
 		private elRef: ElementRef,
 		private assetManager: AssetManager,
-		) {
-			this.app = new Application({
-				height: 600,
-				width: 1000,
-				antialias: true,
-			});
-			this.ball = new ballObject(this.app.view.width, this.app.view.height);
-			this.player	= new pongObject(this.app.view.width, this.app.view.height);
-			this.opponent = new pongObject(this.app.view.width, this.app.view.height);
-		this.initObjects();
+	) {
+		this.initApp();
+		this.initAnnounce();
+	}
+
+	ngAfterViewInit(): void {
 		this.pixiContainer.nativeElement.appendChild(this.app.view);
+		this.announcementCanvas.nativeElement.appendChild(this.announce.view);
+	}
+
+	initApp() {
+		this.app = new Application({
+			height: 600,
+			width: 1000,
+			antialias: true,
+		});
+		this.ball = new ballObject(this.app.view.width, this.app.view.height);
+		this.player	= new pongObject(this.app.view.width, this.app.view.height);
+		this.opponent = new pongObject(this.app.view.width, this.app.view.height);
+		this.initObjects();
 		this.oldDate = new Date();
 		this.app.ticker.add(() => {
 			const date = new Date();
 			this.update((date.getTime() - this.oldDate.getTime()) / this.gamespeed);
 			this.oldDate = new Date();
 		});
+	}
+
+	initAnnounce() {
+		this.announce = new Application({
+			height: 100,
+			width: 1000,
+			antialias: true,
+		});
+		this.oldDate = new Date();
+		// this.announce.ticker.add(() => {
+		// 	const date = new Date();
+		// 	this.update((date.getTime() - this.oldDate.getTime()) / this.gamespeed);
+		// 	this.oldDate = new Date();
+		// });
 	}
 
 	closeEnoughPlayer() {
@@ -83,7 +108,7 @@ export class PongDebugComponent {
 		const style = await this.assetManager.initAssets();
 		this.player.init(10, 250, 20, 100, await this.assetManager.getAsset('SkinEclair'));
 		this.opponent.init(this.app.view.width - (10 + 20), 250, 20, 100, await this.assetManager.getAsset('SkinTorti'));
-		this.ball.init(500, 300, 10, await this.assetManager.getAsset('balleFraise'));
+		this.ball.init(500, 300, 10, await this.assetManager.getAsset('balleBallon'));
 		const graphicElm = new Graphics();
 		graphicElm.beginFill(0xFFFFFF, 0.8);
 		graphicElm.drawRect(490, 0, 20, 250);
@@ -94,7 +119,7 @@ export class PongDebugComponent {
 		this.scoreP2 = new WowText('0', style.p2, 560, 50, this.app);
 		this.funkyText = new WowText('this is my fun text', style.funText, 100, 200, this.app);
 		this.funkyText.setRGB(true, 5000, 20);
-		this.funkyText.setWavy(true, 50, 50);
+		// this.funkyText.setWavy(true, 50, 50);
 		this.app.stage.addChild(graphicElm, this.ball.graphic, this.player.graphic, this.opponent.graphic);
 		this.assetManager.addRuler(this.app);
 	}

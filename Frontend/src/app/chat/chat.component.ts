@@ -5,7 +5,7 @@ import { FetchService } from '../fetch.service';
 import { WebsocketService } from '../websocket.service';
 import { Socket, io } from 'socket.io-client';
 import { fromEvent } from 'rxjs';
-import { NgbModal, NgbPopover, NgbPopoverConfig  } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PunishmentPopup } from '../popup-component/popup-component.component';
 import { NotificationRequest } from 'src/dtos/Notification.dto';
 import { NotificationService } from '../notification.service';
@@ -146,21 +146,26 @@ export class ChatComponent implements OnInit {
 		return this.is_admin;
 	}
 
-	createChatPopup(msg: Message) {
-		this.parent.openPopover(this.chatInteractionTemplate, new PopoverConfig(
-			this.chatBody.nativeElement,
-			'',
-			'outside',
-			'start',
-			msg,
-		));
-		this.parent.openPopover('profile', new PopoverConfig(
-			this.chatBody.nativeElement,
-			'profile arrow-hide',
-			'outside',
-			'start',
-			msg,
-		));
+	createChatPopup(msg: Message, event: MouseEvent) {
+		event.preventDefault();
+		if (event.button == 2) {
+			this.parent.openPopover(this.chatInteractionTemplate, new PopoverConfig(
+				this.chatBody.nativeElement,
+				'',
+				'outside',
+				'start',
+				msg,
+			));
+		}
+		else if (event.button == 0) {
+			this.parent.openPopover('profile', new PopoverConfig(
+				this.chatBody.nativeElement,
+				'profile arrow-hide',
+				'outside',
+				'start',
+				msg,
+			));
+		}
 	}
 
 	async createPopup(title: string, label: string) {
