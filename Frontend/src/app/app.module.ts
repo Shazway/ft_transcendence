@@ -20,6 +20,7 @@ import { ProfilePopupModule } from './profile-popup/profile-popup.module';
 import { ToastComponent } from './toast/toast.component';
 import { ToastsContainer } from './toast/toast.container';
 import { ShopComponent } from './shop/shop.component';
+import { FriendsModule } from './friends/friends.module';
 
 @NgModule({
   declarations: [
@@ -40,6 +41,7 @@ import { ShopComponent } from './shop/shop.component';
     AuthModule,
     ValidateModule,
 	ProfileModule,
+	FriendsModule,
 	ProfilePopupModule,
 	ToastComponent,
 	ToastsContainer,

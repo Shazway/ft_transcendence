@@ -104,6 +104,27 @@ export class FetchService {
 		return res;
 	}
 
+	async getFriendshipRequests()  {
+		let res: AnyProfileUser[] = [];
+		//code de test, faute de route dans le back
+
+		res.push({username : "test1",
+			img_url : "imgtest1",
+			match_history : [],
+			rank_score : 52,
+			activity_status : 1,
+			createdAt : new Date(),
+			wins : 0,
+			losses : 0,
+			achievements : [],
+			friend : [],
+			user_id : 6,
+			intra_id : 2561655,
+			title : "RemiPasDamis"
+			})
+		return (res);
+	}
+
 	async addFriends(friend_id: number) {
 		let res;
 		await axios.get('http://localhost:3001/users/add_friend/' + friend_id, this.getHeader())

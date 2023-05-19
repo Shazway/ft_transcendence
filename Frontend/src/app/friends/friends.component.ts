@@ -12,6 +12,8 @@ import { PunishmentPopup } from '../popup-component/popup-component.component';
 export class FriendsComponent {
 	user_id = localStorage.getItem("user_id");
 	icone_list = {
+		tick : "https://cdn.discordapp.com/attachments/1041104785870438521/1109161609621950464/Tick.png",
+		cross : "https://cdn.discordapp.com/attachments/1041104785870438521/1109161609374474271/Cross.png",
 		go_to_profile: "https://cdn.discordapp.com/attachments/1041104785870438521/1103760104278458468/user.png",
 		go_to_messages: "https://cdn.discordapp.com/attachments/1041104785870438521/1103760105108930602/writing.png",
 		remove_friend: "https://cdn.discordapp.com/attachments/1041104785870438521/1103760104559493130/unfriend.png",
@@ -19,6 +21,7 @@ export class FriendsComponent {
 	}
 
 	public friends: AnyProfileUser[] = [];
+	public friendshipRequests: AnyProfileUser[] = [];
 	constructor(
 		private elRef: ElementRef,
 		private modalService: NgbModal,
@@ -34,6 +37,7 @@ export class FriendsComponent {
 	
 	async ngOnInit() {
 		this.friends = await this.fetchService.getFriends();
+		this.friendshipRequests = await this.fetchService.getFriendshipRequests();
 	}
 
 	async addSystemFriend() {
@@ -103,5 +107,17 @@ export class FriendsComponent {
 	async spectate(friend: AnyProfileUser)
 	{
 		const test = await this.createPopup("Spectate", "friend");
+	}
+
+	accept(user: AnyProfileUser)
+	{
+		console.log("demande acceptee");
+		this.friendshipRequests.splice(this.friendshipRequests.indexOf(user), 1);
+	}
+
+	reject(user: AnyProfileUser)
+	{
+		console.log("demande rejetee");
+		this.friendshipRequests.splice(this.friendshipRequests.indexOf(user), 1);
 	}
 }

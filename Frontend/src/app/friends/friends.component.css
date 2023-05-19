@@ -1,10 +1,11 @@
-.hidden_icon {
+.icon {
 	height: 25px;
 	width: 25px;
-	opacity: 0;
+	opacity: 1;
 	transition: opacity 0.3s ease;
+	background-color: aliceblue;
   }
   
-  .hidden_icon.show {
-	opacity: 1;
-  }
+.line:hover {
+	background-color: rgba(245, 245, 245, 0.151);
+}
