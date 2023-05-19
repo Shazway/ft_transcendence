@@ -288,6 +288,19 @@ export class ItemsService {
 		return null;
 	}
 
+	public async getFriendRequestsSent(user_id: number) {
+		const user = await this.getUser(user_id);
+		if (user && user.sentFriendRequests && user.sentFriendRequests.length)
+			return user.sentFriendRequests;
+		return null;
+	}
+	public async getFriendRequestsReceived(user_id: number) {
+		const user = await this.getUser(user_id);
+		if (user && user.receivedFriendRequests && user.receivedFriendRequests.length)
+			return user.receivedFriendRequests;
+		return null;
+	}
+
 	public async blockUser(source_id: number, target_id: number)
 	{
 		const sourceUser = await this.getUser(source_id);
@@ -413,5 +426,12 @@ export class ItemsService {
 		if (userTwo.rank_score < 0)
 			userTwo.rank_score = 0;
 		await this.userRepo.save([userOne, userTwo]);
+	}
+	async buyItem(user: UserEntity, skin: SkinEntity) {
+		if (user.currency < skin.price)
+			return false;
+		user.currency -= skin.price;
+		user.skin.push(skin);
+		return (await this.userRepo.save(user));
 	}
 }

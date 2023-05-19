@@ -104,7 +104,7 @@ export class UsersController {
 	}
 
 	@Get('friends')
-	async getFriends(@Param('username') us: string, @Req() req: Request, @Res() res: Response) {
+	async getFriends(@Req() req: Request, @Res() res: Response) {
 		const user = this.tokenManager.getUserFromToken(req);
 		const friends = await this.itemsService.getFriends(user.sub);
 		if (friends)
@@ -113,6 +113,15 @@ export class UsersController {
 			res.status(HttpStatus.OK).send(userFriends);
 		}
 		else res.status(HttpStatus.NOT_FOUND).send({ msg: 'No friends found' });
+	}
+
+	@Get('friendRequests')
+	async getFriendRequests(@Req() req: Request, @Res() res: Response) {
+		const user = this.tokenManager.getUserFromToken(req);
+		const receivedRequests = await this.itemsService.getFriendRequestsReceived(user.sub);
+		const sentRequests = await this.itemsService.getFriendRequestsSent(user.sub);
+
+		res.status(HttpStatus.OK).send({received: receivedRequests, sent: sentRequests});
 	}
 
 	@Get(':username')
