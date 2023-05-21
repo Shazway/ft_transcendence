@@ -247,7 +247,7 @@ export class ItemsService {
 			.innerJoinAndSelect('channel_user.user', 'user')
 			.where("user.user_id = :user_id", {user_id})
 			.andWhere("channel.channel_id = :channel_id", {channel_id})
-			.getMany();
+			.getOne();
 		return (userChan);
 	}
 	
