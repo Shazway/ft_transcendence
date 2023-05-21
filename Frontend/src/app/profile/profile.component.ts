@@ -85,6 +85,7 @@ export class ProfileComponent implements AfterViewInit, OnInit {
 		private fetchService: FetchService,
 	) {
 		Chart.register(ChartDataLabels);
+		this.matchHistory = new Array;
 	}
 	
 	async ngOnInit() {
@@ -103,17 +104,20 @@ export class ProfileComponent implements AfterViewInit, OnInit {
 				this.user = newUser;
 		}
 		if (this.user) {
+			console.log('yipeeeee' + this.user.match_history.length);
 			this.user.match_history.reverse().forEach(match => {
+				console.log(match);
 				this.matchHistory.push({
-					Player1: match.users[0].username,
-					P1URL: match.users[0].img_url,
+					Player1: match.user[0].username,
+					P1URL: match.user[0].img_url,
 					P1score: match.current_score[0],
-					Player2: match.users[1].username,
-					P2URL: match.users[1].img_url,
+					Player2: match.user[1].username,
+					P2URL: match.user[1].img_url,
 					P2score: match.current_score[1],
-					date: match.,
+					date: new Date(match.date.setHours(match.date.getHours() + 2)),
 				});
 			});
+			this.rank = this.user.rank_score;
 		}
 	}
 
@@ -295,7 +299,16 @@ export class ProfileComponent implements AfterViewInit, OnInit {
 		return ret;
 	}
 
+	getStatus() {
+		if (this.user)
+			return this.user.activity_status ? 'online' : 'offline';
+		else
+			return 'online';
+	}
+
 	getMaxDate() {
+		if (this.matchHistory.length < 1)
+			return 1;
 		const lastDate = this.matchHistory[this.matchHistory.length - 1].date;
 		const diff = this.getRealTimeDiff(lastDate, this.getDateRange().today);
 		if (diff > 30)
@@ -488,6 +501,7 @@ export class ProfileComponent implements AfterViewInit, OnInit {
 
 	getTimeDiff(timestamp: Date) {
 		let str = new String();
+		console.log(new Date().toString() + ' - ' + timestamp.toString());
 		const time = new Date().getTime() - timestamp.getTime();
 
 		const min = floor(time / (1000 * 60));

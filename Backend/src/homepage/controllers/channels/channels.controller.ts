@@ -104,7 +104,7 @@ export class ChannelsController {
 
 		const userEntity = await this.itemsService.getUser(user.sub);
 		if (!userEntity)
-			res.status(HttpStatus.NOT_FOUND).send('You don\'t exist wtf');
+			return res.status(HttpStatus.NOT_FOUND).send('You don\'t exist wtf');
 		messages = messages.filter((message) => {
 			return !userEntity.blacklistEntry.find(blockedUser => blockedUser.user_id == message.author.user_id);
 		});
