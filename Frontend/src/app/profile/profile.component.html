@@ -6,14 +6,14 @@
 					<div class="card-body p-4">
 						<div class="d-flex text-black">
 							<div class="flex-shrink-0">
-								<img src="https://i1.sndcdn.com/artworks-000329925816-3yu1fd-t500x500.jpg" alt="Generic placeholder image" class="img-fluid card-profile-pic">
+								<img src="{{user ? user.img_url : 'https://i1.sndcdn.com/artworks-000329925816-3yu1fd-t500x500.jpg'}}" alt="Generic placeholder image" class="img-fluid card-profile-pic">
 							</div>
 							<div class="flex-grow-1 ms-3" style="display: flex; flex-direction: column;">
 
 								<div class="d-flex gap-2 flex-grow-1">
 									<div class="w-100" style="display: flex; flex-direction: column;">
-										<h5 class="mb-1 text-center">Mr. Connasse</h5>
-										<p class="mb-2 pb-1 text-center">mettre ici un titre a acheter ?</p>
+										<h5 class="mb-1 text-center">{{user ? user.username : 'Mr. Connasse'}}</h5>
+										<p class="mb-2 pb-1 text-center">{{user ? user.title : 'Professionnal Dummy'}}</p>
 										<div class="d-flex justify-content-start rounded-3 p-2 mb-2 stat-box flex-grow-1">
 											<div class="col justify-content-center">
 												<p class="small text-muted mb-1 text-center">Wins / Losses</p>
@@ -26,7 +26,7 @@
 											<div class="col justify-content-center">
 												<p class="small text-muted mb-1 text-center">Status</p>
 												<div class="d-flex justify-content-center">
-													<p class="mb-0 text-center pe-1">online</p>
+													<p class="mb-0 text-center pe-1">{{getStatus()}}</p>
 													<span class="badge bg-success dot rounded-circle status-dot">&nbsp;</span>
 												</div>
 											</div>

@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, CreateDateColumn } from 'typeorm';
 import { User } from './users.entity';
 
 @Entity({ name: 'match' })
@@ -21,6 +21,9 @@ export class Match {
 
 	@Column("boolean", { default: () => "'{false,false}'", array: true })
 	is_victory!: boolean[];
+
+	@CreateDateColumn()
+	date!: Date;
 
 	@ManyToMany(() => User, (user) => user.match_history, { onDelete: 'CASCADE' })
 	user: User[];

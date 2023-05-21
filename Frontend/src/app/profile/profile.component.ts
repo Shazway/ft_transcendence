@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ViewChild, TemplateRef, ElementRef, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ViewChild, TemplateRef, ElementRef } from '@angular/core';
 import { floor, ceil, random, round } from 'mathjs';
 import { Chart, ChartConfiguration } from 'chart.js/auto';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
@@ -58,7 +58,7 @@ interface Pair {
 		]),
 	],
 })
-export class ProfileComponent implements AfterViewInit, OnInit {
+export class ProfileComponent implements AfterViewInit {
 	@ViewChild('userSettingsTemplate') userSettingsTemplate!: TemplateRef<any>;
 	@ViewChild('profileCard') profileCard!: ElementRef;
 	user!: AnyProfileUser;
@@ -85,9 +85,10 @@ export class ProfileComponent implements AfterViewInit, OnInit {
 		private fetchService: FetchService,
 	) {
 		Chart.register(ChartDataLabels);
+		this.matchHistory = new Array;
 	}
 	
-	async ngOnInit() {
+	async customOnInit() {
 		const name = this.route.snapshot.queryParamMap.get('username');
 		console.log(name);
 		if (!name) {
@@ -104,16 +105,18 @@ export class ProfileComponent implements AfterViewInit, OnInit {
 		}
 		if (this.user) {
 			this.user.match_history.reverse().forEach(match => {
+				const date = new Date(match.date);
 				this.matchHistory.push({
-					Player1: match.users[0].username,
-					P1URL: match.users[0].img_url,
+					Player1: match.user[0].username,
+					P1URL: match.user[0].img_url,
 					P1score: match.current_score[0],
-					Player2: match.users[1].username,
-					P2URL: match.users[1].img_url,
+					Player2: match.user[1].username,
+					P2URL: match.user[1].img_url,
 					P2score: match.current_score[1],
-					date: new Date(),
+					date: new Date(date.setHours(date.getHours() + 2)),
 				});
 			});
+			this.rank = this.user.rank_score;
 		}
 	}
 
@@ -141,8 +144,10 @@ export class ProfileComponent implements AfterViewInit, OnInit {
 		}
 	}
 
-	ngAfterViewInit(): void {
+	async ngAfterViewInit() {
 		this.cdr.detach();
+		await this.customOnInit();
+		console.log(this.matchHistory.length);
 		this.matchChart = new Chart(document.getElementById('matchChart') as HTMLCanvasElement, this.getMatchChartConfig());
 		this.rankChart = new Chart(document.getElementById('rankChart') as HTMLCanvasElement, this.getRankedChartConfig());
 		this.cdr.detectChanges();
@@ -295,7 +300,16 @@ export class ProfileComponent implements AfterViewInit, OnInit {
 		return ret;
 	}
 
+	getStatus() {
+		if (this.user)
+			return this.user.activity_status ? 'online' : 'offline';
+		else
+			return 'online';
+	}
+
 	getMaxDate() {
+		if (this.matchHistory.length < 1)
+			return 1;
 		const lastDate = this.matchHistory[this.matchHistory.length - 1].date;
 		const diff = this.getRealTimeDiff(lastDate, this.getDateRange().today);
 		if (diff > 30)

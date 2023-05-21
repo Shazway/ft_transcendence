@@ -125,7 +125,8 @@ export class PongGateway {
 				player.user_id !== user.sub;
 			});
 			if (!match.players.length) {
-				match.gameService.endGame();
+				if (match.gameService)
+					match.gameService.endGame();
 				await this.matchService.setMatchEnd(matchEntity);
 				this.matchs.delete(matchEntity.match_id);
 			}

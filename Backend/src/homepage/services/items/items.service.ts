@@ -79,6 +79,7 @@ export class ItemsService {
 			.leftJoinAndSelect('user.blacklistEntry', 'blacklistEntry')
 			.leftJoinAndSelect('user.channel', 'channel')
 			.leftJoinAndSelect('user.match_history', 'match_history')
+			.leftJoinAndSelect('match_history.user', 'users')
 			.leftJoinAndSelect('user.skin', 'skin')
 			.where('user.username = :username', { username })
 			.getOne();
