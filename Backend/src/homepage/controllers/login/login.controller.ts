@@ -1,13 +1,14 @@
 /* eslint-disable prettier/prettier */
-import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
+import { Body, Controller, HttpStatus, Post, Res, Req, Get } from '@nestjs/common';
 import { UsersService } from 'src/homepage/services/users/users.service';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { varFetchService } from 'src/homepage/services/var_fetch/var_fetch.service';
 import { HttpService } from '@nestjs/axios';
 import { AuthCode, AuthPair, IntraInfo, TokenInfo } from 'src/homepage/dtos/Api.dto';
 import { ItemsService } from 'src/homepage/services/items/items.service';
 import { AuthService } from 'src/homepage/services/auth/auth.service';
 import { ChannelsService } from 'src/homepage/services/channels/channels.service';
+import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
 
 @Controller('login')
 export class LoginController {
@@ -18,6 +19,7 @@ export class LoginController {
 		private readonly itemsService: ItemsService,
 		private readonly authService: AuthService,
 		private readonly channelsService: ChannelsService,
+		private readonly tokenManager: TokenManagerService,
 	) {
 		this.twoFaMap = new Map<number, AuthPair>();
 	}
@@ -87,5 +89,13 @@ export class LoginController {
 		const intraInfo = await this.usersService.fetcIntraInfo(twoFA.intra_token.access_token);
 		res.status(HttpStatus.OK).send(await this.buildLoginBody(twoFA.intra_token, intraInfo.data, Number(body.id)));
 		this.twoFaMap.delete(Number(body.id));
+	}
+
+	@Get('toggleDoubleAuth')
+	async toggleDoubleAuth(@Req() req: Request, @Res() res: Response) {
+		const user = this.tokenManager.getUserFromToken(req);
+		if ((await this.itemsService.toggleDoubleAuth(user.sub)))
+			return res.status(HttpStatus.BAD_REQUEST).send('Error');
+		return res.status(HttpStatus.ACCEPTED).send('Success');
 	}
 }

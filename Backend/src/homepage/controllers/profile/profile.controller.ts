@@ -1,12 +1,4 @@
-import {
-	Controller,
-	Get,
-	HttpStatus,
-	Param,
-	ParseIntPipe,
-	Req,
-	Res,
-} from '@nestjs/common';
+import { Controller, Get, HttpStatus, Param, Post, Req, Res, Body } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
 import { ItemsService } from 'src/homepage/services/items/items.service';
@@ -20,8 +12,16 @@ export class ProfileController {
 	constructor(
 		private itemService: ItemsService,
 		private tokenManager: TokenManagerService,
-		private userService: UsersService,
+		private userService: UsersService
 	) {}
+
+	@Post('applySkins')
+	async applySkins(@Req() req: Request, @Res() res: Response, @Body() body: number[]) {
+		const user = this.tokenManager.getUserFromToken(req);
+		if (!(await this.itemService.applySelectedSkins(user.sub, body)))
+			return res.status(HttpStatus.BAD_REQUEST).send('Something went wrong');
+		return res.status(HttpStatus.ACCEPTED).send('Success');
+	}
 
 	@Get(':username')
 	async getProfile(@Param('username') us: string, @Req() req: Request, @Res() res: Response) {
