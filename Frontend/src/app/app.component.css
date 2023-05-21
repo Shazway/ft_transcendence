@@ -98,3 +98,8 @@ ul ul a {
 	color: red;
 	padding: 5px;
 }
+
+.mondropdown {
+	position: fixed;
+	right: 16px;
+}
