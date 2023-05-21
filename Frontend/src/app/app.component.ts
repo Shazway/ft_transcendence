@@ -3,6 +3,9 @@ import { AutoClose, Placement, PopoverConfig, Target } from '../dtos/Popover.dto
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { NotificationService } from './notification.service';
 import { NotificationResponse } from 'src/dtos/Notification.dto';
+import { MyProfileUser } from 'src/dtos/User.dto';
+import { FetchService } from './fetch.service';
+import { trigger, state, style, transition, animate } from '@angular/animations';
 
 
 @Component({
@@ -10,6 +13,11 @@ import { NotificationResponse } from 'src/dtos/Notification.dto';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
   providers: [NgbPopover],
+  animations: [
+	trigger('currencyFadeIn', [
+		transition(':enter', [style({ opacity: '0' }), animate('300ms ease-out', style({ opacity: '1' }))]),
+	])
+  ],
 })
 export class AppComponent implements AfterViewInit {
 	@ViewChild('popoverContent') profileTemplate!: TemplateRef<any>;
@@ -19,12 +27,20 @@ export class AppComponent implements AfterViewInit {
 	@ViewChild('toastAchievement') toastAchievement!: TemplateRef<any>;
 	title = 'Frontend';
 	isExpanded = false;
+	myProfile? : MyProfileUser | null;
 
 	constructor(
 		private elRef: ElementRef,
 		private popover: NgbPopover,
 		private notifService: NotificationService,
-	){}
+		private fetchService: FetchService,
+	){
+		
+	}
+
+	async ngOnInit() {
+		this.myProfile = await this.fetchService.getMyProfile();
+	}
 
 	ngAfterViewInit(): void {
 		this.notifService.initTemplates(this.toastFriendRequest, this.toastChallenge, this.toastAchievement)
@@ -93,6 +109,13 @@ export class AppComponent implements AfterViewInit {
 	displayUserChoices()
 	{
 		console.log("il faut deplier le dropdown");
+	}
+
+	getBalance()
+	{
+		if (this.myProfile)
+			return (this.myProfile.currency);
+		return (1);
 	}
 
 }

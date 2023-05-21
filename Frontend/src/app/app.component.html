@@ -16,9 +16,9 @@
 				<a class="inox" href="#">Transcendence</a>
 			</div>
 			<div *ngIf="isConnected()" class="d-flex justify-content-between">
-				<div aria-label="wealth" class="col text-muted align-items-center mx-5" >
+				<div *ngIf="myProfile" @currencyFadeIn aria-label="wealth" class="col text-muted align-items-center mx-5" >
 					<img src="assets/DALL·E 2023-05-11 21.52.35 - coin icon minted with a wheat stalk.png" alt="Currency" width="30" height="24">
-					58
+					{{getBalance()}}
 				</div>
 				<div aria-label="user space" class="col dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
 					{{getUsername()}}
