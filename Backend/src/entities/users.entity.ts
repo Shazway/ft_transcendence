@@ -34,7 +34,7 @@ export class User {
 	@Column({ default: 0, unsigned: true })
 	rank_score!: number;
 
-	@Column({ default: 0, unsigned: true })
+	@Column({ default: 100, unsigned: true })
 	currency!: number;
 
 	@Column({ default: 0 })

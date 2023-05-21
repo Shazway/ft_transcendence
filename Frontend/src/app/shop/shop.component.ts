@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
+import { AfterViewInit, Component } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { string } from 'mathjs';
 import { ShopItem } from 'src/dtos/ShopItem.dto';
 import { ConfirmBuyPopup } from '../popup-component/popup-component.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AppComponent } from '../app.component';
+import { FetchService } from '../fetch.service';
 
 
 //https://www.youtube.com/watch?v=Vy7ESjYNO_Y&list=PLrbLGOB571zeR7FUQifKmjUpT4ImldCPt&index=13
@@ -13,36 +15,43 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
   templateUrl: './shop.component.html',
   styleUrls: ['./shop.component.css']
 })
-export class ShopComponent {
+export class ShopComponent implements AfterViewInit {
 
-	items : Array<ShopItem>;
+	items : Array<ShopItem> | undefined;
 	filteredItems : Array<ShopItem>;
 	existingTypes : Array<string>;
 	chosenType = "" ;
 	searching = "";
 	
-	playerWealth = 65;
+	playerWealth = 0;
 	
-	constructor(private modalService: NgbModal) {
-		this.items = new Array<ShopItem>;
-		this.items.push({price : 500, id : 1, name : "test", description : "ceci est un item test", image : "https://img.passeportsante.net/1200x675/2021-06-01/i107848-eduquer-un-chaton.jpeg", type : "kitten"});
-		this.items.push({price : 50, id : 2, name : "test2", description : "ceci est un item test", image : "https://mag.bullebleue.fr/sites/mag/files/img/articles/chat/arrivee-chaton-maison-bons-reflexes.jpg", type : "kitten"});
-		this.items.push({price : 75, id : 3, name : "test3", description : "ceci est un item test", image : "https://www.zooplus.fr/magazine/wp-content/uploads/2019/06/arriv%C3%A9e-dun-chaton-%C3%A0-la-maison.jpeg", type : "kitten"});
-		this.items.push({price : 20, id : 1, name : "test", description : "ceci est un item test", image : "https://img.passeportsante.net/1200x675/2021-06-01/i107848-eduquer-un-chaton.jpeg", type : "kitten"});
-		this.items.push({price : 10, id : 2, name : "test2", description : "ceci est un item test", image : "https://mag.bullebleue.fr/sites/mag/files/img/articles/chat/arrivee-chaton-maison-bons-reflexes.jpg", type : "kitten"});
-		this.items.push({price : 65, id : 3, name : "test3", description : "ceci est un item test", image : "https://www.zooplus.fr/magazine/wp-content/uploads/2019/06/arriv%C3%A9e-dun-chaton-%C3%A0-la-maison.jpeg", type : "kitten"});
-		this.items.push({price : 40, id : 1, name : "test", description : "ceci est un item test", image : "https://img.passeportsante.net/1200x675/2021-06-01/i107848-eduquer-un-chaton.jpeg", type : "kitten"});
-		this.items.push({price : 80, id : 2, name : "test2", description : "ceci est un item test", image : "https://mag.bullebleue.fr/sites/mag/files/img/articles/chat/arrivee-chaton-maison-bons-reflexes.jpg", type : "kitten"});
-		this.items.push({price : 95, id : 3, name : "test3", description : "ceci est un titre", image : "https://www.zooplus.fr/magazine/wp-content/uploads/2019/06/arriv%C3%A9e-dun-chaton-%C3%A0-la-maison.jpeg", type : "Title"});
+		constructor(
+			private modalService: NgbModal,
+			private parent: AppComponent,
+			private fetchService: FetchService,
+		) {
+		this.getMoney();
 		
 		this.filteredItems = new Array<ShopItem>;
-		this.filteredItems = this.items;
+		
 
 		this.existingTypes = new Array<string>;
 		this.existingTypes.push("kitten");
 		this.existingTypes.push("Skin");
 		this.existingTypes.push("Title");
 		this.existingTypes.push("Background");
+	}
+
+	async ngAfterViewInit() {
+		await this.customOnInit();
+		if (this.items)
+			this.filteredItems = this.items;
+		this.filterItems(this.searching);
+	}
+	async customOnInit() {
+		const availableSkins = await this.fetchService.getBuyableSkins();
+		if (availableSkins)
+			this.items = availableSkins.availableSkins;
 	}
 
 	onChange(value: any) {
@@ -71,14 +80,29 @@ export class ShopComponent {
 	filterItems(value: string)
 	{
 		console.log("filtering");
-		this.filteredItems = this.items.filter(this.filter.bind(this));
+		if (this.items)
+			this.filteredItems = this.items.filter(this.filter.bind(this));
 	}
 
 	async confirmBuy(item : ShopItem) {
+		let res : {newBalance : number, availableSkins : ShopItem[]} | null;
 		const validate = await this.createPopup(item);
 		console.log(validate);
 		if (validate)
-			console.log("validated");
+		{
+			res = await this.fetchService.buy(item);
+			if (res)
+			{
+				console.log("validated");
+				this.playerWealth = res.newBalance;
+				this.items = res.availableSkins;
+				this.filterItems(this.searching);
+				console.log(res.availableSkins);
+				this.parent.updateThunes(this.playerWealth);
+			}
+			else
+				console.log("failed");
+		}
 		else
 			console.log("canceled");
 	}
@@ -89,9 +113,9 @@ export class ShopComponent {
 		return await modalRef.result;
 	}
 
-
-	notEnoughMoney()
+	async getMoney()
 	{
-
+		this.playerWealth = await this.fetchService.getBalance();
+		console.log("thune " + this.playerWealth);
 	}
 }

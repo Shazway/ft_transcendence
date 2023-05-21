@@ -463,7 +463,8 @@ export class ItemsService {
 		await this.matchRepo.save(match);
 		await this.userRepo.save([userOne, userTwo]);
 	}
-	async buyItem(user: UserEntity, skin: SkinEntity) {
+	async buyItem(userId: number, skin: SkinEntity) {
+		const user = await this.getUser(userId);
 		if (user.currency < skin.price)
 			return false;
 		user.currency -= skin.price;

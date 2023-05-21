@@ -40,7 +40,7 @@ export class ConfirmBuyPopup {
 	@Input() item : ShopItem;
 
 	constructor(public activeModal: NgbActiveModal) {
-		this.item = {id : -1, name : "", description : "", type : "", price : -1, image : ""};
+		this.item = {skin_id : -1, name : "", description : "", type : "", price : -1, image : ""};
 	}
 
 	onSubmit(bool: boolean) {

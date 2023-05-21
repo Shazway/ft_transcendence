@@ -61,6 +61,12 @@ export class AppComponent implements AfterViewInit {
 		}
 	}
 
+	updateThunes(newThunes: number)
+	{
+		if (this.myProfile)
+			this.myProfile.currency = newThunes;
+	}
+
 	openPopover(popoverTemplate: string | TemplateRef<any>, config: PopoverConfig) {
 		if (typeof popoverTemplate === 'string') {
 			if (popoverTemplate == "profile")

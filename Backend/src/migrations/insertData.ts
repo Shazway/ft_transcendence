@@ -51,8 +51,15 @@ export class insertData666666666666666666 implements MigrationInterface {
 			{
 				type: 'Paddle',
 				name: 'Default',
-				img_url: 'Default',
-			}
+				img_url: 'assets/raquette-base.png',
+				price : 0,
+			},
+			{
+				type: 'Paddle',
+				name: 'Baguette',
+				img_url: 'assets/raquette-baguette.png',
+				price : 1,
+			},
 		]);
 
 		const ChannelRepo = queryRunner.manager.getRepository(ChannelEntity);

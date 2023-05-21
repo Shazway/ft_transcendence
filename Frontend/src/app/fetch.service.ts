@@ -7,6 +7,7 @@ import { NewChan } from 'src/dtos/NewChan.dto';
 import { Channel } from 'src/dtos/Channel.dto'
 import { AnyProfileUser, User, FriendRequest, MyProfileUser } from 'src/dtos/User.dto';
 import { isUndefined } from 'mathjs';
+import { ShopItem } from 'src/dtos/ShopItem.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -101,6 +102,42 @@ export class FetchService {
 		.then(function (response) {
 			res = response.data;
 			console.log(res);
+		})
+		.catch(function (error) { console.log(error); })
+		.finally(function () {});
+		if (res)
+			return res;
+		return null;
+	}
+
+	async getBalance() {
+		let res: MyProfileUser | null;
+		res = await this.getMyProfile();
+		if (res)
+			return (res.currency);
+		return (-1);
+	}
+
+	async getBuyableSkins() {
+		let res : {availableSkins: ShopItem[]} | undefined;
+		await axios.get<{availableSkins: ShopItem[]}>('http://localhost:3001/shop/availableItems', this.getHeader())
+		.then(function (response) {
+			res = response.data;
+			console.log("available skins : " + res);
+		})
+		.catch(function (error) { console.log(error); })
+		.finally(function () {});
+		return (res);
+	}
+
+	async buy(item : ShopItem) {
+		let res : {newBalance : number, availableSkins : ShopItem[]} | undefined;
+		console.log("ITEM");
+		console.log(item);
+		await axios.get<{newBalance : number, availableSkins : ShopItem[]}>('http://localhost:3001/shop/buy/' + item.skin_id, this.getHeader())
+		.then(function (response) {
+			res = response.data;
+			console.log("available skins : " + res.availableSkins);
 		})
 		.catch(function (error) { console.log(error); })
 		.finally(function () {});
