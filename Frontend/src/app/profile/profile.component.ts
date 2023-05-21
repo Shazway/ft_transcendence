@@ -1,10 +1,13 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ViewChild, TemplateRef, ElementRef } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ViewChild, TemplateRef, ElementRef, OnInit } from '@angular/core';
 import { floor, ceil, random, round } from 'mathjs';
 import { Chart, ChartConfiguration } from 'chart.js/auto';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { AppComponent } from '../app.component';
 import { PopoverConfig } from 'src/dtos/Popover.dto';
 import { trigger, state, style, transition, animate } from '@angular/animations';
+import { ActivatedRoute } from '@angular/router';
+import { FetchService } from '../fetch.service';
+import { AnyProfileUser } from 'src/dtos/User.dto';
 
 interface MatchHistory {
 	Player1: string;
@@ -55,10 +58,11 @@ interface Pair {
 		]),
 	],
 })
-export class ProfileComponent implements AfterViewInit {
+export class ProfileComponent implements AfterViewInit, OnInit {
 	@ViewChild('userSettingsTemplate') userSettingsTemplate!: TemplateRef<any>;
 	@ViewChild('profileCard') profileCard!: ElementRef;
-	matchHistory: Array<MatchHistory>;
+	user!: AnyProfileUser;
+	matchHistory!: Array<MatchHistory>;
 	matchChart!: Chart;
 	rankChart!: Chart;
 	rank = 100;
@@ -73,32 +77,47 @@ export class ProfileComponent implements AfterViewInit {
 	];
 	slideDirection = 'none';
 	settingState = 'closed';
-	
-	panLeft() {
-		this.slideDirection = 'left';
-		setTimeout(() => {
-			const shift = this.paddleSkins.shift();
-			if (shift)
-				this.paddleSkins.push(shift);
-			this.slideDirection = 'none';
-		}, 300);
-	}
-	
-	panRight() {
-		this.slideDirection = 'right';
-		setTimeout(() => {
-			const shift = this.paddleSkins.pop();
-			if (shift)
-				this.paddleSkins.unshift(shift);
-			this.slideDirection = 'none';
-		}, 300);
-	}
 
 	constructor(
 		private cdr: ChangeDetectorRef,
 		private parent: AppComponent,
+		private route: ActivatedRoute,
+		private fetchService: FetchService,
 	) {
 		Chart.register(ChartDataLabels);
+	}
+	
+	async ngOnInit() {
+		const name = this.route.snapshot.queryParamMap.get('username');
+		console.log(name);
+		if (!name) {
+			const newUser = await this.fetchService.getProfile(localStorage.getItem('username'));
+			if (newUser)
+				this.user = newUser;
+		}
+		else if (name == 'Mr.Connasse')
+			this.generateMatches();
+		else {
+			const newUser = await this.fetchService.getProfile(localStorage.getItem(name));
+			if (newUser)
+				this.user = newUser;
+		}
+		if (this.user) {
+			this.user.match_history.reverse().forEach(match => {
+				this.matchHistory.push({
+					Player1: match.users[0].username,
+					P1URL: match.users[0].img_url,
+					P1score: match.current_score[0],
+					Player2: match.users[1].username,
+					P2URL: match.users[1].img_url,
+					P2score: match.current_score[1],
+					date: match.,
+				});
+			});
+		}
+	}
+
+	generateMatches() {
 		const nbGenerate = 1000;
 		this.matchHistory = new Array;
 		let time = new Date();
@@ -129,18 +148,32 @@ export class ProfileComponent implements AfterViewInit {
 		this.cdr.detectChanges();
 		this.cdr.reattach();
 	}
+	
+	panLeft() {
+		this.slideDirection = 'left';
+		setTimeout(() => {
+			const shift = this.paddleSkins.shift();
+			if (shift)
+				this.paddleSkins.push(shift);
+			this.slideDirection = 'none';
+		}, 300);
+	}
+	
+	panRight() {
+		this.slideDirection = 'right';
+		setTimeout(() => {
+			const shift = this.paddleSkins.pop();
+			if (shift)
+				this.paddleSkins.unshift(shift);
+			this.slideDirection = 'none';
+		}, 300);
+	}
 
 	createSettingsPopup() {
 		if (this.settingState == 'closed')
 			this.settingState = 'open';
 		else
 			this.settingState = 'closed';
-		// this.parent.openPopover(this.userSettingsTemplate, new PopoverConfig(
-		// 	this.profileCard.nativeElement,
-		// 	'userSettings',
-		// 	'outside',
-		// 	'bottom',
-		// ));
 	}
 
 	getRankedChartConfig(): ChartConfiguration {
