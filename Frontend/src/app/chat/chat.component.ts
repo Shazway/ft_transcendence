@@ -133,7 +133,7 @@ export class ChatComponent implements OnInit {
 		else {
 			this.client.emit('checkPrivileges', msg);
 			const sub = fromEvent(this.client, 'answerPrivileges').subscribe((data) => {
-				if (!data) {
+				if (data) {
 					if (delMsgElm.classList.contains('show')) {
 						delMsgElm.classList.remove('show');
 						delMsgElm.removeAttribute('title');
