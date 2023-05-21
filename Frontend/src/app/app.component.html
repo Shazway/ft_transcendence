@@ -11,7 +11,7 @@
 <div style="height: 100vh; max-height: 100vh; display: flex; flex-direction: column; overflow: hidden;">
 
 	<nav id="upperbar" class="navbar navbar-light bg-light navbar-fixed-top">
-		<div class="d-flex justify-content-between w-100 px-5">
+		<div class="d-flex justify-content-between w-100 ps-5 pe-3">
 			<div class="sidebar-header">
 				<a class="inox" href="#">Transcendence</a>
 			</div>
@@ -19,18 +19,32 @@
 				<div *ngIf="myProfile" @currencyFadeIn aria-label="wealth" class="col text-muted align-items-center mx-5" >
 					<img src="assets/DALL·E 2023-05-11 21.52.35 - coin icon minted with a wheat stalk.png" alt="Currency" width="30" height="24">
 					{{getBalance()}}
-				</div>
-				<div aria-label="user space" class="col dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
-					{{getUsername()}}
-					<img src="{{getAvatar()}}" alt="Avatar" width = 30>
-				</div>
-				<div class="dropdown-menu col">
-					<a class="dropdown-item" href="#">Action</a>
-					<a class="dropdown-item" href="#">Another action</a>
-					<a class="dropdown-item" href="#">Something else here</a>
+				</div> 
+				 <div>
+					<button class="btn btn-default" type="button" (click)="openDropdown()">
+						{{getUsername()}}
+						<img src="{{getAvatar()}}" class="rounded-circle" alt="Avatar" width = 30>
+					</button>
+					<ul class="dropdown-menu show" style="margin-left: -20px;">
+						<li>
+							<a class="dropdown-item"> blah </a>
+						</li>
+						<li>
+							<a class="dropdown-item"> blah </a>
+						</li>
+						<li>
+							<a class="dropdown-item"> blah </a>
+						</li>
+						<li>
+							<a class="dropdown-item"> blah </a>
+						</li>
+					</ul>
 				</div>
 			</div>
 		</div>
+		<!-- <div class="d-flex justify-content-between w-100 px-5">
+			truc
+		</div> -->
 	</nav>
 	<div class="wrapper h-100">
 		<!-- Sidebar -->
