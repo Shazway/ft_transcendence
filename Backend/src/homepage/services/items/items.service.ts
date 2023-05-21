@@ -366,9 +366,8 @@ export class ItemsService {
 	{
 		const user = await this.getUser(user_id);
 		const channel = await this.getChannel(channel_id);
-		const chanUser = (await this.getUserChan(user_id, channel_id))
 
-		if (!user || !channel || !chanUser)
+		if (!user || !channel || !chan_user)
 			return ;
 		chan_user.user = user;
 		chan_user.channel = channel;

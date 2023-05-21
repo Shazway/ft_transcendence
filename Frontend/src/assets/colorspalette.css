@@ -2,6 +2,11 @@ html, body {
 	height: 100%;
 }
 
+::ng-deep .ps {
+	transition: all 0.3s ease-in-out; /* Add transition for smooth scrolling */
+	overflow: hidden !important; /* Hide default scrollbar */
+}
+
 /*--Colors--*/
 .white {
 	background-color: white;
