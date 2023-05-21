@@ -12,7 +12,7 @@
 			</div>
 			<div class="scrollbar scrollbar-primary h-100 bg-light" style="overflow-y: hidden; overflow-x: hidden;" #chatMsgs>
 <!-- Start of text area -->
-				<perfect-scrollbar wheelSpeed="0.5">
+				<perfect-scrollbar [config]="scrollbarConfig" style="scroll-behavior: smooth;">
 				<div #chanBody class="channel_unpan">
 					<div class="card-body p-0" data-mdb-perfect-scrollbar="true" style="position: relative; " *ngFor="let msg_list of test_msgs$">
 <!-- Start of not current user field -->
