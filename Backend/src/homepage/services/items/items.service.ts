@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AchievementsEntity, ChannelEntity, ChannelUserRelation, FriendrequestRelation, MatchEntity, MatchSettingEntity, MessageEntity, SkinEntity, UserEntity } from 'src/entities';
 import { ChannelUser } from 'src/entities/channel_user.entity';
 import { pongObject } from 'src/homepage/dtos/Pong.dto';
+import { ApplyProfile } from 'src/homepage/dtos/User.dto';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -275,19 +276,29 @@ export class ItemsService {
 	}
 
 	public async addFriendToUser(
-		user_id: number,
-		friend_id: number,
+		sourceId: number,
+		targetId: number,
 	) {
-		const user = await this.getUser(user_id);
-		const friend = await this.getUser(friend_id);
+		const sourceUser = await this.getUser(sourceId);
+		const targetUser = await this.getUser(targetId);
 
-		if (!user || !friend)
+		if (!sourceUser || !targetUser)
 			return null;
-		user.sentFriendRequests = user.sentFriendRequests.filter((User) => User.receiver.user_id == friend.user_id);
-		friend.receivedFriendRequests = user.receivedFriendRequests.filter((User) => User.sender.user_id == user.user_id);
-		user.friend.push(friend);
-		friend.friend.push(user);
-		await this.userRepo.save([user, friend]);
+		if (
+			!sourceUser.sentFriendRequests.find((request) => request.receiver.user_id == targetId) ||
+			!targetUser.receivedFriendRequests.find((request) => request.sender.user_id == sourceId)
+		)
+			return null;
+
+		sourceUser.sentFriendRequests = sourceUser.sentFriendRequests
+			.filter((request) => request.receiver.user_id == targetId);
+
+		targetUser.sentFriendRequests = sourceUser.receivedFriendRequests
+			.filter((request) => request.sender.user_id == sourceId);
+
+		sourceUser.friend.push(targetUser);
+		targetUser.friend.push(sourceUser);
+		return await this.userRepo.save([sourceUser, targetUser]);
 	}
 
 	public async removeFriendFromUsers(
@@ -465,12 +476,13 @@ export class ItemsService {
 		return await this.userRepo.save(user);
 	}
 
-	async applySelectedSkins(userId: number, skinsId: number[])
+	async applySelectedSkins(userId: number, applyProfile: ApplyProfile)
 	{
 		const user = await this.getUser(userId);
 		if (!user)
 			return null;
-		user.current_skins = skinsId;
+		user.current_skins = applyProfile.skins;
+		user.title = applyProfile.title;
 		return await this.userRepo.save(user);
 	}
 }

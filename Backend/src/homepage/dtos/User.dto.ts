@@ -108,3 +108,8 @@ export class AvailableSkins {
 	@Exclude()
 	intra_id!: number;
 }
+
+export class ApplyProfile {
+	skins: number[];
+	title: string;
+}

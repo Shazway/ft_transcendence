@@ -133,15 +133,16 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		const answer = this.buildAnswer(source.sub, source.name, body.type, body.accepted);
 		const user = this.userList.get(body.target_id);
 
-		if (!user)
+		if (!source)
 			throw new WsException('User disconnected');
 		if (body.accepted) {
 			if (body.type == 'friend')
-				await this.itemsService.addFriendToUser(source.sub, body.target_id);
+				if (await this.itemsService.addFriendToUser(source.sub, body.target_id))
+					return client.emit('No request to answer to');
 			if (body.type == 'channel')
 				await this.channelsService.addUserToChannel(body.target_id, body.channel_id);
 		}
 		client.emit('success', 'Answer sent');
-		user.emit(body.type + 'Answer', { notification: answer });
+		if (user) user.emit(body.type + 'Answer', { notification: answer });
 	}
 }

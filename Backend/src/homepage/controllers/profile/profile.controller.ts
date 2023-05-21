@@ -4,7 +4,7 @@ import { TokenManagerService } from 'src/homepage/services/token-manager/token-m
 import { ItemsService } from 'src/homepage/services/items/items.service';
 import { UsersService } from 'src/homepage/services/users/users.service';
 import { plainToClass } from 'class-transformer';
-import { MyProfileUser } from 'src/homepage/dtos/User.dto';
+import { ApplyProfile, MyProfileUser } from 'src/homepage/dtos/User.dto';
 import { AnyProfileUser } from 'src/homepage/dtos/User.dto';
 
 @Controller('profile')
@@ -16,9 +16,9 @@ export class ProfileController {
 	) {}
 
 	@Post('applySkins')
-	async applySkins(@Req() req: Request, @Res() res: Response, @Body() body: number[]) {
+	async applySkins(@Req() req: Request, @Res() res: Response, @Body() body: ApplyProfile) {
 		const user = this.tokenManager.getUserFromToken(req);
-		if (!(await this.itemService.applySelectedSkins(user.sub, body)))
+		if (!body || !(await this.itemService.applySelectedSkins(user.sub, body)))
 			return res.status(HttpStatus.BAD_REQUEST).send('Something went wrong');
 		return res.status(HttpStatus.ACCEPTED).send('Success');
 	}
