@@ -24,6 +24,7 @@ export class ChatComponent implements OnInit {
 	currentMessage!: Message;
 	client!: Socket;
 	channels$: Channel[] = [];
+	currentChannel!: Channel;
 	msgs$: Message[] = [];
 	test_msgs$ = new Array<Array<Message>>;
 	is_admin = false;
@@ -72,6 +73,11 @@ export class ChatComponent implements OnInit {
 		for (let index = this.msgs$.length; index > 0; index--)
 			this.sortMessage(this.msgs$[index - 1]);
 		this.channels$ = await this.fetchService.getChannels();
+		const chan = await this.fetchService.getChannel(1);
+		if (chan)
+			this.currentChannel = chan;
+		else
+			console.log('error while fetching channel 1');
 		//this.notificationService.connectSocket();
 	}
 
@@ -127,7 +133,7 @@ export class ChatComponent implements OnInit {
 		else {
 			this.client.emit('checkPrivileges', msg);
 			const sub = fromEvent(this.client, 'answerPrivileges').subscribe((data) => {
-				if (!data) {
+				if (data) {
 					if (delMsgElm.classList.contains('show')) {
 						delMsgElm.classList.remove('show');
 						delMsgElm.removeAttribute('title');
@@ -249,17 +255,18 @@ export class ChatComponent implements OnInit {
 		}
 	}
 
-	async openChannel(channelId: number) {
+	async openChannel(channel: Channel) {
 		this.is_admin = false;
 		this.client.close();
 		this.msgs$.splice(0, this.msgs$.length);
 		this.test_msgs$.splice(0, this.test_msgs$.length);
-		this.msgs$ = await this.fetchService.getMessages(channelId, 0);
+		this.msgs$ = await this.fetchService.getMessages(channel.channel_id, 0);
 		if (!this.msgs$)
 			return;
 		for (let index = this.msgs$.length; index > 0; index--)
 			this.sortMessage(this.msgs$[index - 1]);
-		this.client = io('ws://localhost:3002?channel_id=' + channelId, this.websocketService.getHeader());
+		this.client = io('ws://localhost:3002?channel_id=' + channel.channel_id, this.websocketService.getHeader());
+		this.currentChannel = channel;
 		this.setClientEvent();
 		this.slideChan();
 	}
