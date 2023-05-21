@@ -177,6 +177,26 @@ export class ItemsService {
 		return friend_request;
 	}
 	
+	public async getFriendrequestFromUser(id: number) {
+		const friend_request = await this.friend_requestRepo
+		.createQueryBuilder('friend_request')
+		.leftJoinAndSelect('friend_request.sender', 'sender')
+		.leftJoinAndSelect('friend_request.receiver', 'receiver')
+		.where('sender.user_id = :id', { id })
+		.getMany();
+		return friend_request;
+	}
+	
+	public async getFriendrequestToUser(id: number) {
+		const friend_request = await this.friend_requestRepo
+		.createQueryBuilder('friend_request')
+		.leftJoinAndSelect('friend_request.sender', 'sender')
+		.leftJoinAndSelect('friend_request.receiver', 'receiver')
+		.where('receiver.user_id = :id', { id })
+		.getMany();
+		return friend_request;
+	}
+	
 	public async getMatchSetting(id: number) {
 		const match_setting = await this.match_settingRepo
 			.createQueryBuilder('match_setting')
@@ -289,15 +309,15 @@ export class ItemsService {
 	}
 
 	public async getFriendRequestsSent(user_id: number) {
-		const user = await this.getUser(user_id);
-		if (user && user.sentFriendRequests && user.sentFriendRequests.length)
-			return user.sentFriendRequests;
+		const sfr = await this.getFriendrequestFromUser(user_id);
+		if (sfr && sfr.length)
+			return sfr;
 		return null;
 	}
 	public async getFriendRequestsReceived(user_id: number) {
-		const user = await this.getUser(user_id);
-		if (user && user.receivedFriendRequests && user.receivedFriendRequests.length)
-			return user.receivedFriendRequests;
+		const rfr = await this.getFriendrequestToUser(user_id);
+		if (rfr && rfr.length)
+			return rfr;
 		return null;
 	}
 

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ProfilePopupComponent } from './profile-popup.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
+import { NotificationService } from '../notification.service';
 
 
 @NgModule({

@@ -146,7 +146,7 @@ export class ChatComponent implements OnInit {
 		return this.is_admin;
 	}
 
-	createChatPopup(msg: Message, event: MouseEvent) {
+	createChatPopup(msg: Message, client: Socket, event: MouseEvent) {
 		event.preventDefault();
 		if (event.button == 2) {
 			this.parent.openPopover(this.chatInteractionTemplate, new PopoverConfig(
@@ -163,7 +163,7 @@ export class ChatComponent implements OnInit {
 				'profile arrow-hide',
 				'outside',
 				'start',
-				msg,
+				{msg: msg, client: this.client},
 			));
 		}
 	}

@@ -5,7 +5,7 @@ import { Response } from 'src/dtos/Response.dto';
 import { Message } from 'src/dtos/message';
 import { NewChan } from 'src/dtos/NewChan.dto';
 import { Channel } from 'src/dtos/Channel.dto'
-import { AnyProfileUser, User } from 'src/dtos/User.dto';
+import { AnyProfileUser, User, FriendRequest } from 'src/dtos/User.dto';
 import { isUndefined } from 'mathjs';
 
 @Injectable({
@@ -97,32 +97,23 @@ export class FetchService {
 		await axios.get<Array<AnyProfileUser>>('http://localhost:3001/users/friends', this.getHeader())
 		.then(function (response) {
 			res = response.data;
-			console.log(res);
+			console.log("amis :" +res);
 		})
 		.catch(function (error) { console.log(error); })
 		.finally(function () {});
 		return res;
 	}
 
-	async getFriendshipRequests()  {
-		let res: AnyProfileUser[] = [];
-		//code de test, faute de route dans le back
-
-		res.push({username : "test1",
-			img_url : "imgtest1",
-			match_history : [],
-			rank_score : 52,
-			activity_status : 1,
-			createdAt : new Date(),
-			wins : 0,
-			losses : 0,
-			achievements : [],
-			friend : [],
-			user_id : 6,
-			intra_id : 2561655,
-			title : "RemiPasDamis"
-			})
-		return (res);
+	async getFriendshipRequests() {
+		let res: {received: FriendRequest[], sent: FriendRequest[]} = {received: [], sent: []};
+		await axios.get<{received: Array<FriendRequest>, sent: Array<FriendRequest>}>('http://localhost:3001/users/friendRequests', this.getHeader())
+		.then(function (response) {
+			res = response.data;
+			console.log("demandes :" +res);
+		})
+		.catch(function (error) { console.log(error); })
+		.finally(function () {});
+		return res;
 	}
 
 	async addFriends(friend_id: number) {

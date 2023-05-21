@@ -121,6 +121,7 @@ export class UsersController {
 		const receivedRequests = await this.itemsService.getFriendRequestsReceived(user.sub);
 		const sentRequests = await this.itemsService.getFriendRequestsSent(user.sub);
 
+		console.log(receivedRequests);
 		res.status(HttpStatus.OK).send({received: receivedRequests, sent: sentRequests});
 	}
 

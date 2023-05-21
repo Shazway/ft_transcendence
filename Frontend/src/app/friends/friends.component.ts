@@ -1,6 +1,6 @@
 import { Component, ElementRef } from '@angular/core';
 import { FetchService } from '../fetch.service';
-import { AnyProfileUser } from 'src/dtos/User.dto';
+import { AnyProfileUser, FriendRequest } from 'src/dtos/User.dto';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PunishmentPopup } from '../popup-component/popup-component.component';
 
@@ -20,8 +20,8 @@ export class FriendsComponent {
 		block_user: "https://cdn.discordapp.com/attachments/1041104785870438521/1103760104815349931/block.png"
 	}
 
-	public friends: AnyProfileUser[] = [];
-	public friendshipRequests: AnyProfileUser[] = [];
+	public friends!: AnyProfileUser[];
+	public friendshipRequests: {received: FriendRequest[], sent: FriendRequest[]} = {received: [], sent: []};
 	constructor(
 		private elRef: ElementRef,
 		private modalService: NgbModal,
@@ -38,8 +38,9 @@ export class FriendsComponent {
 	async ngOnInit() {
 		this.friends = await this.fetchService.getFriends();
 		this.friendshipRequests = await this.fetchService.getFriendshipRequests();
+		console.log(this.friendshipRequests.received);
 	}
-
+	
 	async addSystemFriend() {
 		await this.fetchService.addFriends(1);
 		this.friends.splice(0);
@@ -109,15 +110,16 @@ export class FriendsComponent {
 		const test = await this.createPopup("Spectate", "friend");
 	}
 
-	accept(user: AnyProfileUser)
+	accept(request : FriendRequest)
 	{
 		console.log("demande acceptee");
-		this.friendshipRequests.splice(this.friendshipRequests.indexOf(user), 1);
+		this.friendshipRequests.received.splice(this.friendshipRequests.received.indexOf(request), 1);
 	}
 
-	reject(user: AnyProfileUser)
+	reject(request : FriendRequest)
 	{
 		console.log("demande rejetee");
-		this.friendshipRequests.splice(this.friendshipRequests.indexOf(user), 1);
+		this.friendshipRequests.received.splice(this.friendshipRequests.received.indexOf(request), 1);
+
 	}
 }

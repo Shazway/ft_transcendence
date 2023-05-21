@@ -34,3 +34,8 @@ export interface AnyProfileUser {
 	intra_id: number;
 	title: string;
 }
+
+export interface FriendRequest {
+	sender: AnyProfileUser;
+	receiver: AnyProfileUser;
+}

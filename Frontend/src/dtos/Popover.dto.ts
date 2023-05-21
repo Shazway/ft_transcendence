@@ -1,3 +1,5 @@
+import { Socket } from "socket.io-client";
+
 export type Placement = 'top' | 'bottom' | 'start' | 'end';
 export type AutoClose = boolean | 'inside' | 'outside';
 export type Target = undefined | HTMLElement | string;
