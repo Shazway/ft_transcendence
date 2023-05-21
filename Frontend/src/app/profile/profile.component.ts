@@ -111,7 +111,7 @@ export class ProfileComponent implements AfterViewInit, OnInit {
 					Player2: match.users[1].username,
 					P2URL: match.users[1].img_url,
 					P2score: match.current_score[1],
-					date: match.,
+					date: new Date(),
 				});
 			});
 		}
