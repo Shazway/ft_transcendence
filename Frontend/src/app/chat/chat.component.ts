@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, ViewChild, TemplateRef } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, TemplateRef, AfterViewInit } from '@angular/core';
 import { LessMessage, Message } from '../../dtos/message'
 import { Channel } from '../../dtos/Channel.dto'
 import { FetchService } from '../fetch.service';
@@ -12,17 +12,16 @@ import { NotificationService } from '../notification.service';
 import { Router } from '@angular/router';
 import { AppComponent } from '../app.component';
 import { PopoverConfig } from 'src/dtos/Popover.dto';
-import { PerfectScrollbarConfig } from 'ngx-perfect-scrollbar';
 
 @Component({
 	selector: 'app-chat',
 	templateUrl: './chat.component.html',
 	styleUrls: ['./chat.component.css'],
-	providers: [PerfectScrollbarConfig],
 })
-export class ChatComponent implements OnInit {
+export class ChatComponent implements OnInit, AfterViewInit {
 	@ViewChild('chatInteractionTemplate') chatInteractionTemplate!: TemplateRef<any>;
 	@ViewChild('chanBody') chatBody!: ElementRef;
+	@ViewChild('scrollbar') scrollbar!: ElementRef;
 	currentMessage!: Message;
 	client!: Socket;
 	channels$: Channel[] = [];
@@ -48,10 +47,7 @@ export class ChatComponent implements OnInit {
 		private notificationService: NotificationService,
 		private router: Router,
 		private parent: AppComponent,
-		public scrollbarConfig: PerfectScrollbarConfig,
 	) {
-		scrollbarConfig.wheelSpeed = 0.2;
-		scrollbarConfig.swipeEasing = false;
 		this.client = io('ws://localhost:3002?channel_id=' + 1, websocketService.getHeader());
 		if (!this.client)
 		{
@@ -63,12 +59,33 @@ export class ChatComponent implements OnInit {
 		return;
 	}
 
+	ngAfterViewInit(): void {
+		const containerElement: HTMLElement = this.scrollbar.nativeElement;
+		setTimeout(() => {
+			containerElement.scrollTo({
+				top: containerElement.scrollHeight,
+				behavior: 'smooth',
+			});
+		}, 500)
+	}
+
 	setClientEvent() {
-		this.client.on('onMessage', (event) => { console.log('Message received ' + event); this.sortMessage(event) });
+		this.client.on('onMessage', (event) => { console.log('Message received ' + event); this.sortMessage(event); this.scrollBottom(event); });
 		this.client.on('onError', (event) => { console.log('WebSocket error: ' + event); });
 		this.client.on('connection', () => { console.log('Connected to WebSocket server'); });
 		this.client.on('disconnect', () => { console.log('Disconnected from WebSocket server'); });
 		this.client.on('delMessage', (event) => { console.log('Deleting message ' + event); this.deleteMessage(event); })
+	}
+
+	scrollBottom(msg: Message) {
+		const containerElement: HTMLElement = this.scrollbar.nativeElement;
+		if ((containerElement.clientHeight + containerElement.scrollTop) > containerElement.scrollHeight - 20 || msg.author.username == localStorage.getItem('username'))
+			setTimeout(() => {
+				containerElement.scrollTo({
+					top: containerElement.scrollHeight,
+					behavior: 'smooth',
+				});
+			}, 5)
 	}
 
 	async ngOnInit() {
@@ -106,7 +123,7 @@ export class ChatComponent implements OnInit {
 		});
 		console.log('Message not deleted');
 	}
-
+	
 	slide() {
 		const offscreenElm = this.elRef.nativeElement.querySelector('.offscreen');
 		const offscreenBtn = this.elRef.nativeElement.querySelector('#chatBtn');
@@ -326,7 +343,6 @@ export class ChatComponent implements OnInit {
 		const arr = new Array<Message>;
 		arr.push(new_msg);
 		this.test_msgs$.push(arr);
-		const chat = document.querySelector('scrollbar');
 	}
 
 	isMe(msg : Message) : boolean {

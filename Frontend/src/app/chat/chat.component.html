@@ -10,10 +10,10 @@
 				</div>
 				<!-- <button type="button" id="chatBtn" (click)="slide()" class="btn btn-primary btn-sm" data-mdb-ripple-color="dark">Open chat</button> -->
 			</div>
-			<div class="scrollbar scrollbar-primary h-100 bg-light" style="overflow-y: hidden; overflow-x: hidden;" #chatMsgs>
+			<div #chanBody class="scrollbar scrollbar-primary h-100 bg-light" #scrollbar style="overflow-y: auto; overflow-x: hidden;" #chatMsgs>
 <!-- Start of text area -->
-				<perfect-scrollbar [config]="scrollbarConfig" style="scroll-behavior: smooth;">
-				<div #chanBody class="channel_unpan">
+				<div >
+				<div class="channel_unpan">
 					<div class="card-body p-0" data-mdb-perfect-scrollbar="true" style="position: relative; " *ngFor="let msg_list of test_msgs$">
 <!-- Start of not current user field -->
 						<div *ngIf="!isMe(msg_list[0]) && !isSystem(msg_list[0])" class="d-flex flex-row justify-content-start" id="group-{{msg_list[0].message_id}}">
@@ -53,7 +53,7 @@
 					</div>
 
 				</div>
-				</perfect-scrollbar>
+			</div>
 <!-- End of text area -->
 <!-- Start of channel Select Area -->
 				<div class="card-body p-0 h-100 channel_pan p-3 bg-light" data-mdb-perfect-scrollbar="true">

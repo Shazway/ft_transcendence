@@ -1,4 +1,4 @@
-<div class="w-100">
+<div *ngIf="isLoaded" @viewFadeIn class="w-100">
 	<div class="container pt-3 h-100">
 		<div class="row d-flex justify-content-center align-items-center h-100">
 			<div class="col">
@@ -41,12 +41,12 @@
 									</div>
 								</div>
 
-								<div *ngIf="false" class="d-flex pt-1 gap-2">
+								<div *ngIf="!isMyProfile()" class="d-flex pt-1 gap-2">
 									<button type="button" class="btn btn-outline-primary flex-grow-1">Chat</button>
 									<button type="button" class="btn btn-outline-primary flex-grow-1">Challenge</button>
 									<button type="button" class="btn btn-primary" style="flex-grow: 5;">Add Friend</button>
 								</div>
-								<div *ngIf="true" class="d-flex pt-1 gap-2">
+								<div *ngIf="isMyProfile()" class="d-flex pt-1 gap-2">
 									<button type="button" class="btn btn-outline-primary flex-grow-1" (click)="createSettingsPopup()">Settings</button>
 								</div>
 							</div>
@@ -123,7 +123,6 @@
 				</div>
 			</table>
 		</div>
-
 	</div>
 </div>
 

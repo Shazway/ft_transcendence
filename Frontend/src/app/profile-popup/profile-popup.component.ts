@@ -4,11 +4,17 @@ import { FetchService } from '../fetch.service';
 import { AnyProfileUser } from 'src/dtos/User.dto';
 import { Socket } from 'socket.io-client';
 import { NotificationRequest } from 'src/dtos/Notification.dto';
+import { trigger, transition, style, animate } from '@angular/animations';
 
 @Component({
   selector: 'app-profile-popup',
   templateUrl: './profile-popup.component.html',
-  styleUrls: ['./profile-popup.component.css']
+  styleUrls: ['./profile-popup.component.css'],
+  animations: [
+	trigger('viewFadeIn', [
+		transition(':enter', [style({ opacity: '0' }), animate('300ms ease-out', style({ opacity: '1' }))]),
+	])
+  ],
 })
 export class ProfilePopupComponent implements OnInit {
 	@Input() data!: any;

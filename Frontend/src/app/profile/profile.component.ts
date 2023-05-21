@@ -29,6 +29,9 @@ interface Pair {
 	templateUrl: './profile.component.html',
 	styleUrls: ['./profile.component.css'],
 	animations: [
+		trigger('viewFadeIn', [
+			transition(':enter', [style({ opacity: '0' }), animate('300ms ease-out', style({ opacity: '1' }))]),
+		]),
 		trigger('settingWindow', [
 			transition(':enter', [style({ height: '0', 'margin-bottom': '0' }), animate('300ms ease-out', style({ height: '*', 'margin-bottom': '*' }))]),
 			transition(':leave', animate('300ms ease-out', style({ height: '0', 'margin-bottom': '0' }))),
@@ -67,6 +70,7 @@ export class ProfileComponent implements AfterViewInit {
 	rankChart!: Chart;
 	rank = 100;
 	maxScore = 100;
+	isLoaded = false;
 	paddleSkins = [
 		{ src: 'assets/raquette-baguette.png' },
 		{ src: 'assets/raquette-eclairAuChocolat.png' },
@@ -120,6 +124,16 @@ export class ProfileComponent implements AfterViewInit {
 		}
 	}
 
+	isMyProfile() {
+		const name = this.route.snapshot.queryParamMap.get('username');
+		if (name == 'Mr.Connasse')
+			return false
+		if (!this.user || this.user.username == localStorage.getItem('username'))
+			return true;
+		return false;
+	}
+
+
 	generateMatches() {
 		const nbGenerate = 1000;
 		this.matchHistory = new Array;
@@ -147,6 +161,8 @@ export class ProfileComponent implements AfterViewInit {
 	async ngAfterViewInit() {
 		this.cdr.detach();
 		await this.customOnInit();
+		this.isLoaded = true;
+		this.cdr.detectChanges();
 		this.matchChart = new Chart(document.getElementById('matchChart') as HTMLCanvasElement, this.getMatchChartConfig());
 		this.rankChart = new Chart(document.getElementById('rankChart') as HTMLCanvasElement, this.getRankedChartConfig());
 		this.cdr.detectChanges();
