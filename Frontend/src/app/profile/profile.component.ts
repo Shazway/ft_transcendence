@@ -147,7 +147,6 @@ export class ProfileComponent implements AfterViewInit {
 	async ngAfterViewInit() {
 		this.cdr.detach();
 		await this.customOnInit();
-		console.log(this.matchHistory.length);
 		this.matchChart = new Chart(document.getElementById('matchChart') as HTMLCanvasElement, this.getMatchChartConfig());
 		this.rankChart = new Chart(document.getElementById('rankChart') as HTMLCanvasElement, this.getRankedChartConfig());
 		this.cdr.detectChanges();

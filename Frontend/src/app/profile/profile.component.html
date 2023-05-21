@@ -27,7 +27,7 @@
 												<p class="small text-muted mb-1 text-center">Status</p>
 												<div class="d-flex justify-content-center">
 													<p class="mb-0 text-center pe-1">{{getStatus()}}</p>
-													<span class="badge bg-success dot rounded-circle status-dot">&nbsp;</span>
+													<span class="badge {{getStatus() ? 'bg-success' : 'bg-secondary'}} dot rounded-circle status-dot">&nbsp;</span>
 												</div>
 											</div>
 										</div>
