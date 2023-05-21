@@ -113,7 +113,7 @@ export class GamesService {
 		this.player1.player.client.emit('onMatchEnd', this.buildEndEvent(this.player1));
 		if (this.player2.player.client)
 			this.player2.player.client.emit('onMatchEnd', this.buildEndEvent(this.player2));
-		this.itemsService.updateRankScore(this.player1, this.player2);
+		this.itemsService.updateRankScore(this.player1, this.player2, this.match);
 		this.endGame();
 	}
 
