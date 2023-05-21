@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { NewChan } from 'src/homepage/dtos/Chan.dto';
 import { Repository } from 'typeorm';
@@ -76,8 +76,8 @@ export class ChannelsService {
 		const target = await this.itemsService.getUserChan(target_id, chan_id);
 		if (!target)
 			return false;
-		target[0].is_admin = true;
-		await this.chan_userRepo.save(target[0]);
+		target.is_admin = true;
+		await this.chan_userRepo.save(target);
 		return true;
 	}
 	async setUserOwner(setter_id: number, target_id: number, chan_id: number) {
@@ -89,11 +89,11 @@ export class ChannelsService {
 		const setter = await this.itemsService.getUserChan(setter_id, chan_id);
 		if (!target || !setter)
 			return false;
-		target[0].is_admin = true;
-		target[0].is_creator = true;
-		setter[0].is_creator = false;
-		await this.chan_userRepo.save(target[0]);
-		await this.chan_userRepo.save(setter[0]);
+		target.is_admin = true;
+		target.is_creator = true;
+		setter.is_creator = false;
+		await this.chan_userRepo.save(target);
+		await this.chan_userRepo.save(setter);
 		return true;
 	}
 
@@ -116,7 +116,7 @@ export class ChannelsService {
 		const target = await this.itemsService.getUserChan(target_id, chan_id);
 		if (!target)
 			return false;
-		await this.chan_userRepo.delete(target[0].channel_user_id);
+		await this.chan_userRepo.delete(target.channel_user_id);
 		return true;
 	}
 
@@ -126,8 +126,8 @@ export class ChannelsService {
 		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
 		if (!target_chan)
 			return false;
-		target_chan[0].muteUser(1000 * timer); //Multiply 1000 to the number of seconds you want to mute someone todo: to be changed to a parameter given
-		await this.chan_userRepo.save(target_chan[0]);
+		target_chan.muteUser(1000 * timer); //Multiply 1000 to the number of seconds you want to mute someone todo: to be changed to a parameter given
+		await this.chan_userRepo.save(target_chan);
 		return true;
 	}
 	async unMuteUser(user_id: number, target_id: number, channel_id: number) {
@@ -136,8 +136,8 @@ export class ChannelsService {
 		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
 		if (!target_chan)
 			return false;
-		target_chan[0].unmuteUser();
-		await this.chan_userRepo.save(target_chan[0]);
+		target_chan.unmuteUser();
+		await this.chan_userRepo.save(target_chan);
 		return true;
 	}
 
@@ -147,8 +147,8 @@ export class ChannelsService {
 		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
 		if (!target_chan)
 			return false;
-		target_chan[0].banUser(1000 * timer); //Multiply 1000 to the number of seconds you want to mute someone todo: to be changed to a parameter given
-		await this.chan_userRepo.save(target_chan[0]);
+		target_chan.banUser(1000 * timer); //Multiply 1000 to the number of seconds you want to mute someone todo: to be changed to a parameter given
+		await this.chan_userRepo.save(target_chan);
 		return true;
 	}
 	async unBanUser(user_id: number, target_id: number, channel_id: number) {
@@ -157,22 +157,22 @@ export class ChannelsService {
 		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
 		if (!target_chan)
 			return false;
-		target_chan[0].unBanUser();
-		await this.chan_userRepo.save(target_chan[0]);
+		target_chan.unBanUser();
+		await this.chan_userRepo.save(target_chan);
 		return true;
 	}
 	async isUserAdmin(user_id: number, chan_id: number) {
 		const chan_user = await this.itemsService.getUserChan(user_id, chan_id);
 		if (!chan_user)
 			return false;
-		if (chan_user.length > 0 && chan_user[0].is_admin) return true;
+		if (chan_user.is_admin) return true;
 		return false;
 	}
 	async isUserOwner(user_id: number, chan_id: number) {
 		const chan_user = await this.itemsService.getUserChan(user_id, chan_id);
 		if (!chan_user)
 			return false;
-		if (chan_user.length && chan_user[0].is_creator) return true;
+		if (chan_user.is_creator) return true;
 		return false;
 	}
 	async isMuted(user_id: number, chan_id: number) {
@@ -182,15 +182,13 @@ export class ChannelsService {
 		const time = new Date();
 
 		if (
-			chan_user.length > 0 &&
-			chan_user[0].is_muted &&
-			chan_user[0].remaining_mute_time &&
-			!(time.getTime() >= chan_user[0].remaining_mute_time.getTime())
+			chan_user.is_muted &&
+			chan_user.remaining_mute_time &&
+			!(time.getTime() >= chan_user.remaining_mute_time.getTime())
 		)
 			return true;
-
-		chan_user[0].unmuteUser();
-		this.chan_userRepo.save(chan_user[0]);
+		chan_user.unmuteUser();
+		this.chan_userRepo.save(chan_user);
 		return false;
 	}
 	async isBanned(user_id: number, chan_id: number) {
@@ -198,17 +196,15 @@ export class ChannelsService {
 		if (!chan_user)
 			return false;
 		const time = new Date();
-		if (!chan_user)
-			return false;
 		if (
-			chan_user.length > 0 &&
-			chan_user[0].is_banned &&
-			chan_user[0].remaining_ban_time &&
-			!(time.getTime() >= chan_user[0].remaining_ban_time.getTime())
+			chan_user.is_banned &&
+			chan_user.remaining_ban_time &&
+			!(time.getTime() >= chan_user.remaining_ban_time.getTime())
 		)
 			return true;
-		chan_user[0].unBanUser();
-		this.chan_userRepo.save(chan_user[0]);
+		if (chan_user)
+			chan_user.unBanUser();
+		this.chan_userRepo.save(chan_user);
 		return false;
 	}
 
@@ -216,7 +212,7 @@ export class ChannelsService {
 		const chan_user = await this.itemsService.getUserChan(user_id, chan_id);
 		if (!chan_user)
 			return false;
-		if (chan_user.length > 0 && !chan_user[0].is_banned) return true;
+		if (!chan_user.is_banned) return true;
 		return false;
 	}
 }

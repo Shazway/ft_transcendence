@@ -247,7 +247,7 @@ export class ItemsService {
 			.innerJoinAndSelect('channel_user.user', 'user')
 			.where("user.user_id = :user_id", {user_id})
 			.andWhere("channel.channel_id = :channel_id", {channel_id})
-			.getMany();
+			.getOne();
 		return (userChan);
 	}
 	
@@ -422,7 +422,7 @@ export class ItemsService {
 		return (await this.userRepo.save([sourceEntity, targetEntity]));
 	}
 
-	async updateRankScore(player1: pongObject, player2: pongObject)
+	async updateRankScore(player1: pongObject, player2: pongObject, match: MatchEntity)
 	{
 		const scoreOne = player1.score;
 		const userOne = await this.getUser(player1.player.user_id);
@@ -433,12 +433,14 @@ export class ItemsService {
 			return null;
 		if (scoreOne == 10)
 		{
+			match.is_victory[0] = true;
 			userOne.rank_score += 10;
 			userOne.currency += 10;
 			userOne.wins += 1;
 		}
 		else
 		{
+			match.is_victory[1] = true;
 			userOne.rank_score -= 10;
 			userOne.losses += 1;
 		}
@@ -456,6 +458,9 @@ export class ItemsService {
 			userOne.rank_score = 0;
 		if (userTwo.rank_score < 0)
 			userTwo.rank_score = 0;
+		userOne.match_history.push(match);
+		userTwo.match_history.push(match);
+		await this.matchRepo.save(match);
 		await this.userRepo.save([userOne, userTwo]);
 	}
 	async buyItem(user: UserEntity, skin: SkinEntity) {

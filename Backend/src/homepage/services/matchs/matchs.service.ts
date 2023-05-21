@@ -44,11 +44,9 @@ export class MatchsService {
 	async createFullMatch(playerOne: number, playerTwo: number, isCustom: boolean) {
 		const userOne = await this.itemsService.getUser(playerOne);
 		const userTwo = await this.itemsService.getUser(playerOne);
-		if (!userOne || !userTwo)
-			return null;
+		if (!userOne || !userTwo) return null;
 		const match = await this.createMatch(userOne, userTwo, isCustom);
-		if (!match)
-			return null;
+		if (!match) return null;
 		await this.createRankedMatchSetting();
 		userOne.match_history.push(match);
 		userTwo.match_history.push(match);
@@ -61,10 +59,8 @@ export class MatchsService {
 		const user = await this.itemsService.getUser(user_id);
 		const match = await this.itemsService.getMatch(match_id);
 
-		if (!user || !match)
-			return false;
-		if (!(await this.itemsService.addUserToMatch(user, match)))
-			return false;
+		if (!user || !match) return false;
+		if (!(await this.itemsService.addUserToMatch(user, match))) return false;
 		return true;
 	}
 
