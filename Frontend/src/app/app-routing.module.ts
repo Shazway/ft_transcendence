@@ -24,7 +24,8 @@ const routes: Routes = [
 	{ path: 'friends', component: FriendsComponent },
 	{ path: 'profile', component: ProfileComponent },
 	{ path: 'shop', component: ShopComponent },
-	{ path: 'friendRequests', component: FriendsComponent}
+	{ path: 'friendRequests', component: FriendsComponent},
+	{ path: 'block', component: FriendsComponent},
 ];
 
 @NgModule({

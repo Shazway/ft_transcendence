@@ -79,7 +79,7 @@ export class FriendsComponent {
 
 	goToProfile(friend: AnyProfileUser)
 	{
-
+		return("http://localhost/profile/" + friend.user_id);
 	}
 
 	goToMessages(friend: AnyProfileUser)
@@ -93,10 +93,11 @@ export class FriendsComponent {
 		//add a pop-up to confirm
 	}
 
-	blockUser(friend: AnyProfileUser)
+	async blockUser(block: AnyProfileUser)
 	{
-
+		await this.fetchService.blockUser(block.user_id);
 		//add a pop-up to confirm
+		console.log("bloque " + block.username);
 		
 	}
 
