@@ -21,7 +21,7 @@
 			  role="tab"
 			  aria-controls="requests"
 			  aria-selected="false"
-			  >Friend requests</button
+			  >Friend requests<span *ngIf="friendshipRequests.received.length" class="badge badge-pill badge-danger">{{friendshipRequests.received.length}}</span></button
 			>
 		</li>
 		<li class="nav-item" role="presentation">
