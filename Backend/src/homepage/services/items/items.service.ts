@@ -454,4 +454,23 @@ export class ItemsService {
 		user.skin.push(skin);
 		return (await this.userRepo.save(user));
 	}
+
+	async toggleDoubleAuth(userId: number)
+	{
+		const user = await this.getUser(userId);
+
+		if (!user)
+			return null;
+		user.double_auth = !user.double_auth;
+		return await this.userRepo.save(user);
+	}
+
+	async applySelectedSkins(userId: number, skinsId: number[])
+	{
+		const user = await this.getUser(userId);
+		if (!user)
+			return null;
+		user.current_skins = skinsId;
+		return await this.userRepo.save(user);
+	}
 }

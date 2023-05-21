@@ -51,6 +51,10 @@ export class User {
 
 	@Column({ default: false })
 	double_auth!: boolean;
+
+	@Column('int', { default: () => "'{0,1,2}'", array: true })
+	current_skins: number[];
+
 	// ---------------------- Friendship ----------------------------------
 
 	@OneToMany(() => Friendrequest, (friendrequest) => friendrequest.sender)
@@ -91,5 +95,4 @@ export class User {
 	@ManyToMany(() => Skin, (skin) => skin.user, { onDelete: 'CASCADE' })
 	@JoinTable()
 	skin: Skin[];
-
 }
