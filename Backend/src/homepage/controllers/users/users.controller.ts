@@ -8,7 +8,7 @@ import {
 	ParseIntPipe,
 	Post,
 	Req,
-	Res,
+	Res
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { UsersService } from '../../services/users/users.service';
@@ -27,18 +27,24 @@ export class UsersController {
 		private authService: AuthService,
 		private itemsService: ItemsService,
 		private tokenManager: TokenManagerService,
-		private channelService: ChannelsService,
+		private channelService: ChannelsService
 	) {}
 
 	@Post('change_name')
-	async changeUsername(@Req() req: Request, @Res() res: Response, @Body() body: {username: string}) {
+	async changeUsername(
+		@Req() req: Request,
+		@Res() res: Response,
+		@Body() body: { username: string }
+	) {
 		const checkUser = await this.itemsService.getUserByUsername(body.username);
 		const currentUser = this.tokenManager.getUserFromToken(req);
 
 		if (checkUser && checkUser.user_id == currentUser.sub)
 			return res.status(HttpStatus.NOT_MODIFIED).send('Username taken');
 		if (checkUser && checkUser.user_id != currentUser.sub)
-			return res.status(HttpStatus.UNAUTHORIZED).send('Trying to change someone elses username ?');
+			return res
+				.status(HttpStatus.UNAUTHORIZED)
+				.send('Trying to change someone elses username ?');
 		this.usersService.changeUserName(body.username, currentUser.sub);
 		return res.status(HttpStatus.ACCEPTED).send('Username changed');
 	}
@@ -58,7 +64,7 @@ export class UsersController {
 			msg: 'User created',
 			token: await this.authService.login(newUser, userEntity.user_id),
 			user_id: userEntity.user_id,
-			username: userEntity.username,
+			username: userEntity.username
 		});
 	}
 
@@ -66,10 +72,10 @@ export class UsersController {
 	async addFriend(
 		@Param('id', ParseIntPipe) friend_id: number,
 		@Req() req: Request,
-		@Res() res: Response,
+		@Res() res: Response
 	) {
 		const user = this.tokenManager.getUserFromToken(req);
-		console.log({FriendToAdd: friend_id});
+		console.log({ FriendToAdd: friend_id });
 		this.itemsService.addFriendToUser(user.sub, friend_id);
 		return res.status(HttpStatus.OK).send('Friend added');
 	}
@@ -77,42 +83,38 @@ export class UsersController {
 	async blockUser(
 		@Param('id', ParseIntPipe) target_id: number,
 		@Req() req: Request,
-		@Res() res: Response,
+		@Res() res: Response
 	) {
 		const user = this.tokenManager.getUserFromToken(req);
 
-		console.log({UserToBlock: target_id});
-		if ((await this.itemsService.blockUser(user.sub, target_id)))
+		console.log({ UserToBlock: target_id });
+		if (await this.itemsService.blockUser(user.sub, target_id))
 			res.status(HttpStatus.ACCEPTED).send('User blocked');
-		else
-			res.status(HttpStatus.FORBIDDEN).send('Failed to block user');
+		else res.status(HttpStatus.FORBIDDEN).send('Failed to block user');
 	}
 
 	@Get('unblock/:id')
 	async unblockUser(
 		@Param('id', ParseIntPipe) target_id: number,
 		@Req() req: Request,
-		@Res() res: Response,
+		@Res() res: Response
 	) {
 		const user = this.tokenManager.getUserFromToken(req);
 
-		console.log({UserToBlock: target_id});
-		if ((await this.itemsService.unblockUser(user.sub, target_id)))
+		console.log({ UserToBlock: target_id });
+		if (await this.itemsService.unblockUser(user.sub, target_id))
 			res.status(HttpStatus.ACCEPTED).send('User unblocked');
-		else
-			res.status(HttpStatus.FORBIDDEN).send('Failed to unblock user');
+		else res.status(HttpStatus.FORBIDDEN).send('Failed to unblock user');
 	}
 
 	@Get('friends')
 	async getFriends(@Req() req: Request, @Res() res: Response) {
 		const user = this.tokenManager.getUserFromToken(req);
 		const friends = await this.itemsService.getFriends(user.sub);
-		if (friends)
-		{
+		if (friends) {
 			const userFriends = friends.map((user) => plainToClass(AnyProfileUser, user));
 			res.status(HttpStatus.OK).send(userFriends);
-		}
-		else res.status(HttpStatus.NOT_FOUND).send({ msg: 'No friends found' });
+		} else res.status(HttpStatus.NOT_FOUND).send({ msg: 'No friends found' });
 	}
 
 	@Get('friendRequests')
@@ -122,7 +124,16 @@ export class UsersController {
 		const sentRequests = await this.itemsService.getFriendRequestsSent(user.sub);
 
 		console.log(receivedRequests);
-		res.status(HttpStatus.OK).send({received: receivedRequests, sent: sentRequests});
+		res.status(HttpStatus.OK).send({ received: receivedRequests, sent: sentRequests });
+	}
+
+	@Get('getBlockedUsers')
+	async getBlockedUsers(@Req() req: Request, @Res() res: Response) {
+		const user = this.tokenManager.getUserFromToken(req);
+		const userEntity = await this.itemsService.getUser(user.sub);
+
+		if (!userEntity) return res.status(HttpStatus.BAD_REQUEST).send('User not found');
+		res.status(HttpStatus.OK).send(userEntity.blacklistEntry);
 	}
 
 	@Get(':username')
@@ -130,14 +141,14 @@ export class UsersController {
 		const user = await this.itemsService.getUserByUsername(us);
 		const info = {
 			id: user.intra_id,
-			login: user.username,
+			login: user.username
 		};
 		if (user)
 			res.status(HttpStatus.OK).send({
 				msg: 'User connected',
 				token: await this.authService.login(plainToClass(IntraInfo, info), user.user_id),
 				user_id: user.user_id,
-				username: user.username,
+				username: user.username
 			});
 		else res.status(HttpStatus.NOT_FOUND).send({ msg: 'User not found' });
 	}
