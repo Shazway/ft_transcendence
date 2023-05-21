@@ -1,67 +1,125 @@
 <div class="container mt-3">
-	<h3>Friend requests</h3>
-	<p>number of pending requests:  {{friendshipRequests.received.length}}</p>
-	<div *ngIf="friendshipRequests.received.length != 0" >
-	<!-- <div *ngIf="false" > -->
-			<table class="table table-hover"style="color: aliceblue;">
-			<thead>
-				<tr>
-					<th>Username</th>
-					<th>Quick access</th>
-					<th>Accept</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr *ngFor="let request of friendshipRequests.received" class="line">
-					<td>
-						<p class="small ms-3 mb-0 text-muted">{{ request.sender.username }}</p>
-					</td>
-					<td>
-						<div class="d-flex align-items-end">
-							<img (click)="goToProfile(request.sender)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.sender.user_id}}-profile" src="{{icone_list.go_to_profile}}" alt="profile">
-							<img (click)="goToMessages(request.sender)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.sender.user_id}}-message" src="{{icone_list.go_to_messages}}" alt="message">
-							<img (click)="blockUser(request.sender)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.sender.user_id}}-block" src="{{icone_list.block_user}}" alt="block">
-							<div class="flex-grow-1"></div>
-						</div>
-					</td>
-					<td>
-						<div class="d-flex align-items-end ">
-							<img (click)="accept(request)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.sender.user_id}}-profile" src="{{icone_list.tick}}" alt="accept">
-							<img (click)="reject(request)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.sender.user_id}}-message" src="{{icone_list.cross}}" alt="reject">
-							<div class="flex-grow-1"></div>
-						</div>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+	<ul class="nav nav-tabs mb-3" id="choices" role="tablist">
+		<li class="nav-item" role="presentation">
+		  <button
+			class="nav-link active"
+			id="friends-tab0"
+			(click)="switchToFriends()"
+			type="button"
+			role="tab"
+			aria-controls="friends"
+			aria-selected="true"
+			>Friends</button
+		  >
+		</li>
+		<li class="nav-item" role="presentation">
+			<button
+			  class="nav-link"
+			  id="requests-tab0"
+			  (click)="switchToRequests()"
+			  type="button"
+			  role="tab"
+			  aria-controls="requests"
+			  aria-selected="false"
+			  >Friend requests</button
+			>
+		</li>
+		<li class="nav-item" role="presentation">
+			<button
+			class="nav-link"
+			id="blocked-tab0"
+			(click)="switchToBlocked()"
+			type="button"
+			role="tab"
+			aria-controls="blocked"
+			aria-selected="false"
+			>Blocked users</button
+			>
+		</li>
+	</ul>
+
+	<div class="tab-content" id="choices-content">
+		<div
+		class="tab-pane fade show active"
+		id="friends0"
+		role="tabpanel"
+		aria-labelledby="friends-tab0">
+			<table class="table table-hover" style="color: aliceblue;">
+				<thead>
+					<tr>
+						<th>Username</th>
+						<th>status</th>
+						<th>ranking</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let friend of friends" class="line">
+						<td>
+							<div class="d-flex align-items-end ">
+								<p class="small ms-3 mb-0 text-muted" (click)="onClickFriend(friend)">{{ friend.username }}</p>
+								<div class="flex-grow-1"></div>
+								<img (click)="goToProfile(friend)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{friend.user_id}}-profile" src="{{icone_list.go_to_profile}}" alt="profile">
+								<img (click)="goToMessages(friend)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{friend.user_id}}-message" src="{{icone_list.go_to_messages}}" alt="message">
+								<img (click)="removeFriend(friend)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{friend.user_id}}-unfriend" src="{{icone_list.remove_friend}}" alt="unfriend">
+								<img (click)="blockUser(friend)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{friend.user_id}}-block" src="{{icone_list.block_user}}" alt="block">
+							</div>
+						</td>
+						<td *ngIf="friend.activity_status == 0">offline</td>
+						<td (click)="challenge(friend)" *ngIf="friend.activity_status == 1">online</td> <!--transformer online en lien pour challenge-->
+						<td (click)="spectate(friend)" *ngIf="friend.activity_status == 2">playing</td> <!--transformer playing en lien pour spectate la partie-->
+						<td>{{friend.rank_score}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div
+		class="tab-pane fade"
+		id="requests0"
+		role="tabpanel"
+		aria-labelledby="requests-tab0">
+		<!-- *ngIf="friendshipRequests.received.length != 0" > -->
+		<!-- <div *ngIf="false" > -->
+				<table class="table table-hover"style="color: aliceblue;">
+				<thead>
+					<tr>
+						<th>Username</th>
+						<th>Quick access</th>
+						<th>Accept</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let request of friendshipRequests.received" class="line">
+						<td>
+							<p class="small ms-3 mb-0 text-muted">{{ request.sender.username }}</p>
+						</td>
+						<td>
+							<div class="d-flex align-items-end">
+								<img (click)="goToProfile(request.sender)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.sender.user_id}}-profile" src="{{icone_list.go_to_profile}}" alt="profile">
+								<img (click)="goToMessages(request.sender)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.sender.user_id}}-message" src="{{icone_list.go_to_messages}}" alt="message">
+								<img (click)="blockUser(request.sender)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.sender.user_id}}-block" src="{{icone_list.block_user}}" alt="block">
+								<div class="flex-grow-1"></div>
+							</div>
+						</td>
+						<td>
+							<div class="d-flex align-items-end ">
+								<img (click)="accept(request)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.sender.user_id}}-profile" src="{{icone_list.tick}}" alt="accept">
+								<img (click)="reject(request)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.sender.user_id}}-message" src="{{icone_list.cross}}" alt="reject">
+								<div class="flex-grow-1"></div>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		
+		<div
+		class="tab-pane fade"
+		id="blocked0"
+		role="tabpanel"
+		aria-labelledby="blocked-tab0">
+			coucou c'est vide
+		</div>
 	</div>
-	<h3>My friends</h3>
-	<table class="table table-hover" style="color: aliceblue;">
-		<thead>
-			<tr>
-				<th>Username</th>
-				<th>status</th>
-				<th>ranking</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr *ngFor="let friend of friends" class="line">
-				<td>
-					<div class="d-flex align-items-end ">
-						<p class="small ms-3 mb-0 text-muted" (click)="onClickFriend(friend)">{{ friend.username }}</p>
-						<div class="flex-grow-1"></div>
-						<img (click)="goToProfile(friend)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{friend.user_id}}-profile" src="{{icone_list.go_to_profile}}" alt="profile">
-						<img (click)="goToMessages(friend)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{friend.user_id}}-message" src="{{icone_list.go_to_messages}}" alt="message">
-						<img (click)="removeFriend(friend)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{friend.user_id}}-unfriend" src="{{icone_list.remove_friend}}" alt="unfriend">
-						<img (click)="blockUser(friend)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{friend.user_id}}-block" src="{{icone_list.block_user}}" alt="block">
-					</div>
-				</td>
-				<td *ngIf="friend.activity_status == 0">offline</td>
-				<td (click)="challenge(friend)" *ngIf="friend.activity_status == 1">online</td> <!--transformer online en lien pour challenge-->
-				<td (click)="spectate(friend)" *ngIf="friend.activity_status == 2">playing</td> <!--transformer playing en lien pour spectate la partie-->
-				<td>{{friend.rank_score}}</td>
-			</tr>
-		</tbody>
-	</table>
 </div>
 <button type="button" class="btn btn-primary" (click)="addSystemFriend()">add System as friend</button>

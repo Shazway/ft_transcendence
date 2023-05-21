@@ -20,6 +20,13 @@ export class FriendsComponent {
 		block_user: "https://cdn.discordapp.com/attachments/1041104785870438521/1103760104815349931/block.png"
 	}
 
+	friendsTabElm : any;
+	requestsTabElm : any;
+	blockedTabElm : any;
+	friendsElm : any;
+	requestsElm : any;
+	blockedElm : any;
+
 	public friends!: AnyProfileUser[];
 	public friendshipRequests: {received: FriendRequest[], sent: FriendRequest[]} = {received: [], sent: []};
 	constructor(
@@ -121,6 +128,70 @@ export class FriendsComponent {
 	{
 		console.log("demande rejetee");
 		this.friendshipRequests.received.splice(this.friendshipRequests.received.indexOf(request), 1);
+
+	}
+
+	switchToFriends() {
+		this.friendsTabElm = this.elRef.nativeElement.querySelector("#friends-tab0");
+		this.requestsTabElm = this.elRef.nativeElement.querySelector("#requests-tab0");
+		this.blockedTabElm = this.elRef.nativeElement.querySelector("#blocked-tab0");
+		this.friendsElm = this.elRef.nativeElement.querySelector("#friends0");
+		this.requestsElm = this.elRef.nativeElement.querySelector("#requests0");
+		this.blockedElm = this.elRef.nativeElement.querySelector("#blocked0");
+		this.friendsTabElm.classList.add('active');
+		this.requestsTabElm.classList.remove('active');
+		this.blockedTabElm.classList.remove('active');
+
+		this.friendsElm.classList.add('show');
+		this.friendsElm.classList.add('active');
+		this.requestsElm.classList.remove('show');
+		this.requestsElm.classList.remove('active');
+		this.blockedElm.classList.remove('show');
+		this.blockedElm.classList.remove('active');
+
+		console.log("switch to friends");
+	}
+
+	switchToRequests() {
+		this.friendsTabElm = this.elRef.nativeElement.querySelector("#friends-tab0");
+		this.requestsTabElm = this.elRef.nativeElement.querySelector("#requests-tab0");
+		this.blockedTabElm = this.elRef.nativeElement.querySelector("#blocked-tab0");
+		this.friendsElm = this.elRef.nativeElement.querySelector("#friends0");
+		this.requestsElm = this.elRef.nativeElement.querySelector("#requests0");
+		this.blockedElm = this.elRef.nativeElement.querySelector("#blocked0");
+		this.friendsTabElm.classList.remove('active');
+		this.requestsTabElm.classList.add('active');
+		this.blockedTabElm.classList.remove('active');
+
+		this.friendsElm.classList.remove('show');
+		this.friendsElm.classList.remove('active');
+		this.requestsElm.classList.add('show');
+		this.requestsElm.classList.add('active');
+		this.blockedElm.classList.remove('show');
+		this.blockedElm.classList.remove('active');
+
+		console.log("switch to requets");
+
+	}
+
+	switchToBlocked() {
+		this.friendsTabElm = this.elRef.nativeElement.querySelector("#friends-tab0");
+		this.requestsTabElm = this.elRef.nativeElement.querySelector("#requests-tab0");
+		this.blockedTabElm = this.elRef.nativeElement.querySelector("#blocked-tab0");
+		this.friendsElm = this.elRef.nativeElement.querySelector("#friends0");
+		this.requestsElm = this.elRef.nativeElement.querySelector("#requests0");
+		this.blockedElm = this.elRef.nativeElement.querySelector("#blocked0");
+		this.friendsTabElm.classList.remove('active');
+		this.requestsTabElm.classList.remove('active');
+		this.blockedTabElm.classList.add('active');
+
+		this.friendsElm.classList.remove('show');
+		this.friendsElm.classList.remove('active');
+		this.requestsElm.classList.remove('show');
+		this.requestsElm.classList.remove('active');
+		this.blockedElm.classList.add('show');
+		this.blockedElm.classList.add('active');
+		console.log("switch to blocked");
 
 	}
 }
