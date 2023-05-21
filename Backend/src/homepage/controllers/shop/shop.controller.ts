@@ -25,11 +25,16 @@ export class ShopController {
 	async getMissingSkins(@Req() req: Request, @Res() res: Response) {
 		const user = this.tokenManager.getUserFromToken(req);
 		const userEntity = await this.itemsService.getUser(user.sub);
-		const skinsList = await this.itemsService.getSkins();
+		let skinsList = await this.itemsService.getSkins();
 
+		console.log('Test');
 		if (!userEntity || !skinsList)
 			return res.status(HttpStatus.NO_CONTENT).send({ msg: 'Content not found' });
-		return res.status(HttpStatus.OK).send(skinsList.filter((skin) => !userEntity.skin.includes(skin)));
+		skinsList = skinsList.filter((skin) => !userEntity.skin.includes(skin));
+		console.log(skinsList);
+		console.log('User skins')
+		console.log(userEntity.skin);
+		return res.status(HttpStatus.OK).send({availableSkins: skinsList});
 	}
 
 	@Get('buy/:id')
@@ -44,6 +49,7 @@ export class ShopController {
 		const newUser = (await this.itemsService.buyItem(user.sub, skin))
 		if (!newUser)
 			return res.status(HttpStatus.UNAUTHORIZED).send('Not enough currency');
+		console.log(skinsList.filter((skin) => !newUser.skin.includes(skin)))
 		return res.status(HttpStatus.OK).send({newBalance: newUser.currency, availableSkins: skinsList.filter((skin) => !newUser.skin.includes(skin))});
 	}
 }
