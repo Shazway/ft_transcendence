@@ -6,7 +6,7 @@ import { Message } from 'src/dtos/message';
 import { NewChan } from 'src/dtos/NewChan.dto';
 import { Channel } from 'src/dtos/Channel.dto'
 import { AnyProfileUser, User, FriendRequest } from 'src/dtos/User.dto';
-import { isUndefined } from 'mathjs';
+import { isUndefined, log } from 'mathjs';
 
 @Injectable({
   providedIn: 'root'
@@ -78,8 +78,10 @@ export class FetchService {
 		return res;
 	}
 
-	async getProfile(login: string): Promise<AnyProfileUser | null> {
+	async getProfile(login: string | null): Promise<AnyProfileUser | null> {
 		let res: AnyProfileUser | undefined;
+		if (!login)
+			return null;
 		await axios.get<AnyProfileUser>('http://localhost:3001/profile/' + login, this.getHeader())
 		.then(function (response) {
 			res = response.data;
