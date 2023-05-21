@@ -276,24 +276,29 @@ export class ItemsService {
 	}
 
 	public async addFriendToUser(
-		user_id: number,
-		friend_id: number,
+		sourceId: number,
+		targetId: number,
 	) {
-		const user = await this.getUser(user_id);
-		const friend = await this.getUser(friend_id);
+		const sourceUser = await this.getUser(sourceId);
+		const targetUser = await this.getUser(targetId);
 
-		if (!user || !friend)
+		if (!sourceUser || !targetUser)
 			return null;
 		if (
-			!user.receivedFriendRequests.find((request) => request.sender.user_id == user.user_id) ||
-			!user.sentFriendRequests.find((request) => request.sender.user_id == user.user_id)
+			!sourceUser.sentFriendRequests.find((request) => request.receiver.user_id == targetId) ||
+			!targetUser.receivedFriendRequests.find((request) => request.sender.user_id == sourceId)
 		)
 			return null;
-		user.receivedFriendRequests = user.sentFriendRequests.filter((User) => User.receiver.user_id == friend.user_id);
-		friend.sentFriendRequests = user.receivedFriendRequests.filter((User) => User.sender.user_id == user.user_id);
-		user.friend.push(friend);
-		friend.friend.push(user);
-		return await this.userRepo.save([user, friend]);
+
+		sourceUser.sentFriendRequests = sourceUser.sentFriendRequests
+			.filter((request) => request.receiver.user_id == targetId);
+
+		targetUser.sentFriendRequests = sourceUser.receivedFriendRequests
+			.filter((request) => request.sender.user_id == sourceId);
+
+		sourceUser.friend.push(targetUser);
+		targetUser.friend.push(sourceUser);
+		return await this.userRepo.save([sourceUser, targetUser]);
 	}
 
 	public async removeFriendFromUsers(
