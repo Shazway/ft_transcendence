@@ -80,6 +80,7 @@ export class FetchService {
 
 	async getProfile(login: string | null): Promise<AnyProfileUser | null> {
 		let res: AnyProfileUser | undefined;
+		console.log(login);
 		if (!login)
 			return null;
 		await axios.get<AnyProfileUser>('http://localhost:3001/profile/' + login, this.getHeader())
