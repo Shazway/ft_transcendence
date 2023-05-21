@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ViewChild, TemplateRef, ElementRef, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ViewChild, TemplateRef, ElementRef } from '@angular/core';
 import { floor, ceil, random, round } from 'mathjs';
 import { Chart, ChartConfiguration } from 'chart.js/auto';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
@@ -58,7 +58,7 @@ interface Pair {
 		]),
 	],
 })
-export class ProfileComponent implements AfterViewInit, OnInit {
+export class ProfileComponent implements AfterViewInit {
 	@ViewChild('userSettingsTemplate') userSettingsTemplate!: TemplateRef<any>;
 	@ViewChild('profileCard') profileCard!: ElementRef;
 	user!: AnyProfileUser;
@@ -88,7 +88,7 @@ export class ProfileComponent implements AfterViewInit, OnInit {
 		this.matchHistory = new Array;
 	}
 	
-	async ngOnInit() {
+	async customOnInit() {
 		const name = this.route.snapshot.queryParamMap.get('username');
 		console.log(name);
 		if (!name) {
@@ -104,9 +104,8 @@ export class ProfileComponent implements AfterViewInit, OnInit {
 				this.user = newUser;
 		}
 		if (this.user) {
-			console.log('yipeeeee' + this.user.match_history.length);
 			this.user.match_history.reverse().forEach(match => {
-				console.log(match);
+				const date = new Date(match.date);
 				this.matchHistory.push({
 					Player1: match.user[0].username,
 					P1URL: match.user[0].img_url,
@@ -114,7 +113,7 @@ export class ProfileComponent implements AfterViewInit, OnInit {
 					Player2: match.user[1].username,
 					P2URL: match.user[1].img_url,
 					P2score: match.current_score[1],
-					date: new Date(match.date.setHours(match.date.getHours() + 2)),
+					date: new Date(date.setHours(date.getHours() + 2)),
 				});
 			});
 			this.rank = this.user.rank_score;
@@ -145,8 +144,10 @@ export class ProfileComponent implements AfterViewInit, OnInit {
 		}
 	}
 
-	ngAfterViewInit(): void {
+	async ngAfterViewInit() {
 		this.cdr.detach();
+		await this.customOnInit();
+		console.log(this.matchHistory.length);
 		this.matchChart = new Chart(document.getElementById('matchChart') as HTMLCanvasElement, this.getMatchChartConfig());
 		this.rankChart = new Chart(document.getElementById('rankChart') as HTMLCanvasElement, this.getRankedChartConfig());
 		this.cdr.detectChanges();
@@ -501,7 +502,6 @@ export class ProfileComponent implements AfterViewInit, OnInit {
 
 	getTimeDiff(timestamp: Date) {
 		let str = new String();
-		console.log(new Date().toString() + ' - ' + timestamp.toString());
 		const time = new Date().getTime() - timestamp.getTime();
 
 		const min = floor(time / (1000 * 60));

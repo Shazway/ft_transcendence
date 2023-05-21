@@ -80,7 +80,6 @@ export class AppComponent implements AfterViewInit {
 	}
 
 	openDropdown() {
-		console.log('yeeeeeeeeeeee');
 		const dropDownElm = this.elRef.nativeElement.querySelector('.dropdown-menu');
 		if(!dropDownElm)
 			return;
