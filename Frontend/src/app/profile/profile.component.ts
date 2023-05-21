@@ -99,7 +99,7 @@ export class ProfileComponent implements AfterViewInit {
 		else if (name == 'Mr.Connasse')
 			this.generateMatches();
 		else {
-			const newUser = await this.fetchService.getProfile(localStorage.getItem(name));
+			const newUser = await this.fetchService.getProfile(name);
 			if (newUser)
 				this.user = newUser;
 		}
