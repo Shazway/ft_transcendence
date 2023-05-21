@@ -79,6 +79,17 @@ export class AppComponent implements AfterViewInit {
 		this.popover.open({ data: config.data });
 	}
 
+	openDropdown() {
+		console.log('yeeeeeeeeeeee');
+		const dropDownElm = this.elRef.nativeElement.querySelector('.dropdown-menu');
+		if(!dropDownElm)
+			return;
+		if (dropDownElm.classList.contains('show'))
+			dropDownElm.classList.remove('show');
+		else
+			dropDownElm.classList.add('show');
+	}
+
 	showFriendReq(notif : {notification: NotificationResponse}) {
 		console.log(notif);
 		this.notifService.showFriendRequest(notif.notification);
