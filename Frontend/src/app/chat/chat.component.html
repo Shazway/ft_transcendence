@@ -3,7 +3,7 @@
 <!-- Start of chat app -->
 		<div class="card offscreen" style="height: 60vh;" id="chat2">
 			<div class="card-header d-flex justify-content-between align-items-center p-3 chat-card-header">
-				<h5 class="mb-0">Chat</h5>
+				<h5 *ngIf="currentChannel" class="mb-0">{{currentChannel.channel_name}}</h5>
 				<button type="button" id="chanBtn" (click)="slideChan()" class="btn darkslategrey hoverable btn-sm" data-mdb-ripple-color="dark">Open channels</button>
 				<div (click)="slide()">
 					<img src="https://cdn.onlinewebfonts.com/svg/img_69492.png" id="chatBtn" class="rounded-circle" alt="Open Chat">
@@ -20,7 +20,6 @@
 							<div>
 								<div class="d-flex align-items-end">
 									<p class="small ms-3 mb-0 text-muted">{{ getName(msg_list) }}</p>
-									<!-- <img [ngbPopover]="customPopoverTemplate" popoverTitle="Popover Title" class="rounded-circle border border-2 m-0 ms-2 m-auto hidden_icon" id="img-{{msg_list[0].message_id}}-mute" src="{{icone_list.mute_user}}" alt="mute_user"> -->
 								</div>
 								<div *ngFor="let msg of msg_list" class="d-flex" id="message-{{msg.message_id}}">
 									<p class="small pb-1 ps-2 pe-2 pt-0 ms-2 me-2 mb-1 rounded-3 text-wrap d-block" (click)="onDropdownDel(msg)" style="background-color: rgb(206, 210, 216);">{{msg.message_content}}</p>
@@ -54,26 +53,30 @@
 
 				</div>
 <!-- End of text area -->
+<!-- Start of channel Select Area -->
 				<div class="card-body p-0 h-100 channel_pan p-3 bg-light" data-mdb-perfect-scrollbar="true">
 					<div class="w-100 d-flex mb-2">
 						<button type="button" (click)="createChannel()" class="btn btn-primary btn-sm m-auto" data-mdb-ripple-color="dark">create channel</button>
 					</div>
 					<div class="row" *ngFor="let channel of channels$">
-						<button type="button" (click)="openChannel(channel.channel_id)" class="btn btn-secondary btn-sm mt-1" data-mdb-ripple-color="dark">{{ channel.channel_name }}</button>
+						<button type="button" (click)="openChannel(channel)" class="btn btn-secondary btn-sm mt-1" data-mdb-ripple-color="dark">{{ channel.channel_name }}</button>
 					</div>
 				</div>
+<!-- End of channel Select Area -->
+<!-- Start of channel Create Area -->
 				<div class="card-body p-0 h-100 channel_create_pan p-3 bg-light" data-mdb-perfect-scrollbar="true">
 					<div class="w-100 d-flex mb-2">
 						<button type="button" (click)="createChannel()" class="btn btn-primary btn-sm m-auto">back</button>
 					</div>
-					<form #createChannelBox="ngForm" (ngSubmit)="onClickCreateChannel(createChannelBox.value)">
-						<input type="text" name="channel_name" autocomplete="off" placeholder="Channel name" ngModel><br>
-						<input type="password" name="channel_password" class="chanPass show" autocomplete="off" placeholder="Password" ngModel><br>
-						<label for="privateCheckbox" class="text-black">Set channel private</label>
-						<input type="checkbox" value="false" name="is_channel_private" (change)="togglePrivate($event)" ngModel #privateCheckbox><br>
-						<input type="submit" class="btn btn-outline-secondary btn-sm rounded-5" value = "submit">
+					<form #createChannelBox="ngForm" class="form-check p-0" (ngSubmit)="onClickCreateChannel(createChannelBox.value)">
+						<input type="text" class="form-control form-control-lg text-input" name="channel_name" autocomplete="off" placeholder="Channel name" ngModel><br>
+						<input type="password" name="channel_password" class="chanPass show form-control form-control-lg text-input" autocomplete="off" placeholder="Password" ngModel><br>
+						<input type="checkbox" class="form-check-input ms-2 me-1" value="false" name="is_channel_private" (change)="togglePrivate($event)" ngModel #privateCheckbox>
+						<label for="privateCheckbox" class="text-black form-check-label">Set channel private</label><br>
+						<input type="submit" class="btn btn-outline-secondary btn-sm rounded-5 mt-2" value = "submit">
 					</form>
 				</div>
+<!-- End of channel Create Area -->
 			</div>
 
 			<form #userChatBox="ngForm" (ngSubmit)="onClickChat(userChatBox.value)" >

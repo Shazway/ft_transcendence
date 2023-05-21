@@ -99,13 +99,13 @@ export class ProfileComponent implements AfterViewInit {
 		private parent: AppComponent,
 	) {
 		Chart.register(ChartDataLabels);
-		const nbGenerate = 100;
+		const nbGenerate = 1000;
 		this.matchHistory = new Array;
 		let time = new Date();
 		for (let index = 0; index < nbGenerate; index++) {
 			const chooseWinner = round(random(0,1));
 			const randScore = round(random(0,9));
-			const randTime = random(20, 1000);
+			const randTime = random(20, 200);
 			const min = floor(randTime % 60);
 			const hour = floor((randTime / 60) % 24);
 			const days = floor(randTime / 60 / 24);

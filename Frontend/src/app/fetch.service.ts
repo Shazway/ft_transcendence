@@ -176,4 +176,16 @@ export class FetchService {
 		.finally(function () {});
 		return res;
 	}
+
+	async getChannel(id: number): Promise<Channel | undefined> {
+		let res: Channel | undefined;
+		await axios.get('http://localhost:3001/channels/' + id, this.getHeader())
+		.then(function (response) {
+			res = response.data;
+			console.log(res);
+		})
+		.catch(function (error) { console.log(error); })
+		.finally(function () {});
+		return res;
+	}
 }
