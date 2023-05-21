@@ -363,7 +363,8 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 		body.author.username = user.name;
 		body.author.user_id = user.sub;
-		body.message_id = Validity.message.message_id;
+		if (Validity.message)
+			body.message_id = Validity.message.message_id;
 		if (Validity.check.ret) await this.sendMessageToChannel(user.sub, channel_id, body);
 		else {
 			client.emit('onMessage', Validity.check.msg);

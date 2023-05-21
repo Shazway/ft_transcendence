@@ -12,11 +12,13 @@ import { NotificationService } from '../notification.service';
 import { Router } from '@angular/router';
 import { AppComponent } from '../app.component';
 import { PopoverConfig } from 'src/dtos/Popover.dto';
+import { PerfectScrollbarConfig } from 'ngx-perfect-scrollbar';
 
 @Component({
 	selector: 'app-chat',
 	templateUrl: './chat.component.html',
-	styleUrls: ['./chat.component.css']
+	styleUrls: ['./chat.component.css'],
+	providers: [PerfectScrollbarConfig],
 })
 export class ChatComponent implements OnInit {
 	@ViewChild('chatInteractionTemplate') chatInteractionTemplate!: TemplateRef<any>;
@@ -46,7 +48,10 @@ export class ChatComponent implements OnInit {
 		private notificationService: NotificationService,
 		private router: Router,
 		private parent: AppComponent,
+		public scrollbarConfig: PerfectScrollbarConfig,
 	) {
+		scrollbarConfig.wheelSpeed = 0.2;
+		scrollbarConfig.swipeEasing = false;
 		this.client = io('ws://localhost:3002?channel_id=' + 1, websocketService.getHeader());
 		if (!this.client)
 		{
