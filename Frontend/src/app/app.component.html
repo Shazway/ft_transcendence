@@ -13,7 +13,7 @@
 	<nav id="upperbar" class="navbar navbar-light bg-light navbar-fixed-top">
 		<div class="d-flex justify-content-between w-100 ps-5 pe-3">
 			<div class="sidebar-header">
-				<a class="inox" href="#">Transcendence</a>
+				<a class="inox" href="home">Transcendence</a>
 			</div>
 			<div *ngIf="isConnected()" class="d-flex justify-content-between">
 				<div *ngIf="myProfile" @currencyFadeIn aria-label="wealth" class="col text-muted align-items-center mx-5" >
@@ -41,6 +41,9 @@
 					</ul>
 				</div>
 			</div>
+			<div *ngIf="!isConnected()">
+				<a class="btn" href="login">Log in</a>
+			</div>
 		</div>
 		<!-- <div class="d-flex justify-content-between w-100 px-5">
 			truc
@@ -48,7 +51,7 @@
 	</nav>
 	<div class="wrapper h-100">
 		<!-- Sidebar -->
-		<nav id="sidebar" class="offscreen airforceblue h-100">
+		<nav *ngIf="isConnected()" id="sidebar" class="offscreen airforceblue h-100">
 			<ul class="list-group active">
 				<li class="active" aria-owns="#homeSubmenu">
 					<a data-toggle="collapse" class="dropdown-toggle " (click)="togglePlay()">Home</a>

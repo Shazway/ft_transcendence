@@ -11,6 +11,8 @@ import { PongDebugComponent } from './pong-debug/pong-debug.component';
 import { FriendsComponent } from './friends/friends.component';
 import { ProfileComponent } from './profile/profile.component';
 import { ShopComponent } from './shop/shop.component';
+import { HomeComponent } from './home/home.component';
+import { GlassdoorComponent } from './glassdoor/glassdoor.component';
 
 const routes: Routes = [
 	{ path: 'users', component: UsersComponent },
@@ -26,6 +28,9 @@ const routes: Routes = [
 	{ path: 'shop', component: ShopComponent },
 	{ path: 'friendRequests', component: FriendsComponent},
 	{ path: 'block', component: FriendsComponent},
+	{ path: 'glassdoor', component: GlassdoorComponent},
+	{ path: 'home', component: HomeComponent}
+
 ];
 
 @NgModule({
