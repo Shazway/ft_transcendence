@@ -21,6 +21,7 @@ export class GamesService {
 	private movespeed = 5;
 	private gamespeed = 13;
 	private oldDir = 0;
+	private countdown = 300;
 	public match: MatchEntity;
 	constructor(
 		private itemsService: ItemsService,
@@ -119,7 +120,6 @@ export class GamesService {
 
 	update(delta: number) {
 		if (!this.player1.player.isReady || !this.player2.player.isReady) return;
-
 		this.applyPlayerMove(this.player1, delta);
 		this.applyPlayerMove(this.player2, delta);
 
@@ -127,12 +127,19 @@ export class GamesService {
 			this.ball.changeDirectionPlayer(this.player1);
 		else if (this.closeEnoughOpponent() && this.ball.collidesWithPlayer(this.player2))
 			this.ball.changeDirectionOpponent(this.player2);
-		this.checkDirectionChange();
-		const pointChecker = this.ball.moveObject(delta, this.player1, this.player2);
-		if (pointChecker.state)
-			this.sendScoreChange(pointChecker);
-		if (this.player1.score >= 10 || this.player2.score >= 10)
-			this.endMatch();
+		if (this.countdown > 0)
+			this.countdown -= delta;
+		else {
+			this.checkDirectionChange();
+			const pointChecker = this.ball.moveObject(delta, this.player1, this.player2);
+			if (pointChecker.state)
+			{
+				this.countdown = 300;
+				this.sendScoreChange(pointChecker);
+			}
+			if (this.player1.score >= 10 || this.player2.score >= 10)
+				this.endMatch();
+		}
 	}
 
 	applyPlayerMove(player: pongObject, delta: number) {

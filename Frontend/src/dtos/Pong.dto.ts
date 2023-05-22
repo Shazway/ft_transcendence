@@ -29,7 +29,7 @@ export interface Move {
 export class ballObject {
 	DIAMETER!: number;
 	RADIUS!: number;
-	public speed = 4;
+	public speed = 0;
 	public graphic = new Graphics();
 	public color = 0xFFFFFF;
 	public texture: Texture | undefined;

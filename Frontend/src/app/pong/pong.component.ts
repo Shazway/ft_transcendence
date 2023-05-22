@@ -116,6 +116,7 @@ export class PongComponent {
 			this.ballLock.acquire().then(() => {
 				this.ball.graphic.clear();
 				this.ball.setPos(this.ball.position(250, 150));
+				this.ball.speed = 0;
 			})
 			this.ballLock.release();
 		});
@@ -166,6 +167,7 @@ export class PongComponent {
 		await this.ballLock.acquire().then(() => {
 			this.ball.setPos(event.pos);
 			this.ball.setDir(event.dir);
+			this.ball.speed = 4;
 		});
 		this.ballLock.release();
 	}
