@@ -3,6 +3,8 @@ import { FetchService } from '../fetch.service';
 import { AnyProfileUser, FriendRequest } from 'src/dtos/User.dto';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PunishmentPopup } from '../popup-component/popup-component.component';
+import { Router } from '@angular/router';
+import { AppComponent } from '../app.component';
 
 @Component({
   selector: 'app-friends',
@@ -32,7 +34,9 @@ export class FriendsComponent {
 	constructor(
 		private elRef: ElementRef,
 		private modalService: NgbModal,
-		private fetchService: FetchService
+		private fetchService: FetchService,
+		private router: Router,
+		private parent: AppComponent,
 	) {}
 
 	async createPopup(title: string, label: string) {
@@ -43,6 +47,8 @@ export class FriendsComponent {
 	}
 	
 	async ngOnInit() {
+		if (!this.parent.isConnected())
+			this.router.navigateByUrl('login');
 		this.friends = await this.fetchService.getFriends();
 		this.friendshipRequests = await this.fetchService.getFriendshipRequests();
 		console.log(this.friendshipRequests.received);

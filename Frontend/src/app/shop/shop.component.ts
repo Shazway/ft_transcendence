@@ -6,6 +6,7 @@ import { ConfirmBuyPopup } from '../popup-component/popup-component.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppComponent } from '../app.component';
 import { FetchService } from '../fetch.service';
+import { Router } from '@angular/router';
 
 
 //https://www.youtube.com/watch?v=Vy7ESjYNO_Y&list=PLrbLGOB571zeR7FUQifKmjUpT4ImldCPt&index=13
@@ -29,6 +30,7 @@ export class ShopComponent implements AfterViewInit {
 			private modalService: NgbModal,
 			private parent: AppComponent,
 			private fetchService: FetchService,
+			private router: Router
 		) {
 		this.getMoney();
 		
@@ -49,6 +51,8 @@ export class ShopComponent implements AfterViewInit {
 		this.filterItems(this.searching);
 	}
 	async customOnInit() {
+		if (!this.parent.isConnected())
+			this.router.navigateByUrl('login');
 		const availableSkins = await this.fetchService.getBuyableSkins();
 		if (availableSkins)
 			this.items = availableSkins.availableSkins;

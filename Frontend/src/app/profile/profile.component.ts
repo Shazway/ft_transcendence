@@ -5,7 +5,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { AppComponent } from '../app.component';
 import { PopoverConfig } from 'src/dtos/Popover.dto';
 import { trigger, state, style, transition, animate } from '@angular/animations';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FetchService } from '../fetch.service';
 import { AnyProfileUser } from 'src/dtos/User.dto';
 
@@ -87,12 +87,15 @@ export class ProfileComponent implements AfterViewInit {
 		private parent: AppComponent,
 		private route: ActivatedRoute,
 		private fetchService: FetchService,
+		private router: Router,
 	) {
 		Chart.register(ChartDataLabels);
 		this.matchHistory = new Array;
 	}
 	
 	async customOnInit() {
+		if (!this.parent.isConnected())
+			this.router.navigateByUrl('login');
 		const name = this.route.snapshot.queryParamMap.get('username');
 		console.log(name);
 		if (!name) {

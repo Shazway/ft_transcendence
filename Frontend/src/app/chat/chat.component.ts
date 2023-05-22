@@ -89,6 +89,8 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	}
 
 	async ngOnInit() {
+		if (!this.parent.isConnected())
+			this.router.navigateByUrl('login');
 		this.msgs$ = await this.fetchService.getMessages(1, 0);
 		if (!this.msgs$)
 			return;

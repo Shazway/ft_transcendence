@@ -6,6 +6,7 @@ import { NotificationResponse } from 'src/dtos/Notification.dto';
 import { MyProfileUser } from 'src/dtos/User.dto';
 import { FetchService } from './fetch.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -39,6 +40,8 @@ export class AppComponent implements AfterViewInit {
 	}
 
 	async ngOnInit() {
+		// if (!this.isConnected())
+		// 	this.router.navigateByUrl('login');
 		this.myProfile = await this.fetchService.getMyProfile();
 	}
 
