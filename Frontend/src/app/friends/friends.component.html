@@ -81,7 +81,7 @@
 		aria-labelledby="requests-tab0">
 		<!-- *ngIf="friendshipRequests.received.length != 0" > -->
 		<!-- <div *ngIf="false" > -->
-				<table class="table table-hover"style="color: aliceblue;">
+			<table class="table table-hover"style="color: aliceblue;">
 				<thead>
 					<tr>
 						<th>Username</th>
@@ -119,7 +119,26 @@
 		id="blocked0"
 		role="tabpanel"
 		aria-labelledby="blocked-tab0">
-			coucou c'est vide
+		<table class="table table-hover"style="color: aliceblue;">
+			<thead>
+				<tr>
+					<th>Username</th>
+					<th>Unblock</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr *ngFor="let user of blockedUsers" class="line">
+					<td>
+						<p class="small ms-3 mb-0 text-muted">{{ user.username }}</p>
+					</td>
+					<td>
+						<div class="d-flex align-items-end ">
+							<img (click)="unblockUser(user)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{user.user_id}}-profile" src="{{icone_list.tick}}" alt="accept">
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
 		</div>
 	</div>
 </div>

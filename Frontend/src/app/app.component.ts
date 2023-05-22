@@ -141,4 +141,12 @@ export class AppComponent implements AfterViewInit {
 		return (1);
 	}
 
+	acceptFriendRequest() {
+		// this.notifService.emit()
+	}
+
+	rejectFriendRequest() {
+
+	}
+
 }

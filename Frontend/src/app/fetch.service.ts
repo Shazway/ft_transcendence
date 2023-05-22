@@ -169,10 +169,34 @@ export class FetchService {
 		.finally(function () {});
 		return res;
 	}
+
+	async getBlockedUsers() {
+		let res: AnyProfileUser[] = [];
+		await axios.get<Array<AnyProfileUser>>('http://localhost:3001/users/getBlockedUsers', this.getHeader())
+		.then(function (response) {
+			res = response.data;
+			console.log("blocked :" +res);
+		})
+		.catch(function (error) { console.log(error); })
+		.finally(function () {});
+		return res;
+	}
 	
 	async blockUser(block_id : number) {
 		let res;
 		await axios.get('http://localhost:3001/users/block/' + block_id, this.getHeader())
+		.then(function (response) {
+			res = response.data;
+			console.log(res);
+		})
+		.catch(function (error) { console.log(error); })
+		.finally(function () {});
+		return res;
+	}
+
+	async unblockUser(block_id : number) {
+		let res;
+		await axios.get('http://localhost:3001/users/unblock/' + block_id, this.getHeader())
 		.then(function (response) {
 			res = response.data;
 			console.log(res);

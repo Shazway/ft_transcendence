@@ -48,7 +48,9 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 			client.disconnect();
 			return ;
 		}
+		console.log('Connected notifs ' + user.name);
 		this.userList.set(user.sub, client);
+		console.log(this.userList);
 		await this.notificationService.setUserStatus(user.sub, this.ONLINE);
 	}
 	
@@ -104,27 +106,24 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		body.sent_at = new Date();
 		const source = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		const answer = this.buildAnswer(source.sub, source.name, body.type);
-		const user = this.userList.get(body.target_id);
+		const target = this.userList.get(body.target_id);
 		const notifClient = this.userList.get(source.sub);
 
-		console.log("on est dans handle invite");
-		if (!user || !notifClient)
-			throw new WsException('User or Target not found');
+		console.log("On envoie une invite " + body.type);
 		console.log('request from ' + source.name + ' to: ');
 		console.log(body);
+		if(!body)
+			throw new WsException('Pas de body');
 		if (body.type == 'friend') {
 			if (await this.itemsService.requestExists(source.sub, body.target_id))
 				return client.emit('alreadySent', 'Already pending request');
 			else if (!(await this.itemsService.addFriendRequestToUsers(source.sub, body.target_id)))
 				return client.emit('refusedRequest', 'Friend request refused');
 		}
-		if (user)
-			user.emit(body.type + 'Invite', { notification: answer });
-		else
-		{
-			console.log('?');
-		}
-		notifClient.emit('pendingRequest', 'Request sent and waiting for answer');
+		if (target)
+			target.emit(body.type + 'Invite', { notification: answer });
+		if (notifClient)
+			notifClient.emit('pendingRequest', 'Request sent and waiting for answer');
 	}
 
 	@SubscribeMessage('inviteAnswer')

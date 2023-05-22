@@ -10,7 +10,7 @@
 
 <div style="height: 100vh; max-height: 100vh; display: flex; flex-direction: column; overflow: hidden;">
 
-	<nav id="upperbar" class="navbar navbar-light bg-light navbar-fixed-top">
+	<nav id="upperbar" class="navbar navbar-light bg-light navbar-fixed-top my-light">
 		<div class="d-flex justify-content-between w-100 ps-5 pe-3">
 			<div class="sidebar-header">
 				<a class="inox" href="home">Transcendence</a>
@@ -51,7 +51,7 @@
 	</nav>
 	<div class="wrapper h-100">
 		<!-- Sidebar -->
-		<nav *ngIf="isConnected()" id="sidebar" class="offscreen airforceblue h-100">
+		<nav *ngIf="isConnected()" id="sidebar" class="offscreen light-gunmetal h-100 my-light2">
 			<ul class="list-group active">
 				<li class="active" aria-owns="#homeSubmenu">
 					<a data-toggle="collapse" class="dropdown-toggle " (click)="togglePlay()">Home</a>
@@ -106,6 +106,8 @@
         <div class="toast-body">
         {{context.source_name}} wants to be your friend!
         </div>
+		<div (click)="acceptFriendRequest()" class="btn btn-outline-success">Accept</div>
+		<div (click)="rejectFriendRequest()" class="btn btn-outline-danger">Reject</div>
     </div>
 </ng-template>
 

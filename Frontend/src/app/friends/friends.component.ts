@@ -31,6 +31,8 @@ export class FriendsComponent {
 
 	public friends!: AnyProfileUser[];
 	public friendshipRequests: {received: FriendRequest[], sent: FriendRequest[]} = {received: [], sent: []};
+	public blockedUsers!: AnyProfileUser[];
+
 	constructor(
 		private elRef: ElementRef,
 		private modalService: NgbModal,
@@ -51,6 +53,7 @@ export class FriendsComponent {
 			this.router.navigateByUrl('login');
 		this.friends = await this.fetchService.getFriends();
 		this.friendshipRequests = await this.fetchService.getFriendshipRequests();
+		this.blockedUsers = await this.fetchService.getBlockedUsers();
 		console.log(this.friendshipRequests.received);
 	}
 	
@@ -109,6 +112,14 @@ export class FriendsComponent {
 	async blockUser(block: AnyProfileUser)
 	{
 		await this.fetchService.blockUser(block.user_id);
+		//add a pop-up to confirm
+		console.log("bloque " + block.username);
+		
+	}
+
+	async unblockUser(block: AnyProfileUser)
+	{
+		await this.fetchService.unblockUser(block.user_id);
 		//add a pop-up to confirm
 		console.log("bloque " + block.username);
 		

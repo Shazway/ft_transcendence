@@ -44,7 +44,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		private websocketService: WebsocketService,
 		private elRef: ElementRef,
 		private modalService: NgbModal,
-		private notificationService: NotificationService,
 		private router: Router,
 		private parent: AppComponent,
 	) {
