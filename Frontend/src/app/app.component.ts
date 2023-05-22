@@ -46,6 +46,10 @@ export class AppComponent implements AfterViewInit {
 		this.notifService.initTemplates(this.toastFriendRequest, this.toastChallenge, this.toastAchievement)
 	}
 
+	disconnect() {
+		localStorage.clear();
+	}
+
 	isConnected() {
 		return localStorage.getItem('Jwt_token') ? true : false;
 	}

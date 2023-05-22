@@ -27,7 +27,7 @@
 					</button>
 					<ul class="dropdown-menu mondropdown">
 						<li>
-							<a class="dropdown-item"> blah </a>
+							<a class="dropdown-item" href="friends">Friends</a>
 						</li>
 						<li>
 							<a class="dropdown-item"> blah </a>
@@ -36,7 +36,7 @@
 							<a class="dropdown-item"> blah </a>
 						</li>
 						<li>
-							<a class="dropdown-item"> blah </a>
+							<a class="dropdown-item" (click)="disconnect()" href="home">Disconnect</a>
 						</li>
 					</ul>
 				</div>
@@ -74,10 +74,7 @@
 					<a href="shop">Shop</a>
 				</li>
 				<li>
-					<a href="friends">Friends</a>
-				</li>
-				<li>
-					<a href="login">Log in</a>
+					<a *ngIf="!isConnected()" href="login">Log in</a>
 				</li>
 			</ul>
 		</nav>
