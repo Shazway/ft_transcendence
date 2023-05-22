@@ -43,11 +43,12 @@ export class MatchsService {
 
 	async createFullMatch(playerOne: number, playerTwo: number, isCustom: boolean) {
 		const userOne = await this.itemsService.getUser(playerOne);
-		const userTwo = await this.itemsService.getUser(playerOne);
+		const userTwo = await this.itemsService.getUser(playerTwo);
 		if (!userOne || !userTwo) return null;
 		const match = await this.createMatch(userOne, userTwo, isCustom);
 		if (!match) return null;
 		await this.createRankedMatchSetting();
+		//match.user.push(userOne, userTwo);
 		userOne.match_history.push(match);
 		userTwo.match_history.push(match);
 		await this.usersRepo.save([userOne, userTwo]);

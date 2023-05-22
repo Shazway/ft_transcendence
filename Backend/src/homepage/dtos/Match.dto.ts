@@ -6,4 +6,5 @@ export class Match {
 	entity: MatchEntity;
 	players: Array<Player>;
 	gameService: GamesService;
+	started = false;
 }

@@ -15,6 +15,7 @@ export class ScoreChange {
 
 export class GameEnd {
 	state: number;
+	reason: string;
 }
 
 
