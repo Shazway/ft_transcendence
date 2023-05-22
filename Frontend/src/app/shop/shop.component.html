@@ -32,7 +32,7 @@
 					</div>
 					<div class="card-footer text-center">
 						<button *ngIf="playerWealth >= item.price" (click)="confirmBuy(item)" class="btn btn-primary">{{item.price}}</button>
-						<button disabled="true" *ngIf="playerWealth < item.price" class="btn btn-outline-primary">{{item.price}}</button>
+						<button disabled="true" *ngIf="!(playerWealth >= item.price)" class="btn btn-outline-primary">{{item.price}}</button>
 					</div>
 				</div>
 			</div>
