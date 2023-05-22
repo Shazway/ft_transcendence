@@ -26,7 +26,7 @@ export class AssetManager {
 			return {
 				p1: new TextStyle({ fontFamily: 'PixeloidSansBold', fontSize: 70, fill: 0xaaaaaa, align: 'right' }),
 				p2: new TextStyle({ fontFamily: 'PixeloidSansBold', fontSize: 70, fill: 0xaaaaaa }),
-				funText: new TextStyle({ fontFamily: 'PixeloidSansBold', fontSize: 30, fill: 0x660077 }),
+				funText: new TextStyle({ fontFamily: 'PixeloidSansBold', fontSize: 30, fill: 0xffffff }),
 			}
 		});
 	}

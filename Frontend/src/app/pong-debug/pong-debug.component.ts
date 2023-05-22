@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { Socket, io } from 'socket.io-client';
 import { WebsocketService } from '../websocket.service';
-import { Application, Assets, Graphics, TextStyle, Text } from 'pixi.js';
+import { Application, Assets, Graphics, TextStyle, Text, Color } from 'pixi.js';
 import { pongObject, ballObject, Move, VectorPos } from 'src/dtos/Pong.dto';
 import { ActivatedRoute } from '@angular/router';
 import { MatchSetting } from 'src/dtos/MatchSetting.dto';
@@ -38,7 +38,6 @@ export class PongDebugComponent implements AfterViewInit {
 		private assetManager: AssetManager,
 	) {
 		this.initApp();
-		this.initAnnounce();
 	}
 
 	ngAfterViewInit(): void {
@@ -46,12 +45,18 @@ export class PongDebugComponent implements AfterViewInit {
 		this.announcementCanvas.nativeElement.appendChild(this.announce.view);
 	}
 
+	// @HostListener('window:resize', ['$event'])
+	// onResize(event: Event) {
+	// 	this.announcementCanvas.s
+	// }
+
 	initApp() {
 		this.app = new Application({
 			height: 600,
 			width: 1000,
 			antialias: true,
 		});
+		this.initAnnounce();
 		this.ball = new ballObject(this.app.view.width, this.app.view.height);
 		this.player	= new pongObject(this.app.view.width, this.app.view.height);
 		this.opponent = new pongObject(this.app.view.width, this.app.view.height);
@@ -66,11 +71,11 @@ export class PongDebugComponent implements AfterViewInit {
 
 	initAnnounce() {
 		this.announce = new Application({
-			height: 100,
-			width: 1000,
+			height: 500,
+			width: 500,
 			antialias: true,
+			backgroundAlpha: 0,
 		});
-		this.oldDate = new Date();
 		// this.announce.ticker.add(() => {
 		// 	const date = new Date();
 		// 	this.update((date.getTime() - this.oldDate.getTime()) / this.gamespeed);
@@ -117,9 +122,9 @@ export class PongDebugComponent implements AfterViewInit {
 		this.scoreP1 = new WowText('0', style.p1, 450, 50, this.app);
 		this.scoreP1.setReverse(true);
 		this.scoreP2 = new WowText('0', style.p2, 560, 50, this.app);
-		this.funkyText = new WowText('this is my fun text', style.funText, 100, 200, this.app);
+		this.funkyText = new WowText('this is my fun text', style.funText, 20, 20, this.announce);
 		this.funkyText.setRGB(true, 5000, 20);
-		// this.funkyText.setWavy(true, 50, 50);
+		this.funkyText.setWavy(true, 10, 10);
 		this.app.stage.addChild(graphicElm, this.ball.graphic, this.player.graphic, this.opponent.graphic);
 		this.assetManager.addRuler(this.app);
 	}

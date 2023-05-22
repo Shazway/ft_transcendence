@@ -1,5 +1,5 @@
 <div id="pixiContainer" #pixiContainer></div>
-<div class="modal-footer" id="removable">
+<div *ngIf="!isSpectator" class="modal-footer" id="removable">
 	<button type="button" class="btn btn-secondary">Forfeit</button>
 	<button type="button" class="btn btn-primary" (click)="setReady()">Ready</button>
 </div>

@@ -12,6 +12,7 @@ export interface ScoreChange {
 
 export interface GameEnd {
 	state: number;
+	reason: string;
 }
 
 export interface VectorPos {

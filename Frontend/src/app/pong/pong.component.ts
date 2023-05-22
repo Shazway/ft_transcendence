@@ -30,6 +30,7 @@ export class PongComponent {
 	private gameSettings!: MatchSetting;
 	private ballLock: Mutex;
 	private isMatchOngoing = true;
+	public isSpectator = false;
 
 	private scoreP1!: WowText;
 	private scoreP2!: WowText;
@@ -68,12 +69,24 @@ export class PongComponent {
 		this.client = io('ws://localhost:3005?match_id=' + match_id, this.websocketService.getHeader());
 		this.client.on('onPlayerMove', (event) => { this.updatePlayer(event); });
 		this.client.on('onOpponentMove', (event) => { this.updateOpponent(event); });
-		this.client.on('onBallCollide', (event) => { this.updateBall(event); });
+		this.client.on('onBallCollide', (event) => { this.updateBall(event); if (this.isSpectator) console.log('BallCollide')});
 		this.client.on('startMatch', (event) => { console.log('Match is starting ' + event); this.startMatch(event); });
 		this.client.on('onPlayerReady', (event) => { console.log('You are ready '); });
 		this.client.on('onOpponentReady', (event) => { console.log('Opponent is ready '); });
 		this.client.on('onScoreChange', (event) => { this.updateScore(event); });
 		this.client.on('onMatchEnd', (event) => {this.endMatch(event);});
+		this.client.on('spectateMatch', (event) => { this.setSpectate(event); console.log('You are spectating '); });
+	}
+
+	setSpectate(event: any) {
+		this.isSpectator = true;
+		this.gameSettings = event.matchSetting;
+		this.ball.setPos(event.ballPos);
+		this.ball.direction = event.ballDir;
+		this.player.setPos(event.playerPos.x, event.playerPos.y);
+		this.player.score = event.playerScore;
+		this.opponent.setPos(event.opponentPos.x, event.opponentPos.y);
+		this.opponent.score = event.opponentScore;
 	}
 
 	startMatch(settings: MatchSetting) {
@@ -88,26 +101,30 @@ export class PongComponent {
 	}
 
 	endMatch(event: GameEnd) {
-		if (event.state == this.WIN)
-		{
-			this.scoreP1.setText("10");
-			console.log('You win');
-		} //<-- faire des trucs avec un affichage mieux
-		else if (event.state == this.LOSS)
-		{
-			this.scoreP2.setText("10");
-			console.log('You lose');
-		} //<-- faire des trucs aussi x)
+		if (event.reason == 'score') {
+			if (event.state == this.WIN)
+			{
+				this.scoreP1.setText("10");
+				console.log('You win');
+			} //<-- faire des trucs avec un affichage mieux
+			else if (event.state == this.LOSS)
+			{
+				this.scoreP2.setText("10");
+				console.log('You lose');
+			} //<-- faire des trucs aussi x)
+		}
 		this.ballLock.waitForUnlock().then(() => {
 			this.ballLock.acquire().then(() => {
 				this.ball.setPos(this.ball.position(250, 150));
 			})
 			this.ballLock.release();
-		});
+		});	
 		this.isMatchOngoing = false;
 	}
 
 	updateScore(event: ScoreChange) {
+		if (this.isSpectator)
+			console.log('updateScore');
 		if (event.side == this.PLAYER_SCORED)
 			this.player.score++;
 		else if (event.side == this.OPPONENT_SCORED)
@@ -194,6 +211,8 @@ export class PongComponent {
 
 	@HostListener('window:keyup', ['$event'])
 	handleKeyUp(event: KeyboardEvent) {
+		if (this.isSpectator)
+			return;
 		const key = event.key;
 		if (!this.client)
 			return;
@@ -205,6 +224,8 @@ export class PongComponent {
 
 	@HostListener('window:keydown', ['$event'])
 	handleKeyDown(event: KeyboardEvent) {
+		if (this.isSpectator)
+			return;
 		const key = event.key;
 		clearTimeout(this.timeoutId);
 		this.timeoutId = setTimeout(() => {

@@ -21,6 +21,7 @@ import { ToastComponent } from './toast/toast.component';
 import { ToastsContainer } from './toast/toast.container';
 import { ShopComponent } from './shop/shop.component';
 import { FriendsModule } from './friends/friends.module';
+import { PongModule } from './pong/pong.module';
 
 @NgModule({
   declarations: [
@@ -43,6 +44,7 @@ import { FriendsModule } from './friends/friends.module';
 	ProfileModule,
 	FriendsModule,
 	ProfilePopupModule,
+	PongModule,
 	ToastComponent,
 	ToastsContainer,
   ],
