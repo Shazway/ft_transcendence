@@ -44,6 +44,15 @@ export class PongGateway {
 		return { client: socket, user_id: id, username: name, isReady: false };
 	}
 
+	async isPlayer(userId: number, matchId: number)
+	{
+		const matchEntitiy = await this.itemsService.getMatch(matchId);
+
+		if (!matchEntitiy)
+			return null;
+		return matchEntitiy.user.find((user) => user.user_id == userId)
+	}
+
 	async handleConnection(client: Socket) {
 		let user;
 		try {
@@ -57,6 +66,11 @@ export class PongGateway {
 		let match = this.matchs.get(match_id);
 
 		console.log({ new_player: user });
+		if (!this.isPlayer(user.sub, match_id) && (!match || !match.started))
+		{
+			client.emit('notStarted', 'Match is not ready, please wait before joining again');
+			client.disconnect();
+		}
 		if (!match) {
 			match = new Match();
 			match.players = new Array<Player>();
@@ -64,14 +78,19 @@ export class PongGateway {
 			match.players.push(this.buildPlayer(client, user.sub, user.name));
 			this.matchs.set(match_id, match);
 		}
+		if (match.started)
+		{
+			match.players.push(this.buildPlayer(client, user.sub, user.name));
+			client.emit('spectateMatch');
+			return ;
+		}
 		if (match.players.length == 1 && match.players[0].user_id !== user.sub) {
 			match.players.push(this.buildPlayer(client, user.sub, user.name));
 		}
-		if (match.players.length == 2 && !match.gameService){
+		if (match.players.length == 2 && !match.started){
+			match.started = true;
 			this.initMatch(match, await this.itemsService.getMatchSetting(match.entity.match_id));
 		}
-		if (match.players.length == 2 && match.gameService)
-			match.players.push(this.buildPlayer(client, user.sub, user.name));
 		else
 			this.emitToMatch(
 				'waitMatch',
@@ -101,7 +120,6 @@ export class PongGateway {
 		const matchEntitiy = userEntity.match_history.find((match) => match.is_ongoing == true);
 		if (!matchEntitiy)
 			return ;
-		console.log(matchEntitiy);
 		matchEntitiy.is_victory[this.getOtherPlayerIndex(matchEntitiy, user.sub)] = true;
 		await this.matchService.setMatchEnd(matchEntitiy);
 		const match = this.matchs.get(matchEntitiy.match_id);
