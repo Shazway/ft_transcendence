@@ -420,46 +420,50 @@ export class ItemsService {
 		return (await this.userRepo.save([sourceEntity, targetEntity]));
 	}
 
+	updateWinner(player: UserEntity): UserEntity
+	{
+		player.rank_score += 10;
+		player.currency += 10;
+		player.wins += 1;
+		return player;
+	}
+
+	updateLoser(player: UserEntity): UserEntity
+	{
+		player.rank_score -= 10;
+		player.losses += 1;
+		if (player.rank_score < 0)
+			player.rank_score = 0;
+		return player;
+	}
+
 	async updateRankScore(player1: pongObject, player2: pongObject, match: MatchEntity)
 	{
-		const scoreOne = player1.score;
-		const userOne = await this.getUser(player1.player.user_id);
-		const scoreTwo = player2.score;
-		const userTwo = await this.getUser(player2.player.user_id);
+		let userOne = await this.getUser(player1.player.user_id);
+		let userTwo = await this.getUser(player2.player.user_id);
 
 		if (!userOne || !userTwo)
 			return null;
-		if (scoreOne == 10)
+		if (player1.score == 10)
 		{
 			match.is_victory[0] = true;
-			userOne.rank_score += 10;
-			userOne.currency += 10;
-			userOne.wins += 1;
+			match.is_victory[1] = false;
+			userOne = this.updateWinner(userOne);
+			userTwo = this.updateLoser(userTwo);
 		}
 		else
 		{
 			match.is_victory[1] = true;
-			userOne.rank_score -= 10;
-			userOne.losses += 1;
+			match.is_victory[0] = false;
+			userTwo = this.updateWinner(userTwo);
+			userOne = this.updateLoser(userOne);
 		}
-		if (scoreTwo == 10)
-		{
-			userTwo.rank_score += 10;
-			userTwo.wins += 1;
-		}
-		else
-		{
-			userTwo.rank_score -= 10;
-			userTwo.losses += 1;
-		}
-		if (userOne.rank_score < 0)
-			userOne.rank_score = 0;
-		if (userTwo.rank_score < 0)
-			userTwo.rank_score = 0;
+		if (match.is_ongoing)
+			match.is_ongoing = false;
 		userOne.match_history.push(match);
 		userTwo.match_history.push(match);
 		await this.matchRepo.save(match);
-		await this.userRepo.save([userOne, userTwo]);
+		return await this.userRepo.save([userOne, userTwo]);
 	}
 
 	async toggleDoubleAuth(userId: number)
@@ -488,8 +492,6 @@ export class ItemsService {
 
 		if (!user || !skins)
 			return null;
-		console.log({CurrentSkins: user.skin})
-		console.log({SkinList: skins});
 		return skins.filter((skinOrigin) => {
 			return !user.skin.some((skinCompare) => skinCompare.skin_id === skinOrigin.skin_id);
 		})
@@ -501,10 +503,10 @@ export class ItemsService {
 		if (!user || !skins)
 			return null;
 		const skin = skins.find((skin) => skin.skin_id == skinId);
-		console.log(skin);
+		if (!skin)
+			return null;
 		if (user.currency < skin.price)
 			return null;
-		console.log('Skin bought');
 		user.currency -= skin.price;
 		user.skin.push(skin);
 		return (await this.userRepo.save(user));
