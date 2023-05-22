@@ -13,8 +13,9 @@ import { Socket } from 'socket.io';
 import { Match } from 'src/homepage/dtos/Match.dto';
 import { Player } from 'src/homepage/dtos/Matchmaking.dto';
 import { GamesService } from 'src/homepage/services/game/game.service';
-import { MatchSettingEntity } from 'src/entities';
+import { MatchEntity, MatchSettingEntity } from 'src/entities';
 import { MatchsService } from 'src/homepage/services/matchs/matchs.service';
+import { cp } from 'fs';
 
 @WebSocketGateway(3005, {
 	cors: {
@@ -94,52 +95,37 @@ export class PongGateway {
 		match.gameService.match = match.entity;
 	}
 
-	async handleDisconnect(client: Socket) {
+	async handleDisconnect(client: Socket)
+	{
 		let user;
 		try {
 			user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		} catch(error) {
-			client.disconnect();
 			return ;
 		}
 		const userEntity = await this.itemsService.getUser(user.sub);
 		if (!userEntity)
 			return ;
-		const matchEntity = userEntity.match_history[userEntity.match_history.length - 1];
-		if (!matchEntity)
+		const matchEntitiy = userEntity.match_history.find((match) => match.is_ongoing == true);
+		if (!matchEntitiy)
 			return ;
-		const match = this.matchs.get(matchEntity.match_id);
+		await this.matchService.setMatchEnd(matchEntitiy);
+		matchEntitiy.is_victory[this.getOtherPlayerIndex(matchEntitiy, user.sub)] = true;
+		this.matchService.setMatchEnd(matchEntitiy);
+
+		const match = this.matchs.get(matchEntitiy.match_id);
 		if (!match)
-			return ;
-		matchEntity.is_ongoing = false;
-		if (!matchEntity) {
-			match.players = match.players.filter((player) => {
-				player.user_id !== user.sub;
-			});
-			if (!match.players.length) this.matchs.delete(matchEntity.match_id);
-		}
-		if (!matchEntity.is_ongoing)
-		{
-			match.players = match.players.filter((player) => 
-			{
-				player.user_id !== user.sub;
-			});
-			if (!match.players.length) {
-				if (match.gameService)
-					match.gameService.endGame();
-				await this.matchService.setMatchEnd(matchEntity);
-				this.matchs.delete(matchEntity.match_id);
-			}
-		}
-		else if (match.entity.match_id == 0)
-		{
-			match.players.splice(0);
-			match.gameService.endGame();
-			await this.matchService.setMatchEnd(matchEntity);
-			this.matchs.delete(matchEntity.match_id);
-			return; //TODO faire des trucs genre attendre qu'il se reconnecte après le point en cours ou autre
-		}
-		else return;
+			return;
+		match.gameService.endMatch(user.sub);
+		this.matchs.delete(matchEntitiy.match_id);
+	}
+
+	getPlayerIndex(match: MatchEntity, userId: number): number {
+		return Number(match.user[1].user_id == userId);
+	}
+
+	getOtherPlayerIndex(match: MatchEntity, userId: number): number {
+		return Number(match.user[1].user_id != userId);
 	}
 
 	emitToMatch(event: string, content: any, match: Match) {

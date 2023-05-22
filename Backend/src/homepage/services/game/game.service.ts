@@ -103,17 +103,21 @@ export class GamesService {
 			this.player2.player.client.emit('onScoreChange', {side: this.LEFT});
 		}
 	}
-	buildEndEvent(player: pongObject): GameEnd
+	buildEndEvent(player: pongObject, id?: number): GameEnd
 	{
-		return (player.score >= 10 ? {state: this.WIN} : {state: this.LOSS})
+		if (!id)
+			return (player.score >= 10 ? {state: this.WIN} : {state: this.LOSS});
+		else
+			return (player.player.user_id == id ? {state: this.LOSS} : {state: this.WIN})
 	}
 
-	endMatch() {
+	endMatch(id?: number) {
+		console.log({UserIdWinner: id});
 		this.match.is_ongoing = false;
 		this.itemsService.saveMatchState(this.match);
-		this.player1.player.client.emit('onMatchEnd', this.buildEndEvent(this.player1));
+		this.player1.player.client.emit('onMatchEnd', this.buildEndEvent(this.player1, id));
 		if (this.player2.player.client)
-			this.player2.player.client.emit('onMatchEnd', this.buildEndEvent(this.player2));
+			this.player2.player.client.emit('onMatchEnd', this.buildEndEvent(this.player2, id));
 		this.itemsService.updateRankScore(this.player1, this.player2, this.match);
 		this.endGame();
 	}

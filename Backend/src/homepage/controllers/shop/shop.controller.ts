@@ -23,6 +23,9 @@ export class ShopController {
 		if (!(await this.itemsService.buySkin(user.sub, Number(skinId))))
 			return res.status(HttpStatus.BAD_REQUEST).send('Refused');
 		const skinsList = await this.itemsService.getAvailableSkins(user.sub);
-		return res.status(HttpStatus.ACCEPTED).send({ availableSkins: skinsList });
+		const userEntity = await this.itemsService.getUser(user.sub);
+		return res
+			.status(HttpStatus.ACCEPTED)
+			.send({ newBalance: userEntity.currency, availableSkins: skinsList });
 	}
 }
