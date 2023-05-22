@@ -50,9 +50,7 @@ export class ItemsService {
 	}
 
 	public async getSkins() {
-		const skins = await this.skinRepo.createQueryBuilder('skin')
-		.getMany();
-		return skins;
+		return await this.skinRepo.createQueryBuilder('skin').getMany();
 	}
 
 	public async getUser(id: number) {
@@ -463,14 +461,6 @@ export class ItemsService {
 		await this.matchRepo.save(match);
 		await this.userRepo.save([userOne, userTwo]);
 	}
-	async buyItem(userId: number, skin: SkinEntity) {
-		const user = await this.getUser(userId);
-		if (user.currency < skin.price)
-			return false;
-		user.currency -= skin.price;
-		user.skin.push(skin);
-		return (await this.userRepo.save(user));
-	}
 
 	async toggleDoubleAuth(userId: number)
 	{
@@ -490,5 +480,33 @@ export class ItemsService {
 		user.current_skins = applyProfile.skins;
 		user.title = applyProfile.title;
 		return await this.userRepo.save(user);
+	}
+
+	async getAvailableSkins(userId: number) {
+		const user = await this.getUser(userId);
+		const skins = await this.getSkins();
+
+		if (!user || !skins)
+			return null;
+		console.log({CurrentSkins: user.skin})
+		console.log({SkinList: skins});
+		return skins.filter((skinOrigin) => {
+			return !user.skin.some((skinCompare) => skinCompare.skin_id === skinOrigin.skin_id);
+		})
+	}
+
+	async buySkin(userId: number, skinId: number) {
+		const user = await this.getUser(userId);
+		const skins = await this.getSkins();
+		if (!user || !skins)
+			return null;
+		const skin = skins.find((skin) => skin.skin_id == skinId);
+		console.log(skin);
+		if (user.currency < skin.price)
+			return null;
+		console.log('Skin bought');
+		user.currency -= skin.price;
+		user.skin.push(skin);
+		return (await this.userRepo.save(user));
 	}
 }

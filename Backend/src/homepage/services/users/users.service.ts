@@ -44,7 +44,7 @@ export class UsersService {
 	}
 
 	async createUser(userInfo: IntraInfo) {
-		const user = new UserEntity();
+		let user = new UserEntity();
 		user.intra_id = userInfo.id;
 		user.username = userInfo.login;
 		user.img_url = userInfo.image.versions.large;

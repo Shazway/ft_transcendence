@@ -24,32 +24,24 @@ export class ShopController {
 	@Get('availableItems')
 	async getMissingSkins(@Req() req: Request, @Res() res: Response) {
 		const user = this.tokenManager.getUserFromToken(req);
-		const userEntity = await this.itemsService.getUser(user.sub);
-		let skinsList = await this.itemsService.getSkins();
+		const skinsList = await this.itemsService.getAvailableSkins(user.sub);
 
-		console.log('Test');
-		if (!userEntity || !skinsList)
+		console.log('Testavailable');
+		if (!skinsList)
 			return res.status(HttpStatus.NO_CONTENT).send({ msg: 'Content not found' });
-		skinsList = skinsList.filter((skin) => !userEntity.skin.includes(skin));
-		console.log(skinsList);
-		console.log('User skins')
-		console.log(userEntity.skin);
+		console.log({AvailableSkins: skinsList})
 		return res.status(HttpStatus.OK).send({availableSkins: skinsList});
 	}
-
+	
 	@Get('buy/:id')
 	async buySkin(@Param('id') skinId: string, @Req() req: Request, @Res() res: Response) {
 		const user = this.tokenManager.getUserFromToken(req);
-		const userEntity = await this.itemsService.getUser(user.sub);
-		const skinsList = await this.itemsService.getSkins();
-		const skin = skinsList.find((skin) => skin.skin_id == Number(skinId));
-
-		if (!userEntity || !skinsList || !skin)
-			return res.status(HttpStatus.NO_CONTENT).send({ msg: 'Content not found' });
-		const newUser = (await this.itemsService.buyItem(user.sub, skin))
-		if (!newUser)
-			return res.status(HttpStatus.UNAUTHORIZED).send('Not enough currency');
-		console.log(skinsList.filter((skin) => !newUser.skin.includes(skin)))
-		return res.status(HttpStatus.OK).send({newBalance: newUser.currency, availableSkins: skinsList.filter((skin) => !newUser.skin.includes(skin))});
+		
+		console.log('Testbuy');
+		if (!(await this.itemsService.buySkin(user.sub, Number(skinId))))
+			return res.status(HttpStatus.BAD_REQUEST).send('Refused');
+		const skinsList = await this.itemsService.getAvailableSkins(user.sub);
+		console.log({AvailableSkins: skinsList})
+		return res.status(HttpStatus.ACCEPTED).send({availableSkins: skinsList});
 	}
 }
