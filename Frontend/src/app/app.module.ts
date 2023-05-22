@@ -22,6 +22,10 @@ import { ToastsContainer } from './toast/toast.container';
 import { ShopComponent } from './shop/shop.component';
 import { FriendsModule } from './friends/friends.module';
 import { PongModule } from './pong/pong.module';
+import { HomeComponent } from './home/home.component';
+import { GlassdoorComponent } from './glassdoor/glassdoor.component';
+import { HomeModule } from './home/home.module';
+import { GlassdoorModule } from './glassdoor/glassdoor.module';
 
 @NgModule({
   declarations: [
@@ -47,6 +51,8 @@ import { PongModule } from './pong/pong.module';
 	PongModule,
 	ToastComponent,
 	ToastsContainer,
+	HomeModule,
+	GlassdoorModule,
   ],
   providers: [
     FetchService,

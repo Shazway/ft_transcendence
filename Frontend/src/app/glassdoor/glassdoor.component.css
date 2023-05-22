@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Wix+Madefor+Display:wght@400;600;800&display=swap');
+
+.cssTrans {
+	font-family: 'Wix Madefor Display', sans-serif;
+	font-size: 25px;
+	font-weight: 600;
+}
+
+.cssPong {
+	font-family: 'Wix Madefor Display', sans-serif;
+	font-size: 100px;
+	font-weight: 800;
+	padding: 15px;
+}
+
+.cssText {
+	font-family: 'Wix Madefor Display', sans-serif;
+	font-size: 20px;
+	font-weight: 200;
+}

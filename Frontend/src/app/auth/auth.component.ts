@@ -58,6 +58,6 @@ export class AuthComponent {
 		if (statusCode == 202)
 			this.router.navigateByUrl('validate?bodyId=' + bodyId + '&code=' + code);
 		else
-			this.router.navigateByUrl('');
+			this.router.navigateByUrl('home');
 	}
 }
