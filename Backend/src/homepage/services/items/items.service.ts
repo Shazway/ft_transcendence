@@ -61,6 +61,7 @@ export class ItemsService {
 			.leftJoinAndSelect('user.blacklistEntry', 'blacklistEntry')
 			.leftJoinAndSelect('user.channel', 'channel')
 			.leftJoinAndSelect('user.match_history', 'match_history')
+			.leftJoinAndSelect('match_history.user', 'users')
 			.leftJoinAndSelect('user.sentFriendRequests', 'sentFriendRequests')
 			.leftJoinAndSelect('user.receivedFriendRequests', 'receivedFriendRequests')
 			.leftJoinAndSelect('user.skin', 'skin')

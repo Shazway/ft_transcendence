@@ -48,7 +48,7 @@ export class MatchmakingGateway {
 		}
 		console.log({ new_player: user });
 		const player = await this.itemsService.getUser(user.sub);
-		if (!player) throw new WsException('Player does not exist');
+		if (!player) return;
 		const rankFork = this.getRankFork(player.rank_score);
 		let bracket = this.userQueue.get(rankFork);
 		if (!bracket) {
