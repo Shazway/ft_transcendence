@@ -15,7 +15,6 @@ import { Player } from 'src/homepage/dtos/Matchmaking.dto';
 import { GamesService } from 'src/homepage/services/game/game.service';
 import { MatchEntity, MatchSettingEntity } from 'src/entities';
 import { MatchsService } from 'src/homepage/services/matchs/matchs.service';
-import { Mutex } from 'async-mutex';
 
 @WebSocketGateway(3005, {
 	cors: {
@@ -27,13 +26,11 @@ export class PongGateway {
 	UP = 1;
 	DOWN = 0;
 	VELOCITY = 1;
-	private connectLock: Mutex;
 	constructor(
 		private tokenManager: TokenManagerService,
 		private itemsService: ItemsService,
 		private matchService: MatchsService
 	) {
-		this.connectLock = new Mutex();
 		this.matchs = new Map<number, Match>();
 	}
 
@@ -78,10 +75,18 @@ export class PongGateway {
 			match.players.push(this.buildPlayer(client, user.sub, user.name));
 			this.matchs.set(match_id, match);
 		}
-		if (match.started)
+		if (match.started && match.players.length >= 2)
 		{
-			match.players.push(this.buildPlayer(client, user.sub, user.name));
-			client.emit('spectateMatch');
+			match.gameService.spectators.push(this.buildPlayer(client, user.sub, user.name));
+			client.emit('spectateMatch', {
+				matchSetting: new MatchSettingEntity(),
+				ballPos: match.gameService.ball.pos,
+				ballDir: match.gameService.ball.direction,
+				playerPos: match.gameService.player1.pos,
+				playerScore: match.gameService.player1.score,
+				opponentPos: match.gameService.player2.pos,
+				opponentScore: match.gameService.player2.score,
+			});
 			return ;
 		}
 		if (match.players.length == 1 && match.players[0].user_id !== user.sub) {
@@ -157,12 +162,13 @@ export class PongGateway {
 		if (!match ||!match.gameService) throw new WsException('Match/GameService aren\'t available');
 		match.gameService.changeInput(user.sub, 'ArrowDown', body);
 		const move = match.gameService.getMove(user.sub);
-		match.players.forEach((player) => {
-			if (player.user_id == 0){
-			}
-			else if (player.user_id == user.sub) player.client.emit('onPlayerMove', move);
-			else player.client.emit('onOpponentMove', move);
+		match.players.forEach((player, index) => {
+			if (player.user_id == user.sub)
+				player.client.emit('onPlayerMove', move);
+			else
+				player.client.emit('onOpponentMove', move);
 		});
+		match.gameService.emitToSpectators(match.players[0].user_id == user.sub ? 'onPlayerMove' : 'onOpponentMove', move);
 	}
 
 	@SubscribeMessage('ArrowUp')
@@ -176,11 +182,12 @@ export class PongGateway {
 		// console.log('user ' + user.sub + ' pressed ArrowUp');
 		match.gameService.changeInput(user.sub, 'ArrowUp', body);
 		const move = match.gameService.getMove(user.sub);
-		match.players.forEach((player) => {
+		match.players.forEach((player, index) => {
 			if (player.user_id == 0){
 			}
 			else if (player.user_id == user.sub) player.client.emit('onPlayerMove', move);
 			else player.client.emit('onOpponentMove', move);
+			match.gameService.emitToSpectators(match.players[0].user_id == user.sub ? 'onPlayerMove' : 'onOpponentMove', move);
 		});
 	}
 

@@ -4,6 +4,7 @@ import { MatchEntity, MatchSettingEntity } from 'src/entities';
 import { Player } from 'src/homepage/dtos/Matchmaking.dto';
 import { GameEnd, Move, ballObject, pongObject } from 'src/homepage/dtos/Pong.dto';
 import { ItemsService } from '../items/items.service';
+import { Socket } from 'socket.io';
 
 @Injectable()
 export class GamesService {
@@ -14,18 +15,20 @@ export class GamesService {
 	private interval: NodeJS.Timeout;
 
 	private matchSetting: MatchSettingEntity;
-	private player1: pongObject;
-	private player2: pongObject;
-	private ball: ballObject;
+	public player1: pongObject;
+	public player2: pongObject;
+	public ball: ballObject;
 	private oldDate: Date;
 	private movespeed = 5;
 	private gamespeed = 13;
 	private oldDir = 0;
 	private countdown = 300;
 	public match: MatchEntity;
+	public spectators: Array<Player>;
 	constructor(
 		private itemsService: ItemsService,
 	) {
+		this.spectators = new Array<Player>;
 		this.match = new MatchEntity();
 		this.player1 = new pongObject(1000, 600);
 		this.player2 = new pongObject(1000, 600);
@@ -64,13 +67,23 @@ export class GamesService {
 		return this.ball.pos.x >= this.player2.upperLeftCorner.x - this.ball.DIAMETER;
 	}
 	
+
+	emitToSpectators(event: string, content: any)
+	{
+		this.spectators = this.spectators.filter((spectator) => spectator.client.connected)
+		this.spectators.forEach((spectator) => {
+			spectator.client.emit(event, content);
+		})
+	}
+
 	checkDirectionChange()
 	{
 		if (this.oldDir != this.ball.direction) {
 			this.oldDir = this.ball.direction;
 			this.player1.player.client.emit('onBallCollide', this.ball.getMovement());
 			if (this.player2.player.client)
-				this.player2.player.client.emit('onBallCollide', this.ball.getMovementMirrored());
+				this.player2.player.client.emit('onBallCollide', this.ball.getMovementMirrored())
+			this.emitToSpectators('onBallCollide', this.ball.getMovement());
 		}
 	}
 		
@@ -95,11 +108,13 @@ export class GamesService {
 		if (pointChecker.side == this.LEFT)
 		{
 			this.player1.player.client.emit('onScoreChange', {side: this.LEFT});
+			this.emitToSpectators('onScoreChange', {side: this.LEFT});
 			this.player2.player.client.emit('onScoreChange', {side: this.RIGHT});
 		}
 		else if (pointChecker.side == this.RIGHT)
 		{
 			this.player1.player.client.emit('onScoreChange', {side: this.RIGHT});
+			this.emitToSpectators('onScoreChange', {side: this.RIGHT});
 			this.player2.player.client.emit('onScoreChange', {side: this.LEFT});
 		}
 	}
@@ -117,6 +132,7 @@ export class GamesService {
 		this.itemsService.saveMatchState(this.match);
 		
 		this.player1.player.client.emit('onMatchEnd', this.buildEndEvent(this.player1, id));
+		this.emitToSpectators('onMatchEnd', this.buildEndEvent(this.player1, id));
 		if (this.player2.player.client)
 			this.player2.player.client.emit('onMatchEnd', this.buildEndEvent(this.player2, id));
 		this.itemsService.updateRankScore(this.player1, this.player2, this.match);
