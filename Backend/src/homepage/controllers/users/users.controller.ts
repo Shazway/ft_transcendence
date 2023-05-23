@@ -37,7 +37,8 @@ export class UsersController {
 		@Body() body: { username: string }
 	) {
 		const checkUser = await this.itemsService.getUserByUsername(body.username);
-		const currentUser = await this.tokenManager.getUserFromToken(req);
+		const currentUser = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!currentUser) return;
 
 		if (checkUser && checkUser.user_id == currentUser.sub)
 			return res.status(HttpStatus.NOT_MODIFIED).send('Username taken');
@@ -74,7 +75,8 @@ export class UsersController {
 		@Req() req: Request,
 		@Res() res: Response
 	) {
-		const user = await this.tokenManager.getUserFromToken(req);
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
 		console.log({ FriendToAdd: friend_id });
 		this.itemsService.addFriendToUser(user.sub, friend_id);
 		return res.status(HttpStatus.OK).send('Friend added');
@@ -85,7 +87,8 @@ export class UsersController {
 		@Req() req: Request,
 		@Res() res: Response
 	) {
-		const user = await this.tokenManager.getUserFromToken(req);
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
 
 		console.log({ UserToBlock: target_id });
 		if (await this.itemsService.blockUser(user.sub, target_id))
@@ -99,7 +102,8 @@ export class UsersController {
 		@Req() req: Request,
 		@Res() res: Response
 	) {
-		const user = await this.tokenManager.getUserFromToken(req);
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
 
 		console.log({ UserToBlock: target_id });
 		if (await this.itemsService.unblockUser(user.sub, target_id))
@@ -109,7 +113,8 @@ export class UsersController {
 
 	@Get('friends')
 	async getFriends(@Req() req: Request, @Res() res: Response) {
-		const user = await this.tokenManager.getUserFromToken(req);
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
 		const friends = await this.itemsService.getFriends(user.sub);
 		if (friends) {
 			const userFriends = friends.map((user) => plainToClass(AnyProfileUser, user));
@@ -119,7 +124,8 @@ export class UsersController {
 
 	@Get('friendRequests')
 	async getFriendRequests(@Req() req: Request, @Res() res: Response) {
-		const user = await this.tokenManager.getUserFromToken(req);
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
 		const receivedRequests = await this.itemsService.getFriendRequestsReceived(user.sub);
 		const sentRequests = await this.itemsService.getFriendRequestsSent(user.sub);
 
@@ -129,7 +135,8 @@ export class UsersController {
 
 	@Get('getBlockedUsers')
 	async getBlockedUsers(@Req() req: Request, @Res() res: Response) {
-		const user = await this.tokenManager.getUserFromToken(req);
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
 		const userEntity = await this.itemsService.getUser(user.sub);
 
 		if (!userEntity) return res.status(HttpStatus.BAD_REQUEST).send('User not found');

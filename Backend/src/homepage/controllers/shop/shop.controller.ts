@@ -9,7 +9,8 @@ export class ShopController {
 
 	@Get('availableItems')
 	async getMissingSkins(@Req() req: Request, @Res() res: Response) {
-		const user = await this.tokenManager.getUserFromToken(req);
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
 		const skinsList = await this.itemsService.getAvailableSkins(user.sub);
 
 		if (!skinsList) return res.status(HttpStatus.NO_CONTENT).send({ msg: 'Content not found' });
@@ -18,7 +19,8 @@ export class ShopController {
 
 	@Get('buy/:id')
 	async buySkin(@Param('id') skinId: string, @Req() req: Request, @Res() res: Response) {
-		const user = await this.tokenManager.getUserFromToken(req);
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
 
 		if (!(await this.itemsService.buySkin(user.sub, Number(skinId))))
 			return res.status(HttpStatus.BAD_REQUEST).send('Refused');

@@ -8,7 +8,7 @@ import {
 	ParseIntPipe,
 	Post,
 	Req,
-	Res,
+	Res
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { ChannelsService } from 'src/homepage/services/channels/channels.service';
@@ -28,14 +28,13 @@ export class ChannelsController {
 	) {}
 	@Get('')
 	async getUsersChannel(@Req() req: Request, @Res() res: Response) {
-		const user = await this.tokenManager.getUserFromToken(req);
-		const channelList = await this.channelService.getAllChannelsFromUser(
-			user.sub,
-		);
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
+		const channelList = await this.channelService.getAllChannelsFromUser(user.sub);
 		if (!channelList)
 			return res.status(HttpStatus.NO_CONTENT).send({ msg: 'No channels registered' });
 		const serializedChannels = channelList.map((channel) =>
-			plainToClass(SerializedChan, channel),
+			plainToClass(SerializedChan, channel)
 		);
 		return res.status(HttpStatus.OK).send(serializedChannels);
 	}
@@ -44,38 +43,36 @@ export class ChannelsController {
 	async addChannel(
 		@Req() req: Request,
 		@Res() res: Response,
-		@Param('id', ParseIntPipe) chan_id: number,
+		@Param('id', ParseIntPipe) chan_id: number
 	) {
-		const user = await this.tokenManager.getUserFromToken(req);
-		const isCreated = await this.channelService.addUserToChannel(
-			user.sub,
-			chan_id,
-		);
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
+		const isCreated = await this.channelService.addUserToChannel(user.sub, chan_id);
 		if (!isCreated) res.status(HttpStatus.NOT_FOUND).send({ msg: 'user not added to channel' });
 		else res.status(HttpStatus.OK).send({ msg: 'user added to channel' });
 	}
 
 	@Get('public')
 	async getPublicChannels(@Req() req: Request, @Res() res: Response) {
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
 		const channelList = await this.channelService.getPubChannels();
 		if (!channelList) res.status(HttpStatus.NO_CONTENT).send({ msg: 'No channels registered' });
 		else res.status(HttpStatus.OK).send(channelList);
 	}
 	@Get('all')
 	async getPrivateChannels(@Req() req: Request, @Res() res: Response) {
-		const user = await this.tokenManager.getIdFromToken(req);
-		const channelList = await this.channelService.getAllChannelsFromUser(user);
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
+		const channelList = await this.channelService.getAllChannelsFromUser(user.sub);
 		if (!channelList) res.status(HttpStatus.NO_CONTENT).send({ msg: 'No channels registered' });
 		else res.status(HttpStatus.OK).send(channelList);
 	}
 
 	@Post('create')
-	async createChannel(
-		@Req() req: Request,
-		@Res() res: Response,
-		@Body() newChannel: NewChan,
-	) {
-		const user = await this.tokenManager.getUserFromToken(req);
+	async createChannel(@Req() req: Request, @Res() res: Response, @Body() newChannel: NewChan) {
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
 		const channelEntity = await this.channelService.createChannel(newChannel, user.sub);
 		console.log(channelEntity);
 		res.status(HttpStatus.OK).send({ msg: 'Channel created' });
@@ -85,9 +82,10 @@ export class ChannelsController {
 	async deleteChannel(
 		@Param('id', ParseIntPipe) chan_id: number,
 		@Req() req: Request,
-		@Res() res: Response,)
-	{
-		const user = await this.tokenManager.getUserFromToken(req);
+		@Res() res: Response
+	) {
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
 		await this.channelService.deleteChannel(chan_id, user.sub);
 		res.status(HttpStatus.OK).send({ msg: 'Channel deleted' });
 	}
@@ -97,16 +95,18 @@ export class ChannelsController {
 		@Param('id', ParseIntPipe) chan_id: number,
 		@Param('page', ParseIntPipe) page_num: number,
 		@Req() req: Request,
-		@Res() res: Response,
+		@Res() res: Response
 	) {
-		const user = await this.tokenManager.getUserFromToken(req);
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
 		let messages = await this.messageService.getPage(chan_id, page_num);
 
 		const userEntity = await this.itemsService.getUser(user.sub);
-		if (!userEntity)
-			return res.status(HttpStatus.NOT_FOUND).send('You don\'t exist wtf');
+		if (!userEntity) return res.status(HttpStatus.NOT_FOUND).send("You don't exist wtf");
 		messages = messages.filter((message) => {
-			return !userEntity.blacklistEntry.find(blockedUser => blockedUser.user_id == message.author.user_id);
+			return !userEntity.blacklistEntry.find(
+				(blockedUser) => blockedUser.user_id == message.author.user_id
+			);
 		});
 		if (!messages)
 			res.status(HttpStatus.NOT_FOUND).send({ msg: 'No message in the channel: ' + chan_id });
@@ -117,8 +117,10 @@ export class ChannelsController {
 	async getChannel(
 		@Param('id', ParseIntPipe) chan_id: number,
 		@Req() req: Request,
-		@Res() res: Response,
+		@Res() res: Response
 	) {
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
 		const channel = await this.channelService.getChannelById(chan_id);
 		if (!channel)
 			res.status(HttpStatus.NOT_FOUND).send({ msg: 'No channels with id ' + chan_id });

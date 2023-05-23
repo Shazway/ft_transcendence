@@ -17,7 +17,8 @@ export class ProfileController {
 
 	@Post('applySkins')
 	async applySkins(@Req() req: Request, @Res() res: Response, @Body() body: ApplyProfile) {
-		const user = await this.tokenManager.getUserFromToken(req);
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
 		if (!body || !(await this.itemService.applySelectedSkins(user.sub, body)))
 			return res.status(HttpStatus.BAD_REQUEST).send('Something went wrong');
 		return res.status(HttpStatus.ACCEPTED).send('Success');

@@ -93,7 +93,8 @@ export class LoginController {
 
 	@Get('toggleDoubleAuth')
 	async toggleDoubleAuth(@Req() req: Request, @Res() res: Response) {
-		const user = await this.tokenManager.getUserFromToken(req);
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
 		if ((await this.itemsService.toggleDoubleAuth(user.sub)))
 			return res.status(HttpStatus.BAD_REQUEST).send('Error');
 		return res.status(HttpStatus.ACCEPTED).send('Success');
