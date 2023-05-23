@@ -6,6 +6,10 @@ import * as PIXI from "pixi.js";
 	providedIn: 'root'
 })
 export class AssetManager {
+	app!: Application;
+	countdown!: number;
+	textArray: Array<{elem: PlainText | WowText, type: string}> = new Array;
+	styles!: any;
 	async initAssets() {
 		PIXI.Assets.addBundle('fonts', {
 			PixeloidSans: 'assets/PixeloidMono.ttf',
@@ -22,13 +26,14 @@ export class AssetManager {
 		PIXI.Assets.add('balleBallon' ,'assets/balle-ballon.png');
 		PIXI.Assets.add('balleCitron' ,'assets/balle-tarteCitron.png');
 		PIXI.Assets.add('balleFraise' ,'assets/balle-tarteFraise.png');
-		return await PIXI.Assets.loadBundle('fonts').then(() => {
+		this.styles = await PIXI.Assets.loadBundle('fonts').then(() => {
 			return {
 				p1: new TextStyle({ fontFamily: 'PixeloidSansBold', fontSize: 70, fill: 0xaaaaaa, align: 'right' }),
 				p2: new TextStyle({ fontFamily: 'PixeloidSansBold', fontSize: 70, fill: 0xaaaaaa }),
 				funText: new TextStyle({ fontFamily: 'PixeloidSansBold', fontSize: 30, fill: 0xffffff }),
 			}
 		});
+		return this.styles;
 	}
 
 	async getAsset(key: string | string[]) {
@@ -48,6 +53,17 @@ export class AssetManager {
 		}
 		app.stage.addChild(ruler);
 	}
+
+	setApp(app: Application) {
+		this.app = app;
+	}
+
+	addCountdown(timer: number) {
+		this.countdown = timer;
+		this.textArray.push({elem: new PlainText('', this.styles.p2, this.app.renderer.width/2, this.app.renderer.height/2, this.app), type: 'count'})
+	}
+
+	updateArbiter() {}
 }
 
 export class PlainText {

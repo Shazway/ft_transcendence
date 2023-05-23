@@ -42,7 +42,8 @@ export class AppComponent implements AfterViewInit {
 	async ngOnInit() {
 		// if (!this.isConnected())
 		// 	this.router.navigateByUrl('login');
-		this.myProfile = await this.fetchService.getMyProfile();
+		if (this.isConnected())
+			this.myProfile = await this.fetchService.getMyProfile();
 	}
 
 	ngAfterViewInit(): void {

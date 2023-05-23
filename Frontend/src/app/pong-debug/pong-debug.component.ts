@@ -16,9 +16,11 @@ import { AssetManager, WowText } from 'src/dtos/GraphElem.dto';
 export class PongDebugComponent implements AfterViewInit {
 	@ViewChild('pixiContainer') pixiContainer!: ElementRef;
 	@ViewChild('announcementCanvas') announcementCanvas!: ElementRef;
+	@ViewChild('arbiterContainer') arbiterContainer!: ElementRef;
 	private client!: Socket;
 	private app!: Application;
 	private announce!: Application;
+	private arbiter!: Application;
 	private player!: pongObject;
 	private ball!: ballObject;
 	private opponent!: pongObject;
@@ -43,12 +45,13 @@ export class PongDebugComponent implements AfterViewInit {
 	ngAfterViewInit(): void {
 		this.pixiContainer.nativeElement.appendChild(this.app.view);
 		this.announcementCanvas.nativeElement.appendChild(this.announce.view);
+		this.arbiterContainer.nativeElement.appendChild(this.arbiter.view);
 	}
 
-	// @HostListener('window:resize', ['$event'])
-	// onResize(event: Event) {
-	// 	this.announcementCanvas.s
-	// }
+	@HostListener('window:resize', ['$event'])
+	onResize(event: Event) {
+		this.announce.renderer.resize(window.innerWidth - 10, window.innerHeight - 10);
+	}
 
 	initApp() {
 		this.app = new Application({
@@ -57,6 +60,7 @@ export class PongDebugComponent implements AfterViewInit {
 			antialias: true,
 		});
 		this.initAnnounce();
+		this.initArbiter();
 		this.ball = new ballObject(this.app.view.width, this.app.view.height);
 		this.player	= new pongObject(this.app.view.width, this.app.view.height);
 		this.opponent = new pongObject(this.app.view.width, this.app.view.height);
@@ -71,16 +75,19 @@ export class PongDebugComponent implements AfterViewInit {
 
 	initAnnounce() {
 		this.announce = new Application({
-			height: 500,
-			width: 500,
+			height: window.innerHeight -10,
+			width: window.innerWidth - 10,
 			antialias: true,
 			backgroundAlpha: 0,
 		});
-		// this.announce.ticker.add(() => {
-		// 	const date = new Date();
-		// 	this.update((date.getTime() - this.oldDate.getTime()) / this.gamespeed);
-		// 	this.oldDate = new Date();
-		// });
+	}
+
+	initArbiter() {
+		this.arbiter = new Application({
+			height: 100,
+			width: 1000,
+			antialias: true,
+		});
 	}
 
 	closeEnoughPlayer() {
@@ -122,7 +129,7 @@ export class PongDebugComponent implements AfterViewInit {
 		this.scoreP1 = new WowText('0', style.p1, 450, 50, this.app);
 		this.scoreP1.setReverse(true);
 		this.scoreP2 = new WowText('0', style.p2, 560, 50, this.app);
-		this.funkyText = new WowText('this is my fun text', style.funText, 20, 20, this.announce);
+		this.funkyText = new WowText('this is my fun text', style.funText, 500, 800, this.announce);
 		this.funkyText.setRGB(true, 5000, 20);
 		this.funkyText.setWavy(true, 10, 10);
 		this.app.stage.addChild(graphicElm, this.ball.graphic, this.player.graphic, this.opponent.graphic);
