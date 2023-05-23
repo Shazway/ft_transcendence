@@ -106,8 +106,8 @@
         <div class="toast-body">
         {{context.source_name}} wants to be your friend!
         </div>
-		<div (click)="acceptFriendRequest()" class="btn btn-outline-success">Accept</div>
-		<div (click)="rejectFriendRequest()" class="btn btn-outline-danger">Reject</div>
+		<div (click)="acceptFriendRequest(context)" class="btn btn-outline-success">Accept</div>
+		<div (click)="rejectFriendRequest(context)" class="btn btn-outline-danger">Reject</div>
     </div>
 </ng-template>
 

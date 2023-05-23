@@ -9,7 +9,7 @@ import { NotificationResponse } from '../dtos/Notification.dto';
   providedIn: 'root'
 })
 export class NotificationService {
-	public client: Socket;
+	public client!: Socket;
 	toastFriendRequest!: TemplateRef<any>;
 	toastChallenge!: TemplateRef<any>;
 	toastAchievement!: TemplateRef<any>;
@@ -17,7 +17,11 @@ export class NotificationService {
 	constructor(
 		private websocketService: WebsocketService,
 		private toastService: ToastService,
-	) { 
+	) {
+		this.client = io('ws://localhost:3003', this.websocketService.getHeader());
+	}
+
+	initSocket() {
 		this.client = io('ws://localhost:3003', this.websocketService.getHeader());
 		this.setClientEvent();
 	}

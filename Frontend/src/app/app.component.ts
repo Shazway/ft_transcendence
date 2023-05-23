@@ -2,7 +2,7 @@ import { AfterViewInit, Component, ElementRef, TemplateRef, ViewChild } from '@a
 import { AutoClose, Placement, PopoverConfig, Target } from '../dtos/Popover.dto';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { NotificationService } from './notification.service';
-import { NotificationResponse } from 'src/dtos/Notification.dto';
+import { NotificationRequest, NotificationResponse } from 'src/dtos/Notification.dto';
 import { MyProfileUser } from 'src/dtos/User.dto';
 import { FetchService } from './fetch.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
@@ -36,12 +36,9 @@ export class AppComponent implements AfterViewInit {
 		private notifService: NotificationService,
 		private fetchService: FetchService,
 	){
-		
 	}
 
 	async ngOnInit() {
-		// if (!this.isConnected())
-		// 	this.router.navigateByUrl('login');
 		this.myProfile = await this.fetchService.getMyProfile();
 	}
 
@@ -141,12 +138,15 @@ export class AppComponent implements AfterViewInit {
 		return (1);
 	}
 
-	acceptFriendRequest() {
-		// this.notifService.emit()
+
+	acceptFriendRequest(context : NotificationRequest) {
+		context.accepted = true;
+		this.notifService.emit('inviteAnswer', context);
 	}
 
-	rejectFriendRequest() {
-
+	rejectFriendRequest(context : NotificationRequest) {
+		context.accepted = false;
+		this.notifService.emit('inviteAnswer', context);
 	}
 
 }

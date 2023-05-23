@@ -55,12 +55,12 @@ export class TokenManagerService {
 		} catch (error) {
 			this.throwException(type, 'Wrong token');
 		}
-		if (keyClean.key != this.keyService.getKey())
+		if (!keyClean || keyClean.key != this.keyService.getKey())
 		{
 			if (type == 'Http' && res)
 				res.status(HttpStatus.I_AM_A_TEAPOT).send('Wrong token');
 			else if (type == 'Http') throw new HttpException('Wrong token', HttpStatus.UNAUTHORIZED);
-			return null;
+				return null;
 		}
 		return keyClean;
 	}

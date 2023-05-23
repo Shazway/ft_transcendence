@@ -63,7 +63,9 @@ export class ItemsService {
 			.leftJoinAndSelect('user.match_history', 'match_history')
 			.leftJoinAndSelect('match_history.user', 'users')
 			.leftJoinAndSelect('user.sentFriendRequests', 'sentFriendRequests')
+			.leftJoinAndSelect('sentFriendRequests.receiver', 'receiver')
 			.leftJoinAndSelect('user.receivedFriendRequests', 'receivedFriendRequests')
+			.leftJoinAndSelect('receivedFriendRequests.sender', 'sender')
 			.leftJoinAndSelect('user.skin', 'skin')
 			.where('user.user_id = :id', { id })
 			.getOne();

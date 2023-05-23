@@ -17,6 +17,7 @@ export class AuthComponent {
 	constructor(
 		private route: ActivatedRoute,
 		private router: Router,
+		private notifService: NotificationService,
 		) {}
 
 		getHeader(authorization : string) {
@@ -55,9 +56,17 @@ export class AuthComponent {
 				bodyId = loginReturn.user_id;
 			}
 		});
+		console.log('Testing');
 		if (statusCode == 202)
 			this.router.navigateByUrl('validate?bodyId=' + bodyId + '&code=' + code);
 		else
+		{
+			if (this.notifService.client && !this.notifService.client.connected)
+			{
+				console.log('Test');
+				this.notifService.initSocket();
+			}
 			this.router.navigateByUrl('home');
+		}
 	}
 }

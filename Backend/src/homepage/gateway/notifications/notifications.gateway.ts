@@ -45,6 +45,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		if (!user)
 			return client.disconnect();
 		this.userList.set(user.sub, client);
+		console.log('connected');
 		await this.notificationService.setUserStatus(user.sub, this.ONLINE);
 	}
 	
@@ -88,7 +89,6 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 	}
 
 	//Answer and send friend requests
-
 	@SubscribeMessage('inviteRequest')
 	async handleInvite(
 		@ConnectedSocket() client: Socket,
@@ -111,8 +111,12 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		}
 		if (target)
 			target.emit(body.type + 'Invite', { notification: answer });
+		else
+			console.log('Pas connecte target');
 		if (notifClient)
 			notifClient.emit('pendingRequest', 'Request sent and waiting for answer');
+		else
+			console.log('Pas connecte envoyeur');
 	}
 
 	@SubscribeMessage('inviteAnswer')

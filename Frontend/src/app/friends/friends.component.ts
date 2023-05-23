@@ -5,6 +5,9 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PunishmentPopup } from '../popup-component/popup-component.component';
 import { Router } from '@angular/router';
 import { AppComponent } from '../app.component';
+import { NotificationRequest } from 'src/dtos/Notification.dto';
+import { type } from 'jquery';
+import { NotificationService } from '../notification.service';
 
 @Component({
   selector: 'app-friends',
@@ -37,6 +40,7 @@ export class FriendsComponent {
 		private elRef: ElementRef,
 		private modalService: NgbModal,
 		private fetchService: FetchService,
+		private notifService: NotificationService,
 		private router: Router,
 		private parent: AppComponent,
 	) {}
@@ -135,17 +139,28 @@ export class FriendsComponent {
 		const test = await this.createPopup("Spectate", "friend");
 	}
 
+	friendRequestToNotificationRequest(friend : FriendRequest, bool : boolean) : NotificationRequest {
+		return ({
+			type : "friend",
+			target_name : friend.sender.username,
+			target_id : friend.sender.user_id,
+			accepted : bool
+		})
+
+	}
+
 	accept(request : FriendRequest)
 	{
 		console.log("demande acceptee");
 		this.friendshipRequests.received.splice(this.friendshipRequests.received.indexOf(request), 1);
+		this.notifService.emit('inviteAnswer', this.friendRequestToNotificationRequest(request, true));
 	}
 
 	reject(request : FriendRequest)
 	{
 		console.log("demande rejetee");
 		this.friendshipRequests.received.splice(this.friendshipRequests.received.indexOf(request), 1);
-
+		this.notifService.emit('inviteAnswer', this.friendRequestToNotificationRequest(request, false));
 	}
 
 	switchToFriends() {
