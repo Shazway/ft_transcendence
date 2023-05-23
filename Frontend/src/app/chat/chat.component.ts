@@ -368,7 +368,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	async onClickChat(data: LessMessage) {
 		if (!this.client || data.message_content.trim().length == 0)
 			return false;
-		this.elRef.nativeElement.querySelector('.text-input').value = '';
+		this.elRef.nativeElement.querySelector('#exampleFormControlInput1').value = '';
 		const author = localStorage.getItem('username');
 		const id = localStorage.getItem('id');
 		if (id && author)

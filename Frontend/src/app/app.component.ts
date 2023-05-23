@@ -39,7 +39,8 @@ export class AppComponent implements AfterViewInit {
 	}
 
 	async ngOnInit() {
-		this.myProfile = await this.fetchService.getMyProfile();
+		if (this.isConnected())
+			this.myProfile = await this.fetchService.getMyProfile();
 	}
 
 	ngAfterViewInit(): void {
