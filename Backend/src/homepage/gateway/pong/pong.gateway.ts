@@ -51,14 +51,8 @@ export class PongGateway {
 	}
 
 	async handleConnection(client: Socket) {
-		let user;
-		try {
-			user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		} catch(error) {
-			console.log(error);
-			client.disconnect();
-			return ;
-		}
+		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'EEEE');
+		if (!user) return client.disconnect();
 		const match_id = Number(client.handshake.query.match_id);
 		let match = this.matchs.get(match_id);
 
@@ -113,12 +107,8 @@ export class PongGateway {
 
 	async handleDisconnect(client: Socket)
 	{
-		let user;
-		try {
-			user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		} catch(error) {
-			return ;
-		}
+		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'EEEE');
+		if (!user) return client.disconnect();
 		const userEntity = await this.itemsService.getUser(user.sub);
 		if (!userEntity)
 			return ;
@@ -154,8 +144,8 @@ export class PongGateway {
 	}
 
 	@SubscribeMessage('ArrowDown')
-	handleDown(@ConnectedSocket() client: Socket, @MessageBody() body: boolean) {
-		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
+	async handleDown(@ConnectedSocket() client: Socket, @MessageBody() body: boolean) {
+		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		const match_id = Number(client.handshake.query.match_id);
 		const match = this.matchs.get(match_id);
 
@@ -172,8 +162,8 @@ export class PongGateway {
 	}
 
 	@SubscribeMessage('ArrowUp')
-	handleUp(@ConnectedSocket() client: Socket, @MessageBody() body: boolean) {
-		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
+	async handleUp(@ConnectedSocket() client: Socket, @MessageBody() body: boolean) {
+		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 
 		const match_id = Number(client.handshake.query.match_id);
 		const match = this.matchs.get(match_id);
@@ -193,7 +183,7 @@ export class PongGateway {
 
 	@SubscribeMessage('ready')
 	async playerReady(@ConnectedSocket() client: Socket) {
-		const user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
+		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		const match_id = Number(client.handshake.query.match_id);
 		const match = this.matchs.get(match_id);
 

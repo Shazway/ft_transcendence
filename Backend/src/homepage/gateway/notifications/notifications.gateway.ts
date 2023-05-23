@@ -40,28 +40,19 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 	server;
 
 	async handleConnection(client: Socket) {
-		let user;
-		try {
-			user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		} catch(error) {
-			console.log(error);
-			client.disconnect();
-			return ;
-		}
-		console.log('Connected notifs ' + user.name);
+		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'EEEE');
+		
+		if (!user)
+			return client.disconnect();
 		this.userList.set(user.sub, client);
-		console.log(this.userList);
 		await this.notificationService.setUserStatus(user.sub, this.ONLINE);
 	}
 	
 	async handleDisconnect(client: Socket) {
-		let user;
-		try {
-			user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		} catch(error) {
-			client.disconnect();
-			return ;
-		}
+		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'EEEE');
+		
+		if (!user)
+			return client.disconnect();
 		this.userList.delete(user.sub);
 		await this.notificationService.setUserStatus(user.sub, this.OFFLINE);
 	}
@@ -104,16 +95,14 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		@MessageBody() body: NotificationRequest
 	) {
 		body.sent_at = new Date();
-		const source = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
+		const source = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		const answer = this.buildAnswer(source.sub, source.name, body.type);
 		const target = this.userList.get(body.target_id);
 		const notifClient = this.userList.get(source.sub);
 
-		console.log("On envoie une invite " + body.type);
-		console.log('request from ' + source.name + ' to: ');
-		console.log(body);
 		if(!body)
 			throw new WsException('Pas de body');
+		console.log('request from ' + source.name + ' to: ' + body.target_id);
 		if (body.type == 'friend') {
 			if (await this.itemsService.requestExists(source.sub, body.target_id))
 				return client.emit('alreadySent', 'Already pending request');
@@ -128,7 +117,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 
 	@SubscribeMessage('inviteAnswer')
 	async handeAnswer(@ConnectedSocket() client: Socket, @MessageBody() body: NotificationRequest) {
-		const source = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
+		const source = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		const answer = this.buildAnswer(source.sub, source.name, body.type, body.accepted);
 		const user = this.userList.get(body.target_id);
 

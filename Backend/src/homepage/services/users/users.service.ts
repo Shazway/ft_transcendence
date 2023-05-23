@@ -22,7 +22,7 @@ export class UsersService {
 		return intraHeader;
 	}
 
-	async fetcIntraInfo(token: string) {
+	async fetchIntraInfo(token: string) {
 		return await axios.get<IntraInfo>('https://api.intra.42.fr/v2/me', {
 			headers: { Authorization: 'Bearer ' + token },
 		});

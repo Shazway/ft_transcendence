@@ -6,8 +6,8 @@ import { TokenManagerService } from 'src/homepage/services/token-manager/token-m
 export class AuthVerifMiddleware implements NestMiddleware {
 	constructor(private tokenManager: TokenManagerService) {}
 
-	use(@Req() req: Request, @Res() res: Response, next: () => void) {
-		this.tokenManager.getUsernameFromToken(req);
+	async use(@Req() req: Request, @Res() res: Response, next: () => void) {
+		await this.tokenManager.getUsernameFromToken(req);
 		next();
 	}
 }

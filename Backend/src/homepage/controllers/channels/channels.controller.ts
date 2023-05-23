@@ -28,7 +28,7 @@ export class ChannelsController {
 	) {}
 	@Get('')
 	async getUsersChannel(@Req() req: Request, @Res() res: Response) {
-		const user = this.tokenManager.getUserFromToken(req);
+		const user = await this.tokenManager.getUserFromToken(req);
 		const channelList = await this.channelService.getAllChannelsFromUser(
 			user.sub,
 		);
@@ -46,7 +46,7 @@ export class ChannelsController {
 		@Res() res: Response,
 		@Param('id', ParseIntPipe) chan_id: number,
 	) {
-		const user = this.tokenManager.getUserFromToken(req);
+		const user = await this.tokenManager.getUserFromToken(req);
 		const isCreated = await this.channelService.addUserToChannel(
 			user.sub,
 			chan_id,
@@ -75,7 +75,7 @@ export class ChannelsController {
 		@Res() res: Response,
 		@Body() newChannel: NewChan,
 	) {
-		const user = this.tokenManager.getUserFromToken(req);
+		const user = await this.tokenManager.getUserFromToken(req);
 		const channelEntity = await this.channelService.createChannel(newChannel, user.sub);
 		console.log(channelEntity);
 		res.status(HttpStatus.OK).send({ msg: 'Channel created' });
@@ -87,7 +87,7 @@ export class ChannelsController {
 		@Req() req: Request,
 		@Res() res: Response,)
 	{
-		const user = this.tokenManager.getUserFromToken(req);
+		const user = await this.tokenManager.getUserFromToken(req);
 		await this.channelService.deleteChannel(chan_id, user.sub);
 		res.status(HttpStatus.OK).send({ msg: 'Channel deleted' });
 	}
@@ -99,7 +99,7 @@ export class ChannelsController {
 		@Req() req: Request,
 		@Res() res: Response,
 	) {
-		const user = this.tokenManager.getUserFromToken(req);
+		const user = await this.tokenManager.getUserFromToken(req);
 		let messages = await this.messageService.getPage(chan_id, page_num);
 
 		const userEntity = await this.itemsService.getUser(user.sub);

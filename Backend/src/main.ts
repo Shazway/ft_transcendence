@@ -1,10 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { RoutesMapper } from '@nestjs/core/middleware/routes-mapper';
+import { ServerKeyService } from './homepage/services/server-key/server-key.service';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
 	app.setGlobalPrefix('');
+	const keyGen = app.get(ServerKeyService);
+	keyGen.generateKey();
 	await app.listen(3001);
 	const server = app.getHttpServer();
 	const router = server._events.request._router;
@@ -15,8 +17,8 @@ async function bootstrap() {
 				return {
 					route: {
 						path: layer.route?.path,
-						method: layer.route?.stack[0].method,
-					},
+						method: layer.route?.stack[0].method
+					}
 				};
 			}
 		})

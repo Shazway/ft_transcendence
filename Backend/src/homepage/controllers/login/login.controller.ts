@@ -40,7 +40,7 @@ export class LoginController {
 			tokenInfo: tokenInfo,
 			intraInfo: intraInfo,
 			created: created,
-			jwt_token: await this.authService.login(intraInfo, id),
+			jwt_token: await this.authService.login(intraInfo, id, tokenInfo.access_token),
 			user_id: id,
 		}
 	}
@@ -51,7 +51,7 @@ export class LoginController {
 		if (resToken)
 		{
 			console.log({TokenInfo: resToken});
-			const intraInfo = await this.usersService.fetcIntraInfo(resToken.access_token);
+			const intraInfo = await this.usersService.fetchIntraInfo(resToken.access_token);
 			console.log({ Id: intraInfo.data.id, Login: intraInfo.data.login});
 			const user = await this.itemsService.getUserByIntraId(intraInfo.data.id);
 
@@ -86,14 +86,14 @@ export class LoginController {
 
 		if (!twoFA || !this.authService.verifyCode(twoFA.secret, body.mail_code))
 			return res.status(HttpStatus.UNAUTHORIZED).send('Wrong code');
-		const intraInfo = await this.usersService.fetcIntraInfo(twoFA.intra_token.access_token);
+		const intraInfo = await this.usersService.fetchIntraInfo(twoFA.intra_token.access_token);
 		res.status(HttpStatus.OK).send(await this.buildLoginBody(twoFA.intra_token, intraInfo.data, Number(body.id)));
 		this.twoFaMap.delete(Number(body.id));
 	}
 
 	@Get('toggleDoubleAuth')
 	async toggleDoubleAuth(@Req() req: Request, @Res() res: Response) {
-		const user = this.tokenManager.getUserFromToken(req);
+		const user = await this.tokenManager.getUserFromToken(req);
 		if ((await this.itemsService.toggleDoubleAuth(user.sub)))
 			return res.status(HttpStatus.BAD_REQUEST).send('Error');
 		return res.status(HttpStatus.ACCEPTED).send('Success');

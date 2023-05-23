@@ -41,7 +41,11 @@ export class MessagesService {
 
 	async addMessageToChannel(msg: Message, token: string, channel_id: number) {
 		const channel = await this.itemsService.getChannel(channel_id);
-		const user = await this.itemsService.getUser(this.tokenManager.getToken(token, 'ws').sub);
+		const user = await this.itemsService.getUser(
+			(
+				await this.tokenManager.getToken(token, 'ws')
+			).sub
+		);
 
 		if (!user)
 			return { check: {ret: false, msg: 'User not found'}, message: null};

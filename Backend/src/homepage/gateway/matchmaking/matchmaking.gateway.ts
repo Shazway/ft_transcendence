@@ -38,14 +38,8 @@ export class MatchmakingGateway {
 	}
 
 	async handleConnection(client: Socket) {
-		let user;
-		try {
-			user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		} catch (error) {
-			console.log(error);
-			client.disconnect();
-			return;
-		}
+		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'EEEE');
+		if (!user) return client.disconnect();
 		console.log({ new_player: user });
 		const player = await this.itemsService.getUser(user.sub);
 		if (!player) return;
@@ -62,13 +56,8 @@ export class MatchmakingGateway {
 	}
 
 	async handleDisconnect(client: Socket) {
-		let user;
-		try {
-			user = this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		} catch (error) {
-			client.disconnect();
-			return;
-		}
+		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'EEEE');
+		if (!user) return client.disconnect();
 		const player = await this.itemsService.getUser(user.sub);
 
 		if (!player) return client.disconnect();

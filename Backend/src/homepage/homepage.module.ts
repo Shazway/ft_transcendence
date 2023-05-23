@@ -32,6 +32,7 @@ import { GamesService } from './services/game/game.service';
 import { HttpexceptionFilter } from './filters/httpexception/httpexception.filter';
 import { APP_FILTER } from '@nestjs/core';
 import { WsexceptionFilter } from './filters/wsexception/wsexception.filter';
+import { ServerKeyService } from './services/server-key/server-key.service';
 
 @Module({
 	imports: [
@@ -78,6 +79,7 @@ import { WsexceptionFilter } from './filters/wsexception/wsexception.filter';
 		MatchmakingGateway,
 		PongGateway,
 		GamesService,
+		ServerKeyService,
 	],
 })
 export class HomepageModule {
@@ -87,28 +89,28 @@ export class HomepageModule {
 			path: '*',
 			method: RequestMethod.OPTIONS,
 		});
-		auth.apply(AuthVerifMiddleware)
-			.exclude(
-				{
-					path: 'users/create',
-					method: RequestMethod.ALL,
-				},
-				{
-					path: 'users/:username',
-					method: RequestMethod.ALL,
-				},
-				{
-					path: 'login',
-					method: RequestMethod.ALL,
-				},
-				{
-					path: 'login/callback',
-					method: RequestMethod.ALL,
-				},
-			)
-			.forRoutes({
-				path: '*',
-				method: RequestMethod.ALL,
-			});
+		//auth.apply(AuthVerifMiddleware)
+		//	.exclude(
+		//		{
+		//			path: 'users/create',
+		//			method: RequestMethod.ALL,
+		//		},
+		//		{
+		//			path: 'users/:username',
+		//			method: RequestMethod.ALL,
+		//		},
+		//		{
+		//			path: 'login',
+		//			method: RequestMethod.ALL,
+		//		},
+		//		{
+		//			path: 'login/callback',
+		//			method: RequestMethod.ALL,
+		//		},
+		//	)
+		//	.forRoutes({
+		//		path: '*',
+		//		method: RequestMethod.ALL,
+		//	});
 	}
 }

@@ -10,7 +10,7 @@ export class HeaderInterceptor implements NestInterceptor {
 		response.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
 		response.setHeader(
 			'Access-Control-Allow-Headers',
-			'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With',
+			'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With'
 		);
 		return next.handle();
 	}

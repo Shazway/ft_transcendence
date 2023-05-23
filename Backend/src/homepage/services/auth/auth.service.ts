@@ -5,10 +5,11 @@ import { varFetchService } from '../var_fetch/var_fetch.service';
 import { totp } from 'notp';
 import { authenticator } from 'otplib';
 import axios from 'axios';
+import { ServerKeyService } from '../server-key/server-key.service';
 
 @Injectable()
 export class AuthService {
-	constructor(private jwtService: JwtService,) {}
+	constructor(private jwtService: JwtService, private keyService: ServerKeyService) {}
 
 	getTokenBody(code: string) {
 		const authWorker = varFetchService.getAPIKeys();
@@ -23,33 +24,37 @@ export class AuthService {
 
 	async getAccessToken(code: string) {
 		let resToken: TokenInfo;
-		await axios.post<TokenInfo>('https://api.intra.42.fr/oauth/token', this.getTokenBody(code))
-		.then(function (response) {
-			resToken = response.data;
-		})
-		.catch(function (error) { console.log(error); })
-		.finally(function () {});
+		await axios
+			.post<TokenInfo>('https://api.intra.42.fr/oauth/token', this.getTokenBody(code))
+			.then(function (response) {
+				resToken = response.data;
+			})
+			.catch(function (error) {
+				console.log(error);
+			});
 		return resToken;
 	}
 
-	async login(user: IntraInfo, user_id: number) {
+	async login(user: IntraInfo, user_id: number, ft_key: string) {
 		const payload = {
 			name: user.login,
 			sub: user_id,
+			key: this.keyService.getKey(),
+			ft_key: ft_key
 		};
 		return this.jwtService.sign(payload);
 	}
 
 	createMail(code: string = null, user: IntraInfo) {
-		const mailgun = require("mailgun-js");
+		const mailgun = require('mailgun-js');
 		const keys = varFetchService.getMailKeys();
-		const mg = mailgun({apiKey: keys.key, domain: keys.domain});
+		const mg = mailgun({ apiKey: keys.key, domain: keys.domain });
 		const data = {
 			from: varFetchService.getMailCredentials().mail,
 			to: user.email,
-			subject: "Hello",
-			template: "one-time-authentification-code",
-			'h:X-Mailgun-Variables': JSON.stringify({Username: user.login, Code: code}),
+			subject: 'Hello',
+			template: 'one-time-authentification-code',
+			'h:X-Mailgun-Variables': JSON.stringify({ Username: user.login, Code: code })
 		};
 		mg.messages().send(data, function (error, body) {
 			console.log(body);

@@ -17,7 +17,7 @@ export class ProfileController {
 
 	@Post('applySkins')
 	async applySkins(@Req() req: Request, @Res() res: Response, @Body() body: ApplyProfile) {
-		const user = this.tokenManager.getUserFromToken(req);
+		const user = await this.tokenManager.getUserFromToken(req);
 		if (!body || !(await this.itemService.applySelectedSkins(user.sub, body)))
 			return res.status(HttpStatus.BAD_REQUEST).send('Something went wrong');
 		return res.status(HttpStatus.ACCEPTED).send('Success');
@@ -25,7 +25,8 @@ export class ProfileController {
 
 	@Get(':username')
 	async getProfile(@Param('username') us: string, @Req() req: Request, @Res() res: Response) {
-		const user = this.tokenManager.getUserFromToken(req);
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
 		const targetUser = await this.itemService.getUserByUsername(us);
 		let serializedUser: MyProfileUser | AnyProfileUser;
 

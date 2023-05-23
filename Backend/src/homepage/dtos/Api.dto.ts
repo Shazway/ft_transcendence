@@ -20,14 +20,14 @@ export class IntraInfo {
 	id: number;
 	login: string;
 	email: string;
-	image: { 
-		link: string,
+	image: {
+		link: string;
 		versions: {
-			large: string,
-			medium: string,
-			small: string,
-			micro: string,
-		},
+			large: string;
+			medium: string;
+			small: string;
+			micro: string;
+		};
 	};
 }
 
