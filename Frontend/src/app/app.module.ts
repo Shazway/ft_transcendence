@@ -27,6 +27,7 @@ import { GlassdoorComponent } from './glassdoor/glassdoor.component';
 import { HomeModule } from './home/home.module';
 import { GlassdoorModule } from './glassdoor/glassdoor.module';
 import { LeaderboardComponent } from './leaderboard/leaderboard.component';
+import { SearchComponent } from './search/search.component';
 
 @NgModule({
   declarations: [
@@ -36,6 +37,7 @@ import { LeaderboardComponent } from './leaderboard/leaderboard.component';
     ShopComponent,
 	ConfirmBuyPopup,
  LeaderboardComponent,
+ SearchComponent,
   ],
   imports: [
     BrowserModule,

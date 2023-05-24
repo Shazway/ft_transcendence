@@ -14,6 +14,7 @@ import { ShopComponent } from './shop/shop.component';
 import { HomeComponent } from './home/home.component';
 import { GlassdoorComponent } from './glassdoor/glassdoor.component';
 import { LeaderboardComponent } from './leaderboard/leaderboard.component';
+import { SearchComponent } from './search/search.component';
 
 const routes: Routes = [
 	{ path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -33,6 +34,7 @@ const routes: Routes = [
 	{ path: 'glassdoor', component: GlassdoorComponent},
 	{ path: 'home', component: HomeComponent},
 	{ path: 'leaderboard', component: LeaderboardComponent},
+	{ path: 'search', component: SearchComponent},
 	{ path: '**', redirectTo: '/home', pathMatch: 'full' },
 
 ];
