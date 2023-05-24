@@ -203,4 +203,14 @@ export class PongGateway {
 				match
 			);
 	}
+
+	@SubscribeMessage('getSpectators')
+	async getSpectators(@ConnectedSocket() client: Socket) {
+		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
+		const match_id = Number(client.handshake.query.match_id);
+		const match = this.matchs.get(match_id);
+
+		if (!user || !match || !match.gameService) throw new WsException('Match/GameService aren\'t available');
+		client.emit('getSpectators', match.gameService.spectators);
+	}
 }
