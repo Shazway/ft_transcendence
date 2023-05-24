@@ -56,10 +56,10 @@ export class FriendsComponent {
 	async ngOnInit() {
 		if (!this.parent.isConnected())
 			this.router.navigateByUrl('login');
+		this.blockedUsers = await this.fetchService.getBlockedUsers();
 		this.friends = await this.fetchService.getFriends();
 		this.friends.sort((a, b) => b.activity_status - a.activity_status);
 		this.friendshipRequests = await this.fetchService.getFriendshipRequests();
-		this.blockedUsers = await this.fetchService.getBlockedUsers();
 		console.log(this.friendshipRequests.received);
 	}
 	
@@ -118,6 +118,8 @@ export class FriendsComponent {
 	async blockUser(block: AnyProfileUser)
 	{
 		await this.fetchService.blockUser(block.user_id);
+		this.friends.splice(this.friends.indexOf(block), 1);
+
 		//add a pop-up to confirm
 		console.log("bloque " + block.username);
 		
@@ -126,8 +128,9 @@ export class FriendsComponent {
 	async unblockUser(block: AnyProfileUser)
 	{
 		await this.fetchService.unblockUser(block.user_id);
+		this.blockedUsers.splice(this.blockedUsers.indexOf(block), 1);
 		//add a pop-up to confirm
-		console.log("bloque " + block.username);
+		console.log("unbloque " + block.username);
 		
 	}
 
