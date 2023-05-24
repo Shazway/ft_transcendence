@@ -16,6 +16,7 @@ import { GlassdoorComponent } from './glassdoor/glassdoor.component';
 import { LeaderboardComponent } from './leaderboard/leaderboard.component';
 
 const routes: Routes = [
+	{ path: '', redirectTo: '/home', pathMatch: 'full' },
 	{ path: 'users', component: UsersComponent },
 	{ path: 'login', component: LoginComponent },
 	{ path: 'chat', component: ChatComponent },
@@ -31,7 +32,9 @@ const routes: Routes = [
 	{ path: 'block', component: FriendsComponent},
 	{ path: 'glassdoor', component: GlassdoorComponent},
 	{ path: 'home', component: HomeComponent},
-	{ path: 'leaderboard', component: LeaderboardComponent}
+	{ path: 'leaderboard', component: LeaderboardComponent},
+	{ path: '**', redirectTo: '/home', pathMatch: 'full' },
+
 ];
 
 @NgModule({
