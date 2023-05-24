@@ -541,4 +541,13 @@ export class ItemsService {
 	async saveUserState(user: UserEntity) {
 		return await this.userRepo.save(user);
 	}
+
+	async changeImgUser(userId: number, img_url: string) {
+		const user = await this.getUser(userId);
+
+		if (!user)
+			return null;
+		user.img_url = img_url;
+		return await this.userRepo.save(user);
+	}
 }

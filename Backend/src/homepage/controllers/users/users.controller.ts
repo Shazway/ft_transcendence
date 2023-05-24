@@ -36,9 +36,9 @@ export class UsersController {
 		@Res() res: Response,
 		@Body() body: { username: string }
 	) {
-		const checkUser = await this.itemsService.getUserByUsername(body.username);
 		const currentUser = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!currentUser) return;
+		const checkUser = await this.itemsService.getUserByUsername(body.username);
 
 		if (checkUser && checkUser.user_id == currentUser.sub)
 			return res.status(HttpStatus.NOT_MODIFIED).send('Username taken');
@@ -48,6 +48,16 @@ export class UsersController {
 				.send('Trying to change someone elses username ?');
 		this.usersService.changeUserName(body.username, currentUser.sub);
 		return res.status(HttpStatus.ACCEPTED).send('Username changed');
+	}
+
+	@Post('change_img')
+	async changeImg(@Req() req: Request, @Res() res: Response, @Body() body: { img_url: string }) {
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
+		if (!body) return res.status(HttpStatus.BAD_REQUEST).send('Error no body');
+		if (await this.itemsService.changeImgUser(user.sub, body.img_url))
+			return res.status(HttpStatus.ACCEPTED).send('Change img_url');
+		return res.status(HttpStatus.NOT_MODIFIED);
 	}
 
 	@Post('create')
@@ -151,10 +161,25 @@ export class UsersController {
 		@Res() res: Response
 	) {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
 
 		if (!(await this.itemsService.removeFriend(user.sub, target_id)))
 			return res.status(HttpStatus.NOT_FOUND).send('Error');
 		res.status(HttpStatus.ACCEPTED).send('User removed');
+	}
+
+	@Post('addToChannel')
+	async addUserToChannel(
+		@Req() req: Request,
+		@Res() res: Response,
+		@Body() body: { channel_id: number; target_id: number }
+	) {
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
+		if (!body) return res.status(HttpStatus.BAD_REQUEST).send('Error no body');
+		if (await this.channelService.addUserToChannel(user.sub, body.channel_id, body.target_id))
+			return res.status(HttpStatus.BAD_REQUEST).send('Error adding this person to channel');
+		res.status(HttpStatus.ACCEPTED).send('Success');
 	}
 
 	@Get(':username')
