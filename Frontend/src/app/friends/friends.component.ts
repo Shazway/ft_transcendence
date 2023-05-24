@@ -57,9 +57,9 @@ export class FriendsComponent {
 		if (!this.parent.isConnected())
 			this.router.navigateByUrl('login');
 		this.friends = await this.fetchService.getFriends();
+		this.friends.sort((a, b) => b.activity_status - a.activity_status);
 		this.friendshipRequests = await this.fetchService.getFriendshipRequests();
 		this.blockedUsers = await this.fetchService.getBlockedUsers();
-		this.friends.sort((a, b) => a.activity_status - b.activity_status);
 		console.log(this.friendshipRequests.received);
 	}
 	
