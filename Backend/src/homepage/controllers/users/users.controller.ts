@@ -50,6 +50,16 @@ export class UsersController {
 		return res.status(HttpStatus.ACCEPTED).send('Username changed');
 	}
 
+	@Post('prefixedList')
+	async getUsersFromPrefix(@Req() req: Request, @Res() res: Response, @Body() body: { prefix: string })
+	{
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
+
+		const prefixedUsers = await this.itemsService.getPrefixedUsers(body.prefix);
+		res.status(HttpStatus.OK).send(prefixedUsers);
+	}
+
 	@Post('change_img')
 	async changeImg(@Req() req: Request, @Res() res: Response, @Body() body: { img_url: string }) {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);

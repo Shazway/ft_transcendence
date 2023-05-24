@@ -42,11 +42,20 @@ export class ItemsService {
 	}
 
 	public async getAllUsers() {
-		const user = await this.userRepo
+		const users = await this.userRepo
 			.createQueryBuilder('user')
 			.orderBy('username')
 			.getMany();
-		return user;
+		return users;
+	}
+
+	public async getPrefixedUsers(usernamePrefix: string) {
+		const users = await this.userRepo
+			.createQueryBuilder('user')
+			.where('user.username LIKE :prefix', { prefix: `${usernamePrefix}%` })
+			.orderBy('user.username')
+			.getMany();
+		return users;
 	}
 
 	public async getSkins() {
