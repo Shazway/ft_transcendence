@@ -1,0 +1,5 @@
+.line:hover {
+	background-color: rgba(245, 245, 245, 0.096);
+	box-shadow: 0px 0px 10px rgba(233, 226, 226, 0.274);
+	z-index: 500;
+}

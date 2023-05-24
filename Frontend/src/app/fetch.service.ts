@@ -183,6 +183,22 @@ export class FetchService {
 		return null;
 	}
 
+	async getLeaderboard() {
+		let res: AnyProfileUser[] = [];
+		const teaFunc = this.teapotError;
+		const route = this.router;
+		await axios.get<Array<AnyProfileUser>>('http://localhost:3001/leaderboard', this.getHeader())
+		.then(function (response) {
+			res = response.data;
+			console.log("leaders:" +res);
+		})
+		.catch(function (error) {
+			teaFunc(error, route);
+		})
+		.finally(function () {});
+		return res;
+	}
+
 	async getFriends() {
 		let res: AnyProfileUser[] = [];
 		const teaFunc = this.teapotError;

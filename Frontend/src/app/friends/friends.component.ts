@@ -8,6 +8,7 @@ import { AppComponent } from '../app.component';
 import { NotificationRequest } from 'src/dtos/Notification.dto';
 import { type } from 'jquery';
 import { NotificationService } from '../notification.service';
+import { boolean } from 'mathjs';
 
 @Component({
   selector: 'app-friends',
@@ -58,6 +59,7 @@ export class FriendsComponent {
 		this.friends = await this.fetchService.getFriends();
 		this.friendshipRequests = await this.fetchService.getFriendshipRequests();
 		this.blockedUsers = await this.fetchService.getBlockedUsers();
+		this.friends.sort((a, b) => a.activity_status - b.activity_status);
 		console.log(this.friendshipRequests.received);
 	}
 	

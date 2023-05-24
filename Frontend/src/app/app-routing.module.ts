@@ -13,6 +13,7 @@ import { ProfileComponent } from './profile/profile.component';
 import { ShopComponent } from './shop/shop.component';
 import { HomeComponent } from './home/home.component';
 import { GlassdoorComponent } from './glassdoor/glassdoor.component';
+import { LeaderboardComponent } from './leaderboard/leaderboard.component';
 
 const routes: Routes = [
 	{ path: 'users', component: UsersComponent },
@@ -29,7 +30,8 @@ const routes: Routes = [
 	{ path: 'friendRequests', component: FriendsComponent},
 	{ path: 'block', component: FriendsComponent},
 	{ path: 'glassdoor', component: GlassdoorComponent},
-	{ path: 'home', component: HomeComponent}
+	{ path: 'home', component: HomeComponent},
+	{ path: 'leaderboard', component: LeaderboardComponent}
 
 ];
 

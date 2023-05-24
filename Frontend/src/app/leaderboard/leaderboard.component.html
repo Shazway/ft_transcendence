@@ -1,0 +1,33 @@
+<div class="d-flex flex-row flex-fill" >
+	<div class="d-flex flex-column flex-grow-1 m-5" >
+		<h3>Leaderboard</h3>
+		<table class="table" style="color: aliceblue;">
+			<thead>
+				<tr>
+					<th>Rank</th>
+					<th>Username</th>
+					<th>Score</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr *ngFor="let user of users" (mouseover)="updateCurrentUser(user)" class="line">
+					<td>{{users.indexOf(user) + 1}}</td>
+					<td>{{user.username}}</td>
+					<td>{{user.rank_score}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="d-flex flex-column m-5 text-center card text-black" style="width: 30%; height: 80%;">
+		<div class="card-body p-4">
+
+			<h2 class="mb-1 text-center">{{currentUser.username}}</h2>
+			<h2>Rank : {{users.indexOf(currentUser) + 1}}</h2>
+			<img src="{{currentUser.img_url}}" class="img-fluid">
+			<div class="text-start">
+				<h4>currently {{currentUser.activity_status}}</h4>
+				<h4>Wins/Losses : {{currentUser.wins}}/{{currentUser.losses}}</h4>
+			</div>
+		</div>
+	</div>
+</div>

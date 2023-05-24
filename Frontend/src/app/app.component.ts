@@ -76,7 +76,6 @@ export class AppComponent implements AfterViewInit {
 		if (typeof popoverTemplate === 'string') {
 			if (popoverTemplate == "profile")
 			{
-				console.log("iciiiiii");
 				this.popover.ngbPopover = this.profileTemplate;
 			} 
 			else return;
