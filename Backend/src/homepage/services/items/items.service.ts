@@ -306,8 +306,8 @@ export class ItemsService {
 	) {
 		if (!source || !friend)
 			return null;
-		source.friend = source.friend.filter((source) => source.user_id === friend.user_id);
-		friend.friend = friend.friend.filter((user) => user.user_id === source.user_id);
+		source.friend = source.friend.filter((source) => source.user_id !== friend.user_id);
+		friend.friend = friend.friend.filter((user) => user.user_id !== source.user_id);
 		return await this.userRepo.save([source, friend]);
 	}
 

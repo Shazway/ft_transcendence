@@ -32,7 +32,6 @@ const routes: Routes = [
 	{ path: 'glassdoor', component: GlassdoorComponent},
 	{ path: 'home', component: HomeComponent},
 	{ path: 'leaderboard', component: LeaderboardComponent}
-
 ];
 
 @NgModule({
