@@ -1,0 +1,26 @@
+.button42 {
+	z-index: 1000;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	cursor: pointer;
+	background-image: none;
+	white-space: nowrap;
+	padding: 16px 42px;
+	background-color: #00babc;
+	font-size: 24px;
+	border-radius: 12px;
+	box-shadow: 0px 0px 60px rgb(0, 0, 0);
+  }
+
+.button42:hover {
+	box-shadow: 0px 0px 60px #00babc;
+}
+
+.devMode {
+	position: fixed;
+	bottom: 0;
+  	right: 0;
+
+}

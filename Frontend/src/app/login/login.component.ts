@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FetchService } from '../fetch.service';
 import { Router } from '@angular/router';
@@ -11,8 +11,11 @@ import { User } from 'src/dtos/User.dto';
 })
 export class LoginComponent {
 
+	devModeElm : any;
+
 	constructor(
 			private loginService: FetchService,
+			private elRef: ElementRef,
 			private router: Router,
 		) {}
 
@@ -30,6 +33,12 @@ export class LoginComponent {
 	}
 
 	showDevDoor() {
-		
+		console.log("devdoor");
+		this.devModeElm = this.elRef.nativeElement.querySelector("#modeDev");
+		console.log(this.devModeElm);
+		if (this.devModeElm.classList.contains('fade'))
+			this.devModeElm.classList.remove('fade');
+		else
+			this.devModeElm.classList.add('fade');
 	}
 }
