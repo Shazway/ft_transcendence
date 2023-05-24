@@ -109,10 +109,11 @@ export class FriendsComponent {
 
 	}
 
-	removeFriend(friend: AnyProfileUser)
+	async removeFriend(friend: AnyProfileUser)
 	{
-
 		//add a pop-up to confirm
+		await this.fetchService.removeFriends(friend.user_id);
+		this.friends.splice(this.friends.indexOf(friend), 1);
 	}
 
 	async blockUser(block: AnyProfileUser)

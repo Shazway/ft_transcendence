@@ -296,6 +296,23 @@ export class FetchService {
 		return res;
 	}
 
+	async removeFriends(friend_id: number) {
+		let res;
+		const teaFunc = this.teapotError;
+		const route = this.router;
+		await axios.get('http://localhost:3001/users/removeFriend/' + friend_id, this.getHeader())
+		.then(function (response) {
+			res = response.data;
+			console.log(res);
+		})
+		.catch(function (error) {
+			teaFunc(error, route);
+		})
+		.finally(function () {});
+		return res;
+	}
+
+
 	async getMessages(channel_id: number, page: number): Promise<Message[]> {
 		let res: Message[] = [];
 		const teaFunc = this.teapotError;
