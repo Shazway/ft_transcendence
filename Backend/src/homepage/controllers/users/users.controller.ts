@@ -140,6 +140,7 @@ export class UsersController {
 		const userEntity = await this.itemsService.getUser(user.sub);
 
 		if (!userEntity) return res.status(HttpStatus.BAD_REQUEST).send('User not found');
+		console.log(userEntity.blacklistEntry);
 		res.status(HttpStatus.OK).send(userEntity.blacklistEntry);
 	}
 

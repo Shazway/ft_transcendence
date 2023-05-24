@@ -23,7 +23,7 @@
 			  aria-selected="false"
 			>
 				Friend requests
-				<span *ngIf="friendshipRequests.received.length" class="badge badge-pill bg-danger rounded-circle" style="font-size: 10px;">{{friendshipRequests.received.length}}</span>
+				<span *ngIf="friendshipRequests.received?.length" class="badge badge-pill bg-danger rounded-circle" style="font-size: 10px;">{{friendshipRequests.received.length}}</span>
 				</button>
 		</li>
 		<li class="nav-item" role="presentation">
@@ -127,13 +127,13 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr *ngFor="let user of blockedUsers" class="line">
+				<tr *ngFor="let userb of blockedUsers" class="line">
 					<td>
-						<p class="small ms-3 mb-0 text-muted">{{ user.username }}</p>
+						<p class="small ms-3 mb-0 text-muted">{{ userb.username }}</p>
 					</td>
 					<td>
 						<div class="d-flex align-items-end ">
-							<img (click)="unblockUser(user)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{user.user_id}}-profile" src="{{icone_list.tick}}" alt="accept">
+							<img (click)="unblockUser(userb)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{userb.user_id}}-profile" src="{{icone_list.tick}}" alt="accept">
 						</div>
 					</td>
 				</tr>

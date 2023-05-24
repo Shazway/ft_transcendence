@@ -238,7 +238,8 @@ export class FetchService {
 		await axios.get<Array<AnyProfileUser>>('http://localhost:3001/users/getBlockedUsers', this.getHeader())
 		.then(function (response) {
 			res = response.data;
-			console.log("blocked :" +res);
+			console.log("blocked :");
+			console.log(res);
 		})
 		.catch(function (error) {
 			teaFunc(error, route);

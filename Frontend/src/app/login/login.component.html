@@ -1,19 +1,30 @@
-<form #userlogin="ngForm" (ngSubmit)="onClickSubmit(userlogin.value)" >
-	<input type = "text" name = "login" placeholder = "Username" ngModel>
-	<br/>
-	<input type = "number" name = "rank_score" placeholder = "Rank" ngModel>
-	<br/>
-	<input type = "text" name = "img_url" placeholder = "Image URL" ngModel>
-	<br/>
-	<input type = "submit" value = "submit">
- </form>
- <h2>OR LOGIN</h2>
- <form #userlogin2="ngForm" (ngSubmit)="onClickSubmitLogin(userlogin2.value)" >
-	 <input type = "text" name = "login" placeholder = "Username" ngModel>
-	 <br/>
-	 <input type = "submit" value = "submit">
-</form>
-<h2>OR 42</h2>
- <form #user42="ngForm" (ngSubmit)="onClickAuth()" >
-	<input type = "submit" value = "submit">
- </form>
+<div class="container-fluid" >
+	<div class="d-flex h-100 flex-column text-center py-5" style="padding-top: 20%; margin: 20%;">
+		<div class="card">
+			<h3 class="cssTrans">Log in with 42</h3>
+			<form #user42="ngForm" (ngSubmit)="onClickAuth()" >
+				<input type = "submit" value = "submit">
+			 </form>
+		</div>
+		<div (click)="showDevDoor()" class="btn">I'm a dev</div>
+		<div class="hidden">
+			<form #userlogin="ngForm" (ngSubmit)="onClickSubmit(userlogin.value)" >
+				<input type = "text" name = "login" placeholder = "Username" ngModel>
+				<br/>
+				<input type = "number" name = "rank_score" placeholder = "Rank" ngModel>
+				<br/>
+				<input type = "text" name = "img_url" placeholder = "Image URL" ngModel>
+				<br/>
+				<input type = "submit" value = "submit">
+			 </form>
+			 <h2>OR LOGIN</h2>
+			 <form #userlogin2="ngForm" (ngSubmit)="onClickSubmitLogin(userlogin2.value)" >
+				 <input type = "text" name = "login" placeholder = "Username" ngModel>
+				 <br/>
+				 <input type = "submit" value = "submit">
+			</form>
+		</div>
+	</div>
+</div>
+
+ 
