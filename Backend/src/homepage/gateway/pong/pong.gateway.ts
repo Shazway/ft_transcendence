@@ -53,15 +53,20 @@ export class PongGateway {
 	async handleConnection(client: Socket) {
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'EEEE');
 		if (!user) return client.disconnect();
+		const userEntity = await this.itemsService.getUser(user.sub);
 		const match_id = Number(client.handshake.query.match_id);
 		let match = this.matchs.get(match_id);
 
 		console.log({ new_player: user });
+		if (userEntity.inMatch)
+			return client.disconnect();
 		if (!this.isPlayer(user.sub, match_id) && (!match || !match.started))
 		{
 			client.emit('notStarted', 'Match is not ready, please wait before joining again');
 			client.disconnect();
 		}
+		userEntity.inMatch = true;
+		await this.itemsService.saveUserState(userEntity);
 		if (!match) {
 			match = new Match();
 			match.players = new Array<Player>();
@@ -202,5 +207,15 @@ export class PongGateway {
 				await this.itemsService.getMatchSetting(match.entity.match_id),
 				match
 			);
+	}
+
+	@SubscribeMessage('getSpectators')
+	async getSpectators(@ConnectedSocket() client: Socket) {
+		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
+		const match_id = Number(client.handshake.query.match_id);
+		const match = this.matchs.get(match_id);
+
+		if (!user || !match || !match.gameService) throw new WsException('Match/GameService aren\'t available');
+		client.emit('getSpectators', match.gameService.spectators);
 	}
 }

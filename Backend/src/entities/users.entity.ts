@@ -55,6 +55,9 @@ export class User {
 	@Column('int', { default: () => "'{0,1,2}'", array: true })
 	current_skins: number[];
 
+	@Column({ default: false })
+	inMatch!: boolean;
+
 	// ---------------------- Friendship ----------------------------------
 
 	@OneToMany(() => Friendrequest, (friendrequest) => friendrequest.sender)
