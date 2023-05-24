@@ -25,7 +25,9 @@
 			<h2>Rank : {{users.indexOf(currentUser) + 1}}</h2>
 			<img src="{{currentUser.img_url}}" class="img-fluid">
 			<div class="text-start">
-				<h4>currently {{currentUser.activity_status}}</h4>
+				<h5 *ngIf="currentStatus == 0">offline<span class="badge bg-secondary dot rounded-circle status-dot">&nbsp;</span></h5>
+				<h5 *ngIf="currentStatus == 1">online<span class="badge bg-success dot rounded-circle status-dot">&nbsp;</span></h5>
+				<h5 (click)="spectate(currentUser)" *ngIf="currentStatus == 2">playing<span class="badge bg-primary dot rounded-circle status-dot">&nbsp;</span></h5> <!--transformer playing en lien pour spectate la partie-->
 				<h4>Wins/Losses : {{currentUser.wins}}/{{currentUser.losses}}</h4>
 			</div>
 		</div>

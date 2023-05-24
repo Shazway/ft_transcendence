@@ -13,6 +13,7 @@ export class LeaderboardComponent {
 
 	public users!: AnyProfileUser[];
 	public currentUser!: AnyProfileUser;
+	public currentStatus = 0;
 
 	constructor(
 		private parent: AppComponent,
@@ -24,8 +25,20 @@ export class LeaderboardComponent {
 		this.currentUser = this.users[0];
 	}
 
-	updateCurrentUser(newUser : AnyProfileUser) {
+	async updateCurrentUser(newUser : AnyProfileUser) {
+		let updated :  AnyProfileUser | null;
 		this.currentUser = newUser;
+		updated = await this.fetchService.getProfile(newUser.username);
+		if (updated)
+			this.currentStatus = updated.activity_status;
+		else
+			this.currentStatus = newUser.activity_status;
+	}
+
+	async spectate(friend: AnyProfileUser)
+	{
+		//todo
+		console.log("Tentative de spectate");
 	}
 
 	
