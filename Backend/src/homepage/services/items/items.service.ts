@@ -256,7 +256,8 @@ export class ItemsService {
 	public async getLeaderboard() {
 		const user = await this.userRepo
 			.createQueryBuilder('user')
-			.orderBy('rank_score')
+			.orderBy('rank_score', 'DESC')
+			.take(50)
 			.getMany();
 		return user;
 	}

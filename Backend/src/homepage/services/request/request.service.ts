@@ -8,9 +8,10 @@ export class RequestService {
 
 	async handleFriendRequestInvite(sourceId: number, targetId: number) {
 		if (!(await this.itemsService.canSendRequest(sourceId, targetId)))
-			return null;
+			return false;
 		else if (!(await this.itemsService.addFriendRequestToUsers(sourceId, targetId)))
-			return null;
+			return false;
+		return true;
 	}
 
 	async handleFriendRequestAnswer(sourceId: number, targetId: number) {

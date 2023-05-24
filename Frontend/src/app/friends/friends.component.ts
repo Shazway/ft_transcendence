@@ -155,6 +155,7 @@ export class FriendsComponent {
 	{
 		console.log("demande acceptee");
 		this.friendshipRequests.received.splice(this.friendshipRequests.received.indexOf(request), 1);
+		this.friends.push(request.sender);
 		this.notifService.emit('inviteAnswer', this.friendRequestToNotificationRequest(request, true));
 	}
 
