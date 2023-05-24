@@ -104,8 +104,8 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 			throw new WsException('Pas de body');
 		console.log('request from ' + source.name + ' to: ' + body.target_id);
 		if (body.type == 'friend') {
-			if (await this.itemsService.requestExists(source.sub, body.target_id))
-				return client.emit('alreadySent', 'Already pending request');
+			if (!(await this.itemsService.canSendRequest(source.sub, body.target_id)))
+				return client.emit('alreadySent', 'Not possible');
 			else if (!(await this.itemsService.addFriendRequestToUsers(source.sub, body.target_id)))
 				return client.emit('refusedRequest', 'Friend request refused');
 		}
@@ -122,19 +122,14 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 	@SubscribeMessage('inviteAnswer')
 	async handeAnswer(@ConnectedSocket() client: Socket, @MessageBody() body: NotificationRequest) {
 		const source = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
+		if (!body)
+			throw new WsException('No answer given is necessary');
 		const answer = this.buildAnswer(source.sub, source.name, body.type, body.accepted);
 		const user = this.userList.get(body.target_id);
-		console.log(body);
-		if (!source)
-		throw new WsException('User disconnected');
-		if (body.accepted) {
-			if (body.type == 'friend')
-			{
-				console.log("On est dans handleAnswer source=" + source.sub);
-
-				if (await this.itemsService.addFriendToUser(source.sub, body.target_id))
+		if (body.accepted)
+		{
+			if (body.type == 'friend' && !(await this.itemsService.addFriendToUser(source.sub, body.target_id)))
 					return client.emit('No request to answer to');
-			}
 			if (body.type == 'channel')
 				await this.channelsService.addUserToChannel(body.target_id, body.channel_id);
 		}

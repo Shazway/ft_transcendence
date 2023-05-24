@@ -6,6 +6,7 @@ export class NotificationRequest {
 	accepted: boolean;
 	channel_id: number;
 }
+
 export class NotificationResponse {
 	type: string;
 	source_name: string;

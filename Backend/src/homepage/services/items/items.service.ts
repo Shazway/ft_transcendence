@@ -19,7 +19,7 @@ export class ItemsService {
 		@InjectRepository(ChannelEntity)
 			private readonly chanRepo: Repository<ChannelEntity>,
 		@InjectRepository(FriendrequestRelation)
-			private readonly friend_requestRepo: Repository<FriendrequestRelation>,
+			private readonly FriendRequestRepo: Repository<FriendrequestRelation>,
 		@InjectRepository(MatchSettingEntity)
 			private readonly match_settingRepo: Repository<MatchSettingEntity>,
 		@InjectRepository(MatchEntity)
@@ -171,7 +171,7 @@ export class ItemsService {
 	}
 	
 	public async getFriendrequest(id: number) {
-		const friend_request = await this.friend_requestRepo
+		const friend_request = await this.FriendRequestRepo
 		.createQueryBuilder('friend_request')
 		.leftJoinAndSelect('friend_request.sender', 'sender')
 		.leftJoinAndSelect('friend_request.receiver', 'receiver')
@@ -181,7 +181,7 @@ export class ItemsService {
 	}
 	
 	public async getFriendrequestFromUser(id: number) {
-		const friend_request = await this.friend_requestRepo
+		const friend_request = await this.FriendRequestRepo
 		.createQueryBuilder('friend_request')
 		.leftJoinAndSelect('friend_request.sender', 'sender')
 		.leftJoinAndSelect('friend_request.receiver', 'receiver')
@@ -191,7 +191,7 @@ export class ItemsService {
 	}
 	
 	public async getFriendrequestToUser(id: number) {
-		const friend_request = await this.friend_requestRepo
+		const friend_request = await this.FriendRequestRepo
 		.createQueryBuilder('friend_request')
 		.leftJoinAndSelect('friend_request.sender', 'sender')
 		.leftJoinAndSelect('friend_request.receiver', 'receiver')
@@ -286,18 +286,14 @@ export class ItemsService {
 
 		if (!sourceUser || !targetUser)
 			return null;
-		if (
-			!sourceUser.sentFriendRequests.find((request) => request.receiver.user_id == targetId) ||
-			!targetUser.receivedFriendRequests.find((request) => request.sender.user_id == sourceId)
-		)
+		const receivedRequest = sourceUser.receivedFriendRequests.find((request) => request.sender.user_id == targetId);
+		const sentRequest = targetUser.sentFriendRequests.find((request) => request.receiver.user_id == sourceId);
+		if (!receivedRequest || !sentRequest)
 			return null;
-
-		sourceUser.sentFriendRequests = sourceUser.sentFriendRequests
-			.filter((request) => request.receiver.user_id == targetId);
-
-		targetUser.sentFriendRequests = sourceUser.receivedFriendRequests
-			.filter((request) => request.sender.user_id == sourceId);
-
+		this.FriendRequestRepo.remove([
+			receivedRequest,
+			sentRequest
+		]);
 		sourceUser.friend.push(targetUser);
 		targetUser.friend.push(sourceUser);
 		return await this.userRepo.save([sourceUser, targetUser]);
@@ -380,22 +376,24 @@ export class ItemsService {
 	}
 
 	public createFriendRequest() {
-		return this.friend_requestRepo.create();
+		return this.FriendRequestRepo.create();
 	}
 
-	public async requestExists(sourceId: number, targetId: number) {
+	public async canSendRequest(sourceId: number, targetId: number) {
 		const sourceEntity = await this.getUser(sourceId);
-
-		if (!sourceEntity)
+		const targetEntity = await this.getUser(targetId);
+		if (!sourceEntity || !targetEntity)
 			return false;
-		else
-		{
-			sourceEntity.sentFriendRequests.forEach((request) => {
-				if (request.receiver.user_id == targetId)
-					return true;
-			});
-		}
-		return false;
+		if (sourceEntity.friend.find((friend) => targetEntity.user_id == friend.user_id) ||
+			sourceEntity.blacklistEntry.find((blockedUser) => targetEntity.user_id == blockedUser.user_id))
+			return false;
+		if
+			(
+			targetEntity.receivedFriendRequests
+				.find((request) => request.sender.user_id == sourceEntity.user_id)
+			)
+			return false;
+		return true;
 	}
 	public async addUserToMatch(user: UserEntity, match: MatchEntity)
 	{
@@ -414,12 +412,11 @@ export class ItemsService {
 			return null;
 		if (targetEntity.blacklistEntry.find((user) => user.user_id === sourceId))
 			return null;
-
 		friendRequest.receiver = targetEntity;
 		friendRequest.sender = sourceEntity;
 		targetEntity.receivedFriendRequests.push(friendRequest);
 		sourceEntity.sentFriendRequests.push(friendRequest);
-		await this.friend_requestRepo.save(friendRequest);
+		await this.FriendRequestRepo.save(friendRequest);
 		return (await this.userRepo.save([sourceEntity, targetEntity]));
 	}
 
