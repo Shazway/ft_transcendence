@@ -407,10 +407,9 @@ export class ItemsService {
 		const friendRequest = this.createFriendRequest();
 		const targetEntity = await this.getUser(targetId);
 		const sourceEntity = await this.getUser(sourceId);
+
 		console.log("source id = " + sourceId + " target id = " + targetId);
 		if (!friendRequest || !targetEntity || !sourceEntity)
-			return null;
-		if (targetEntity.blacklistEntry.find((user) => user.user_id === sourceId))
 			return null;
 		friendRequest.receiver = targetEntity;
 		friendRequest.sender = sourceEntity;
@@ -510,5 +509,21 @@ export class ItemsService {
 		user.currency -= skin.price;
 		user.skin.push(skin);
 		return (await this.userRepo.save(user));
+	}
+
+	async deleteFriendRequest(sourceId: number, targetId: number) {
+		const sourceUser = await this.getUser(sourceId);
+		const targetUser = await this.getUser(targetId);
+
+		if (!sourceUser || !targetUser)
+			return null;
+		const receivedRequest = sourceUser.receivedFriendRequests.find((request) => request.sender.user_id == targetId);
+		const sentRequest = targetUser.sentFriendRequests.find((request) => request.receiver.user_id == sourceId);
+		if (!receivedRequest || !sentRequest)
+			return null;
+		this.FriendRequestRepo.remove([
+			receivedRequest,
+			sentRequest
+		]);
 	}
 }

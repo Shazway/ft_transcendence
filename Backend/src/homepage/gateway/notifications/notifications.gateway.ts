@@ -15,6 +15,7 @@ import { NotificationRequest, NotificationResponse } from 'src/homepage/dtos/Not
 import { ChannelsService } from 'src/homepage/services/channels/channels.service';
 import { ItemsService } from 'src/homepage/services/items/items.service';
 import { NotificationsService } from 'src/homepage/services/notifications/notifications.service';
+import { RequestService } from 'src/homepage/services/request/request.service';
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
 
 @WebSocketGateway(3003, {
@@ -31,7 +32,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		private tokenManager: TokenManagerService,
 		private notificationService: NotificationsService,
 		private itemsService: ItemsService,
-		private channelsService: ChannelsService
+		private requestService: RequestService,
 	) {
 		this.userList = new Map<number, Socket>();
 	}
@@ -103,12 +104,8 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		if(!body)
 			throw new WsException('Pas de body');
 		console.log('request from ' + source.name + ' to: ' + body.target_id);
-		if (body.type == 'friend') {
-			if (!(await this.itemsService.canSendRequest(source.sub, body.target_id)))
-				return client.emit('alreadySent', 'Not possible');
-			else if (!(await this.itemsService.addFriendRequestToUsers(source.sub, body.target_id)))
-				return client.emit('refusedRequest', 'Friend request refused');
-		}
+		if (body.type == 'friend' && await this.requestService.handleFriendRequestInvite(source.sub, body.target_id))
+			client.emit('refusedInvite', 'Something went wrong');
 		if (target)
 			target.emit(body.type + 'Invite', { notification: answer });
 		else
@@ -128,11 +125,11 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		const user = this.userList.get(body.target_id);
 		if (body.accepted)
 		{
-			if (body.type == 'friend' && !(await this.itemsService.addFriendToUser(source.sub, body.target_id)))
-					return client.emit('No request to answer to');
-			if (body.type == 'channel')
-				await this.channelsService.addUserToChannel(body.target_id, body.channel_id);
+			if (body.type == 'friend' && !this.requestService.handleFriendRequestAnswer(source.sub, body.target_id))
+				return client.emit('No request to answer to');
 		}
+		else
+			this.itemsService.deleteFriendRequest(source.sub, body.target_id);
 		client.emit('success', 'Answer sent');
 		if (user) user.emit(body.type + 'Answer', { notification: answer });
 	}

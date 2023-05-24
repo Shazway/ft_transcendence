@@ -33,6 +33,7 @@ import { HttpexceptionFilter } from './filters/httpexception/httpexception.filte
 import { APP_FILTER } from '@nestjs/core';
 import { WsexceptionFilter } from './filters/wsexception/wsexception.filter';
 import { ServerKeyService } from './services/server-key/server-key.service';
+import { RequestService } from './services/request/request.service';
 
 @Module({
 	imports: [
@@ -80,6 +81,7 @@ import { ServerKeyService } from './services/server-key/server-key.service';
 		PongGateway,
 		GamesService,
 		ServerKeyService,
+		RequestService,
 	],
 })
 export class HomepageModule {
