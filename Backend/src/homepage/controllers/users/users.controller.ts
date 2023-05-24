@@ -144,6 +144,19 @@ export class UsersController {
 		res.status(HttpStatus.OK).send(userEntity.blacklistEntry);
 	}
 
+	@Get('removeFriend/:id')
+	async removeFriend(
+		@Param('id', ParseIntPipe) target_id: number,
+		@Req() req: Request,
+		@Res() res: Response
+	) {
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+
+		if (!(await this.itemsService.removeFriend(user.sub, target_id)))
+			return res.status(HttpStatus.NOT_FOUND).send('Error');
+		res.status(HttpStatus.ACCEPTED).send('User removed');
+	}
+
 	@Get(':username')
 	async getUser(@Param('username') us: string, @Req() req: Request, @Res() res: Response) {
 		const user = await this.itemsService.getUserByUsername(us);

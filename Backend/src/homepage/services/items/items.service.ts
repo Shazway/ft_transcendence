@@ -306,9 +306,17 @@ export class ItemsService {
 	) {
 		if (!source || !friend)
 			return null;
-		source.friend = source.friend.filter((source) => source.user_id === friend.user_id);
-		friend.friend = friend.friend.filter((user) => user.user_id === source.user_id);
+		source.friend = source.friend.filter((source) => source.user_id !== friend.user_id);
+		friend.friend = friend.friend.filter((user) => user.user_id !== source.user_id);
 		return await this.userRepo.save([source, friend]);
+	}
+	public async removeFriend(sourceId: number, targetId: number) {
+		const source = await this.getUser(sourceId);
+		const target = await this.getUser(targetId);
+
+		if (!source || !target)
+			return null;
+		return await this.removeFriendFromUsers(source, target);
 	}
 
 	public async getFriends(user_id: number) {
