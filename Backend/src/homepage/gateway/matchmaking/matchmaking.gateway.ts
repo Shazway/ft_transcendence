@@ -42,7 +42,7 @@ export class MatchmakingGateway {
 		if (!user) return client.disconnect();
 		console.log({ new_player: user });
 		const player = await this.itemsService.getUser(user.sub);
-		if (!player) return;
+		if (!player || player.inMatch) return client.disconnect();
 		const rankFork = this.getRankFork(player.rank_score);
 		let bracket = this.userQueue.get(rankFork);
 		if (!bracket) {
@@ -61,6 +61,8 @@ export class MatchmakingGateway {
 		const player = await this.itemsService.getUser(user.sub);
 
 		if (!player) return client.disconnect();
+		player.inMatch = false;
+		this.itemsService.saveUserState(player);
 		const rankFork = this.getRankFork(player.rank_score);
 		const bracket = this.userQueue.get(rankFork);
 		this.matchMaker = this.matchMaker.filter((player) => player.user_id != user.sub);

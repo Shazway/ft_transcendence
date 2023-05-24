@@ -462,6 +462,8 @@ export class ItemsService {
 			match.is_ongoing = false;
 		userOne.match_history.push(match);
 		userTwo.match_history.push(match);
+		userOne.inMatch = false;
+		userTwo.inMatch = false;
 		await this.matchRepo.save(match);
 		return await this.userRepo.save([userOne, userTwo]);
 	}
@@ -526,5 +528,9 @@ export class ItemsService {
 			receivedRequest,
 			sentRequest
 		]);
+	}
+
+	async saveUserState(user: UserEntity) {
+		return await this.userRepo.save(user);
 	}
 }
