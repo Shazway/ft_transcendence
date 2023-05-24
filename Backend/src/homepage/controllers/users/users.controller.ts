@@ -182,6 +182,19 @@ export class UsersController {
 		res.status(HttpStatus.ACCEPTED).send('Success');
 	}
 
+	@Get('ongoingMatch/:id')
+	async getOngoingMatch(
+		@Param('id', ParseIntPipe) target_id: number,
+		@Req() req: Request,
+		@Res() res: Response
+	) {
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
+		const match = await this.itemsService.getCurrentMatch(target_id);
+		if (!match) return res.status(HttpStatus.NOT_FOUND).send('Match not found');
+		return res.status(HttpStatus.OK).send(match.match_id);
+	}
+
 	@Get(':username')
 	async getUser(@Param('username') us: string, @Req() req: Request, @Res() res: Response) {
 		const user = await this.itemsService.getUserByUsername(us);

@@ -4,7 +4,6 @@ import { MatchEntity, MatchSettingEntity } from 'src/entities';
 import { Player } from 'src/homepage/dtos/Matchmaking.dto';
 import { GameEnd, Move, ballObject, pongObject } from 'src/homepage/dtos/Pong.dto';
 import { ItemsService } from '../items/items.service';
-import { Socket } from 'socket.io';
 
 @Injectable()
 export class GamesService {
@@ -121,7 +120,7 @@ export class GamesService {
 	buildEndEvent(player: pongObject, id?: number): GameEnd
 	{
 		if (!id)
-			return (player.score >= 10 ? {state: this.WIN, reason: "score"} : {state: this.LOSS, reason: "score"});
+			return (player.score >= this.matchSetting.score_to_win ? {state: this.WIN, reason: "score"} : {state: this.LOSS, reason: "score"});
 		else
 			return (player.player.user_id == id ? {state: this.LOSS, reason: "left"} : {state: this.WIN, reason: "left"})
 	}
@@ -135,7 +134,8 @@ export class GamesService {
 		this.emitToSpectators('onMatchEnd', this.buildEndEvent(this.player1, id));
 		if (this.player2.player.client)
 			this.player2.player.client.emit('onMatchEnd', this.buildEndEvent(this.player2, id));
-		this.itemsService.updateRankScore(this.player1, this.player2, this.match);
+		if (this.matchSetting.is_ranked)
+			this.itemsService.updateRankScore(this.player1, this.player2, this.match, this.matchSetting);
 		this.endGame();
 	}
 
@@ -158,7 +158,7 @@ export class GamesService {
 				this.countdown = 300;
 				this.sendScoreChange(pointChecker);
 			}
-			if (this.player1.score >= 10 || this.player2.score >= 10)
+			if (this.player1.score >= this.matchSetting.score_to_win || this.player2.score >= this.matchSetting.score_to_win)
 				this.endMatch();
 		}
 	}

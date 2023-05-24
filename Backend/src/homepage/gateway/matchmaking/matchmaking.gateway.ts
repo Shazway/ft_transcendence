@@ -113,8 +113,7 @@ export class MatchmakingGateway {
 					if (this.matchMaker.length == 2) {
 						const match = await this.matchsService.createFullMatch(
 							this.matchMaker[0].user_id,
-							this.matchMaker[1].user_id,
-							false
+							this.matchMaker[1].user_id
 						);
 						this.matchMaker[0].client.emit(
 							'foundMatch',

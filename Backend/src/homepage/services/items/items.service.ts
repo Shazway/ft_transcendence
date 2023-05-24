@@ -445,14 +445,14 @@ export class ItemsService {
 		return player;
 	}
 
-	async updateRankScore(player1: pongObject, player2: pongObject, match: MatchEntity)
+	async updateRankScore(player1: pongObject, player2: pongObject, match: MatchEntity, matchSetting: MatchSettingEntity)
 	{
 		let userOne = await this.getUser(player1.player.user_id);
 		let userTwo = await this.getUser(player2.player.user_id);
 
 		if (!userOne || !userTwo)
 			return null;
-		if (player1.score == 10)
+		if (player1.score == matchSetting.score_to_win)
 		{
 			match.is_victory[0] = true;
 			match.is_victory[1] = false;
@@ -549,5 +549,13 @@ export class ItemsService {
 			return null;
 		user.img_url = img_url;
 		return await this.userRepo.save(user);
+	}
+
+	async getCurrentMatch(target_id: number) {
+		const user = await this.getUser(target_id);
+		if (!user)
+			return null;
+		const match = user.match_history.find((match) => {match.is_ongoing});
+		return match;
 	}
 }

@@ -20,14 +20,17 @@ export class MatchsService {
 	async createRankedMatchSetting() {
 		const Settings = new MatchSettingEntity();
 		Settings.is_ranked = true;
-		Settings.score_to_win = 5;
-		Settings.round_to_win = 3;
+		Settings.score_to_win = 10;
 		const newSettings = this.matchSettingRepo.create(Settings);
+		return await this.matchSettingRepo.save(newSettings);
+	}
+	async createCustomMatchSetting(matchSetting: MatchSetting) {
+		const newSettings = this.matchSettingRepo.create(matchSetting);
 		return await this.matchSettingRepo.save(newSettings);
 	}
 
 	//For new matchmaking based matches
-	public async createMatch(playerOne: UserEntity, playerTwo: UserEntity, isCustom: boolean) {
+	public async createMatch(playerOne: UserEntity, playerTwo: UserEntity) {
 		const match = new MatchEntity();
 		const users = [playerOne, playerTwo];
 		const scores = [0, 0];
@@ -41,14 +44,15 @@ export class MatchsService {
 		return await this.matchRepo.save(newMatch);
 	}
 
-	async createFullMatch(playerOne: number, playerTwo: number, isCustom: boolean) {
+	async createFullMatch(playerOne: number, playerTwo: number, matchSetting: MatchSetting = null) {
 		const userOne = await this.itemsService.getUser(playerOne);
 		const userTwo = await this.itemsService.getUser(playerTwo);
 		if (!userOne || !userTwo) return null;
-		const match = await this.createMatch(userOne, userTwo, isCustom);
+		const match = await this.createMatch(userOne, userTwo);
 		if (!match) return null;
-		await this.createRankedMatchSetting();
-		//match.user.push(userOne, userTwo);
+		if (!matchSetting) await this.createRankedMatchSetting();
+		else await this.createCustomMatchSetting(matchSetting);
+
 		userOne.match_history.push(match);
 		userTwo.match_history.push(match);
 		await this.usersRepo.save([userOne, userTwo]);
@@ -63,6 +67,11 @@ export class MatchsService {
 		if (!user || !match) return false;
 		if (!(await this.itemsService.addUserToMatch(user, match))) return false;
 		return true;
+	}
+
+	public async addUsersToMatch(player1: number, player2: number, matchId: number) {
+		await this.addUserToMatch(player1, matchId);
+		await this.addUserToMatch(player2, matchId);
 	}
 
 	public async setMatchEnd(matchEntity: MatchEntity) {
