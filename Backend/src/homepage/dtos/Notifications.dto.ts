@@ -1,3 +1,5 @@
+import { MatchSettingEntity } from 'src/entities';
+
 export class NotificationRequest {
 	type: string;
 	target_name: string;
@@ -5,6 +7,7 @@ export class NotificationRequest {
 	sent_at: Date;
 	accepted: boolean;
 	channel_id: number;
+	match_setting: MatchSettingEntity;
 }
 
 export class NotificationResponse {

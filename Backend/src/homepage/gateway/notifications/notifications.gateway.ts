@@ -12,8 +12,8 @@ import {
 import { Socket } from 'socket.io';
 import { AchievementsEntity } from 'src/entities';
 import { NotificationRequest, NotificationResponse } from 'src/homepage/dtos/Notifications.dto';
-import { ChannelsService } from 'src/homepage/services/channels/channels.service';
 import { ItemsService } from 'src/homepage/services/items/items.service';
+import { MatchsService } from 'src/homepage/services/matchs/matchs.service';
 import { NotificationsService } from 'src/homepage/services/notifications/notifications.service';
 import { RequestService } from 'src/homepage/services/request/request.service';
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
@@ -33,6 +33,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		private notificationService: NotificationsService,
 		private itemsService: ItemsService,
 		private requestService: RequestService,
+		private matchService: MatchsService,
 	) {
 		this.userList = new Map<number, Socket>();
 	}
@@ -107,7 +108,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		if (body.type == 'friend' && await this.requestService.handleFriendRequestInvite(source.sub, body.target_id))
 			client.emit('refusedInvite', 'Something went wrong');
 		if (target)
-			target.emit(body.type + 'Invite', { notification: answer });
+			target.emit(body.type + 'Invite', { notification: answer, matchSetting: body.match_setting});
 		else
 			console.log('Pas connecte target');
 		if (notifClient)
@@ -122,15 +123,26 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		if (!body)
 			throw new WsException('No answer given is necessary');
 		const answer = this.buildAnswer(source.sub, source.name, body.type, body.accepted);
-		const user = this.userList.get(body.target_id);
+		const target = this.userList.get(body.target_id);
 		if (body.accepted)
 		{
 			if (body.type == 'friend' && !this.requestService.handleFriendRequestAnswer(source.sub, body.target_id))
 				return client.emit('No request to answer to');
+			if (body.type == 'match')
+			{
+				if (!target)
+					return client.emit('Disconnect', 'Opponent disconnected');
+				const match = await this.matchService.createFullMatch(source.sub, body.target_id, body.match_setting);
+				if (!match)
+					return client.emit('Error', 'Something went wrong');
+				client.emit('casualMatch', match.match_id);
+				target.emit('casualMatch', match.match_id);
+				return;
+			}
 		}
 		else
 			this.itemsService.deleteFriendRequest(source.sub, body.target_id);
 		client.emit('success', 'Answer sent');
-		if (user) user.emit(body.type + 'Answer', { notification: answer });
+		if (target) target.emit(body.type + 'Answer', { notification: answer });
 	}
 }
