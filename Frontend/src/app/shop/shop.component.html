@@ -24,7 +24,9 @@
 		<div class="d-flex row row-cols-1 row-cols-md-3 px-4 m-0" >
 			<div class="col-3 m-0 mb-4" *ngFor="let item of filteredItems">
 				<div class="card" style="max-width: 30vw;">
-					<img src="{{item.image}}" class="card-image-top">
+					<div style="max-height: 200px; display: flex; justify-content: center; align-items: center;">
+						<img src="{{item.img_url}}" class="card-image-top" style="object-fit: contain; max-width: 100%; max-height: 100%;">
+					</div>
 					<div class="card-body" style="color: black;">
 						<h5 class="card-title">{{item.name}}</h5>
 						<p class="card-text">{{item.description}}</p>
