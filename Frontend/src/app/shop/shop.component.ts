@@ -60,22 +60,18 @@ export class ShopComponent implements AfterViewInit {
 
 	onChange(value: any) {
         this.chosenType = value.target.value;
-		console.log("Le user a choisi " + this.chosenType);
 		this.filterItems("");
     }
 
 	onClickSearch(value: any)
 	{
 		this.searching = value;
-		console.log(value);
-		console.log("Le user cherche " + this.searching);
 		this.filterItems("");
 
 	}
 
 	filter(element : ShopItem, index : number)
 	{
-		console.log("fonction filter");
 		if ((this.chosenType == '' || element.type===this.chosenType) && (this.searching == '' || element.name.search(this.searching) != -1 || element.description.search(this.searching) != -1))
 			return true;
 		return false
@@ -83,7 +79,6 @@ export class ShopComponent implements AfterViewInit {
 
 	filterItems(value: string)
 	{
-		console.log("filtering");
 		if (this.items)
 			this.filteredItems = this.items.filter(this.filter.bind(this));
 	}
@@ -91,24 +86,17 @@ export class ShopComponent implements AfterViewInit {
 	async confirmBuy(item : ShopItem) {
 		let res : {newBalance : number, availableSkins : ShopItem[]} | null;
 		const validate = await this.createPopup(item);
-		console.log(validate);
 		if (validate)
 		{
 			res = await this.fetchService.buy(item);
 			if (res)
 			{
-				console.log("validated");
 				this.playerWealth = res.newBalance;
 				this.items = res.availableSkins;
 				this.filterItems(this.searching);
-				console.log(res.availableSkins);
 				this.parent.updateThunes(this.playerWealth);
 			}
-			else
-				console.log("failed");
 		}
-		else
-			console.log("canceled");
 	}
 	
 	async createPopup(item : ShopItem) {
@@ -120,6 +108,5 @@ export class ShopComponent implements AfterViewInit {
 	async getMoney()
 	{
 		this.playerWealth = await this.fetchService.getBalance();
-		console.log("thune " + this.playerWealth);
 	}
 }

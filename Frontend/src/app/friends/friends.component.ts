@@ -60,14 +60,12 @@ export class FriendsComponent {
 		this.friends = await this.fetchService.getFriends();
 		this.friends.sort((a, b) => b.activity_status - a.activity_status);
 		this.friendshipRequests = await this.fetchService.getFriendshipRequests();
-		console.log(this.friendshipRequests.received);
 	}
 	
 	async addSystemFriend() {
 		await this.fetchService.addFriends(1);
 		this.friends.splice(0);
 		this.friends = await this.fetchService.getFriends();
-		console.log(this.friends);
 	}
 
 	async onClickFriend(friend: AnyProfileUser)
@@ -122,7 +120,6 @@ export class FriendsComponent {
 		this.friends.splice(this.friends.indexOf(block), 1);
 
 		//add a pop-up to confirm
-		console.log("bloque " + block.username);
 		
 	}
 
@@ -131,7 +128,6 @@ export class FriendsComponent {
 		await this.fetchService.unblockUser(block.user_id);
 		this.blockedUsers.splice(this.blockedUsers.indexOf(block), 1);
 		//add a pop-up to confirm
-		console.log("unbloque " + block.username);
 		
 	}
 
@@ -157,7 +153,6 @@ export class FriendsComponent {
 
 	accept(request : FriendRequest)
 	{
-		console.log("demande acceptee");
 		this.friendshipRequests.received.splice(this.friendshipRequests.received.indexOf(request), 1);
 		this.friends.push(request.sender);
 		this.notifService.emit('inviteAnswer', this.friendRequestToNotificationRequest(request, true));
@@ -165,7 +160,6 @@ export class FriendsComponent {
 
 	reject(request : FriendRequest)
 	{
-		console.log("demande rejetee");
 		this.friendshipRequests.received.splice(this.friendshipRequests.received.indexOf(request), 1);
 		this.notifService.emit('inviteAnswer', this.friendRequestToNotificationRequest(request, false));
 	}

@@ -53,7 +53,6 @@ export class FetchService {
 		await axios.get('http://localhost:3001/leaderboard', this.getHeader())
 		.then(function (response) {
 			res = response.data;
-			console.log(res);
 		})
 		.catch(function (error) {
 			teaFunc(error, route);
@@ -69,7 +68,6 @@ export class FetchService {
 		await axios.post<Response>('http://localhost:3001/users/create', param, this.getHeader())
 		.then(function (response) {
 			res = response.data;
-			console.log(res);
 			localStorage.setItem('Jwt_token', res.token);
 			localStorage.setItem('id', res.user_id);
 			localStorage.setItem('username', res.username);
@@ -88,7 +86,6 @@ export class FetchService {
 		await axios.get<Response>('http://localhost:3001/users/' + login, this.getHeader())
 		.then(function (response) {
 			res = response.data;
-			console.log(res);
 			localStorage.setItem('Jwt_token', res.token);
 			localStorage.setItem('id', res.user_id);
 			localStorage.setItem('username', res.username);
@@ -109,7 +106,6 @@ export class FetchService {
 		await axios.get<AnyProfileUser>('http://localhost:3001/profile/' + login, this.getHeader())
 		.then(function (response) {
 			res = response.data;
-			console.log(res);
 		})
 		.catch(function (error) {
 			teaFunc(error, route);
@@ -127,7 +123,6 @@ export class FetchService {
 		await axios.get<MyProfileUser>('http://localhost:3001/profile/' + localStorage.getItem('username'), this.getHeader())
 		.then(function (response) {
 			res = response.data;
-			console.log(res);
 		})
 		.catch(function (error) {
 			teaFunc(error, route);
@@ -154,8 +149,6 @@ export class FetchService {
 		.then(function (response) {
 			if (response && response.data)
 				res = response.data.availableSkins;
-			console.log("available skins : ");
-			console.log(res);
 		})
 		.catch(function (error) {
 			teaFunc(error, route);
@@ -168,12 +161,9 @@ export class FetchService {
 		let res : {newBalance : number, availableSkins : ShopItem[]} | undefined;
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log("ITEM");
-		console.log(item);
 		await axios.get<{newBalance : number, availableSkins : ShopItem[]}>('http://localhost:3001/shop/buy/' + item.skin_id, this.getHeader())
 		.then(function (response) {
 			res = response.data;
-			console.log("available skins : " + res.availableSkins);
 		})
 		.catch(function (error) {
 			teaFunc(error, route);
@@ -191,7 +181,6 @@ export class FetchService {
 		await axios.get<Array<AnyProfileUser>>('http://localhost:3001/leaderboard', this.getHeader())
 		.then(function (response) {
 			res = response.data;
-			console.log("leaders:" +res);
 		})
 		.catch(function (error) {
 			teaFunc(error, route);
@@ -208,7 +197,6 @@ export class FetchService {
 		.then(function (response) {
 			if (response && response.data)
 				res = response.data;
-			console.log("amis :" +res);
 		})
 		.catch(function (error) {
 			teaFunc(error, route);
@@ -224,7 +212,6 @@ export class FetchService {
 		await axios.get<{received: Array<FriendRequest>, sent: Array<FriendRequest>}>('http://localhost:3001/users/friendRequests', this.getHeader())
 		.then(function (response) {
 			res = response.data;
-			console.log("demandes :" +res);
 		})
 		.catch(function (error) {
 			teaFunc(error, route);
@@ -240,8 +227,6 @@ export class FetchService {
 		await axios.get<Array<AnyProfileUser>>('http://localhost:3001/users/getBlockedUsers', this.getHeader())
 		.then(function (response) {
 			res = response.data;
-			console.log("blocked :");
-			console.log(res);
 		})
 		.catch(function (error) {
 			teaFunc(error, route);
@@ -257,7 +242,6 @@ export class FetchService {
 		await axios.get('http://localhost:3001/users/block/' + block_id, this.getHeader())
 		.then(function (response) {
 			res = response.data;
-			console.log(res);
 		})
 		.catch(function (error) {
 			teaFunc(error, route);
@@ -273,7 +257,6 @@ export class FetchService {
 		await axios.get('http://localhost:3001/users/unblock/' + block_id, this.getHeader())
 		.then(function (response) {
 			res = response.data;
-			console.log(res);
 		})
 		.catch(function (error) {
 			teaFunc(error, route);
@@ -289,7 +272,6 @@ export class FetchService {
 		await axios.get('http://localhost:3001/users/add_friend/' + friend_id, this.getHeader())
 		.then(function (response) {
 			res = response.data;
-			console.log(res);
 		})
 		.catch(function (error) {
 			teaFunc(error, route);
@@ -305,7 +287,6 @@ export class FetchService {
 		await axios.get('http://localhost:3001/users/removeFriend/' + friend_id, this.getHeader())
 		.then(function (response) {
 			res = response.data;
-			console.log(res);
 		})
 		.catch(function (error) {
 			teaFunc(error, route);
@@ -322,7 +303,6 @@ export class FetchService {
 		await axios.get('http://localhost:3001/channels/' + channel_id + '/messages/' + page, this.getHeader())
 		.then(function (response) {
 			res = response.data;
-			console.log(res);
 		})
 		.catch(function (error) {
 			teaFunc(error, route);
@@ -335,11 +315,9 @@ export class FetchService {
 		let res;
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log(param);
 		await axios.post('http://localhost:3001/channels/create', param, this.getHeader())
 		.then(function (response) {
 			res = response.data;
-			console.log(res);
 		})
 		.catch(function (error) {
 			teaFunc(error, route);
@@ -355,7 +333,6 @@ export class FetchService {
 		await axios.get('http://localhost:3001/channels/all', this.getHeader())
 		.then(function (response) {
 			res = response.data;
-			console.log(res);
 		})
 		.catch(function (error) {
 			teaFunc(error, route);
@@ -371,7 +348,6 @@ export class FetchService {
 		await axios.get('http://localhost:3001/channels/' + id, this.getHeader())
 		.then(function (response) {
 			res = response.data;
-			console.log(res);
 		})
 		.catch(function (error) {
 			teaFunc(error, route);
@@ -387,8 +363,6 @@ export class FetchService {
 		await axios.post<Array<AnyProfileUser>>('http://localhost:3001/users/prefixedList', {prefix : value}, this.getHeader())
 		.then(function (response) {
 			res = response.data;
-			console.log("found :");
-			console.log(res);
 		})
 		.catch(function (error) {
 			teaFunc(error, route);

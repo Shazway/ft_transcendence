@@ -100,7 +100,6 @@ export class AppComponent implements AfterViewInit {
 	}
 
 	showFriendReq(notif : {notification: NotificationResponse}) {
-		console.log(notif);
 		this.notifService.showFriendRequest(notif.notification);
 	}
 
@@ -124,11 +123,6 @@ export class AppComponent implements AfterViewInit {
 	getUsername()
 	{
 		return localStorage.getItem('username');
-	}
-
-	displayUserChoices()
-	{
-		console.log("il faut deplier le dropdown");
 	}
 
 	getBalance()
