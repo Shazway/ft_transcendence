@@ -26,12 +26,12 @@ export class ShopComponent implements AfterViewInit {
 	
 	playerWealth = 0;
 	
-		constructor(
-			private modalService: NgbModal,
-			private parent: AppComponent,
-			private fetchService: FetchService,
-			private router: Router
-		) {
+	constructor(
+		private modalService: NgbModal,
+		private parent: AppComponent,
+		private fetchService: FetchService,
+		private router: Router
+	) {
 		this.getMoney();
 		
 		this.filteredItems = new Array<ShopItem>;
