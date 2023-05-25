@@ -175,7 +175,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		return this.is_admin;
 	}
 
-	createChatPopup(msg: Message, client: Socket, event: MouseEvent) {
+	createChatPopup(msg: Message, event: MouseEvent) {
 		event.preventDefault();
 		if (event.button == 2) {
 			this.parent.openPopover(this.chatInteractionTemplate, new PopoverConfig(
@@ -339,7 +339,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	}
 
 	sortMessage(new_msg: Message) {
-		console.log(new_msg)
 		if (this.test_msgs$.length && this.test_msgs$[this.test_msgs$.length - 1][0].author.user_id == new_msg.author.user_id) {
 			this.test_msgs$[this.test_msgs$.length - 1].push(new_msg);
 			return;

@@ -104,7 +104,6 @@ export class FetchService {
 		let res: AnyProfileUser | undefined;
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log(login);
 		if (!login)
 			return null;
 		await axios.get<AnyProfileUser>('http://localhost:3001/profile/' + login, this.getHeader())
@@ -320,9 +319,8 @@ export class FetchService {
 		const route = this.router;
 		await axios.get('http://localhost:3001/channels/' + channel_id + '/messages/' + page, this.getHeader())
 		.then(function (response) {
-		res = response.data;
-		console.log(res);
-		console.log('WTH');
+			res = response.data;
+			console.log(res);
 		})
 		.catch(function (error) {
 			teaFunc(error, route);

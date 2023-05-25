@@ -187,8 +187,6 @@ export class FriendsComponent {
 		this.requestsElm.classList.remove('active');
 		this.blockedElm.classList.remove('show');
 		this.blockedElm.classList.remove('active');
-
-		console.log("switch to friends");
 	}
 
 	switchToRequests() {
@@ -208,9 +206,6 @@ export class FriendsComponent {
 		this.requestsElm.classList.add('active');
 		this.blockedElm.classList.remove('show');
 		this.blockedElm.classList.remove('active');
-
-		console.log("switch to requets");
-
 	}
 
 	switchToBlocked() {
@@ -230,7 +225,5 @@ export class FriendsComponent {
 		this.requestsElm.classList.remove('active');
 		this.blockedElm.classList.add('show');
 		this.blockedElm.classList.add('active');
-		console.log("switch to blocked");
-
 	}
 }
