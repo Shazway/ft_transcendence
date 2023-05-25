@@ -48,7 +48,7 @@ export class ChannelsController {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
 		const isCreated = await this.channelService.addUserToChannel(user.sub, chan_id);
-		if (!isCreated) res.status(HttpStatus.NOT_FOUND).send({ msg: 'user not added to channel' });
+		if (!isCreated) res.status(HttpStatus.NOT_FOUND).send({ msg: 'User not added to channel' });
 		else res.status(HttpStatus.OK).send({ msg: 'user added to channel' });
 	}
 

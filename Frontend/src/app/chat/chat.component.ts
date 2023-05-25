@@ -48,6 +48,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		private parent: AppComponent,
 	) {
 		this.client = io('ws://localhost:3002?channel_id=' + 1, websocketService.getHeader());
+		console.log('connected');
 		if (!this.client)
 		{
 			this.router.navigateByUrl('login');
@@ -88,20 +89,26 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	}
 
 	async ngOnInit() {
+		console.log('pass 1');
 		if (!this.parent.isConnected())
 			this.router.navigateByUrl('login');
 		this.msgs$ = await this.fetchService.getMessages(1, 0);
+		console.log('pass 2');
 		if (!this.msgs$)
 			return;
 		for (let index = this.msgs$.length; index > 0; index--)
 			this.sortMessage(this.msgs$[index - 1]);
+		console.log('pass 3');
 		this.channels$ = await this.fetchService.getChannels();
+		console.log('pass 4');
 		const chan = await this.fetchService.getChannel(1);
+		console.log('pass 5');
+		console.log(chan);
 		if (chan)
 			this.currentChannel = chan;
 		else
 			console.log('error while fetching channel 1');
-		//this.notificationService.connectSocket();
+		console.log('pass 5');
 	}
 
 	deleteMessage(msg: Message) {

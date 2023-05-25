@@ -295,8 +295,9 @@ export class ItemsService {
 
 	public async createPrivateChannel(user1: UserEntity, user2: UserEntity) {
 		const channel = new ChannelEntity();
-
+	
 		channel.channel_name = user1.username + '/' + user2.username;
+		channel.is_dm = true;
 		channel.is_channel_private = true;
 		const chan = this.chanRepo.create(channel);
 		return this.chanRepo.save(chan);
@@ -432,7 +433,7 @@ export class ItemsService {
 		const user = await this.getUser(user_id);
 		const channel = await this.getChannel(channel_id);
 
-		if (!user || !channel || !chan_user)
+		if (!user || !channel || !chan_user || channel.is_dm)
 			return ;
 		chan_user.user = user;
 		chan_user.channel = channel;
