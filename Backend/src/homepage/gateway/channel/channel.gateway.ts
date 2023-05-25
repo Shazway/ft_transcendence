@@ -64,7 +64,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			return client.disconnect();
 		if (isMember && !channel.is_channel_private)
 		{
-			await this.channelService.isMuted(user.sub, channel_id); //Unmutes if time is up
+			await this.channelService.isMuted(user.sub, channel_id);
 			if ((await this.channelService.isBanned(user.sub, channel_id)) ||
 				!this.addUserToList(client, user))
 			{

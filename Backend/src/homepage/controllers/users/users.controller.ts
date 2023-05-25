@@ -137,10 +137,10 @@ export class UsersController {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
 		const friends = await this.itemsService.getFriends(user.sub);
-		if (friends) {
-			const userFriends = friends.map((user) => plainToClass(AnyProfileUser, user));
-			res.status(HttpStatus.OK).send(userFriends);
-		} else res.status(HttpStatus.NOT_FOUND).send({ msg: 'No friends found' });
+		let userFriends = new Array<AnyProfileUser>;
+		if (friends)
+			userFriends = friends.map((user) => plainToClass(AnyProfileUser, user));
+		res.status(HttpStatus.OK).send(userFriends);
 	}
 
 	@Get('friendRequests')

@@ -5,6 +5,7 @@ import { Friendrequest } from 'src/entities/friend_request.entity';
 import { Match } from 'src/entities/matchs.entity';
 import { User } from 'src/entities/users.entity';
 import { Skin } from 'src/entities/skins.entity';
+import { AchievementList } from './Achievement.dto';
 
 export class NewUser {
 	login: string;
@@ -22,7 +23,7 @@ export class AnyProfileUser {
 	createdAt: Date;
 	wins: number;
 	losses: number;
-	achievements: Achievement[];
+	achievements: AchievementList;
 	friend: User[];
 	user_id: number;
 	intra_id!: number;
@@ -47,7 +48,7 @@ export class MyProfileUser {
 	wins: number;
 	losses: number;
 	channel: ChannelUser[];
-	achievements: Achievement[];
+	achievements: AchievementList;
 	currency: number;
 	friend: User[];
 	sentFriendRequests: Friendrequest[];
