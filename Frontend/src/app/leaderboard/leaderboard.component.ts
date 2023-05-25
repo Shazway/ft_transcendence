@@ -28,17 +28,29 @@ export class LeaderboardComponent {
 	async updateCurrentUser(newUser : AnyProfileUser) {
 		let updated :  AnyProfileUser | null;
 		this.currentUser = newUser;
+		this.currentStatus = this.currentUser.activity_status;
 		updated = await this.fetchService.getProfile(newUser.username);
-		if (updated)
-			this.currentStatus = updated.activity_status;
-		else
-			this.currentStatus = newUser.activity_status;
+		if (updated) {
+			if (updated.user_id == this.currentUser.user_id)
+				this.currentStatus = updated.activity_status;
+			newUser.activity_status = updated.activity_status;
+		}
 	}
 
-	async spectate(friend: AnyProfileUser)
-	{
+	async spectate(friend: AnyProfileUser) {
+		if (friend.activity_status != 2)
+			return;
 		//todo
 		console.log("Tentative de spectate");
+	}
+
+	getCurrentStatus(status: number) {
+		if (this.currentUser.username == localStorage.getItem('username'))
+			return ['online', 'bg-success'];
+		if (status == 0) return ['offline', 'bg-secondary'];
+		if (status == 1) return ['online', 'bg-success'];
+		if (status == 2) return ['playing', 'bg-primary'];
+		return 'WTF?';
 	}
 
 	

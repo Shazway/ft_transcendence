@@ -1,4 +1,7 @@
-import { Component } from '@angular/core';
+import { Component} from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
+import { AnyProfileUser } from 'src/dtos/User.dto';
+import { FetchService } from '../fetch.service';
 
 @Component({
   selector: 'app-search',
@@ -7,15 +10,22 @@ import { Component } from '@angular/core';
 })
 export class SearchComponent {
 
+	foundProfiles : AnyProfileUser[];
 
-	searching = "";
+	constructor(
+		private fetchService: FetchService,
+	) {
+		this.foundProfiles = [];
+	}
 
-	
-	onClickSearch(value: any)
-	{
-		this.searching = value;
-		console.log(value);
-		console.log("Le user cherche " + this.searching);
+	changeSearch(value : string) {
+		if (value.length >= 3)
+			this.onClickSearch(value);
+	}
+
+	async onClickSearch(value : string) {
+		console.log("appel au back pour " + value);
+		this.foundProfiles = await this.fetchService.searchingPrefix(value);
 	}
 
 }

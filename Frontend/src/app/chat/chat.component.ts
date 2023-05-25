@@ -261,7 +261,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		this.client.emit('delMessage', msg)
 	}
 
-	slideChan() {
+	async slideChan() {
 		const offscreenChat = this.elRef.nativeElement.querySelector('.offscreen');
 		const offscreenChatBtn = this.elRef.nativeElement.querySelector('#chatBtn');
 		const offscreenElm = this.elRef.nativeElement.querySelector('.channel_pan');
@@ -282,6 +282,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			offscreenElm.classList.add('show');
 			onscreenElm.classList.add('hide');
 			offCreateChan.classList.remove('show');
+			this.channels$ = await this.fetchService.getChannels();
 		}
 	}
 
@@ -301,12 +302,13 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		this.slideChan();
 	}
 
-	createChannel() {
+	async createChannel() {
 		const offCreateChan = this.elRef.nativeElement.querySelector('.channel_create_pan');
 		const offscreenElm = this.elRef.nativeElement.querySelector('.channel_pan');
 		if (offCreateChan.classList.contains('show')) {
 			offCreateChan.classList.remove('show');
 			offscreenElm.classList.add('show');
+			this.channels$ = await this.fetchService.getChannels();
 		}
 		else {
 			offCreateChan.classList.add('show');

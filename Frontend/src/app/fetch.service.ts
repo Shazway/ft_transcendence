@@ -378,4 +378,21 @@ export class FetchService {
 		.finally(function () {});
 		return res;
 	}
+
+	async searchingPrefix(value : string) {
+		let res: AnyProfileUser[] = [];
+		const teaFunc = this.teapotError;
+		const route = this.router;
+		await axios.post<Array<AnyProfileUser>>('http://localhost:3001/users/prefixedList', {prefix : value}, this.getHeader())
+		.then(function (response) {
+			res = response.data;
+			console.log("found :");
+			console.log(res);
+		})
+		.catch(function (error) {
+			teaFunc(error, route);
+		})
+		.finally(function () {});
+		return res;
+	}
 }
