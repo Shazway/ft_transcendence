@@ -5,9 +5,9 @@
 	</button>
 </div>
 <div class="modal-body">
-	Do you want to buy the {{item.type}} "{{item.name}}" ?
+	Are you sure you want to block {{user.username}} ? It will delete your private convo and you won't see their messages anymore 
 </div>
 <div class="modal-footer">
 		<button type="button" class="btn btn-secondary" (click)="onSubmit(false)">Cancel</button>
-		<button type="submit" class="btn btn-primary" (click)="onSubmit(true)">Buy for {{item.price}}</button>
+		<button type="submit" class="btn btn-primary" (click)="onSubmit(true)">Block {{user.username}}</button>
 </div>

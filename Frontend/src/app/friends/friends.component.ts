@@ -2,7 +2,7 @@ import { Component, ElementRef } from '@angular/core';
 import { FetchService } from '../fetch.service';
 import { AnyProfileUser, FriendRequest } from 'src/dtos/User.dto';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { PunishmentPopup } from '../popup-component/popup-component.component';
+import { ConfirmBlockPopup, ConfirmUnfriendPopup, PunishmentPopup } from '../popup-component/popup-component.component';
 import { Router } from '@angular/router';
 import { AppComponent } from '../app.component';
 import { NotificationRequest } from 'src/dtos/Notification.dto';
@@ -99,7 +99,7 @@ export class FriendsComponent {
 
 	goToProfile(friend: AnyProfileUser)
 	{
-		return("http://localhost/profile/" + friend.user_id);
+		this.router.navigateByUrl("http://localhost/profile/" + friend.user_id);
 	}
 
 	goToMessages(friend: AnyProfileUser)
@@ -107,20 +107,30 @@ export class FriendsComponent {
 
 	}
 
+	async unfriendPopup(user : AnyProfileUser) {
+		const modalRef = this.modalService.open(ConfirmUnfriendPopup);
+		modalRef.componentInstance.item = user;
+		return await modalRef.result;
+	}
+
 	async removeFriend(friend: AnyProfileUser)
 	{
-		//add a pop-up to confirm
+		const validate = await this.unfriendPopup(friend);
 		await this.fetchService.removeFriends(friend.user_id);
 		this.friends.splice(this.friends.indexOf(friend), 1);
 	}
 
+	async blockPopup(user : AnyProfileUser) {
+		const modalRef = this.modalService.open(ConfirmBlockPopup);
+		modalRef.componentInstance.item = user;
+		return await modalRef.result;
+	}
+
 	async blockUser(block: AnyProfileUser)
 	{
+		const validate = await this.unfriendPopup(block);
 		await this.fetchService.blockUser(block.user_id);
 		this.friends.splice(this.friends.indexOf(block), 1);
-
-		//add a pop-up to confirm
-		
 	}
 
 	async unblockUser(block: AnyProfileUser)

@@ -314,16 +314,20 @@ export class ItemsService {
 		channel.us_channel.push(chanUser1, chanUser2);
 		user1.channel.push(chanUser1);
 		user2.channel.push(chanUser2);
-		await this.userRepo.save([user1, user2]);
+		await this.userRepo.save(user1);
+		await this.userRepo.save(user2);
 		await this.chanRepo.save(channel);
 		await this.chan_userRepo.save([chanUser1, chanUser2]);
 	}
 
 	public async addFriendsToPrivateChannel(user1: UserEntity, user2: UserEntity) {
-		const channel = await this.createPrivateChannel(user1, user2);
-		if (!channel)
+		const oldChannel = await this.createPrivateChannel(user1, user2);
+		if (!oldChannel)
 			return null;
-		this.addUsersToPrivateChannel(user1, user2, channel);
+		const newChan = await this.getChannel(oldChannel.channel_id);
+		if (!newChan)
+			return null;
+		this.addUsersToPrivateChannel(user1, user2, newChan);
 	}
 
 	public async addFriendToUser(
@@ -343,10 +347,11 @@ export class ItemsService {
 			receivedRequest,
 			sentRequest
 		]);
+		console.log(sourceUser.username);
+		console.log(targetUser.username);
 		sourceUser.friend.push(targetUser);
 		targetUser.friend.push(sourceUser);
-		await this.addFriendsToPrivateChannel(sourceUser, targetUser);
-		return await this.userRepo.save([sourceUser, targetUser]);
+		await this.addFriendsToPrivateChannel(sourceUser, targetUser);;
 	}
 
 	public async removeFromPrivateChannel(source: UserEntity, friend: UserEntity) {
