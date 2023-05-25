@@ -12,20 +12,21 @@ export class AssetManager {
 	styles!: any;
 	async initAssets() {
 		PIXI.Assets.addBundle('fonts', {
-			PixeloidSans: 'assets/PixeloidMono.ttf',
-			PixeloidMono: 'assets/PixeloidMono.ttf',
-			PixeloidSansBold: 'assets/PixeloidSansBold.ttf',
+			PixeloidSans: 'assets/Fonts/PixeloidMono.ttf',
+			PixeloidMono: 'assets/Fonts/PixeloidMono.ttf',
+			PixeloidSansBold: 'assets/Fonts/PixeloidSansBold.ttf',
 		});
-		PIXI.Assets.add('SkinGradient' ,'assets/paddle-red-gradient.png');
-		PIXI.Assets.add('SkinHotDog' ,'assets/raquette-hotdog.png');
-		PIXI.Assets.add('SkinSwirl' ,'assets/Swirl.png');
-		PIXI.Assets.add('SkinPoele' ,'assets/raquette-poele.png');
-		PIXI.Assets.add('SkinBaguette' ,'assets/raquette-baguette.png');
-		PIXI.Assets.add('SkinEclair' ,'assets/raquette-eclairAuChocolat.png');
-		PIXI.Assets.add('SkinTorti' ,'assets/raquette-torti.png');
-		PIXI.Assets.add('balleBallon' ,'assets/balle-ballon.png');
-		PIXI.Assets.add('balleCitron' ,'assets/balle-tarteCitron.png');
-		PIXI.Assets.add('balleFraise' ,'assets/balle-tarteFraise.png');
+		PIXI.Assets.add('SkinGradient' ,'assets/Skins/Paddle/red-gradient.png');
+		PIXI.Assets.add('SkinHotDog' ,'assets/Skins/Paddle/hotdog.png');
+		PIXI.Assets.add('Default' ,'assets/Skins/Paddle/default.png');
+		PIXI.Assets.add('SkinSwirl' ,'assets/Skins/Paddle/Swirl.png');
+		PIXI.Assets.add('SkinPoele' ,'assets/Skins/Paddle/poele.png');
+		PIXI.Assets.add('SkinBaguette' ,'assets/Skins/Paddle/baguette.png');
+		PIXI.Assets.add('SkinEclair' ,'assets/Skins/Paddle/eclairAuChocolat.png');
+		PIXI.Assets.add('SkinTorti' ,'assets/Skins/Paddle/torti.png');
+		PIXI.Assets.add('balleBallon' ,'assets/Skins/Ball/ballon.png');
+		PIXI.Assets.add('balleCitron' ,'assets/Skins/Ball/tarteCitron.png');
+		PIXI.Assets.add('balleFraise' ,'assets/Skins/Ball/tarteFraise.png');
 		this.styles = await PIXI.Assets.loadBundle('fonts').then(() => {
 			return {
 				p1: new TextStyle({ fontFamily: 'PixeloidSansBold', fontSize: 70, fill: 0xaaaaaa, align: 'right' }),

@@ -29,8 +29,8 @@
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
-			  "src/assets/popover.css",
-			  "src/assets/colorspalette.css"
+			  "src/assets/CSS/popover.css",
+			  "src/assets/CSS/colorspalette.css"
             ],
             "scripts": [
               "node_modules/bootstrap/dist/js/bootstrap.min.js"
