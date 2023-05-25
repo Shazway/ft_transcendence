@@ -56,34 +56,39 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			client.disconnect();
 			return;
 		}
-		if (channel.is_dm && this.channelService.isUserMember(user.sub, channel_id))
+		const isMember = this.channelService.isUserMember(user.sub, channel_id);
+
+		if (channel.is_dm && isMember)
 			return this.addUserToList(client, user);
-		if (!(await this.channelService.isUserMember(user.sub, channel_id)))
+		else if (channel.is_dm)
+			return client.disconnect();
+		if (isMember && !channel.is_channel_private)
 		{
-			if (((!channel.channel_password &&
-				(await this.addUserToChannel(user.sub, channel_id))) ||
-				(await this.addUserToChannel(
-				user.sub,
-				channel_id,
-				client.handshake.query.channel_pass))))
-				await this.sendMessageToChannel(0, channel_id,
-				{
-					message_id: 0,
-					message_content: user.name + ' joined the channel',
-					author: { username: 'System', user_id: 0 },
-					createdAt: new Date()
-				});
-			else
+			await this.channelService.isMuted(user.sub, channel_id); //Unmutes if time is up
+			if ((await this.channelService.isBanned(user.sub, channel_id)) ||
+				!this.addUserToList(client, user))
 			{
+				client.emit('onError', 'User is banned');
 				return client.disconnect();
 			}
+			if (!channel.is_channel_private && ((!channel.channel_password &&
+				(await this.addUserToChannel(user.sub, channel_id))) ||
+				(await this.addUserToChannel(user.sub, channel_id, client.handshake.query.channel_pass))))
+			await this.sendMessageToChannel(0, channel_id, this.buildJoinChannel(user));
 		}
-		await this.channelService.isMuted(user.sub, channel_id); //Unmutes if time is up
-		if ((await this.channelService.isBanned(user.sub, channel_id)) ||
-			!this.addUserToList(client, user))
-		{
-			client.emit('onError', 'User is banned');
-			return client.disconnect();
+		else if (channel.is_channel_private && isMember)
+			this.addUserToList(client, user);
+		else
+			client.disconnect();
+	}
+
+	buildJoinChannel(user: any)
+	{
+		return {
+				message_id: 0,
+				message_content: user.name + ' joined the channel',
+				author: { username: 'System', user_id: 0 },
+				createdAt: new Date()
 		}
 	}
 
@@ -103,14 +108,16 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	addUserToList(client: Socket, user: any) {
 		const query = client.handshake.query;
+
 		if (!query || !query.channel_id) {
 			client.emit('onError', 'Channel does not exist');
 			return false;
 		}
-		let channel = this.channelList.get(Number(query.channel_id));
+		const channel_id = query.channel_id;
+		let channel = this.channelList.get(Number(channel_id));
 		if (!channel) {
-			this.channelList.set(Number(query.channel_id), new Map<number, Array<Socket>>());
-			channel = this.channelList.get(Number(query.channel_id));
+			this.channelList.set(Number(channel_id), new Map<number, Array<Socket>>());
+			channel = this.channelList.get(Number(channel_id));
 		}
 		const users = channel.get(user.sub);
 		if (!users)
