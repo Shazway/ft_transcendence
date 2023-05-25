@@ -122,11 +122,10 @@ export class GamesService {
 		if (!id)
 			return (player.score >= this.matchSetting.score_to_win ? {state: this.WIN, reason: "score"} : {state: this.LOSS, reason: "score"});
 		else
-			return (player.player.user_id == id ? {state: this.LOSS, reason: "left"} : {state: this.WIN, reason: "left"})
+			return (player.player.user_id == id ? {state: this.LOSS, reason: "you left"} : {state: this.WIN, reason: "opponent left"})
 	}
 
 	endMatch(id?: number) {
-		console.log({UserIdWinner: id});
 		this.match.is_ongoing = false;
 		this.itemsService.saveMatchState(this.match);
 		
@@ -135,7 +134,7 @@ export class GamesService {
 		if (this.player2.player.client)
 			this.player2.player.client.emit('onMatchEnd', this.buildEndEvent(this.player2, id));
 		if (this.matchSetting.is_ranked)
-			this.itemsService.updateRankScore(this.player1, this.player2, this.match, this.matchSetting);
+			this.itemsService.updateRankScore(this.player1, this.player2, this.match, this.matchSetting, id);
 		this.endGame();
 	}
 

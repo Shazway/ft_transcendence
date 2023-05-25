@@ -13,9 +13,11 @@ interface MatchHistory {
 	Player1: string;
 	P1URL: string;
 	P1score: number;
+	P1Victory: boolean;
 	Player2: string;
 	P2URL: string;
 	P2score: number;
+	P2Victory: boolean;
 	date: Date;
 }
 
@@ -112,14 +114,18 @@ export class ProfileComponent implements AfterViewInit {
 		}
 		if (this.user) {
 			this.user.match_history.reverse().forEach(match => {
+				console.log('mon match');
+				console.log(match);
 				const date = new Date(match.date);
 				this.matchHistory.push({
 					Player1: match.user[0].username,
 					P1URL: match.user[0].img_url,
 					P1score: match.current_score[0],
+					P1Victory: match.is_victory[0],
 					Player2: match.user[1].username,
 					P2URL: match.user[1].img_url,
 					P2score: match.current_score[1],
+					P2Victory: match.is_victory[1],
 					date: new Date(date.setHours(date.getHours() + 2)),
 				});
 			});
@@ -136,6 +142,14 @@ export class ProfileComponent implements AfterViewInit {
 		return false;
 	}
 
+	isCurrentProfile(name: string) {
+		const username = this.route.snapshot.queryParamMap.get('username');
+		if (username)
+			return (name == username);
+		else
+			return (name == localStorage.getItem('username'));
+	}
+
 
 	generateMatches() {
 		const nbGenerate = 1000;
@@ -150,12 +164,14 @@ export class ProfileComponent implements AfterViewInit {
 			const days = floor(randTime / 60 / 24);
 			time = this.forgeDate(time, days, hour, min);
 			this.matchHistory.push({
-				Player1: 'Mr. Connasse',
+				Player1: 'Mr.Connasse',
 				P1URL: 'https://i1.sndcdn.com/artworks-000329925816-3yu1fd-t500x500.jpg',
 				P1score: chooseWinner ? 10 : randScore,
+				P1Victory: Boolean(chooseWinner),
 				Player2: 'Pedro',
 				P2URL: 'https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp',
 				P2score: !chooseWinner ? 10 : randScore,
+				P2Victory: !chooseWinner,
 				date: time,
 			});
 		}
@@ -306,9 +322,11 @@ export class ProfileComponent implements AfterViewInit {
 		this.matchHistory.reverse().forEach((match, index) => {
 			if (ret.length == 0 && index != 0 && match.date.getTime() >= dateRange.past.getTime())
 				ret.push({x: this.getRealTimeDiff(dateRange.past, dateRange.today), y: this.rank})
-			if (this.isVictory(match)) this.rank += 10;
-			else this.rank -= 10;
-			if (this.rank < 0) this.rank = 0;
+			if (this.isCurrentProfile('Mr.Connasse')) {
+				if (this.isVictory(match)) this.rank += 10;
+				else this.rank -= 10;
+				if (this.rank < 0) this.rank = 0;
+			}
 			if (match.date.getTime() >= dateRange.past.getTime()) {
 				if (this.rank > this.maxScore) this.maxScore = this.rank;
 				ret.push({x: this.getRealTimeDiff(match.date, dateRange.today), y: this.rank})
@@ -483,13 +501,13 @@ export class ProfileComponent implements AfterViewInit {
 	countScores() {
 		let ret = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 		this.matchHistory.forEach(match => {
-			if (match.Player1 == 'Mr. Connasse') {
-				if (match.P1score == 10)
+			if (this.isCurrentProfile(match.Player1)) {
+				if (match.P1Victory)
 					ret[match.P2score + 10]++;
 				else ret[match.P1score]++;
 			}
 			else {
-				if (match.P2score == 10)
+				if (match.P2Victory)
 					ret[match.P1score + 10]++;
 				else ret[match.P2score]++;
 			}
@@ -513,9 +531,9 @@ export class ProfileComponent implements AfterViewInit {
 	}
 
 	isVictory(match: MatchHistory) {
-		if (match.Player1 == 'Mr. Connasse')
-			return (match.P1score == 10);
-		return (match.P2score == 10);
+		if (this.isCurrentProfile(match.Player1))
+			return match.P1Victory;
+		return match.P2Victory;
 	}
 
 	getTimeDiff(timestamp: Date) {
@@ -530,9 +548,22 @@ export class ProfileComponent implements AfterViewInit {
 			str += days + ' day ';
 		if (hour > 0)
 			str += (hour - days * 24) + ' hour ';
-		if (min > 0 && days < 1)
+		if ((min > 0 || (min >= 0 && hour < 1)) && days < 1)
 			str += (min - hour * 60) + ' min ';
 		str += 'ago';
 		return str;
 	}
+
+	getName(match: MatchHistory, player: string) {
+		return this.isCurrentProfile(player) ? match.Player1 : match.Player2;
+	}
+
+	getScore(match: MatchHistory, player: string) {
+		return (this.isCurrentProfile(player) ? match.P1score : match.P2score);
+	}
+
+	getImg(match: MatchHistory, player: string) {
+		return (this.isCurrentProfile(player) ? match.P1URL : match.P2URL);
+	}
 }
+

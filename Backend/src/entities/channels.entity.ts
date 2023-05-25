@@ -17,6 +17,9 @@ export class Channel {
 	@Column({ default: false })
 	is_channel_private: boolean;
 
+	@Column({ default: false })
+	is_dm: boolean;
+
 	@OneToMany(() => ChannelUser, (us_channel) => us_channel.channel)
 	us_channel: ChannelUser[];
 
