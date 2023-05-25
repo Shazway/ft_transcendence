@@ -504,14 +504,16 @@ export class ItemsService {
 		return player;
 	}
 
-	async updateRankScore(player1: pongObject, player2: pongObject, match: MatchEntity, matchSetting: MatchSettingEntity)
+	async updateLeftMatch(player1: pongObject, player2: pongObject, match: MatchEntity, id: number)
 	{
 		let userOne = await this.getUser(player1.player.user_id);
 		let userTwo = await this.getUser(player2.player.user_id);
 
 		if (!userOne || !userTwo)
 			return null;
-		if (player1.score == matchSetting.score_to_win)
+		console.log('Update left match:');
+		console.log(id);
+		if (player1.player.user_id != id)
 		{
 			match.is_victory[0] = true;
 			match.is_victory[1] = false;
@@ -533,6 +535,45 @@ export class ItemsService {
 		userTwo.inMatch = false;
 		await this.matchRepo.save(match);
 		return await this.userRepo.save([userOne, userTwo]);
+	}
+
+	async updateFinishedMatch(player1: pongObject, player2: pongObject, match: MatchEntity, matchSetting: MatchSettingEntity)
+	{
+		let userOne = await this.getUser(player1.player.user_id);
+		let userTwo = await this.getUser(player2.player.user_id);
+
+		if (!userOne || !userTwo)
+			return null;
+		if (player1.player.user_id == matchSetting.score_to_win)
+		{
+			match.is_victory[0] = true;
+			match.is_victory[1] = false;
+			userOne = this.updateWinner(userOne);
+			userTwo = this.updateLoser(userTwo);
+		}
+		else
+		{
+			match.is_victory[1] = true;
+			match.is_victory[0] = false;
+			userTwo = this.updateWinner(userTwo);
+			userOne = this.updateLoser(userOne);
+		}
+		if (match.is_ongoing)
+			match.is_ongoing = false;
+		userOne.match_history.push(match);
+		userTwo.match_history.push(match);
+		userOne.inMatch = false;
+		userTwo.inMatch = false;
+		await this.matchRepo.save(match);
+		return await this.userRepo.save([userOne, userTwo]);
+	}
+
+
+	async updateRankScore(player1: pongObject, player2: pongObject, match: MatchEntity, matchSetting: MatchSettingEntity, id?: number)
+	{
+		if (id)
+			return this.updateLeftMatch(player1, player2, match, id);
+		return this.updateFinishedMatch(player1, player2, match, matchSetting);
 	}
 
 	async toggleDoubleAuth(userId: number)

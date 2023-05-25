@@ -128,14 +128,15 @@ export class PongGateway {
 			return ;
 		const matchEntitiy = userEntity.match_history.find((match) => match.is_ongoing == true);
 		if (!matchEntitiy)
-			return ;
+			return;
+		if (!matchEntitiy.is_ongoing)
+			return this.matchs.delete(matchEntitiy.match_id);;
 		matchEntitiy.is_victory[this.getOtherPlayerIndex(matchEntitiy, user.sub)] = true;
 		await this.matchService.setMatchEnd(matchEntitiy);
 		const match = this.matchs.get(matchEntitiy.match_id);
 		if (!match)
 			return;
 		if (match.gameService) match.gameService.endMatch(user.sub);
-		this.matchs.delete(matchEntitiy.match_id);
 	}
 
 	getPlayerIndex(match: MatchEntity, userId: number): number {
