@@ -23,11 +23,9 @@
 
 			<h2 class="mb-1 text-center">{{currentUser.username}}</h2>
 			<h2>Rank : {{users.indexOf(currentUser) + 1}}</h2>
-			<img src="{{currentUser.img_url}}" class="img-fluid">
+			<img src="{{currentUser.img_url}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" class="img-fluid rounded-circle">
 			<div class="text-start">
-				<h5 *ngIf="currentStatus == 0">offline<span class="badge bg-secondary dot rounded-circle status-dot">&nbsp;</span></h5>
-				<h5 *ngIf="currentStatus == 1">online<span class="badge bg-success dot rounded-circle status-dot">&nbsp;</span></h5>
-				<h5 (click)="spectate(currentUser)" *ngIf="currentStatus == 2">playing<span class="badge bg-primary dot rounded-circle status-dot">&nbsp;</span></h5> <!--transformer playing en lien pour spectate la partie-->
+				<h5 (click)="spectate(currentUser)">{{ getCurrentStatus(currentStatus)[0] }}<span class="badge {{ getCurrentStatus(currentStatus)[1]}} dot rounded-circle status-dot">&nbsp;</span></h5>
 				<h4>Wins/Losses : {{currentUser.wins}}/{{currentUser.losses}}</h4>
 			</div>
 		</div>
