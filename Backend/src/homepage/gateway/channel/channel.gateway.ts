@@ -56,13 +56,9 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			client.disconnect();
 			return;
 		}
-		if (channel.is_channel_private && this.channelService.isUserMember(user.sub, channel_id))
+		if (channel.is_dm && this.channelService.isUserMember(user.sub, channel_id))
 			return this.addUserToList(client, user);
-		if (!this.channelList.get(channel_id))
-			this.channelList.set(channel_id, new Map<number, Array<Socket>>);
-		else
-			client.disconnect();
-			if (!(await this.channelService.isUserMember(user.sub, channel_id)))
+		if (!(await this.channelService.isUserMember(user.sub, channel_id)))
 		{
 			if (((!channel.channel_password &&
 				(await this.addUserToChannel(user.sub, channel_id))) ||
@@ -153,7 +149,10 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	async sendMessageToChannel(sourceId: number, channel_id: number, message: Message, dest = 'onMessage') {
 		const channel = this.channelList.get(channel_id);
-		if (!channel) throw new WsException('Channel does not exist');
+		if (!channel)
+		{
+			throw new WsException('Channel does not exist');
+		}
 		channel.forEach(async (userSockets, key) => {
 			if (!(await this.usersService.isBlockedCheck(sourceId, key)))
 				this.socketEmit(userSockets, dest, message);
@@ -173,10 +172,14 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		chan_user.is_creator = is_creator;
 		chan_user.is_admin = is_admin;
 		const channel = await this.itemService.getChannel(chan_id);
-		if (!channel) throw new WsException('Not allowed');
+
+		if (!channel) 
+		{
+			throw new WsException('Not allowed');
+		}
 		if (channel.is_dm)
 			return false;
-		else if (!channel.channel_password)
+		if (!channel.channel_password)
 			await this.itemService.addUserToChannel(chan_user, chan_id, user_id);
 		else if (pass === channel.channel_password)
 			await this.itemService.addUserToChannel(chan_user, chan_id, user_id);
@@ -193,7 +196,9 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const user = await this.itemService.getUser(target.target_id);
 		const channel = await this.itemService.getChannel(channel_id);
 		if (!user || !channel)
+		{
 			throw new WsException('User or Channel does not exist');
+		}
 		if (channel.is_channel_private)
 			return true;
 		await this.sendMessageToChannel(0, channel_id, {
@@ -208,13 +213,15 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@SubscribeMessage('addFriend')
 	async handleInvite(@ConnectedSocket() client: Socket, @MessageBody() body: NotificationRequest) {
 		if (!body)
+		{
 			throw new WsException('No body');
+		}
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		if (body && body.target_id == user.sub)
 			throw new WsException('You cannot add yourself');
 		await this.notificationGateway.handleInvite(client, body);
 	}
-
+	
 	@SubscribeMessage('block')
 	async handleBlock(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
 		if (!body)
@@ -338,7 +345,6 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			'You have been unbanned by ' + user.name
 		);
 		this.channelLeaveMsg(channel_id, body);
-		this.socketDisconnect(targets);
 		this.notificationGateway.sendMessage([user.sub], 'User unbanned successfully');
 	}
 
@@ -376,7 +382,6 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		if (!body)
 			throw new WsException('No body');
 		body.createdAt = new Date();
-		console.log(body);
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		const channel_id = Number(client.handshake.query.channel_id);
 		const Validity = await this.messageService.addMessageToChannel(
@@ -417,7 +422,6 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		const channel_id = Number(client.handshake.query.channel_id);
 
-		console.log(body);
 		const ret = await this.channelService.checkPrivileges(
 			user.sub,
 			body.author.user_id,
@@ -427,9 +431,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			return client.emit('onError', 'Lacking privileges');
 		if (this.messageService.delMessage(body.message_id)) {
 			await this.sendMessageToChannel(user.sub, channel_id, body, 'delMessage');
-			console.log('message deleted: ' + body.message_id);
 		} else {
-			console.log('message not deleted: ' + body.message_id);
 		}
 	}
 }
