@@ -1,9 +1,22 @@
-<form #searchField="ngForm" (ngSubmit)="onClickSearch(searchField.value.searchFld)" class="row g-3">
+
+<form #searchField="ngForm" (ngSubmit)="onClickSearch(searchField.value.searchFld)" (input)="changeSearch(searchField.value.searchFld)" class="row g-3">
 	<div class="col-auto">
-	  <label for="search" class="visually-hidden">Search</label>
-	  <input class="form-control" name="searchFld" placeholder="Search" ngModel>
+		<label for="search" class="visually-hidden">Search</label>
+		<input class="form-control" name="searchFld" placeholder="Search" ngModel>
 	</div>
 	<div class="col-auto">
-	  <button type="submit" class="btn btn-primary mb-3">Go</button>
+		<button type="submit" class="btn btn-primary mb-3">Go</button>
 	</div>
-  </form>
+</form>
+<table class="table" style="color: aliceblue;">
+	<thead>
+		<tr>
+			<th>Username</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr *ngFor="let user of foundProfiles" class="line">
+			<td>{{user.username}}</td>
+		</tr>
+	</tbody>
+</table>
