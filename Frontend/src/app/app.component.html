@@ -15,8 +15,8 @@
 			<div class="sidebar-header">
 				<a class="inox" href="home">Transcendence</a>
 			</div>
-			<div *ngIf="isConnected()" class="d-flex justify-content-between">
-				<div *ngIf="myProfile" @currencyFadeIn aria-label="wealth" class="col text-muted align-items-center mx-5" >
+			<div *ngIf="isConnected()" class="d-flex justify-content-between align-middle">
+				<div *ngIf="myProfile" @currencyFadeIn aria-label="wealth" class="d-flex text-muted mx-5 align-items-center" >
 					<img src="assets/DALL·E 2023-05-11 21.52.35 - coin icon minted with a wheat stalk.png" alt="Currency" width="30" height="24">
 					{{getBalance()}}
 				</div> 
