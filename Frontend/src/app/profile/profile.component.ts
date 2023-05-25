@@ -322,9 +322,11 @@ export class ProfileComponent implements AfterViewInit {
 		this.matchHistory.reverse().forEach((match, index) => {
 			if (ret.length == 0 && index != 0 && match.date.getTime() >= dateRange.past.getTime())
 				ret.push({x: this.getRealTimeDiff(dateRange.past, dateRange.today), y: this.rank})
-			if (this.isVictory(match)) this.rank += 10;
-			else this.rank -= 10;
-			if (this.rank < 0) this.rank = 0;
+			if (this.isCurrentProfile('Mr.Connasse')) {
+				if (this.isVictory(match)) this.rank += 10;
+				else this.rank -= 10;
+				if (this.rank < 0) this.rank = 0;
+			}
 			if (match.date.getTime() >= dateRange.past.getTime()) {
 				if (this.rank > this.maxScore) this.maxScore = this.rank;
 				ret.push({x: this.getRealTimeDiff(match.date, dateRange.today), y: this.rank})
@@ -546,7 +548,7 @@ export class ProfileComponent implements AfterViewInit {
 			str += days + ' day ';
 		if (hour > 0)
 			str += (hour - days * 24) + ' hour ';
-		if (min > 0 && days < 1)
+		if ((min > 0 || (min >= 0 && hour < 1)) && days < 1)
 			str += (min - hour * 60) + ' min ';
 		str += 'ago';
 		return str;
