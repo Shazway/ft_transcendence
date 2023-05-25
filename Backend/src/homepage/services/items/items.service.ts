@@ -83,16 +83,22 @@ export class ItemsService {
 
 	public async getUserByUsername(username: string) {
 		const user = await this.userRepo
-			.createQueryBuilder('user')
-			.leftJoinAndSelect('user.achievement', 'achievement')
-			.leftJoinAndSelect('user.friend', 'friend')
-			.leftJoinAndSelect('user.blacklistEntry', 'blacklistEntry')
-			.leftJoinAndSelect('user.channel', 'channel')
-			.leftJoinAndSelect('user.match_history', 'match_history')
-			.leftJoinAndSelect('match_history.user', 'users')
-			.leftJoinAndSelect('user.skin', 'skin')
-			.where('user.username = :username', { username })
-			.getOne();
+		.createQueryBuilder('user')
+		.leftJoinAndSelect('user.achievement', 'achievement')
+		.leftJoinAndSelect('user.friend', 'friend')
+		.leftJoinAndSelect('user.blacklistEntry', 'blacklistEntry')
+		.leftJoinAndSelect('user.channel', 'channel')
+		.leftJoinAndSelect('user.match_history', 'match_history')
+		.leftJoinAndSelect('match_history.user', 'users')
+		.leftJoinAndSelect('user.skin', 'skin')
+		.where('user.username = :username', { username })
+		.leftJoinAndSelect(
+			'user.match_history',
+			'last_2_matches',
+			'last_2_matches.id IN ' +
+			'(SELECT id FROM match_history ORDER BY id DESC LIMIT 2)'
+		)
+		.getOne();
 		return user;
 	}
 
