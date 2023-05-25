@@ -287,6 +287,38 @@ export class ItemsService {
 		await this.userRepo.save(user);
 	}
 
+	public async createPrivateChannel(user1: UserEntity, user2: UserEntity) {
+		const channel = new ChannelEntity();
+
+		channel.channel_name = user1.username + '/' + user2.username;
+		channel.is_channel_private = true;
+		const chan = this.chanRepo.create(channel);
+		return this.chanRepo.save(chan);
+	}
+
+	public async addUsersToPrivateChannel(user1: UserEntity, user2: UserEntity, channel: ChannelEntity) {
+		const chanUser1 = new ChannelUserRelation();
+		const chanUser2 = new ChannelUserRelation();
+
+		chanUser1.user = user1;
+		chanUser2.user = user2;
+		chanUser1.channel = channel;
+		chanUser2.channel = channel;
+		channel.us_channel.push(chanUser1, chanUser2);
+		user1.channel.push(chanUser1);
+		user2.channel.push(chanUser2);
+		await this.userRepo.save([user1, user2]);
+		await this.chanRepo.save(channel);
+		await this.chan_userRepo.save([chanUser1, chanUser2]);
+	}
+
+	public async addFriendsToPrivateChannel(user1: UserEntity, user2: UserEntity) {
+		const channel = await this.createPrivateChannel(user1, user2);
+		if (!channel)
+			return null;
+		this.addUsersToPrivateChannel(user1, user2, channel);
+	}
+
 	public async addFriendToUser(
 		sourceId: number,
 		targetId: number,
@@ -306,7 +338,18 @@ export class ItemsService {
 		]);
 		sourceUser.friend.push(targetUser);
 		targetUser.friend.push(sourceUser);
+		await this.addFriendsToPrivateChannel(sourceUser, targetUser);
 		return await this.userRepo.save([sourceUser, targetUser]);
+	}
+
+	public async removeFromPrivateChannel(source: UserEntity, friend: UserEntity) {
+		const privateChannels = await this.getPvChannelsFromUser(source.user_id);
+		const channel = privateChannels.find((channel) => {
+			channel.us_channel.find((chanUser) => friend.user_id == chanUser.user.user_id)
+		});
+		if (channel)
+			await this.chanRepo.remove(channel);
+		return true;
 	}
 
 	public async removeFriendFromUsers(
@@ -317,6 +360,7 @@ export class ItemsService {
 			return null;
 		source.friend = source.friend.filter((source) => source.user_id !== friend.user_id);
 		friend.friend = friend.friend.filter((user) => user.user_id !== source.user_id);
+		this.removeFromPrivateChannel(source, friend);
 		return await this.userRepo.save([source, friend]);
 	}
 	public async removeFriend(sourceId: number, targetId: number) {

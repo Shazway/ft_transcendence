@@ -54,20 +54,20 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			client.disconnect();
 			return;
 		}
-		else if (channel && !this.channelList.get(channel_id))
+		if (channel.is_channel_private && this.channelService.isUserMember(user.sub, channel_id))
+			return this.addUserToList(client, user);
+		if (!this.channelList.get(channel_id))
 			this.channelList.set(channel_id, new Map<number, Array<Socket>>);
+		else
+			client.disconnect();
 		if (!(await this.channelService.isUserMember(user.sub, channel_id)))
 		{
-			if (
-				!channel.is_channel_private &&
-				((!channel.channel_password &&
+			if (((!channel.channel_password &&
 				(await this.addUserToChannel(user.sub, channel_id))) ||
 				(await this.addUserToChannel(
 				user.sub,
 				channel_id,
-				client.handshake.query.channel_pass
-				)))
-				)
+				client.handshake.query.channel_pass))))
 				await this.sendMessageToChannel(0, channel_id,
 				{
 					message_id: 0,
@@ -75,17 +75,15 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 					author: { username: 'System', user_id: 0 },
 					createdAt: new Date()
 				});
-				else return client.disconnect();
+			else return client.disconnect();
 		}
 		await this.channelService.isMuted(user.sub, channel_id); //Unmutes if time is up
-		if (
-			(await this.channelService.isBanned(user.sub, channel_id)) ||
-			!this.addUserToList(client, user)
-			)
-			{
-				client.emit('onError', 'User is banned');
-				return client.disconnect();
-			}
+		if ((await this.channelService.isBanned(user.sub, channel_id)) ||
+			!this.addUserToList(client, user))
+		{
+			client.emit('onError', 'User is banned');
+			return client.disconnect();
+		}
 	}
 
 	async handleDisconnect(client: Socket)
@@ -173,7 +171,9 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		chan_user.is_creator = is_creator;
 		chan_user.is_admin = is_admin;
 		const channel = await this.itemService.getChannel(chan_id);
-		if (!channel) throw new WsException('Channel does not exist');
+		if (!channel) throw new WsException('Not allowed');
+		if (channel.is_channel_private)
+			return false;
 		else if (!channel.channel_password)
 			await this.itemService.addUserToChannel(chan_user, chan_id, user_id);
 		else if (pass === channel.channel_password)
@@ -189,9 +189,11 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	async channelLeaveMsg(channel_id: number, target: Punishment) {
 		const user = await this.itemService.getUser(target.target_id);
-
-		if (!user)
-		throw new WsException('User does not exist');
+		const channel = await this.itemService.getChannel(channel_id);
+		if (!user || !channel)
+			throw new WsException('User or Channel does not exist');
+		if (channel.is_channel_private)
+			return true;
 		await this.sendMessageToChannel(0, channel_id, {
 			message_id: 0,
 			message_content: user.username + ' left the channel',
@@ -203,17 +205,28 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('addFriend')
 	async handleInvite(@ConnectedSocket() client: Socket, @MessageBody() body: NotificationRequest) {
-		console.log("on est dans addFriend");
 		await this.notificationGateway.handleInvite(client, body);
 	}
 
 	@SubscribeMessage('block')
 	async handleBlock(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-
+		
 		if ((await this.itemService.blockUser(user.sub, body.target_id)))
-			return client.emit('User blocked successfully');
-		client.emit('An error has occured');
+			return client.emit('Success', 'User blocked success');
+		const channel_id = Number(client.handshake.query.channel_id);
+		const channel = await this.itemService.getChannel(channel_id);
+		if (channel && channel.is_channel_private)
+		{
+			const chan = this.channelList.get(channel_id);
+			if (chan)
+			{
+				chan.forEach((user) => {
+					this.socketDisconnect(user);
+				});
+			}
+			this.channelList.delete(channel_id);
+		}
 	}
 
 	@SubscribeMessage('mute')
