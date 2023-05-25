@@ -37,7 +37,6 @@ export class ProfilePopupComponent implements OnInit {
 	}
 
 	addFriend() {
-		console.log("on est dans addFriend Frontend");
 		this.data.client.emit('addFriend', this.buildNotif("friend", this.data.msg.author.username, this.data.msg.author.user_id));
 	}
 }

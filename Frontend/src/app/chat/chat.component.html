@@ -17,7 +17,7 @@
 					<div class="card-body p-0" data-mdb-perfect-scrollbar="true" style="position: relative; " *ngFor="let msg_list of test_msgs$">
 <!-- Start of not current user field -->
 						<div *ngIf="!isMe(msg_list[0]) && !isSystem(msg_list[0])" class="d-flex flex-row justify-content-start" id="group-{{msg_list[0].message_id}}">
-							<img (click)="createChatPopup(msg_list[0], client, $event)" (contextmenu)="createChatPopup(msg_list[0], client, $event)" id="img-{{msg_list[0].message_id}}" class="rounded-circle" src="{{msg_list[0].author.img_url}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 1" style="width: 45px; height: 100%;">
+							<img (click)="createChatPopup(msg_list[0], $event)" (contextmenu)="createChatPopup(msg_list[0], $event)" id="img-{{msg_list[0].message_id}}" class="rounded-circle" src="{{msg_list[0].author.img_url}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 1" style="width: 45px; height: 100%;">
 							<div>
 								<div class="d-flex align-items-end">
 									<p class="small ms-3 mb-0 text-muted">{{ getName(msg_list) }}</p>
