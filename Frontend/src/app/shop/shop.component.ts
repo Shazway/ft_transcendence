@@ -18,7 +18,7 @@ import { Router } from '@angular/router';
 })
 export class ShopComponent implements AfterViewInit {
 
-	items : Array<ShopItem> | undefined;
+	items : Array<ShopItem> = [];
 	filteredItems : Array<ShopItem>;
 	existingTypes : Array<string>;
 	chosenType = "" ;
@@ -55,7 +55,7 @@ export class ShopComponent implements AfterViewInit {
 			this.router.navigateByUrl('login');
 		const availableSkins = await this.fetchService.getBuyableSkins();
 		if (availableSkins)
-			this.items = availableSkins.availableSkins;
+			this.items = availableSkins;
 	}
 
 	onChange(value: any) {

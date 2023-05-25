@@ -147,12 +147,13 @@ export class FetchService {
 	}
 
 	async getBuyableSkins() {
-		let res : {availableSkins: ShopItem[]} | undefined;
+		let res : ShopItem[] = [];
 		const teaFunc = this.teapotError;
 		const route = this.router;
 		await axios.get<{availableSkins: ShopItem[]}>('http://localhost:3001/shop/availableItems', this.getHeader())
 		.then(function (response) {
-			res = response.data;
+			if (response && response.data)
+				res = response.data.availableSkins;
 			console.log("available skins : ");
 			console.log(res);
 		})
@@ -205,7 +206,8 @@ export class FetchService {
 		const route = this.router;
 		await axios.get<Array<AnyProfileUser>>('http://localhost:3001/users/friends', this.getHeader())
 		.then(function (response) {
-			res = response.data;
+			if (response && response.data)
+				res = response.data;
 			console.log("amis :" +res);
 		})
 		.catch(function (error) {
