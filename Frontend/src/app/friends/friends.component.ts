@@ -33,9 +33,9 @@ export class FriendsComponent {
 	requestsElm : any;
 	blockedElm : any;
 
-	public friends!: AnyProfileUser[];
+	public friends: AnyProfileUser[] = [];
 	public friendshipRequests: {received: FriendRequest[], sent: FriendRequest[]} = {received: [], sent: []};
-	public blockedUsers!: AnyProfileUser[];
+	public blockedUsers: AnyProfileUser[] = [];
 
 	constructor(
 		private elRef: ElementRef,

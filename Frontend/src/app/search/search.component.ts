@@ -24,8 +24,11 @@ export class SearchComponent {
 	}
 
 	async onClickSearch(value : string) {
-		console.log("appel au back pour " + value);
-		this.foundProfiles = await this.fetchService.searchingPrefix(value);
+		if (value.length > 0)
+		{
+			console.log("appel au back pour " + value);
+			this.foundProfiles = await this.fetchService.searchingPrefix(value);
+		}
 	}
 
 }
