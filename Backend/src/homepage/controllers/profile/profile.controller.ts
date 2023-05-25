@@ -36,6 +36,5 @@ export class ProfileController {
 		else if (user && targetUser) serializedUser = plainToClass(AnyProfileUser, targetUser);
 		else res.status(HttpStatus.NOT_FOUND).send({ msg: 'User not found' });
 		if (user) res.status(HttpStatus.OK).send(serializedUser);
-		console.log(serializedUser);
 	}
 }
