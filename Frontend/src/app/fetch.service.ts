@@ -154,7 +154,8 @@ export class FetchService {
 		await axios.get<{availableSkins: ShopItem[]}>('http://localhost:3001/shop/availableItems', this.getHeader())
 		.then(function (response) {
 			res = response.data;
-			console.log("available skins : " + res);
+			console.log("available skins : ");
+			console.log(res);
 		})
 		.catch(function (error) {
 			teaFunc(error, route);
