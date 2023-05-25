@@ -36,7 +36,7 @@
 									<div class="d-flex justify-content-start rounded-3 p-2 mb-2 stat-box">
 										<div class="col justify-content-center">
 											<p class="small text-muted mb-1 text-center">Rank Score</p>
-											<p class="mb-0 text-center font-weight-bold display-2 rank-label">{{user.rank_score}}</p>
+											<p class="mb-0 text-center font-weight-bold display-2 rank-label">{{rank}}</p>
 										</div>
 									</div>
 								</div>
@@ -86,7 +86,37 @@
 	</div>
 	<div class="row gap-3 px-5 mx-2" style="height: 33vw;">
 
-		<div class="col d-flex border rounded-3 white">
+		<div class="col border rounded-3 white h-100 p-0">
+			<table class="w-100 h-100">
+				<thead class="w-100">
+					<div class="d-flex w-100 justify-content-center">
+						<h2 class="m-auto mt-2">Achievements</h2>
+					</div>
+				</thead>
+				<hr class="mb-0">
+				<div class="w-100" style="height: 95%; overflow-y: auto;">
+					<div class="d-flex w-100 p-1 border-bottom">
+						<img class="rounded-circle versus-img player" src="assets/Trophy/Trophy1.png" alt="avatar 1">
+					</div>
+					<!-- <div *ngFor="let match of matchHistory" class="d-flex w-100 p-1 border-bottom">
+						<img class="rounded-circle versus-img player" src="{{ getImg(match, match.Player2) }}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 1">
+						<div class="flex-grow-1">
+							<div class="d-flex align-items-center justify-content-center px-2">
+								<h4 class="m-0">{{isVictory(match) ? 'Victory' : 'Defeat'}}</h4>
+							</div>
+							<div class="row">
+								<div class="col d-flex align-items-center justify-content-center px-2"><p class="m-0 small">{{ getName(match, match.Player2) }}</p></div>
+								<div class="col-3 d-flex align-items-center justify-content-center px-2"><p class="m-0 small">{{ getScore(match, match.Player2) }} / {{ getScore(match, match.Player1) }}</p></div>
+								<div class="col d-flex align-items-center justify-content-center px-2"><p class="m-0 small">{{ getName(match, match.Player1) }}</p></div>
+							</div>
+							<div class="d-flex align-items-center justify-content-center px-2">
+								<p class="m-0 small text-muted">{{getTimeDiff(match.date)}}</p>
+							</div>
+						</div>
+						<img class="rounded-circle versus-img opponent" src="{{ getImg(match, match.Player1) }}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 2">
+					</div> -->
+				</div>
+			</table>
 		</div>
 
 		<div class="col border rounded-3 white">

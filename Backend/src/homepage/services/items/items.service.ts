@@ -41,6 +41,10 @@ export class ItemsService {
 		await this.matchRepo.save(match);
 	}
 
+	public async getAllAchievements() {
+		return await this.achieveRepo.createQueryBuilder('achievement').getMany();
+	}
+
 	public async getAllUsers() {
 		const users = await this.userRepo
 			.createQueryBuilder('user')
@@ -611,6 +615,12 @@ export class ItemsService {
 		return skins.filter((skinOrigin) => {
 			return !user.skin.some((skinCompare) => skinCompare.skin_id === skinOrigin.skin_id);
 		})
+	}
+
+	getLockedAchievements(targetUser: UserEntity, allAchievements: Array<AchievementsEntity>) {
+		return allAchievements.filter((achievementOrigin) => {
+			return !targetUser.achievement.some((achievementCompare) => achievementCompare.achievement_id == achievementOrigin.achievement_id);
+		});
 	}
 
 	async buySkin(userId: number, skinId: number) {

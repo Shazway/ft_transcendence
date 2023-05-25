@@ -20,7 +20,6 @@ const routes: Routes = [
 	{ path: '', redirectTo: '/home', pathMatch: 'full' },
 	{ path: 'users', component: UsersComponent },
 	{ path: 'login', component: LoginComponent },
-	{ path: 'chat', component: ChatComponent },
 	{ path: 'auth', component: AuthComponent },
 	{ path: 'validate', component: ValidateComponent },
 	{ path: 'matchmaking', component: MatchMakingComponent },

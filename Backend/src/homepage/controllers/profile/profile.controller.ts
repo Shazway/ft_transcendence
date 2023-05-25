@@ -6,6 +6,7 @@ import { UsersService } from 'src/homepage/services/users/users.service';
 import { plainToClass } from 'class-transformer';
 import { ApplyProfile, MyProfileUser } from 'src/homepage/dtos/User.dto';
 import { AnyProfileUser } from 'src/homepage/dtos/User.dto';
+import { AchievementsEntity } from 'src/entities';
 
 @Controller('profile')
 export class ProfileController {
@@ -29,12 +30,16 @@ export class ProfileController {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
 		const targetUser = await this.itemService.getUserByUsername(us);
+		const achievements = targetUser.achievement;
+		const allAchievements = await this.itemService.getAllAchievements();
 		let serializedUser: MyProfileUser | AnyProfileUser;
 
-		if (user && targetUser && user.name === targetUser.username)
+		if (targetUser && user.name === targetUser.username)
 			serializedUser = plainToClass(MyProfileUser, targetUser);
-		else if (user && targetUser) serializedUser = plainToClass(AnyProfileUser, targetUser);
-		else res.status(HttpStatus.NOT_FOUND).send({ msg: 'User not found' });
-		if (user) res.status(HttpStatus.OK).send(serializedUser);
+		else if (targetUser) serializedUser = plainToClass(AnyProfileUser, targetUser);
+		else res.status(HttpStatus.NOT_FOUND).send(null);
+		serializedUser.achievements.unlockedAchievements = achievements;
+		serializedUser.achievements.lockedAchievements = this.itemService.getLockedAchievements(targetUser, allAchievements);
+		res.status(HttpStatus.OK).send(serializedUser);
 	}
 }

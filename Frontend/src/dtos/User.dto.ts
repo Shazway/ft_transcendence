@@ -1,3 +1,4 @@
+import { AchievementList } from "./Achievement.dto";
 import { Channel } from "./Channel.dto";
 import { Match } from "./MatchMaking.dto";
 
@@ -29,7 +30,7 @@ export interface AnyProfileUser {
 	createdAt: Date;
 	wins: number;
 	losses: number;
-	achievements: Achievement[];
+	achievements: AchievementList;
 	friend: User[];
 	user_id: number;
 	intra_id: number;

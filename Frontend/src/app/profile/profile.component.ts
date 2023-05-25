@@ -74,12 +74,13 @@ export class ProfileComponent implements AfterViewInit {
 	maxScore = 100;
 	isLoaded = false;
 	paddleSkins = [
-		{ src: 'assets/raquette-baguette.png' },
-		{ src: 'assets/raquette-eclairAuChocolat.png' },
-		{ src: 'assets/raquette-poele.png' },
-		{ src: 'assets/raquette-torti.png' },
-		{ src: 'assets/Swirl.png' },
-		{ src: 'assets/paddle-red-gradient.png' },
+		{ src: 'assets/Skins/Paddle/baguette.png' },
+		{ src: 'assets/Skins/Paddle/eclairAuChocolat.png' },
+		{ src: 'assets/Skins/Paddle/default.png' },
+		{ src: 'assets/Skins/Paddle/poele.png' },
+		{ src: 'assets/Skins/Paddle/torti.png' },
+		{ src: 'assets/Skins/Paddle/Swirl.png' },
+		{ src: 'assets/Skins/Paddle/red-gradient.png' },
 	];
 	slideDirection = 'none';
 	settingState = 'closed';
