@@ -104,21 +104,21 @@
 				<hr class="mb-0">
 				<div class="w-100" style="height: 95%; overflow-y: auto;">
 					<div *ngFor="let match of matchHistory" class="d-flex w-100 p-1 border-bottom">
-						<img class="rounded-circle versus-img player" src="{{match.P2URL}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 1">
+						<img class="rounded-circle versus-img player" src="{{ getImg(match, match.Player2) }}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 1">
 						<div class="flex-grow-1">
 							<div class="d-flex align-items-center justify-content-center px-2">
 								<h4 class="m-0">{{isVictory(match) ? 'Victory' : 'Defeat'}}</h4>
 							</div>
 							<div class="row">
-								<div class="col d-flex align-items-center justify-content-center px-2"><p class="m-0 small">{{match.Player2}}</p></div>
-								<div class="col-3 d-flex align-items-center justify-content-center px-2"><p class="m-0 small">{{match.P2score}} / {{match.P1score}}</p></div>
-								<div class="col d-flex align-items-center justify-content-center px-2"><p class="m-0 small">{{match.Player1}}</p></div>
+								<div class="col d-flex align-items-center justify-content-center px-2"><p class="m-0 small">{{ getName(match, match.Player2) }}</p></div>
+								<div class="col-3 d-flex align-items-center justify-content-center px-2"><p class="m-0 small">{{ getScore(match, match.Player2) }} / {{ getScore(match, match.Player1) }}</p></div>
+								<div class="col d-flex align-items-center justify-content-center px-2"><p class="m-0 small">{{ getName(match, match.Player1) }}</p></div>
 							</div>
 							<div class="d-flex align-items-center justify-content-center px-2">
 								<p class="m-0 small text-muted">{{getTimeDiff(match.date)}}</p>
 							</div>
 						</div>
-						<img class="rounded-circle versus-img opponent" src="{{match.P1URL}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 2">
+						<img class="rounded-circle versus-img opponent" src="{{ getImg(match, match.Player1) }}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 2">
 					</div>
 				</div>
 			</table>

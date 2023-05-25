@@ -16,6 +16,15 @@ html, body {
 	border-radius: 10px;
 }
 
+.scrollbar-faded ::-webkit-scrollbar {
+	opacity: 0;
+	transition: opacity 0.5s;
+}
+
+.scrollbar-faded:hover ::-webkit-scrollbar {
+opacity: 1;
+}
+
 /*--Colors--*/
 .white {
 	background-color: white;

@@ -88,12 +88,10 @@ export class ItemsService {
 		.leftJoinAndSelect('user.friend', 'friend')
 		.leftJoinAndSelect('user.blacklistEntry', 'blacklistEntry')
 		.leftJoinAndSelect('user.channel', 'channel')
-		.leftJoinAndSelect('user.match_history', 'match_history')
 		.leftJoinAndSelect(
 			'user.match_history',
-			'last_2_matches',
-			'last_2_matches.id IN ' +
-			'(SELECT id FROM match_history ORDER BY id DESC LIMIT 2)'
+			'match_history',
+			'match_history IN (SELECT * FROM user.match_history ORDER BY user.match_history.match_id DESC LIMIT 2)'
 		)
 		.leftJoinAndSelect('match_history.user', 'users')
 		.leftJoinAndSelect('user.skin', 'skin')
