@@ -52,12 +52,14 @@ export class insertData666666666666666666 implements MigrationInterface {
 				type: 'Paddle',
 				name: 'Default',
 				img_url: 'assets/raquette-base.png',
+				description: 'A free paddle skin!',
 				price : 0,
 			},
 			{
 				type: 'Paddle',
 				name: 'Baguette',
 				img_url: 'assets/raquette-baguette.png',
+				description: 'The most French skin ever made',
 				price : 1,
 			},
 		]);
