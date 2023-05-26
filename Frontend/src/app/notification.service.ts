@@ -20,6 +20,7 @@ export class NotificationService {
 	) {
 		if (!this.client || (this.client && !this.client.connected))
 			this.client = io('ws://localhost:3003', this.websocketService.getHeader());
+		this.setClientEvent();
 	}
 
 	initSocket() {
@@ -41,8 +42,8 @@ export class NotificationService {
 		this.client.on('friendInvite', (event) => { this.showFriendRequest(event.notification); console.log('friendInvite ', event); });
 	}
 
-	showFriendRequest(notification: NotificationResponse) {
-		this.toastService.show(this.toastFriendRequest, { classname: 'bg-success text-light p-0', delay: 10000, context: notification });
+	showFriendRequest(notification: any) {
+		this.toastService.show(this.toastFriendRequest, { classname: 'p-0', delay: 10000, context: notification });
 	}
 
 	showAchievements() {

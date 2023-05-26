@@ -47,7 +47,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		if (!user)
 			return client.disconnect();
 		this.userList.set(user.sub, client);
-		console.log('connected');
+		console.log('connected ' + user.name);
 		await this.notificationService.setUserStatus(user.sub, this.ONLINE);
 	}
 	
@@ -56,7 +56,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		
 		if (!user)
 			return client.disconnect();
-		console.log('disconnected');
+		console.log('disconnected ' + user.name);
 		this.userList.delete(user.sub);
 		await this.notificationService.setUserStatus(user.sub, this.OFFLINE);
 	}
@@ -105,14 +105,13 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 
 		if(!body)
 			throw new WsException('Pas de body');
-		console.log('request from ' + source.name + ' to: ' + body.target_id);
 		if (body.type == 'friend' && await this.requestService.handleFriendRequestInvite(source.sub, body.target_id))
 			client.emit('refusedInvite', 'Something went wrong');
-		if (target)
-			target.emit(body.type + 'Invite', { notification: answer, matchSetting: body.match_setting});
+		if (target && target.connected)
+			target.emit(body.type + 'Invite', { notification: answer});
 		else
 			console.log('Pas connecte target');
-		if (notifClient)
+		if (notifClient && notifClient.connected)
 			notifClient.emit('pendingRequest', 'Request sent and waiting for answer');
 		else
 			console.log('Pas connecte envoyeur');
@@ -145,5 +144,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 			this.itemsService.deleteFriendRequest(source.sub, body.target_id);
 		client.emit('success', 'Answer sent');
 		if (target) target.emit(body.type + 'Answer', { notification: answer });
+		else
+			console.log('target deco pas de popup')
 	}
 }
