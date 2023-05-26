@@ -2,7 +2,7 @@
 	<div class="container pt-3 h-100">
 		<div class="row d-flex justify-content-center align-items-center h-100">
 			<div class="col">
-				<div class="card profile-card" #profileCard>
+				<div class="card profile-card my-light2" #profileCard>
 					<div class="card-body p-4">
 						<div class="d-flex text-black">
 							<div class="flex-shrink-0">
@@ -86,7 +86,7 @@
 	</div>
 	<div class="row gap-3 px-5 mx-2" style="height: 33vw;">
 
-		<div class="col border rounded-3 white h-100 p-0">
+		<div class="col border border-dark rounded-3 white h-100 p-0 my-light2" style="overflow: hidden;">
 			<table class="w-100 h-100">
 				<thead class="w-100">
 					<div class="d-flex w-100 justify-content-center">
@@ -94,37 +94,39 @@
 					</div>
 				</thead>
 				<hr class="mb-0">
-				<div class="w-100" style="height: 95%; overflow-y: auto;">
-					<div class="d-flex w-100 p-1 border-bottom">
-						<img class="rounded-circle versus-img player" src="assets/Trophy/Trophy1.png" alt="avatar 1">
+				<div *ngIf="user" class="w-100 scroll-small" style="height: 98%; overflow-y: auto;">
+					<div *ngFor="let achieve of user.achievements.unlockedAchievements" class="d-flex flex-column w-100 p-5 border-bottom bg-trophy gradient-overlay">
+						<h4 style="z-index: 100;">{{achieve.achievement_name}}</h4>
+						<p style="z-index: 100;">{{achieve.achievement_description}}</p>
 					</div>
-					<!-- <div *ngFor="let match of matchHistory" class="d-flex w-100 p-1 border-bottom">
-						<img class="rounded-circle versus-img player" src="{{ getImg(match, match.Player2) }}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 1">
-						<div class="flex-grow-1">
-							<div class="d-flex align-items-center justify-content-center px-2">
-								<h4 class="m-0">{{isVictory(match) ? 'Victory' : 'Defeat'}}</h4>
-							</div>
-							<div class="row">
-								<div class="col d-flex align-items-center justify-content-center px-2"><p class="m-0 small">{{ getName(match, match.Player2) }}</p></div>
-								<div class="col-3 d-flex align-items-center justify-content-center px-2"><p class="m-0 small">{{ getScore(match, match.Player2) }} / {{ getScore(match, match.Player1) }}</p></div>
-								<div class="col d-flex align-items-center justify-content-center px-2"><p class="m-0 small">{{ getName(match, match.Player1) }}</p></div>
-							</div>
-							<div class="d-flex align-items-center justify-content-center px-2">
-								<p class="m-0 small text-muted">{{getTimeDiff(match.date)}}</p>
-							</div>
-						</div>
-						<img class="rounded-circle versus-img opponent" src="{{ getImg(match, match.Player1) }}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 2">
-					</div> -->
+					<div *ngFor="let achieve of user.achievements.lockedAchievements" class="d-flex flex-column w-100 p-5 border-bottom bg-trophy gradient-overlay bg-grayed">
+						<h4 style="z-index: 100;">{{achieve.achievement_name}}</h4>
+						<p style="z-index: 100;">{{achieve.achievement_description}}</p>
+					</div>
+				</div>
+				<div *ngIf="!user" class="w-100 scroll-small" style="height: 98%; overflow-y: auto;">
+					<div *ngFor="let achieve of achievements.unlockedAchievements" class="d-flex flex-column w-100 p-5 border-bottom bg-trophy gradient-overlay">
+						<h4 style="z-index: 100;">{{achieve.achievement_name}}</h4>
+						<p style="z-index: 100;">{{achieve.achievement_description}}</p>
+					</div>
+					<div *ngFor="let achieve of achievements.lockedAchievements" class="d-flex flex-column w-100 p-5 border-bottom bg-trophy gradient-overlay bg-grayed">
+						<h4 style="z-index: 100;">{{achieve.achievement_name}}</h4>
+						<p style="z-index: 100;">{{achieve.achievement_description}}</p>
+					</div>
 				</div>
 			</table>
 		</div>
-
-		<div class="col border rounded-3 white">
-			<canvas id="matchChart"></canvas>
-			<canvas id="rankChart"></canvas>
+		<div class="col border rounded-3 white my-light2">
+			<div *ngIf="matchHistory.length">
+				<canvas id="matchChart"></canvas>
+				<canvas id="rankChart"></canvas>
+			</div>
+			<div *ngIf="!matchHistory.length" class="justify-content-center align-items-center h-100">
+				<h4 class="text-center text-muted">No stats yet</h4>
+			</div>
 		</div>
 
-		<div class="col border rounded-3 white h-100 p-0">
+		<div class="col border rounded-3 white h-100 p-0 my-light2" style="overflow: hidden;">
 			<table class="w-100 h-100">
 				<thead class="w-100">
 					<div class="d-flex w-100 justify-content-center">
@@ -132,23 +134,28 @@
 					</div>
 				</thead>
 				<hr class="mb-0">
-				<div class="w-100" style="height: 95%; overflow-y: auto;">
-					<div *ngFor="let match of matchHistory" class="d-flex w-100 p-1 border-bottom">
-						<img class="rounded-circle versus-img player" src="{{ getImg(match, match.Player2) }}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 1">
-						<div class="flex-grow-1">
-							<div class="d-flex align-items-center justify-content-center px-2">
-								<h4 class="m-0">{{isVictory(match) ? 'Victory' : 'Defeat'}}</h4>
+				<div class="w-100" style="height: 98%; overflow-y: auto;">
+					<div *ngIf="matchHistory.length">
+						<div *ngFor="let match of matchHistory" class="d-flex w-100 p-1 border-bottom">
+							<img class="rounded-circle versus-img player" src="{{ getImg(match, match.Player2) }}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 1">
+							<div class="flex-grow-1">
+								<div class="d-flex align-items-center justify-content-center px-2">
+									<h4 class="m-0">{{isVictory(match) ? 'Victory' : 'Defeat'}}</h4>
+								</div>
+								<div class="row">
+									<div class="col d-flex align-items-center justify-content-center px-2"><p class="m-0 small">{{ getName(match, match.Player2) }}</p></div>
+									<div class="col-3 d-flex align-items-center justify-content-center px-2"><p class="m-0 small">{{ getScore(match, match.Player2) }} / {{ getScore(match, match.Player1) }}</p></div>
+									<div class="col d-flex align-items-center justify-content-center px-2"><p class="m-0 small">{{ getName(match, match.Player1) }}</p></div>
+								</div>
+								<div class="d-flex align-items-center justify-content-center px-2">
+									<p class="m-0 small text-muted">{{getTimeDiff(match.date)}}</p>
+								</div>
 							</div>
-							<div class="row">
-								<div class="col d-flex align-items-center justify-content-center px-2"><p class="m-0 small">{{ getName(match, match.Player2) }}</p></div>
-								<div class="col-3 d-flex align-items-center justify-content-center px-2"><p class="m-0 small">{{ getScore(match, match.Player2) }} / {{ getScore(match, match.Player1) }}</p></div>
-								<div class="col d-flex align-items-center justify-content-center px-2"><p class="m-0 small">{{ getName(match, match.Player1) }}</p></div>
-							</div>
-							<div class="d-flex align-items-center justify-content-center px-2">
-								<p class="m-0 small text-muted">{{getTimeDiff(match.date)}}</p>
-							</div>
+							<img class="rounded-circle versus-img opponent" src="{{ getImg(match, match.Player1) }}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 2">
 						</div>
-						<img class="rounded-circle versus-img opponent" src="{{ getImg(match, match.Player1) }}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 2">
+					</div>
+					<div *ngIf="!matchHistory.length" class="justify-content-center align-items-center h-100">
+						<h4 class="text-center text-muted">No stats yet</h4>
 					</div>
 				</div>
 			</table>

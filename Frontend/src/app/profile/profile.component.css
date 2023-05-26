@@ -35,3 +35,30 @@
 .opponent {
 
 }
+
+.gradient-overlay {
+	position: relative;
+}
+
+.gradient-overlay::after {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(to right, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, 0));
+	pointer-events: none;
+}
+
+.bg-grayed {
+	filter: grayscale(100%);
+}
+
+.bg-trophy {
+	background-image: url('src/assets/Trophy/Trophy_display.png');
+	background-repeat: repeat;
+	background-position: center right;
+	background-size: cover;
+	color: white;
+}

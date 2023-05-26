@@ -8,6 +8,7 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
 import { ActivatedRoute, Router } from '@angular/router';
 import { FetchService } from '../fetch.service';
 import { AnyProfileUser } from 'src/dtos/User.dto';
+import { AchievementList } from 'src/dtos/Achievement.dto';
 
 interface MatchHistory {
 	Player1: string;
@@ -84,6 +85,7 @@ export class ProfileComponent implements AfterViewInit {
 	];
 	slideDirection = 'none';
 	settingState = 'closed';
+	achievements: AchievementList = {unlockedAchievements: [], lockedAchievements: []};
 
 	constructor(
 		private cdr: ChangeDetectorRef,
@@ -100,7 +102,6 @@ export class ProfileComponent implements AfterViewInit {
 		if (!this.parent.isConnected())
 			this.router.navigateByUrl('login');
 		const name = this.route.snapshot.queryParamMap.get('username');
-		console.log(name);
 		if (!name) {
 			const newUser = await this.fetchService.getProfile(localStorage.getItem('username'));
 			if (newUser)
@@ -114,6 +115,7 @@ export class ProfileComponent implements AfterViewInit {
 				this.user = newUser;
 		}
 		if (this.user) {
+			console.log(this.user.achievements);
 			this.user.match_history.reverse().forEach(match => {
 				console.log('mon match');
 				console.log(match);
@@ -176,6 +178,14 @@ export class ProfileComponent implements AfterViewInit {
 				date: time,
 			});
 		}
+
+		let index = 0
+		for (; index < 5; index++) {
+			this.achievements.unlockedAchievements.push({achievement_name: 'Achievement ' + index, achievement_description: 'Description ' + index});
+		}
+		for (; index < 15; index++) {
+			this.achievements.lockedAchievements.push({achievement_name: 'Achievement ' + index, achievement_description: 'Description ' + index});
+		}
 	}
 
 	async ngAfterViewInit() {
@@ -183,8 +193,10 @@ export class ProfileComponent implements AfterViewInit {
 		await this.customOnInit();
 		this.isLoaded = true;
 		this.cdr.detectChanges();
-		this.matchChart = new Chart(document.getElementById('matchChart') as HTMLCanvasElement, this.getMatchChartConfig());
-		this.rankChart = new Chart(document.getElementById('rankChart') as HTMLCanvasElement, this.getRankedChartConfig());
+		if (this.user && this.user.match_history?.length > 0) {
+			this.matchChart = new Chart(document.getElementById('matchChart') as HTMLCanvasElement, this.getMatchChartConfig());
+			this.rankChart = new Chart(document.getElementById('rankChart') as HTMLCanvasElement, this.getRankedChartConfig());
+		}
 		this.cdr.detectChanges();
 		this.cdr.reattach();
 	}

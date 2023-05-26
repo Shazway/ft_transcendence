@@ -4,6 +4,6 @@ export interface Achievement {
 }
 
 export interface AchievementList {
-	unlockedAchievements: Achievement;
-	lockedAchievements: Achievement;
+	unlockedAchievements: Achievement[];
+	lockedAchievements: Achievement[];
 }

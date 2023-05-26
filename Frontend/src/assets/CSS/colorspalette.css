@@ -6,6 +6,10 @@ html, body {
 	width: 7px;
 }
 
+.scroll-small::-webkit-scrollbar {
+	width: 0px;
+}
+
 ::-webkit-scrollbar-track {
 	background-color: #f1f1f1;
 	border-radius: 10px;
