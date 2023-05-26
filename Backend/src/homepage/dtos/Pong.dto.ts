@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
+import { distance } from 'mathjs';
 import { Player } from './Matchmaking.dto';
-import * as math from "mathjs"
 
 export class Position {
 	x: number;
@@ -88,7 +88,7 @@ export class ballObject {
 	}
 	
 	distancePos(pos1: Position, pos2: Position) { //Easier to write distance comparing
-		return math.distance([pos1.x, pos1.y], [pos2.x, pos2.y]);
+		return distance([pos1.x, pos1.y], [pos2.x, pos2.y]);
 	}
 
 	collidesWithPlayer(player: pongObject): boolean { //Check collision for player (left side player)
