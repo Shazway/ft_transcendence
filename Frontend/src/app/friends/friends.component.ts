@@ -71,7 +71,6 @@ export class FriendsComponent {
 	}
 	
 	async addSystemFriend() {
-		await this.fetchService.addFriends(1);
 		this.friends.splice(0);
 		this.friends = await this.fetchService.getFriends();
 	}
