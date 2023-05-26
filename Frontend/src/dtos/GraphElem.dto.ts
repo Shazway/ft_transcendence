@@ -1,6 +1,5 @@
 import { Injectable } from "@angular/core";
-import { TextStyle, Text, Application, Color } from "pixi.js";
-import * as PIXI from "pixi.js";
+import { TextStyle, Text, Application, Color, Assets, Graphics, TextMetrics } from "pixi.js";
 
 @Injectable({
 	providedIn: 'root'
@@ -11,23 +10,23 @@ export class AssetManager {
 	textArray: Array<{elem: PlainText | WowText, type: string}> = new Array;
 	styles!: any;
 	async initAssets() {
-		PIXI.Assets.addBundle('fonts', {
+		Assets.addBundle('fonts', {
 			PixeloidSans: 'assets/Fonts/PixeloidMono.ttf',
 			PixeloidMono: 'assets/Fonts/PixeloidMono.ttf',
 			PixeloidSansBold: 'assets/Fonts/PixeloidSansBold.ttf',
 		});
-		PIXI.Assets.add('SkinGradient' ,'assets/Skins/Paddle/red-gradient.png');
-		PIXI.Assets.add('SkinHotDog' ,'assets/Skins/Paddle/hotdog.png');
-		PIXI.Assets.add('Default' ,'assets/Skins/Paddle/default.png');
-		PIXI.Assets.add('SkinSwirl' ,'assets/Skins/Paddle/Swirl.png');
-		PIXI.Assets.add('SkinPoele' ,'assets/Skins/Paddle/poele.png');
-		PIXI.Assets.add('SkinBaguette' ,'assets/Skins/Paddle/baguette.png');
-		PIXI.Assets.add('SkinEclair' ,'assets/Skins/Paddle/eclairAuChocolat.png');
-		PIXI.Assets.add('SkinTorti' ,'assets/Skins/Paddle/torti.png');
-		PIXI.Assets.add('balleBallon' ,'assets/Skins/Ball/ballon.png');
-		PIXI.Assets.add('balleCitron' ,'assets/Skins/Ball/tarteCitron.png');
-		PIXI.Assets.add('balleFraise' ,'assets/Skins/Ball/tarteFraise.png');
-		this.styles = await PIXI.Assets.loadBundle('fonts').then(() => {
+		Assets.add('SkinGradient' ,'assets/Skins/Paddle/red-gradient.png');
+		Assets.add('SkinHotDog' ,'assets/Skins/Paddle/hotdog.png');
+		Assets.add('Default' ,'assets/Skins/Paddle/default.png');
+		Assets.add('SkinSwirl' ,'assets/Skins/Paddle/Swirl.png');
+		Assets.add('SkinPoele' ,'assets/Skins/Paddle/poele.png');
+		Assets.add('SkinBaguette' ,'assets/Skins/Paddle/baguette.png');
+		Assets.add('SkinEclair' ,'assets/Skins/Paddle/eclairAuChocolat.png');
+		Assets.add('SkinTorti' ,'assets/Skins/Paddle/torti.png');
+		Assets.add('balleBallon' ,'assets/Skins/Ball/ballon.png');
+		Assets.add('balleCitron' ,'assets/Skins/Ball/tarteCitron.png');
+		Assets.add('balleFraise' ,'assets/Skins/Ball/tarteFraise.png');
+		this.styles = await Assets.loadBundle('fonts').then(() => {
 			return {
 				p1: new TextStyle({ fontFamily: 'PixeloidSansBold', fontSize: 70, fill: 0xaaaaaa, align: 'right' }),
 				p2: new TextStyle({ fontFamily: 'PixeloidSansBold', fontSize: 70, fill: 0xaaaaaa }),
@@ -39,12 +38,12 @@ export class AssetManager {
 
 	async getAsset(key: string | string[]) {
 		if (typeof key == 'string')
-			return await PIXI.Assets.load(key);
-		return await PIXI.Assets.load(key);
+			return await Assets.load(key);
+		return await Assets.load(key);
 	}
 
 	addRuler(app: Application) {
-		const ruler = new PIXI.Graphics();
+		const ruler = new Graphics();
 		for (let index = 0; index < 120; index++) {
 			for (let index2 = 0; index2 < 80; index2++) {
 				ruler.beginFill(0x555555);
@@ -173,7 +172,7 @@ export class WowText {
 		let len = 0;
 		if (this.isReverse) {
 			this.text.reverse().forEach((charac) => {
-				len -= PIXI.TextMetrics.measureText(charac.text, charac.style).width;
+				len -= TextMetrics.measureText(charac.text, charac.style).width;
 				charac.x = this.startPosX + len;
 				charac.y = this.startPosY;
 			})
@@ -181,7 +180,7 @@ export class WowText {
 			this.text.forEach((charac) => {
 				charac.x = this.startPosX + len;
 				charac.y = this.startPosY;
-				len += PIXI.TextMetrics.measureText(charac.text, charac.style).width;
+				len += TextMetrics.measureText(charac.text, charac.style).width;
 			})
 		}
 		return this;
@@ -198,7 +197,7 @@ export class WowText {
 			charac.y = this.startPosY;
 			this.text.push(charac);
 			this.app.stage.addChild(charac);
-			len += PIXI.TextMetrics.measureText(charac.text, charac.style).width;
+			len += TextMetrics.measureText(charac.text, charac.style).width;
 		})
 		return this;
 	}

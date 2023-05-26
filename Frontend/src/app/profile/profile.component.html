@@ -121,7 +121,7 @@
 				<canvas id="matchChart"></canvas>
 				<canvas id="rankChart"></canvas>
 			</div>
-			<div *ngIf="!matchHistory.length" class="justify-content-center align-items-center h-100">
+			<div *ngIf="!matchHistory.length" class="d-flex justify-content-center align-items-center h-100">
 				<h4 class="text-center text-muted">No stats yet</h4>
 			</div>
 		</div>
@@ -154,8 +154,8 @@
 							<img class="rounded-circle versus-img opponent" src="{{ getImg(match, match.Player1) }}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 2">
 						</div>
 					</div>
-					<div *ngIf="!matchHistory.length" class="justify-content-center align-items-center h-100">
-						<h4 class="text-center text-muted">No stats yet</h4>
+					<div *ngIf="!matchHistory.length" class="d-flex justify-content-center align-items-center h-100">
+						<h4 class="text-center text-muted">No Matches in history</h4>
 					</div>
 				</div>
 			</table>
