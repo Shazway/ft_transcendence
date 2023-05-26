@@ -99,7 +99,7 @@ export class FriendsComponent {
 
 	goToProfile(friend: AnyProfileUser)
 	{
-		this.router.navigateByUrl("http://localhost/profile/" + friend.user_id);
+		this.router.navigateByUrl("http://localhost:4200/profile/" + friend.username);
 	}
 
 	goToMessages(friend: AnyProfileUser)
