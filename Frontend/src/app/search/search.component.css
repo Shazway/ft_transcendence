@@ -1,3 +1,4 @@
 .line:hover {
-	background-color: rgba(245, 245, 245, 0.151);
+	background-color: rgba(245, 245, 245, 0.808);
+	cursor: pointer;
 }
