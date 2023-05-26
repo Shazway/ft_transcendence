@@ -60,6 +60,11 @@ export class PongGateway {
 			await this.connectMutex.acquire().then(async () => {
 				const userEntity = await this.itemsService.getUser(user.sub);
 				const match_id = Number(client.handshake.query.match_id);
+				if (!match_id)
+					return client.disconnect();
+				const matchEntity = await this.itemsService.getMatch(match_id);
+				if (!matchEntity || !matchEntity.is_ongoing)
+					return client.disconnect();
 				let match = this.matchs.get(match_id);
 		
 				console.log({ new_player: user });
@@ -75,7 +80,7 @@ export class PongGateway {
 				if (!match) {
 					match = new Match();
 					match.players = new Array<Player>();
-					match.entity = await this.itemsService.getMatch(match_id);
+					match.entity = matchEntity;
 					match.players.push(this.buildPlayer(client, user.sub, user.name));
 					this.matchs.set(match_id, match);
 				}

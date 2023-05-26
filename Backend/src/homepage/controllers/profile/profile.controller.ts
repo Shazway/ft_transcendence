@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Controller, Get, HttpStatus, Param, Post, Req, Res, Body } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
@@ -6,7 +7,6 @@ import { UsersService } from 'src/homepage/services/users/users.service';
 import { plainToClass } from 'class-transformer';
 import { ApplyProfile, MyProfileUser } from 'src/homepage/dtos/User.dto';
 import { AnyProfileUser } from 'src/homepage/dtos/User.dto';
-import { AchievementsEntity } from 'src/entities';
 import { AchievementList } from 'src/homepage/dtos/Achievement.dto';
 
 @Controller('profile')
