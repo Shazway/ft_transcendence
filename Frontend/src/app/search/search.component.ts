@@ -27,12 +27,12 @@ export class SearchComponent {
 
 	async onClickSearch(value : string) {
 		if (value.length > 0)
-			this.foundProfiles = await this.fetchService.searchingPrefix(value);
+			this.foundProfiles = await this.fetchService.searchingSubstring(value);
 	}
 
 	goToProfile(user: AnyProfileUser)
 	{
-		this.router.navigateByUrl("http://localhost/profile/" + user.user_id);
+		this.router.navigateByUrl("http://localhost:4200/profile/?username=" + user.username);
 	}
 
 }

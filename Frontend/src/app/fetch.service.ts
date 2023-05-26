@@ -356,11 +356,12 @@ export class FetchService {
 		return res;
 	}
 
-	async searchingPrefix(value : string) {
+	async searchingSubstring(value : string) {
 		let res: AnyProfileUser[] = [];
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		await axios.post<Array<AnyProfileUser>>('http://localhost:3001/users/prefixedList', {prefix : value}, this.getHeader())
+		console.log("J' envoie " + value);
+		await axios.post<Array<AnyProfileUser>>('http://localhost:3001/users/prefixed', {substring: value}, this.getHeader())
 		.then(function (response) {
 			res = response.data;
 		})
