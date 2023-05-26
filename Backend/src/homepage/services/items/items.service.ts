@@ -53,10 +53,10 @@ export class ItemsService {
 		return users;
 	}
 
-	public async getPrefixedUsers(usernamePrefix: string) {
+	public async getUsersBySubstring(substring: string) {
 		const users = await this.userRepo
 			.createQueryBuilder('user')
-			.where('user.username LIKE :prefix', { prefix: `${usernamePrefix}%` })
+			.where('user.username LIKE :substring', { substring: `%${substring}%` })
 			.orderBy('user.username')
 			.getMany();
 		return users;

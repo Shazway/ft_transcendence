@@ -51,13 +51,13 @@ export class UsersController {
 		return res.status(HttpStatus.ACCEPTED).send('Username changed');
 	}
 
-	@Post('prefixedList')
-	async getUsersFromPrefix(@Req() req: Request, @Res() res: Response, @Body() body: { prefix: string })
+	@Post('userBySubstring')
+	async getUsersFromPrefix(@Req() req: Request, @Res() res: Response, @Body() body: { substring: string })
 	{
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
 
-		const prefixedUsers = await this.itemsService.getPrefixedUsers(body.prefix);
+		const prefixedUsers = await this.itemsService.getUsersBySubstring(body.substring);
 		res.status(HttpStatus.OK).send(prefixedUsers);
 	}
 
