@@ -38,16 +38,27 @@ export class ChannelsController {
 		else res.status(HttpStatus.OK).send(channelList);
 	}
 
-	@Post('invite/:id')
+	async getIdFromBody(body: {channel_id: number, username: string, targetId: number})
+	{
+		if (body.targetId)
+			return body.targetId;
+		const userEntity = await this.itemsService.getUserByUsername(body.username);
+		if (!userEntity)
+			return 0;
+		return userEntity.user_id;
+	}
+
+	@Post('invite')
 	async inviteToChannel(
-		@Param('id', ParseIntPipe) userId: number,
 		@Req() req: Request,
 		@Res() res: Response,
-		@Body() body: { channel_id: number }
+		@Body() body: { channel_id: number, username: string, targetId: number }
 	) {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
-		if (!body || !body.channel_id || !userId) return res.status(HttpStatus.UNAUTHORIZED).send('No body');
+		if (!body || !body.channel_id || (!body.targetId && !body.username)) return res.status(HttpStatus.UNAUTHORIZED).send('No body');
+		const userId = await this.getIdFromBody(body);
+		if (!userId) return res.status(HttpStatus.UNAUTHORIZED).send('No body');
 		const channelId = body.channel_id;
 		const targetEntity = await this.itemsService.getUser(userId);
 
