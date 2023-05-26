@@ -217,24 +217,38 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		return true;
 	}
 
+	async getPrivilegesFromUsername(sourceId: number, username: string, channelId: number): Promise<{ ret: boolean; msg: string; }> {
+		const targetEntity = await this.itemService.getUserByUsername(username);
+		if (!targetEntity)
+			return ({ret: false, msg: 'User not found'});
+		return await this.channelService.checkPrivileges(sourceId, targetEntity.user_id, channelId);
+	}
+
+	async getPrivilegesFromBody(sourceId: number, body: Punishment, channelId: number) {
+		if (!body)
+			return {ret: false, msg: 'No body sent'}
+		if (!body.username && body.target_id)
+			return await this.channelService.checkPrivileges(sourceId, body.target_id, channelId);
+		else if (body.username)
+			return await this.getPrivilegesFromUsername(sourceId, body.username, channelId);
+		return {ret: false, msg: 'Not allowed'};
+	}
+
 	@SubscribeMessage('addFriend')
 	async handleInvite(@ConnectedSocket() client: Socket, @MessageBody() body: NotificationRequest) {
-		if (!body)
-		{
+		if (!body || !body.target_id)
 			throw new WsException('No body');
-		}
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		if (body && body.target_id == user.sub)
 			throw new WsException('You cannot add yourself');
 		await this.notificationGateway.handleInvite(client, body);
 	}
-	
+
 	@SubscribeMessage('block')
 	async handleBlock(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
-		if (!body)
+		if (!body || (!body.target_id && !body.username))
 			throw new WsException('No body');
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-
 		if (body && body.target_id == user.sub)
 			throw new WsException('You cannot block yourself');
 		if ((await this.itemService.blockUser(user.sub, body.target_id)))
@@ -256,15 +270,14 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('mute')
 	async handleMute(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
-		if (!body)
+		if (!body || (!body.target_id && !body.username))
 			throw new WsException('No body');
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-
 		const channel_id = Number(client.handshake.query.channel_id);
-		const ret = await this.channelService.checkPrivileges(user.sub, body.target_id, channel_id);
+		const ret = await this.getPrivilegesFromBody(user.sub, body, channel_id);
 		const channel = this.channelList.get(channel_id);
 
-		if (body && body.target_id == user.sub)
+		if (body.target_id == user.sub)
 			throw new WsException('You cannot mute yourself');
 		if (!channel)
 			throw new WsException('Channel no longer exists');
@@ -284,12 +297,13 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('unmute')
 	async handleUnmute(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
-		if (!body)
+		if (!body || (!body.target_id && !body.username))
 			throw new WsException('No body');
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		const channel_id = Number(client.handshake.query.channel_id);
-		const ret = await this.channelService.checkPrivileges(user.sub, body.target_id, channel_id);
+		const ret = await this.getPrivilegesFromBody(user.sub, body, channel_id);
 		const channel = this.channelList.get(channel_id);
+
 		if (!channel)
 			throw new WsException('Channel no longer exists');
 		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
@@ -306,9 +320,11 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('ban')
 	async handleBan(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
+		if (!body || (!body.target_id && !body.username))
+			throw new WsException('No body');
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		const channel_id = Number(client.handshake.query.channel_id);
-		const ret = await this.channelService.checkPrivileges(user.sub, body.target_id, channel_id);
+		const ret = await this.getPrivilegesFromBody(user.sub, body, channel_id);
 		const channel = this.channelList.get(channel_id);
 
 		if (!body)
@@ -333,11 +349,11 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('unban')
 	async handleUnban(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
-		if (!body)
+		if (!body || (!body.target_id && !body.username))
 			throw new WsException('No body');
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		const channel_id = Number(client.handshake.query.channel_id);
-		const ret = await this.channelService.checkPrivileges(user.sub, body.target_id, channel_id);
+		const ret = await this.getPrivilegesFromBody(user.sub, body, channel_id);
 		const channel = this.channelList.get(channel_id);
 
 		if (!channel)
@@ -357,11 +373,11 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('kick')
 	async handleKick(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
-		if (!body)
+		if (!body || (!body.target_id && !body.username))
 			throw new WsException('No body');
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		const channel_id = Number(client.handshake.query.channel_id);
-		const ret = await this.channelService.checkPrivileges(user.sub, body.target_id, channel_id);
+		const ret = await this.getPrivilegesFromBody(user.sub, body, channel_id);
 		const channel = this.channelList.get(channel_id);
 	
 		if (!channel)
