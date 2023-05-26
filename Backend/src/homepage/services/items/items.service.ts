@@ -648,10 +648,11 @@ export class ItemsService {
 		const sentRequest = targetUser.sentFriendRequests.find((request) => request.receiver.user_id == sourceId);
 		if (!receivedRequest || !sentRequest)
 			return null;
-		this.FriendRequestRepo.remove([
+		await this.FriendRequestRepo.remove([
 			receivedRequest,
 			sentRequest
 		]);
+		return true;
 	}
 
 	async saveUserState(user: UserEntity) {

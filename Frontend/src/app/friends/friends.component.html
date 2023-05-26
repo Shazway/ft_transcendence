@@ -164,13 +164,13 @@
 					<tr>
 						<th>Username</th>
 						<th>Quick access</th>
-						<th>Accept</th>
+						<th>Cancel</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr *ngFor="let request of friendshipRequests.sent" class="line">
 						<td>
-							<p class="small ms-3 mb-0 text-muted">{{ request.sender.username }}</p>
+							<p class="small ms-3 mb-0 text-muted">{{ request.receiver.username }}</p>
 						</td>
 						<td>
 							<div class="d-flex align-items-end">

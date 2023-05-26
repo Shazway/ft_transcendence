@@ -164,7 +164,8 @@ export class FriendsComponent {
 
 	cancel(request : FriendRequest)
 	{
-		console.log("annuler la demande d'ami pour " + request.receiver.username)
+		this.friendshipRequests.sent.splice(this.friendshipRequests.sent.indexOf(request), 1);
+		this.fetchService.cancelFriendRequest(request.receiver.user_id);
 	}
 
 	switchToFriends() {
