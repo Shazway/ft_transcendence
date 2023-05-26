@@ -58,6 +58,9 @@ export class User {
 	@Column({ default: false })
 	inMatch!: boolean;
 
+	@Column({ default: 1 })
+	channelInviteAuth: number;
+
 	// ---------------------- Friendship ----------------------------------
 
 	@OneToMany(() => Friendrequest, (friendrequest) => friendrequest.sender)
