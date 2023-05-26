@@ -23,18 +23,18 @@ export interface Achievement {
 
 export interface AnyProfileUser {
 	username: string;
-	img_url: string;
-	match_history: Match[];
+	img_url?: string;
+	match_history?: Match[];
 	rank_score: number;
 	activity_status: number;
-	createdAt: Date;
-	wins: number;
-	losses: number;
-	achievements: AchievementList;
-	friend: User[];
+	createdAt?: Date;
+	wins?: number;
+	losses?: number;
+	achievements?: AchievementList;
+	friend?: User[];
 	user_id: number;
-	intra_id: number;
-	title: string;
+	intra_id?: number;
+	title?: string;
 }
 
 
