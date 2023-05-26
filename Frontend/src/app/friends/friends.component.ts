@@ -89,7 +89,7 @@ export class FriendsComponent {
 
 	async unfriendPopup(user : AnyProfileUser) {
 		const modalRef = this.modalService.open(ConfirmUnfriendPopup);
-		modalRef.componentInstance.item = user;
+		modalRef.componentInstance.user = user;
 		return await modalRef.result;
 	}
 
@@ -104,7 +104,7 @@ export class FriendsComponent {
 
 	async blockPopup(user : AnyProfileUser) {
 		const modalRef = this.modalService.open(ConfirmBlockPopup);
-		modalRef.componentInstance.item = user;
+		modalRef.componentInstance.user = user;
 		return await modalRef.result;
 	}
 
