@@ -18,11 +18,13 @@ export class NotificationService {
 		private websocketService: WebsocketService,
 		private toastService: ToastService,
 	) {
-		this.client = io('ws://localhost:3003', this.websocketService.getHeader());
+		if (!this.client || (this.client && !this.client.connected))
+			this.client = io('ws://localhost:3003', this.websocketService.getHeader());
 	}
 
 	initSocket() {
-		this.client = io('ws://localhost:3003', this.websocketService.getHeader());
+		if (!this.client || (this.client && !this.client.connected))
+			this.client = io('ws://localhost:3003', this.websocketService.getHeader());
 		this.setClientEvent();
 	}
 
