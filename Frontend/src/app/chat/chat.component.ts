@@ -370,9 +370,68 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	async onClickChat(data: LessMessage) {
 		if (!this.client || data.message_content.trim().length == 0)
 			return false;
+
+		if (data.message_content[0] == '/') {
+			const split = data.message_content.split(' ');
+			if (split[0] == '/leave') {
+				this.client.emit('kick', {
+					username: localStorage.getItem('username'),
+					message: "You left the channel",
+				});
+				return;
+			}
+			else if (split[0] == '/obliterate') return;
+			else if (split[0] == '/kick') {
+				if (split.length < 2) return;
+				this.client.emit('kick', {
+					username: split[1],
+					message: "You have been kicked",
+				});
+				return;
+			}
+			else if (split[0] == '/ban') {
+				if (split.length < 2) return;
+				const time = split[2] ? Number(split[2]) : 0;
+				this.client.emit('ban', {
+					username: split[1],
+					message: "You have been banned",
+					time,
+				});
+				return;
+			}
+			else if (split[0] == '/unban') {
+				if (split.length < 2) return;
+				this.client.emit('unban', {
+					username: split[1],
+					message: "You have been unbanned",
+				});
+				return;
+			}
+			else if (split[0] == '/mute') {
+				if (split.length < 2) return;
+				const time = split[2] ? Number(split[2]) : 0;
+				this.client.emit('mute', {
+					username: split[1],
+					message: "You have been muted",
+					time,
+				});
+				return;
+			}
+			else if (split[0] == '/unmute') {
+				if (split.length < 2) return;
+				this.client.emit('unmute', {
+					username: split[1],
+					message: "You have been unmuted",
+				});
+				return;
+			}
+			else if (split[0] == '/invite') return;
+		}
+
 		this.elRef.nativeElement.querySelector('#exampleFormControlInput1').value = '';
 		const author = localStorage.getItem('username');
 		const id = localStorage.getItem('id');
+
 		if (id && author)
 			this.client.emit('message', {
 				message_content: data.message_content,
