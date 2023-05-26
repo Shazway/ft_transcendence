@@ -192,7 +192,7 @@ export class ProfileComponent implements AfterViewInit {
 		await this.customOnInit();
 		this.isLoaded = true;
 		this.cdr.detectChanges();
-		if (this.user && this.user.match_history?.length > 0) {
+		if (this.user && this.user.match_history.length > 0) {
 			this.matchChart = new Chart(document.getElementById('matchChart') as HTMLCanvasElement, this.getMatchChartConfig());
 			this.rankChart = new Chart(document.getElementById('rankChart') as HTMLCanvasElement, this.getRankedChartConfig());
 		}
