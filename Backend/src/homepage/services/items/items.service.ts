@@ -442,8 +442,12 @@ export class ItemsService {
 		const user = await this.getUser(user_id);
 		const channel = await this.getChannel(channel_id);
 
-		if (!user || !channel || !chan_user || channel.is_dm)
-			return ;
+		console.log('???');
+		if (!user || !channel || channel.is_dm)
+		{
+			console.log('Not added chanUser ' + user + channel + channel.is_dm);
+			return false;
+		}
 		chan_user.user = user;
 		chan_user.channel = channel;
 		channel.us_channel.push(chan_user);
@@ -451,6 +455,8 @@ export class ItemsService {
 		await this.userRepo.save(user);
 		await this.chanRepo.save(channel);
 		await this.chan_userRepo.save(chan_user);
+		console.log('Added chanUser');
+		return true;
 	}
 
 	public createFriendRequest() {

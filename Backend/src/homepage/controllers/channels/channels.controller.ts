@@ -35,7 +35,7 @@ export class ChannelsController {
 		if (!user) return;
 		const channelList = await this.channelService.getAllChannelsFromUser(user.sub);
 		if (!channelList) res.status(HttpStatus.NO_CONTENT).send({ msg: 'No channels registered' });
-		else res.status(HttpStatus.OK).send(channelList);
+		else res.status(HttpStatus.OK).send(channelList.filter(async (channel) => !(await this.channelService.isBanned(user.sub, channel.channel_id))));
 	}
 
 	async getIdFromBody(body: {channel_id: number, username: string, targetId: number})

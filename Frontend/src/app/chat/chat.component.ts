@@ -77,9 +77,9 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		this.client.on('delMessage', (event) => { console.log('Deleting message ' + event); this.deleteMessage(event); })
 	}
 
-	scrollBottom(msg: Message) {
+	scrollBottom(msg?: Message) {
 		const containerElement: HTMLElement = this.scrollbar.nativeElement;
-		if ((containerElement.clientHeight + containerElement.scrollTop) > containerElement.scrollHeight - 20 || msg.author.username == localStorage.getItem('username'))
+		if ((containerElement.clientHeight + containerElement.scrollTop) > containerElement.scrollHeight - 20 || !msg || msg.author.username == localStorage.getItem('username'))
 			setTimeout(() => {
 				containerElement.scrollTo({
 					top: containerElement.scrollHeight,
@@ -293,7 +293,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		this.client = io('ws://localhost:3002?channel_id=' + channel.channel_id, this.websocketService.getHeader());
 		this.currentChannel = channel;
 		this.setClientEvent();
-		this.slideChan();
+		const offscreenElm = this.elRef.nativeElement.querySelector('.channel_pan');
+		if (offscreenElm.classList.contains('show'))
+			this.slideChan();
+		this.scrollBottom();
 	}
 
 	async createChannel() {
@@ -367,7 +370,14 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		return (msg.author.user_id == 0)
 	}
 
+	setErrorPrompt() {
+		const prompt = this.elRef.nativeElement.querySelector('.text-input');
+		prompt.classList.add('set_error');
+	}
+
 	async onClickChat(data: LessMessage) {
+		if (!this.client.connected)
+			this.openChannel(this.currentChannel);
 		if (!this.client || data.message_content.trim().length == 0)
 			return false;
 
@@ -390,7 +400,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 				return;
 			}
 			else if (split[0] == '/ban') {
-				if (split.length < 2) return;
+				if (split.length < 2) return this.setErrorPrompt();
 				const time = split[2] ? Number(split[2]) : 0;
 				this.client.emit('ban', {
 					username: split[1],
