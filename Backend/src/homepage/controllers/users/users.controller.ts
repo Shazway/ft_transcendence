@@ -165,7 +165,7 @@ export class UsersController {
 		if (!user) return;
 		if (!target_id)
 			return res.status(HttpStatus.UNAUTHORIZED).send('No id given')
-		if (!(await this.itemsService.deleteFriendRequest(user.sub, target_id)))
+		if (!(await this.itemsService.deleteFriendRequest(target_id, user.sub)))
 			return res.status(HttpStatus.UNAUTHORIZED).send('Something went wrong');
 		res.status(HttpStatus.OK).send('Success');
 	}

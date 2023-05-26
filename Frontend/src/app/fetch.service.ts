@@ -280,6 +280,22 @@ export class FetchService {
 		return res;
 	}
 
+	async cancelFriendRequest(friend_id: number) {
+		let res;
+		const teaFunc = this.teapotError;
+		const route = this.router;
+		console.log("id = " + friend_id);
+		await axios.get('http://localhost:3001/users/removeFriendRequest/' + friend_id, this.getHeader())
+		.then(function (response) {
+			res = response.data;
+		})
+		.catch(function (error) {
+			teaFunc(error, route);
+		})
+		.finally(function () {});
+		return res;
+	}
+
 
 	async getMessages(channel_id: number, page: number): Promise<Message[]> {
 		let res: Message[] = [];
