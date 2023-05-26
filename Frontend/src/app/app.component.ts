@@ -99,7 +99,7 @@ export class AppComponent implements AfterViewInit {
 			dropDownElm.classList.add('show');
 	}
 
-	showFriendReq(notif : {notification: NotificationResponse}) {
+	showFriendReq(notif : {notification: NotificationRequest}) {
 		this.notifService.showFriendRequest(notif.notification);
 	}
 
@@ -133,14 +133,19 @@ export class AppComponent implements AfterViewInit {
 	}
 
 
-	acceptFriendRequest(context : NotificationRequest) {
+	acceptFriendRequest(context : NotificationRequest, toast: any) {
 		context.accepted = true;
 		this.notifService.emit('inviteAnswer', context);
+		console.log(context);
+		this.notifDismiss(toast);
 	}
 
-	rejectFriendRequest(context : NotificationRequest) {
+	rejectFriendRequest(context : NotificationRequest, toast: any) {
 		context.accepted = false;
 		this.notifService.emit('inviteAnswer', context);
+		console.log(context);
+
+		this.notifDismiss(toast);
 	}
 
 }

@@ -25,16 +25,4 @@ export class HomeComponent {
 	{
 		return(localStorage.getItem('username'));
 	}
-
-	printToast()
-	{
-		let test = {
-			source_id : 0,
-			type : "friend",
-			source_name : "test0",
-			sent_at : new Date(),
-			accepted : false};
-		this.notifService.showFriendRequest({test});
-	}
-
 }

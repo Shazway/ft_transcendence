@@ -2,7 +2,7 @@ import { Injectable, TemplateRef, ViewChild } from '@angular/core';
 import { Socket, io } from 'socket.io-client';
 import { WebsocketService } from './websocket.service';
 import { ToastService } from './toast/toast.service';
-import { NotificationResponse } from '../dtos/Notification.dto';
+import { NotificationRequest, NotificationResponse } from '../dtos/Notification.dto';
 
 
 @Injectable({
@@ -42,7 +42,7 @@ export class NotificationService {
 		this.client.on('friendInvite', (event) => { this.showFriendRequest(event.notification); console.log('friendInvite ', event); });
 	}
 
-	showFriendRequest(notification: any) {
+	showFriendRequest(notification: NotificationRequest) {
 		this.toastService.show(this.toastFriendRequest, { classname: 'p-0', delay: 10000, context: notification });
 	}
 
