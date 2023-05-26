@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AppComponent } from '../app.component';
+import { NotificationService } from '../notification.service';
 
 @Component({
   selector: 'app-home',
@@ -12,6 +13,7 @@ export class HomeComponent {
 	constructor(
 		private router: Router,
 		private parent: AppComponent,
+		private notifService: NotificationService,
 	) {}
 
 	async ngOnInit() {
@@ -23,5 +25,4 @@ export class HomeComponent {
 	{
 		return(localStorage.getItem('username'));
 	}
-
 }

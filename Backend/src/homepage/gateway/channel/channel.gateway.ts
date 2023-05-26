@@ -258,6 +258,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		if (body && body.target_id == user.sub)
 			throw new WsException('You cannot add yourself');
+		await this.notificationGateway.handleConnection(client);
 		await this.notificationGateway.handleInvite(client, body);
 	}
 
