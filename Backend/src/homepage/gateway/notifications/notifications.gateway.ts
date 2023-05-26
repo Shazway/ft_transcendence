@@ -56,6 +56,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		
 		if (!user)
 			return client.disconnect();
+		console.log('disconnected');
 		this.userList.delete(user.sub);
 		await this.notificationService.setUserStatus(user.sub, this.OFFLINE);
 	}
