@@ -32,7 +32,8 @@ export class SearchComponent {
 
 	goToProfile(user: AnyProfileUser)
 	{
-		this.router.navigateByUrl("http://localhost:4200/profile/?username=" + user.username);
+		console.log(user);
+		this.router.navigateByUrl("profile?username=" + user.username);
 	}
 
 }
