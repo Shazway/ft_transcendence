@@ -107,18 +107,6 @@ export class UsersController {
 		});
 	}
 
-	@Get('add_friend/:id')
-	async addFriend(
-		@Param('id', ParseIntPipe) friend_id: number,
-		@Req() req: Request,
-		@Res() res: Response
-	) {
-		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
-		if (!user) return;
-		console.log({ FriendToAdd: friend_id });
-		this.itemsService.addFriendToUser(user.sub, friend_id);
-		return res.status(HttpStatus.OK).send('Friend added');
-	}
 	@Get('block/:id')
 	async blockUser(
 		@Param('id', ParseIntPipe) target_id: number,
@@ -169,6 +157,17 @@ export class UsersController {
 
 		console.log(receivedRequests);
 		res.status(HttpStatus.OK).send({ received: receivedRequests, sent: sentRequests });
+	}
+
+	@Get('removeFriendRequest/:id')
+	async removeFriendRequest(@Param('id', ParseIntPipe) target_id: number, @Req() req: Request, @Res() res: Response) {
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
+		if (!target_id)
+			return res.status(HttpStatus.UNAUTHORIZED).send('No id given')
+		if (!(await this.itemsService.deleteFriendRequest(user.sub, target_id)))
+			return res.status(HttpStatus.UNAUTHORIZED).send('Something went wrong');
+		res.status(HttpStatus.OK).send('Success');
 	}
 
 	@Get('getBlockedUsers')
