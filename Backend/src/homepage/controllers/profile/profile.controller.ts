@@ -7,6 +7,7 @@ import { plainToClass } from 'class-transformer';
 import { ApplyProfile, MyProfileUser } from 'src/homepage/dtos/User.dto';
 import { AnyProfileUser } from 'src/homepage/dtos/User.dto';
 import { AchievementsEntity } from 'src/entities';
+import { AchievementList } from 'src/homepage/dtos/Achievement.dto';
 
 @Controller('profile')
 export class ProfileController {
@@ -37,7 +38,8 @@ export class ProfileController {
 		if (targetUser && user.name === targetUser.username)
 			serializedUser = plainToClass(MyProfileUser, targetUser);
 		else if (targetUser) serializedUser = plainToClass(AnyProfileUser, targetUser);
-		else res.status(HttpStatus.NOT_FOUND).send(null);
+		else return res.status(HttpStatus.NOT_FOUND).send(null);
+		serializedUser.achievements = new AchievementList();
 		serializedUser.achievements.unlockedAchievements = achievements;
 		serializedUser.achievements.lockedAchievements = this.itemService.getLockedAchievements(targetUser, allAchievements);
 		res.status(HttpStatus.OK).send(serializedUser);

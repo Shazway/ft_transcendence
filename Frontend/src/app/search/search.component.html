@@ -8,14 +8,14 @@
 		<button type="submit" class="btn btn-primary mb-3">Go</button>
 	</div>
 </form>
-<table class="table" style="color: aliceblue;">
+<table class="table table-hover" style="color: aliceblue;">
 	<thead>
 		<tr>
 			<th>Username</th>
 		</tr>
 	</thead>
 	<tbody>
-		<tr *ngFor="let user of foundProfiles" class="line">
+		<tr *ngFor="let user of foundProfiles" (click)="goToProfile(user)" class="line">
 			<td>{{user.username}}</td>
 		</tr>
 	</tbody>

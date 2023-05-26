@@ -2,6 +2,7 @@ import { Component} from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { AnyProfileUser } from 'src/dtos/User.dto';
 import { FetchService } from '../fetch.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-search',
@@ -14,6 +15,7 @@ export class SearchComponent {
 
 	constructor(
 		private fetchService: FetchService,
+		private router: Router,
 	) {
 		this.foundProfiles = [];
 	}
@@ -26,6 +28,11 @@ export class SearchComponent {
 	async onClickSearch(value : string) {
 		if (value.length > 0)
 			this.foundProfiles = await this.fetchService.searchingPrefix(value);
+	}
+
+	goToProfile(user: AnyProfileUser)
+	{
+		this.router.navigateByUrl("http://localhost/profile/" + user.user_id);
 	}
 
 }
