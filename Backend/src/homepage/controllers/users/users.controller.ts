@@ -56,7 +56,8 @@ export class UsersController {
 	{
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
-
+		if (!body || !body.substring)
+			return res.status(HttpStatus.UNAUTHORIZED).send(null);
 		const prefixedUsers = await this.itemsService.getUsersBySubstring(body.substring);
 		res.status(HttpStatus.OK).send(prefixedUsers);
 	}
