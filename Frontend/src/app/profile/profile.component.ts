@@ -114,8 +114,7 @@ export class ProfileComponent implements AfterViewInit {
 			if (newUser)
 				this.user = newUser;
 		}
-		if (this.user) {
-			console.log(this.user.achievements);
+		if (this.user && this.user.match_history) {
 			this.user.match_history.reverse().forEach(match => {
 				console.log('mon match');
 				console.log(match);

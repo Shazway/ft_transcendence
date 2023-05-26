@@ -56,6 +56,19 @@ export class ChannelsService {
 		const channel_list = await this.itemsService.getAllChannelsFromUser(id);
 		return channel_list;
 	}
+
+	async canInvite(userId: number, channelId: number)
+	{
+		const user = await this.itemsService.getUser(userId);
+		const channel = await this.itemsService.getChannel(channelId);
+
+		if (!user || !channel || channel.is_dm || !channel.is_channel_private)
+			return false;
+		if (this.isUserAdmin(userId, channelId))
+			return true;
+		return false;
+	}
+
 	async addUserToChannel(user_id: number, chan_id: number, pass = null, is_creator = false, is_admin = false) {
 		const chan_user = new ChannelUserRelation();
 		const channel = await this.itemsService.getChannel(chan_id);

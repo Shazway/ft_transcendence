@@ -62,7 +62,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			return this.addUserToList(client, user);
 		else if (channel.is_dm)
 			return client.disconnect();
-		if (isMember && !channel.is_channel_private)
+		if (!channel.is_channel_private)
 		{
 			await this.channelService.isMuted(user.sub, channel_id);
 			if ((await this.channelService.isBanned(user.sub, channel_id)) ||
@@ -71,10 +71,10 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 				client.emit('onError', 'User is banned');
 				return client.disconnect();
 			}
-			if (!channel.is_channel_private && ((!channel.channel_password &&
+			if (((!channel.channel_password &&
 				(await this.addUserToChannel(user.sub, channel_id))) ||
-				(await this.addUserToChannel(user.sub, channel_id, client.handshake.query.channel_pass))))
-			await this.sendMessageToChannel(0, channel_id, this.buildJoinChannel(user));
+				(await this.addUserToChannel(user.sub, channel_id, client.handshake.query.channel_pass))) && isMember)
+					await this.sendMessageToChannel(0, channel_id, this.buildJoinChannel(user));
 		}
 		else if (channel.is_channel_private && isMember)
 			this.addUserToList(client, user);
@@ -86,7 +86,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	{
 		return {
 				message_id: 0,
-				message_content: user.name + ' joined the channel',
+				message_content: user.name + ' is online',
 				author: { username: 'System', user_id: 0 },
 				createdAt: new Date()
 		}
