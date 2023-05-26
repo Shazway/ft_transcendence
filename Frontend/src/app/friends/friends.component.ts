@@ -8,7 +8,7 @@ import { AppComponent } from '../app.component';
 import { NotificationRequest } from 'src/dtos/Notification.dto';
 import { type } from 'jquery';
 import { NotificationService } from '../notification.service';
-import { boolean } from 'mathjs';
+import { boolean, compare } from 'mathjs';
 
 @Component({
   selector: 'app-friends',
@@ -29,9 +29,11 @@ export class FriendsComponent {
 	friendsTabElm : any;
 	requestsTabElm : any;
 	blockedTabElm : any;
+	sentTabElm : any;
 	friendsElm : any;
 	requestsElm : any;
 	blockedElm : any;
+	sentElm : any;
 
 	public friends: AnyProfileUser[] = [];
 	public friendshipRequests: {received: FriendRequest[], sent: FriendRequest[]} = {received: [], sent: []};
@@ -57,7 +59,13 @@ export class FriendsComponent {
 		if (!this.parent.isConnected())
 			this.router.navigateByUrl('login');
 		this.blockedUsers = await this.fetchService.getBlockedUsers();
+		this.blockedUsers.sort((a, b)=>{
+			return (a.username.localeCompare(b.username));
+		})
 		this.friends = await this.fetchService.getFriends();
+		this.friends.sort((a, b)=>{
+			return (a.username.localeCompare(b.username));
+		})
 		this.friends.sort((a, b) => b.activity_status - a.activity_status);
 		this.friendshipRequests = await this.fetchService.getFriendshipRequests();
 	}
@@ -68,42 +76,13 @@ export class FriendsComponent {
 		this.friends = await this.fetchService.getFriends();
 	}
 
-	async onClickFriend(friend: AnyProfileUser)
+	goToProfile(user: AnyProfileUser)
 	{
-		const goToProfileElm = this.elRef.nativeElement.querySelector("#img-" + friend.user_id + "-profile");
-		const goToMessagesElm = this.elRef.nativeElement.querySelector("#img-" + friend.user_id + "-message");
-		const removeFriendElm = this.elRef.nativeElement.querySelector('#img-' + friend.user_id + '-unfriend');
-		const blockUserElm = this.elRef.nativeElement.querySelector('#img-' + friend.user_id + '-block');
-
-		if (goToProfileElm.classList.contains('show')) {
-			goToProfileElm.classList.remove('show');
-			goToProfileElm.removeAttribute('title');
-			goToMessagesElm.classList.remove('show');
-			goToMessagesElm.removeAttribute('title');
-			removeFriendElm.classList.remove('show');
-			removeFriendElm.removeAttribute('title');
-			blockUserElm.classList.remove('show');
-			blockUserElm.removeAttribute('title');
-		}
-		else {
-			goToProfileElm.classList.add('show');
-			goToProfileElm.setAttribute('title', 'Profile');
-			goToMessagesElm.classList.add('show');
-			goToMessagesElm.setAttribute('title', 'Message');
-			removeFriendElm.classList.add('show');
-			removeFriendElm.setAttribute('title', 'Unfriend');
-			blockUserElm.classList.add('show');
-			blockUserElm.setAttribute('title', 'Block');
-		}
-	}
-
-	goToProfile(friend: AnyProfileUser)
-	{
-		this.router.navigateByUrl("profile?username=" + friend.username);
+		this.router.navigateByUrl("profile?username=" + user.username);
 
 	}
 
-	goToMessages(friend: AnyProfileUser)
+	goToMessages(user: AnyProfileUser)
 	{
 
 	}
@@ -114,11 +93,13 @@ export class FriendsComponent {
 		return await modalRef.result;
 	}
 
-	async removeFriend(friend: AnyProfileUser)
+	async removeFriend(user: AnyProfileUser)
 	{
-		const validate = await this.unfriendPopup(friend);
-		await this.fetchService.removeFriends(friend.user_id);
-		this.friends.splice(this.friends.indexOf(friend), 1);
+		const validate = await this.unfriendPopup(user);
+		if (validate) {
+			await this.fetchService.removeFriends(user.user_id);
+			this.friends.splice(this.friends.indexOf(user), 1);
+		}
 	}
 
 	async blockPopup(user : AnyProfileUser) {
@@ -127,27 +108,31 @@ export class FriendsComponent {
 		return await modalRef.result;
 	}
 
-	async blockUser(block: AnyProfileUser)
+	async blockUser(user: AnyProfileUser)
 	{
-		const validate = await this.unfriendPopup(block);
-		await this.fetchService.blockUser(block.user_id);
-		this.friends.splice(this.friends.indexOf(block), 1);
+		const validate = await this.blockPopup(user);
+		if (validate) {
+			await this.fetchService.blockUser(user.user_id);
+			this.friends.splice(this.friends.indexOf(user), 1);
+			this.blockedUsers.push(user);
+			this.blockedUsers.sort((a, b)=>{
+				return (a.username.localeCompare(b.username));
+			})
+		}
 	}
 
-	async unblockUser(block: AnyProfileUser)
+	async unblockUser(user: AnyProfileUser)
 	{
-		await this.fetchService.unblockUser(block.user_id);
-		this.blockedUsers.splice(this.blockedUsers.indexOf(block), 1);
-		//add a pop-up to confirm
-		
+		await this.fetchService.unblockUser(user.user_id);
+		this.blockedUsers.splice(this.blockedUsers.indexOf(user), 1);		
 	}
 
-	async challenge(friend: AnyProfileUser)
+	async challenge(user: AnyProfileUser)
 	{
 		const test = await this.createPopup("Challenge", "friend");
 	}
 
-	async spectate(friend: AnyProfileUser)
+	async spectate(user: AnyProfileUser)
 	{
 		const test = await this.createPopup("Spectate", "friend");
 	}
@@ -166,6 +151,9 @@ export class FriendsComponent {
 	{
 		this.friendshipRequests.received.splice(this.friendshipRequests.received.indexOf(request), 1);
 		this.friends.push(request.sender);
+		this.friends.sort((a, b)=>{
+			return (a.username.localeCompare(b.username));
+		})
 		this.notifService.emit('inviteAnswer', this.friendRequestToNotificationRequest(request, true));
 	}
 
@@ -175,16 +163,24 @@ export class FriendsComponent {
 		this.notifService.emit('inviteAnswer', this.friendRequestToNotificationRequest(request, false));
 	}
 
+	cancel(request : FriendRequest)
+	{
+		console.log("annuler la demande d'ami pour " + request.receiver.username)
+	}
+
 	switchToFriends() {
 		this.friendsTabElm = this.elRef.nativeElement.querySelector("#friends-tab0");
 		this.requestsTabElm = this.elRef.nativeElement.querySelector("#requests-tab0");
 		this.blockedTabElm = this.elRef.nativeElement.querySelector("#blocked-tab0");
+		this.sentTabElm = this.elRef.nativeElement.querySelector("#sent-tab0");
 		this.friendsElm = this.elRef.nativeElement.querySelector("#friends0");
 		this.requestsElm = this.elRef.nativeElement.querySelector("#requests0");
 		this.blockedElm = this.elRef.nativeElement.querySelector("#blocked0");
+		this.sentElm = this.elRef.nativeElement.querySelector("#sent0");
 		this.friendsTabElm.classList.add('active');
 		this.requestsTabElm.classList.remove('active');
 		this.blockedTabElm.classList.remove('active');
+		this.sentTabElm.classList.remove('active');
 
 		this.friendsElm.classList.add('show');
 		this.friendsElm.classList.add('active');
@@ -192,18 +188,23 @@ export class FriendsComponent {
 		this.requestsElm.classList.remove('active');
 		this.blockedElm.classList.remove('show');
 		this.blockedElm.classList.remove('active');
+		this.sentElm.classList.remove('show');
+		this.sentElm.classList.remove('active');
 	}
 
 	switchToRequests() {
 		this.friendsTabElm = this.elRef.nativeElement.querySelector("#friends-tab0");
 		this.requestsTabElm = this.elRef.nativeElement.querySelector("#requests-tab0");
 		this.blockedTabElm = this.elRef.nativeElement.querySelector("#blocked-tab0");
+		this.sentTabElm = this.elRef.nativeElement.querySelector("#sent-tab0");
 		this.friendsElm = this.elRef.nativeElement.querySelector("#friends0");
 		this.requestsElm = this.elRef.nativeElement.querySelector("#requests0");
 		this.blockedElm = this.elRef.nativeElement.querySelector("#blocked0");
+		this.sentElm = this.elRef.nativeElement.querySelector("#sent0");
 		this.friendsTabElm.classList.remove('active');
 		this.requestsTabElm.classList.add('active');
 		this.blockedTabElm.classList.remove('active');
+		this.sentTabElm.classList.remove('active');
 
 		this.friendsElm.classList.remove('show');
 		this.friendsElm.classList.remove('active');
@@ -211,18 +212,23 @@ export class FriendsComponent {
 		this.requestsElm.classList.add('active');
 		this.blockedElm.classList.remove('show');
 		this.blockedElm.classList.remove('active');
+		this.sentElm.classList.remove('show');
+		this.sentElm.classList.remove('active');
 	}
 
 	switchToBlocked() {
 		this.friendsTabElm = this.elRef.nativeElement.querySelector("#friends-tab0");
 		this.requestsTabElm = this.elRef.nativeElement.querySelector("#requests-tab0");
 		this.blockedTabElm = this.elRef.nativeElement.querySelector("#blocked-tab0");
+		this.sentTabElm = this.elRef.nativeElement.querySelector("#sent-tab0");
 		this.friendsElm = this.elRef.nativeElement.querySelector("#friends0");
 		this.requestsElm = this.elRef.nativeElement.querySelector("#requests0");
 		this.blockedElm = this.elRef.nativeElement.querySelector("#blocked0");
+		this.sentElm = this.elRef.nativeElement.querySelector("#sent0");
 		this.friendsTabElm.classList.remove('active');
 		this.requestsTabElm.classList.remove('active');
 		this.blockedTabElm.classList.add('active');
+		this.sentTabElm.classList.remove('active');
 
 		this.friendsElm.classList.remove('show');
 		this.friendsElm.classList.remove('active');
@@ -230,5 +236,31 @@ export class FriendsComponent {
 		this.requestsElm.classList.remove('active');
 		this.blockedElm.classList.add('show');
 		this.blockedElm.classList.add('active');
+		this.sentElm.classList.remove('show');
+		this.sentElm.classList.remove('active');
+	}
+
+	switchToSent() {
+		this.friendsTabElm = this.elRef.nativeElement.querySelector("#friends-tab0");
+		this.requestsTabElm = this.elRef.nativeElement.querySelector("#requests-tab0");
+		this.blockedTabElm = this.elRef.nativeElement.querySelector("#blocked-tab0");
+		this.sentTabElm = this.elRef.nativeElement.querySelector("#sent-tab0");
+		this.friendsElm = this.elRef.nativeElement.querySelector("#friends0");
+		this.requestsElm = this.elRef.nativeElement.querySelector("#requests0");
+		this.blockedElm = this.elRef.nativeElement.querySelector("#blocked0");
+		this.sentElm = this.elRef.nativeElement.querySelector("#sent0");
+		this.friendsTabElm.classList.remove('active');
+		this.requestsTabElm.classList.remove('active');
+		this.blockedTabElm.classList.remove('active');
+		this.sentTabElm.classList.add('active');
+
+		this.friendsElm.classList.remove('show');
+		this.friendsElm.classList.remove('active');
+		this.requestsElm.classList.remove('show');
+		this.requestsElm.classList.remove('active');
+		this.blockedElm.classList.remove('show');
+		this.blockedElm.classList.remove('active');
+		this.sentElm.classList.add('show');
+		this.sentElm.classList.add('active');
 	}
 }

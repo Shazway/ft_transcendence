@@ -28,6 +28,19 @@
 		</li>
 		<li class="nav-item" role="presentation">
 			<button
+			  class="nav-link"
+			  id="sent-tab0"
+			  (click)="switchToSent()"
+			  type="button"
+			  role="tab"
+			  aria-controls="sent"
+			  aria-selected="false"
+			>
+				My requests
+				</button>
+		</li>
+		<li class="nav-item" role="presentation">
+			<button
 			class="nav-link"
 			id="blocked-tab0"
 			(click)="switchToBlocked()"
@@ -57,7 +70,7 @@
 					<tr *ngFor="let friend of friends" class="line">
 						<td>
 							<div class="d-flex align-items-end ">
-								<p class="small ms-3 mb-0 text-muted" (click)="onClickFriend(friend)">{{ friend.username }}</p>
+								<p class="small ms-3 mb-0 text-muted">{{ friend.username }}</p>
 								<div class="flex-grow-1"></div>
 								<img (click)="goToProfile(friend)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{friend.user_id}}-profile" src="{{icone_list.go_to_profile}}" alt="profile">
 								<img (click)="goToMessages(friend)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{friend.user_id}}-message" src="{{icone_list.go_to_messages}}" alt="message">
@@ -140,6 +153,43 @@
 			</tbody>
 		</table>
 		</div>
+
+		<div
+		class="tab-pane fade"
+		id="sent0"
+		role="tabpanel"
+		aria-labelledby="sent-tab0">
+			<table class="table table-hover"style="color: aliceblue;">
+				<thead>
+					<tr>
+						<th>Username</th>
+						<th>Quick access</th>
+						<th>Accept</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let request of friendshipRequests.sent" class="line">
+						<td>
+							<p class="small ms-3 mb-0 text-muted">{{ request.sender.username }}</p>
+						</td>
+						<td>
+							<div class="d-flex align-items-end">
+								<img (click)="goToProfile(request.sender)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.receiver.user_id}}-profile" src="{{icone_list.go_to_profile}}" alt="profile">
+								<img (click)="goToMessages(request.sender)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.receiver.user_id}}-message" src="{{icone_list.go_to_messages}}" alt="message">
+								<img (click)="blockUser(request.sender)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.receiver.user_id}}-block" src="{{icone_list.block_user}}" alt="block">
+								<div class="flex-grow-1"></div>
+							</div>
+						</td>
+						<td>
+							<div class="d-flex align-items-end ">
+								<img (click)="cancel(request)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.receiver.user_id}}-message" src="{{icone_list.cross}}" alt="reject">
+								<div class="flex-grow-1"></div>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 	</div>
 </div>
-<button type="button" class="btn btn-primary" (click)="addSystemFriend()">add System as friend</button>
+

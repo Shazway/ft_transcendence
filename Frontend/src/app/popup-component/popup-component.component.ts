@@ -54,9 +54,10 @@ export class ConfirmBuyPopup {
 	templateUrl: './confirmUnfriend-popup.html',
 })
 export class ConfirmUnfriendPopup {
-	@Input() user! : AnyProfileUser;
+	@Input() user!: AnyProfileUser;
 
 	constructor(public activeModal: NgbActiveModal) {
+		this.user = {user_id : 0, username : "", rank_score : 0, activity_status : 0};
 	}
 
 	onSubmit(bool: boolean) {
@@ -69,9 +70,10 @@ export class ConfirmUnfriendPopup {
 	templateUrl: './confirmBlock-popup.html',
 })
 export class ConfirmBlockPopup {
-	@Input() user! : AnyProfileUser;
+	@Input() user : AnyProfileUser;
 
 	constructor(public activeModal: NgbActiveModal) {
+		this.user = {user_id : 0, username : "", rank_score : 0, activity_status : 0};
 	}
 
 	onSubmit(bool: boolean) {
