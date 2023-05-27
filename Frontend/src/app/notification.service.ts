@@ -6,7 +6,7 @@ import { NotificationRequest, NotificationResponse } from '../dtos/Notification.
 
 
 @Injectable({
-  providedIn: 'root'
+	providedIn: 'root'
 })
 export class NotificationService {
 	public client!: Socket;
