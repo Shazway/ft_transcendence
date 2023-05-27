@@ -200,9 +200,10 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	}
 
 	socketEmit(clients: Array<Socket>, eventDest: string, ...content: any[]) {
-		clients.forEach((client) => {
-			client.emit(eventDest, content[0]);
-		});
+		if (clients)
+			clients.forEach((client) => {
+				client.emit(eventDest, content[0]);
+			});
 	}
 
 	async channelLeaveMsg(channel_id: number, targetId: number) {

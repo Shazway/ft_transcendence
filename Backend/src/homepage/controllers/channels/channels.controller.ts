@@ -33,9 +33,17 @@ export class ChannelsController {
 	async getPrivateChannels(@Req() req: Request, @Res() res: Response) {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
-		const channelList = await this.channelService.getAllChannelsFromUser(user.sub);
-		if (!channelList) res.status(HttpStatus.NO_CONTENT).send({ msg: 'No channels registered' });
-		else res.status(HttpStatus.OK).send(channelList.filter(async (channel) => !(await this.channelService.isBanned(user.sub, channel.channel_id))));
+		const channelList = await this.itemsService.getChannelsFromUser(user.sub);
+		if (!channelList) return res.status(HttpStatus.OK).send(channelList);
+		const filteredList = await Promise.all(channelList.map(async (channel) => {
+			const isBanned = await this.channelService.isBanned(user.sub, channel.channel_id);
+				if (!isBanned) {
+					return channel;
+			}
+			}));
+		const filteredChannelsWithoutNull = filteredList.filter((channel) => channel);
+		console.log(filteredChannelsWithoutNull);
+		res.status(HttpStatus.OK).send(filteredChannelsWithoutNull);
 	}
 
 	async getIdFromBody(body: {channel_id: number, username: string, targetId: number})

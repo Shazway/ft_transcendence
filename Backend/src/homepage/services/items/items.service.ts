@@ -681,4 +681,21 @@ export class ItemsService {
 		const match = user.match_history.find((match) => {match.is_ongoing});
 		return match;
 	}
+
+	async getChannelsFromUser(id: number) {
+		const channels = await this.chanRepo
+		.createQueryBuilder('channel')
+		.leftJoinAndSelect('channel.us_channel', 'channel_user')
+		.where((qb) => {
+			const subQuery = qb
+			.subQuery()
+			.select('1')
+			.from(ChannelUser, 'cu')
+			.where('cu.channel_user_id = :id', { id })
+			.getQuery();
+			return `EXISTS ${subQuery}`;
+		})
+		.getMany();
+		return channels;
+	}
 }
