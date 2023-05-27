@@ -14,7 +14,14 @@
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
 			"allowedCommonJsDependencies": [
-			"pixi"
+			"escape-latex",
+			"fraction.js",
+			"complex.js",
+			"seedrandom",
+			"typed-function",
+			"eventemitter3",
+			"earcut",
+			"javascript-natural-sort"
 		 ],
             "outputPath": "dist/frontend",
             "index": "src/index.html",

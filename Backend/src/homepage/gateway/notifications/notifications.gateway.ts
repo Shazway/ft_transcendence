@@ -110,18 +110,18 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		const source = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		const answer = this.buildAnswer(source.sub, source.name, body.type);
 		const target = this.userList.get(body.target_id);
-		const notifClient = this.userList.get(source.sub);
-
 		if(!body)
 			throw new WsException('Pas de body');
-		if (body.type == 'friend' && await this.requestService.handleFriendRequestInvite(source.sub, body.target_id))
-			client.emit('refusedInvite', 'Something went wrong');
+		if (body.type == 'friend' && !(await this.requestService.handleFriendRequestInvite(source.sub, body.target_id)))
+			return client.emit('refusedInvite', 'Something went wrong');
+		else if (body.type == 'match' && !target)
+			return client.emit('offline', 'Your friend is currently offline');
 		if (target && target.connected)
 			target.emit(body.type + 'Invite', { notification: answer});
 		else
 			console.log('Pas connecte target');
-		if (notifClient && notifClient.connected)
-			notifClient.emit('pendingRequest', 'Request sent and waiting for answer');
+		if (client && client.connected)
+			client.emit('pendingRequest', 'Request sent and waiting for answer');
 		else
 			console.log('Pas connecte envoyeur');
 	}
