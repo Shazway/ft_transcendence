@@ -16,6 +16,7 @@ import { TokenManagerService } from 'src/homepage/services/token-manager/token-m
 import { NewChan } from '../../dtos/Chan.dto';
 import { MessagesService } from 'src/homepage/services/messages/messages.service';
 import { ItemsService } from 'src/homepage/services/items/items.service';
+import { NotificationsGateway } from 'src/homepage/gateway/notifications/notifications.gateway';
 
 @Controller('channels')
 export class ChannelsController {
@@ -26,7 +27,8 @@ export class ChannelsController {
 		private channelService: ChannelsService,
 		private tokenManager: TokenManagerService,
 		private messageService: MessagesService,
-		private itemsService: ItemsService
+		private itemsService: ItemsService,
+		private notificationsGateway: NotificationsGateway
 	) {}
 
 	@Get('all')
@@ -75,6 +77,7 @@ export class ChannelsController {
 				targetEntity.friend.find((friend) => friend.user_id == user.sub))) && await this.channelService.canInvite(user.sub, channelId))
 		{
 			await this.channelService.addUserToChannel(user.sub, channelId);
+			this.notificationsGateway.onChannelInvite(user, targetEntity);
 			return res.status(HttpStatus.ACCEPTED).send('User added to channel successfully');
 		}
 		res.status(HttpStatus.UNAUTHORIZED).send('Not allowed' + targetEntity.channelInviteAuth);

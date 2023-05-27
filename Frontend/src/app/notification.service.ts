@@ -39,10 +39,11 @@ export class NotificationService {
 	setClientEvent() {
 		this.client.on('friendAnswer', (event) => { console.log('Answer ' + event);});
 		this.client.on('pendingRequest', (event) => {  console.log('pendingRequest' + event); });
-		this.client.on('friendInvite', (event) => { this.showFriendRequest(event.notification); console.log('friendInvite ', event); });
+		this.client.on('friendInvite', (event) => { this.showNotificationInvite(event.notification); console.log('friendInvite ', event); });
+		this.client.on('channelInvite', (event) => { this.showNotificationInvite(event.notification); console.log('channelInvite ', event); });
 	}
 
-	showFriendRequest(notification: NotificationRequest) {
+	showNotificationInvite(notification: NotificationRequest) {
 		this.toastService.show(this.toastFriendRequest, { classname: 'p-0', delay: 10000, context: notification });
 	}
 

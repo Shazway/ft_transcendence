@@ -65,10 +65,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		{
 			await this.channelService.isMuted(user.sub, channel_id);
 			if (await this.channelService.isBanned(user.sub, channel_id))
-			{
-				console.log('Je suis ban ' + user.name);
 				return client.disconnect();
-			}
 			this.addUserToList(client, user);
 			if (!isMember)
 			{
@@ -162,9 +159,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	async sendMessageToChannel(sourceId: number, channel_id: number, message: Message, dest = 'onMessage') {
 		const channel = this.channelList.get(channel_id);
 		if (!channel)
-		{
 			throw new WsException('Channel does not exist');
-		}
 		channel.forEach(async (userSockets, key) => {
 			if (!(await this.usersService.isBlockedCheck(sourceId, key)))
 				this.socketEmit(userSockets, dest, message);
@@ -188,17 +183,10 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		chan_user.is_creator = is_creator;
 		chan_user.is_admin = is_admin;
 
-		console.log('create user-channel');
 		if (!channel.channel_password)
-		{
-			console.log('no pass');
 			return await this.itemService.addUserToChannel(chan_user, chan_id, user_id);
-		}
 		else if (pass === channel.channel_password)
-		{
-			console.log('el pass ?')
 			return await this.itemService.addUserToChannel(chan_user, chan_id, user_id);
-		}
 		return true;
 	}
 
@@ -383,7 +371,6 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		if (!channel || !targetId)
 			throw new WsException('Channel no longer exists');
 		if (!ret.ret) return client.emit('onError', ret.msg);
-
 		this.channelService.unBanUser(user.sub, targetId, channel_id);
 		const targets = channel.get(targetId);
 		this.socketEmit(
@@ -409,7 +396,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		if (!ret.ret && user.sub != targetId) return client.emit('onError', 'Lacking privileges');
 		const targets = channel.get(targetId);
 		if (user.sub === targetId) {
-			this.sendSystemMessageToChannel(channel_id, targetId, ' left the channel');
+			this.sendSystemMessageToChannel(channel_id, targetId, ' was kicked by ' + user.name);
 			return this.notificationGateway.sendMessage([user.sub], 'You have left the room');
 		}
 		if (targets) {

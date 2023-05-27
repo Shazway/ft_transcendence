@@ -10,7 +10,7 @@ import {
 	WsException
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
-import { AchievementsEntity } from 'src/entities';
+import { AchievementsEntity, UserEntity } from 'src/entities';
 import { NotificationRequest, NotificationResponse } from 'src/homepage/dtos/Notifications.dto';
 import { ItemsService } from 'src/homepage/services/items/items.service';
 import { MatchsService } from 'src/homepage/services/matchs/matchs.service';
@@ -91,7 +91,16 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		return answer;
 	}
 
-	//Answer and send friend requests
+	async onChannelInvite(sourceUser: any, targetUser: UserEntity)
+	{
+		if (!targetUser)
+			return;
+		const client = this.userList.get(targetUser.user_id);
+
+		if (client && sourceUser)
+			client.emit('channelInvite', this.buildAnswer(sourceUser.user_id, sourceUser.username, 'channel'));
+	}
+
 	@SubscribeMessage('inviteRequest')
 	async handleInvite(
 		@ConnectedSocket() client: Socket,

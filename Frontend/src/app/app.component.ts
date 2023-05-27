@@ -77,7 +77,7 @@ export class AppComponent implements AfterViewInit {
 			if (popoverTemplate == "profile")
 			{
 				this.popover.ngbPopover = this.profileTemplate;
-			} 
+			}
 			else return;
 		}
 		else this.popover.ngbPopover = popoverTemplate;
@@ -100,7 +100,7 @@ export class AppComponent implements AfterViewInit {
 	}
 
 	showFriendReq(notif : {notification: NotificationRequest}) {
-		this.notifService.showFriendRequest(notif.notification);
+		this.notifService.showNotificationInvite(notif.notification);
 	}
 
 	showAchievements() {
