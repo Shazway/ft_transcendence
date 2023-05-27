@@ -30,7 +30,7 @@ export class ChannelsController {
 	) {}
 
 	@Get('all')
-	async getPrivateChannels(@Req() req: Request, @Res() res: Response) {
+	async getAllChannelsAllowed(@Req() req: Request, @Res() res: Response) {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
 		const channelList = await this.itemsService.getChannelsFromUser(user.sub);
@@ -42,7 +42,6 @@ export class ChannelsController {
 			}
 			}));
 		const filteredChannelsWithoutNull = filteredList.filter((channel) => channel);
-		console.log(filteredChannelsWithoutNull);
 		res.status(HttpStatus.OK).send(filteredChannelsWithoutNull);
 	}
 

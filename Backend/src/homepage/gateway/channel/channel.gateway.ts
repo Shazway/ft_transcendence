@@ -151,9 +151,12 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	}
 
 	socketDisconnect(clients: Array<Socket>) {
-		clients.forEach((client) => {
-			client.disconnect();
-		});
+		if (clients && clients.length)
+		{
+			clients.forEach((client) => {
+				client.disconnect();
+			});
+		}
 	}
 
 	async sendMessageToChannel(sourceId: number, channel_id: number, message: Message, dest = 'onMessage') {
@@ -206,18 +209,14 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			});
 	}
 
-	async channelLeaveMsg(channel_id: number, targetId: number) {
+	async sendSystemMessageToChannel(channel_id: number, targetId: number, content: string) {
 		const user = await this.itemService.getUser(targetId);
 		const channel = await this.itemService.getChannel(channel_id);
 		if (!user || !channel)
-		{
 			throw new WsException('User or Channel does not exist');
-		}
-		if (channel.is_channel_private)
-			return true;
 		await this.sendMessageToChannel(0, channel_id, {
 			message_id: 0,
-			message_content: user.username + ' left the channel',
+			message_content: user.username + content,
 			author: { username: 'System', user_id: 0 },
 			createdAt: new Date()
 		});
@@ -228,6 +227,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const targetEntity = await this.itemService.getUserByUsername(username);
 		if (!targetEntity)
 			return ({ret: false, msg: 'User not found'});
+		console.log('Get privi from username');
 		return await this.channelService.checkPrivileges(sourceId, targetEntity.user_id, channelId);
 	}
 
@@ -357,15 +357,15 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		if (!channel)
 			throw new WsException('Channel no longer exists');
 		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
-			this.channelService.banUser(user.sub, targetId, channel_id, body.time);
-
+		
+		this.channelService.banUser(user.sub, targetId, channel_id, body.time);
 		const targets = channel.get(targetId);
 		this.socketEmit(
 			targets,
 			'onMessage',
 			'You have been banned by ' + user.name + ' for reason: ' + body.message
 		);
-		this.channelLeaveMsg(channel_id, targetId);
+		this.sendSystemMessageToChannel(channel_id, targetId, ' was banned from the channel by ' + user.name)
 		this.socketDisconnect(targets);
 		this.notificationGateway.sendMessage([user.sub], 'Successful ban');
 	}
@@ -382,16 +382,15 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 		if (!channel || !targetId)
 			throw new WsException('Channel no longer exists');
-		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
-			this.channelService.unBanUser(user.sub, targetId, channel_id);
+		if (!ret.ret) return client.emit('onError', ret.msg);
 
+		this.channelService.unBanUser(user.sub, targetId, channel_id);
 		const targets = channel.get(targetId);
 		this.socketEmit(
 			targets,
 			'onMessage',
 			'You have been unbanned by ' + user.name
 		);
-		this.channelLeaveMsg(channel_id, targetId);
 		this.notificationGateway.sendMessage([user.sub], 'User unbanned successfully');
 	}
 
@@ -410,7 +409,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		if (!ret.ret && user.sub != targetId) return client.emit('onError', 'Lacking privileges');
 		const targets = channel.get(targetId);
 		if (user.sub === targetId) {
-			this.channelLeaveMsg(channel_id, targetId);
+			this.sendSystemMessageToChannel(channel_id, targetId, ' left the channel');
 			return this.notificationGateway.sendMessage([user.sub], 'You have left the room');
 		}
 		if (targets) {
@@ -421,7 +420,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			);
 			this.socketDisconnect(targets);
 		}
-		this.channelLeaveMsg(channel_id, targetId);
+		this.sendSystemMessageToChannel(channel_id, targetId, ' was kicked by ' + user.name);
 		this.notificationGateway.sendMessage([user.sub], 'Successful kick');
 	}
 

@@ -214,11 +214,7 @@ export class ChannelsService {
 			chan_user.remaining_ban_time &&
 			!(time.getTime() >= chan_user.remaining_ban_time.getTime())
 		)
-		{
-			console.log('Return true');
 			return true;
-		}
-		console.log('Return false/is unbanned' + chan_id);
 		chan_user.unBanUser();
 		await this.chan_userRepo.save(chan_user);
 		return false;
@@ -228,7 +224,6 @@ export class ChannelsService {
 		const chan_user = await this.itemsService.getUserChan(user_id, chan_id);
 		if (!chan_user)
 			return false;
-		if (!chan_user.is_banned) return true;
-		return false;
+		return true;
 	}
 }
