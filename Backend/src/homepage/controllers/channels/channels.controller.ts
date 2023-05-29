@@ -18,6 +18,7 @@ import { MessagesService } from 'src/homepage/services/messages/messages.service
 import { ItemsService } from 'src/homepage/services/items/items.service';
 import { NotificationsGateway } from 'src/homepage/gateway/notifications/notifications.gateway';
 import { UserEntity } from 'src/entities';
+import { UsersService } from 'src/homepage/services/users/users.service';
 
 @Controller('channels')
 export class ChannelsController {
@@ -29,7 +30,8 @@ export class ChannelsController {
 		private tokenManager: TokenManagerService,
 		private messageService: MessagesService,
 		private itemsService: ItemsService,
-		private notificationsGateway: NotificationsGateway
+		private notificationsGateway: NotificationsGateway,
+		private usersService: UsersService
 	) {}
 
 	@Get('all')
@@ -76,6 +78,10 @@ export class ChannelsController {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
 		if (!body || !body.channel_id || (!body.targetId && !body.username)) return res.status(HttpStatus.UNAUTHORIZED).send('No body');
+		else if (body.targetId == user.sub) return res.status(HttpStatus.UNAUTHORIZED).send('Unauthorized');
+		else if (await this.usersService.isBlockedCheck(body.targetId, user.sub))
+			return res.status(HttpStatus.UNAUTHORIZED).send('Unauthorized');
+
 		const userId = await this.getIdFromBody(body);
 		if (!userId) return res.status(HttpStatus.UNAUTHORIZED).send('No body');
 		const channelId = body.channel_id;

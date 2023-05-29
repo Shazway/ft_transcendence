@@ -319,7 +319,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const targetId = await this.getIdFromBody(body);
 
 		if (targetId == user.sub)
-			throw new WsException('You cannot mute yourself');
+			throw new WsException(ret.msg);
 		if (!channel)
 			throw new WsException('Channel no longer exists');
 		if (!ret.ret)
@@ -347,7 +347,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const targetId = await this.getIdFromBody(body);
 
 		if (!channel || !targetId)
-			throw new WsException('Channel no longer exists');
+			throw new WsException(ret.msg);
 		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
 		if (!this.channelService.unMuteUser(user.sub, targetId, channel_id))
 			return client.emit('onError', 'Error while unmuting some dude');
@@ -370,10 +370,8 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const targetId = await this.getIdFromBody(body);
 		const channel = this.channelList.get(channel_id);
 
-		if (!body || !targetId) {
-			console.log('MAMAAAAAAAAAAAAAAAAAAAAAAAA');
-			throw new WsException('No body');
-		}
+		if (!targetId)
+			throw new WsException(ret.msg);
 		if (targetId == user.sub)
 			throw new WsException('You cannot ban yourself');
 		if (!channel)
@@ -403,7 +401,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const targetId = await this.getIdFromBody(body);
 
 		if (!channel || !targetId)
-			throw new WsException('Channel no longer exists');
+			throw new WsException(ret.msg);
 		if (!ret.ret) return client.emit('onError', ret.msg);
 		this.channelService.unBanUser(user.sub, targetId, channel_id);
 		const targets = channel.get(targetId);
@@ -426,7 +424,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const targetId = await this.getIdFromBody(body);
 	
 		if (!channel || !targetId)
-			throw new WsException('Channel no longer exists');
+			throw new WsException(ret.msg);
 		if (!ret.ret && user.sub != targetId) return client.emit('onError', 'Lacking privileges');
 		const targets = channel.get(targetId);
 		if (user.sub === targetId) {
