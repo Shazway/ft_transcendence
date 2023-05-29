@@ -679,7 +679,7 @@ export class ItemsService {
 	async getSkinById(skindId: number) {
 		const skin = await this.skinRepo.
 			createQueryBuilder('skin')
-			.where('user.user_id = :id', { skindId })
+			.where('skin.skin_id = :id', { id: skindId })
 			.getOne();
 		return skin
 	}

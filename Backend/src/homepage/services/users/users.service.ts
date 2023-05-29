@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UserEntity } from 'src/entities';
+import { SkinEntity, UserEntity } from 'src/entities';
 import { ItemsService } from '../items/items.service';
 import { HttpService } from '@nestjs/axios';
 import axios, { AxiosRequestConfig, AxiosRequestHeaders } from 'axios';
@@ -49,7 +49,6 @@ export class UsersService {
 		const defaultBall = await this.itemsService.getSkinById(2);
 		const defaultBackGround = await this.itemsService.getSkinById(3);
 
-		user.skin.push(defaultBackGround, defaultBall, defaultPaddle);
 		user.intra_id = userInfo.id;
 		user.username = userInfo.login;
 		user.img_url = userInfo.image.versions.large;
@@ -58,6 +57,8 @@ export class UsersService {
 		if (user.username == 'tmoragli') user.title = 'The machine';
 		if (user.username == 'mdelwaul') user.title = 'Break CTO';
 		const newUser = this.userRepository.create(user);
+		newUser.skin = new Array<SkinEntity>();
+		newUser.skin.push(defaultBackGround, defaultBall, defaultPaddle);
 		return await this.userRepository.save(newUser);
 	}
 	async getAllUsers() {
