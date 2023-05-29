@@ -79,6 +79,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		this.client.on('connection', () => { console.log('Connected to WebSocket server'); });
 		this.client.on('disconnect', () => { console.log('Disconnected from WebSocket server'); });
 		this.client.on('delMessage', (event) => { console.log('Deleting message ' + event); this.deleteMessage(event); })
+		this.client.on('isAdmin', (event) => { this.is_admin = event; console.log('You are admin ?: ' + event); })
 	}
 
 	handleError(event: string) {
@@ -91,6 +92,8 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		if (event == 'User is banned') return;
 		if (event == 'User is not an admin') return;
 		if (event == 'Target is an admin') return;
+		if (event == 'No body') return;
+		if (event == 'Message too long') return;
 	}
 
 	scrollBottom(msg?: Message) {
@@ -318,6 +321,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		this.client = io('ws://localhost:3002?channel_id=' + channel.channel_id, this.websocketService.getHeader());
 		this.currentChannel = channel;
 		this.setClientEvent();
+		this.client.emit('isAdmin');
 		const offscreenElm = this.elRef.nativeElement.querySelector('.channel_pan');
 		if (offscreenElm.classList.contains('show'))
 			this.slideChan();
