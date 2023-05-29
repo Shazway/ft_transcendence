@@ -500,4 +500,25 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		} else {
 		}
 	}
+
+	@SubscribeMessage('isAdmin')
+	async isAdmin(@ConnectedSocket() client: Socket) {
+		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
+		const channel_id = Number(client.handshake.query.channel_id);
+
+		if (!channel_id)
+			throw new WsException('Channel doesn\'t exist.');
+
+		client.emit('isAdmin', await this.channelService.isUserAdmin(user.sub, channel_id));
+	}
+	@SubscribeMessage('isOwner')
+	async isOwner(@ConnectedSocket() client: Socket) {
+		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
+		const channel_id = Number(client.handshake.query.channel_id);
+
+		if (!channel_id)
+			throw new WsException('Channel doesn\'t exist.');
+
+		client.emit('isAdmin', await this.channelService.isUserOwner(user.sub, channel_id));
+	}
 }
