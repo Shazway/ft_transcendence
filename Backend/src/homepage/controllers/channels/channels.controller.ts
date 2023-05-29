@@ -38,12 +38,22 @@ export class ChannelsController {
 		const channelList = await this.itemsService.getChannelsFromUser(user.sub);
 		if (!channelList) return res.status(HttpStatus.OK).send(channelList);
 		const filteredList = await Promise.all(channelList.map(async (channel) => {
-			const isBanned = await this.channelService.isBanned(user.sub, channel.channel_id);
-				if (!isBanned) {
-					return channel;
-			}
+				const isBanned = await this.channelService.isBanned(user.sub, channel.channel_id);
+					if (!isBanned) {
+						return channel;
+				}
 			}));
+		filteredList.forEach((channel) => {
+			if (channel.is_dm)
+			{
+				channel.us_channel.forEach((chanUser) => {
+					if (chanUser.user.user_id != user.sub)
+						channel.channel_name = chanUser.user.username;
+					});
+			}
+		});
 		const filteredChannelsWithoutNull = filteredList.filter((channel) => channel);
+		console.log(filteredChannelsWithoutNull);
 		res.status(HttpStatus.OK).send(filteredChannelsWithoutNull);
 	}
 
@@ -76,8 +86,9 @@ export class ChannelsController {
 		else if ((targetEntity.channelInviteAuth == this.ALL_ALLOWED || (targetEntity.channelInviteAuth == this.FRIENDS_ALLOWED &&
 				targetEntity.friend.find((friend) => friend.user_id == user.sub))) && await this.channelService.canInvite(user.sub, channelId))
 		{
+			const channelEntity = await this.itemsService.getChannel(channelId);
 			await this.channelService.addUserToChannel(user.sub, channelId);
-			this.notificationsGateway.onChannelInvite(user, targetEntity);
+			this.notificationsGateway.onChannelInvite(user, targetEntity, channelEntity.channel_name);
 			return res.status(HttpStatus.ACCEPTED).send('User added to channel successfully');
 		}
 		res.status(HttpStatus.UNAUTHORIZED).send('Not allowed' + targetEntity.channelInviteAuth);
