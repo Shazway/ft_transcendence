@@ -39,18 +39,12 @@ export class MessagesService {
 		return { ret: true, msg: 'Valid User' };
 	}
 
-	async addMessageToChannel(msg: Message, token: string, channel_id: number) {
+	async addMessageToChannel(msg: Message, userId: number, channel_id: number) {
 		const channel = await this.itemsService.getChannel(channel_id);
-		const user = await this.itemsService.getUser(
-			(
-				await this.tokenManager.getToken(token, 'ws')
-			).sub
-		);
+		const user = await this.itemsService.getUser(userId);
 
-		if (!user)
-			return { check: {ret: false, msg: 'User not found'}, message: null};
-		if (!channel)
-			return { check: {ret: false, msg: 'Channel not found'}, message: null};
+		if (!user) return { check: { ret: false, msg: 'User not found' }, message: null };
+		if (!channel) return { check: { ret: false, msg: 'Channel not found' }, message: null };
 		const message = new MessageEntity();
 		message.message_content = msg.message_content;
 		const isValid = await this.isValidUserChannel(user, channel);
