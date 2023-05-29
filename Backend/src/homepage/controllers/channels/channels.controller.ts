@@ -43,16 +43,17 @@ export class ChannelsController {
 						return channel;
 				}
 			}));
-		const changeDmNames = filteredList.map((channel) => {
+		filteredList.forEach((channel) => {
 			if (channel.is_dm)
 			{
 				channel.us_channel.forEach((chanUser) => {
 					if (chanUser.user.user_id != user.sub)
 						channel.channel_name = chanUser.user.username;
-				});
+					});
 			}
 		});
-		const filteredChannelsWithoutNull = changeDmNames.filter((channel) => channel);
+		const filteredChannelsWithoutNull = filteredList.filter((channel) => channel);
+		console.log(filteredChannelsWithoutNull);
 		res.status(HttpStatus.OK).send(filteredChannelsWithoutNull);
 	}
 
