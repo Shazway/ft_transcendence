@@ -239,6 +239,14 @@ img{ max-width:100%;}
 	border-color: red;
 }
 
+.channel-head {
+	width: 200px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	cursor: default;
+}
+
 .mondropup {
 	position: absolute;
 	bottom: 35px;

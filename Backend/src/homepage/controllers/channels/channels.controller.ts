@@ -17,6 +17,7 @@ import { NewChan } from '../../dtos/Chan.dto';
 import { MessagesService } from 'src/homepage/services/messages/messages.service';
 import { ItemsService } from 'src/homepage/services/items/items.service';
 import { NotificationsGateway } from 'src/homepage/gateway/notifications/notifications.gateway';
+import { UserEntity } from 'src/entities';
 
 @Controller('channels')
 export class ChannelsController {
@@ -43,17 +44,16 @@ export class ChannelsController {
 						return channel;
 				}
 			}));
-		filteredList.forEach((channel) => {
+		filteredList.map((channel) => {
 			if (channel.is_dm)
 			{
 				channel.us_channel.forEach((chanUser) => {
 					if (chanUser.user.user_id != user.sub)
 						channel.channel_name = chanUser.user.username;
-					});
+				});
 			}
 		});
 		const filteredChannelsWithoutNull = filteredList.filter((channel) => channel);
-		console.log(filteredChannelsWithoutNull);
 		res.status(HttpStatus.OK).send(filteredChannelsWithoutNull);
 	}
 
@@ -92,6 +92,30 @@ export class ChannelsController {
 			return res.status(HttpStatus.ACCEPTED).send('User added to channel successfully');
 		}
 		res.status(HttpStatus.UNAUTHORIZED).send('Not allowed' + targetEntity.channelInviteAuth);
+	}
+
+	@Post('inviteBySubstring')
+	async getAllowedInviteBySub(
+		@Req() req: Request,
+		@Res() res: Response,
+		@Body() body: {substring: string}) {
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
+		if (!body || !body.substring) return res.status(HttpStatus.UNAUTHORIZED).send('No body');
+		const sourceId = user.sub;
+
+		let invitableUsers: UserEntity[];
+		invitableUsers = await this.itemsService.getUsersBySubstring(body.substring);
+		if (invitableUsers)
+		{
+			invitableUsers = invitableUsers.filter((user) => user.channelInviteAuth != this.NOT_ALLOWED);
+			invitableUsers = invitableUsers.filter((user) => {
+				if (user.channelInviteAuth == this.FRIENDS_ALLOWED && !(user.friend.find((friend) => friend.user_id == sourceId)))
+					return false;
+				return true;
+			})
+		}
+		res.status(HttpStatus.OK).send(invitableUsers);
 	}
 
 	@Post('create')

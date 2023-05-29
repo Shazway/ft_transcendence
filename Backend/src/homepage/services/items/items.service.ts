@@ -56,6 +56,7 @@ export class ItemsService {
 	public async getUsersBySubstring(substring: string) {
 		const users = await this.userRepo
 			.createQueryBuilder('user')
+			.leftJoinAndSelect('user.friend', 'friend')
 			.where('user.username LIKE :substring', { substring: `%${substring}%` })
 			.orderBy('user.username')
 			.getMany();
@@ -311,6 +312,7 @@ export class ItemsService {
 		const chanUser1 = new ChannelUserRelation();
 		const chanUser2 = new ChannelUserRelation();
 
+		channel.us_channel = new Array<ChannelUser>();
 		chanUser1.user = user1;
 		chanUser2.user = user2;
 		chanUser1.channel = channel;
@@ -678,15 +680,24 @@ export class ItemsService {
 			.getOne();
 		return skin
 	}
-	async getChannelsFromUser(id: number) {
-		const channels = await this.chanRepo
-		.createQueryBuilder('channel')
-		.leftJoinAndSelect('channel.us_channel', 'us_channel')
-		.leftJoin('us_channel.user', 'user')
-		.where('channel.is_channel_private = false')
-		.orWhere('channel.is_channel_private = true AND user.user_id = ANY(:ids)', { ids: [id] })
-		.getMany();
 
-		return channels;
+	async getChannelsFromUser(userId: number)
+	{
+		const user = await this.userRepo.createQueryBuilder('user')
+			.leftJoinAndSelect('user.channel', 'channel')
+			.leftJoinAndSelect('channel.channel', 'chan')
+			.leftJoinAndSelect('chan.us_channel', 'us_channel')
+			.leftJoinAndSelect('us_channel.user', 'useR')
+			.where('user.user_id = :userId', { userId })
+			.getOne();
+		let userChannels = new Array<ChannelEntity>;
+
+		user.channel.forEach((chanUser) => {
+			if (chanUser && chanUser.channel && chanUser.channel.is_channel_private)
+				userChannels.push(chanUser.channel);
+		});
+		const publicChannels = await this.getAllPbChannels();
+		userChannels = userChannels.concat(publicChannels);
+		return userChannels;
 	}
 }
