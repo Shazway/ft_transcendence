@@ -77,7 +77,7 @@ export class AppComponent implements AfterViewInit {
 			if (popoverTemplate == "profile")
 			{
 				this.popover.ngbPopover = this.profileTemplate;
-			} 
+			}
 			else return;
 		}
 		else this.popover.ngbPopover = popoverTemplate;
@@ -99,8 +99,8 @@ export class AppComponent implements AfterViewInit {
 			dropDownElm.classList.add('show');
 	}
 
-	showFriendReq(notif : {notification: NotificationResponse}) {
-		this.notifService.showFriendRequest(notif.notification);
+	showFriendReq(notif : {notification: NotificationRequest}) {
+		this.notifService.showNotificationInvite(notif.notification);
 	}
 
 	showAchievements() {
@@ -133,14 +133,19 @@ export class AppComponent implements AfterViewInit {
 	}
 
 
-	acceptFriendRequest(context : NotificationRequest) {
+	acceptFriendRequest(context : NotificationRequest, toast: any) {
 		context.accepted = true;
 		this.notifService.emit('inviteAnswer', context);
+		console.log(context);
+		this.notifDismiss(toast);
 	}
 
-	rejectFriendRequest(context : NotificationRequest) {
+	rejectFriendRequest(context : NotificationRequest, toast: any) {
 		context.accepted = false;
 		this.notifService.emit('inviteAnswer', context);
+		console.log(context);
+
+		this.notifDismiss(toast);
 	}
 
 }

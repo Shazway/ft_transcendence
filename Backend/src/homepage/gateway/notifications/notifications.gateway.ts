@@ -10,7 +10,7 @@ import {
 	WsException
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
-import { AchievementsEntity } from 'src/entities';
+import { AchievementsEntity, UserEntity } from 'src/entities';
 import { NotificationRequest, NotificationResponse } from 'src/homepage/dtos/Notifications.dto';
 import { ItemsService } from 'src/homepage/services/items/items.service';
 import { MatchsService } from 'src/homepage/services/matchs/matchs.service';
@@ -47,7 +47,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		if (!user)
 			return client.disconnect();
 		this.userList.set(user.sub, client);
-		console.log('connected');
+		console.log('connected ' + user.name);
 		await this.notificationService.setUserStatus(user.sub, this.ONLINE);
 	}
 	
@@ -56,7 +56,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		
 		if (!user)
 			return client.disconnect();
-		console.log('disconnected');
+		console.log('disconnected ' + user.name);
 		this.userList.delete(user.sub);
 		await this.notificationService.setUserStatus(user.sub, this.OFFLINE);
 	}
@@ -91,7 +91,16 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		return answer;
 	}
 
-	//Answer and send friend requests
+	async onChannelInvite(sourceUser: any, targetUser: UserEntity)
+	{
+		if (!targetUser)
+			return;
+		const client = this.userList.get(targetUser.user_id);
+
+		if (client && sourceUser)
+			client.emit('channelInvite', this.buildAnswer(sourceUser.user_id, sourceUser.username, 'channel'));
+	}
+
 	@SubscribeMessage('inviteRequest')
 	async handleInvite(
 		@ConnectedSocket() client: Socket,
@@ -101,19 +110,18 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		const source = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		const answer = this.buildAnswer(source.sub, source.name, body.type);
 		const target = this.userList.get(body.target_id);
-		const notifClient = this.userList.get(source.sub);
-
 		if(!body)
 			throw new WsException('Pas de body');
-		console.log('request from ' + source.name + ' to: ' + body.target_id);
-		if (body.type == 'friend' && await this.requestService.handleFriendRequestInvite(source.sub, body.target_id))
-			client.emit('refusedInvite', 'Something went wrong');
-		if (target)
-			target.emit(body.type + 'Invite', { notification: answer, matchSetting: body.match_setting});
+		if (body.type == 'friend' && !(await this.requestService.handleFriendRequestInvite(source.sub, body.target_id)))
+			return client.emit('refusedInvite', 'Something went wrong');
+		else if (body.type == 'match' && !target)
+			return client.emit('offline', 'Your friend is currently offline');
+		if (target && target.connected)
+			target.emit(body.type + 'Invite', { notification: answer});
 		else
 			console.log('Pas connecte target');
-		if (notifClient)
-			notifClient.emit('pendingRequest', 'Request sent and waiting for answer');
+		if (client && client.connected)
+			client.emit('pendingRequest', 'Request sent and waiting for answer');
 		else
 			console.log('Pas connecte envoyeur');
 	}
@@ -145,5 +153,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 			this.itemsService.deleteFriendRequest(source.sub, body.target_id);
 		client.emit('success', 'Answer sent');
 		if (target) target.emit(body.type + 'Answer', { notification: answer });
+		else
+			console.log('target deco pas de popup')
 	}
 }

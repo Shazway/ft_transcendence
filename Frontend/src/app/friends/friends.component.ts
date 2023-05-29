@@ -6,9 +6,7 @@ import { ConfirmBlockPopup, ConfirmUnfriendPopup, PunishmentPopup } from '../pop
 import { Router } from '@angular/router';
 import { AppComponent } from '../app.component';
 import { NotificationRequest } from 'src/dtos/Notification.dto';
-import { type } from 'jquery';
 import { NotificationService } from '../notification.service';
-import { boolean, compare } from 'mathjs';
 
 @Component({
   selector: 'app-friends',
@@ -54,7 +52,7 @@ export class FriendsComponent {
 		modalRef.componentInstance.label = label;
 		return await modalRef.result;
 	}
-	
+
 	async ngOnInit() {
 		if (!this.parent.isConnected())
 			this.router.navigateByUrl('login');
@@ -69,7 +67,7 @@ export class FriendsComponent {
 		this.friends.sort((a, b) => b.activity_status - a.activity_status);
 		this.friendshipRequests = await this.fetchService.getFriendshipRequests();
 	}
-	
+
 	async addSystemFriend() {
 		this.friends.splice(0);
 		this.friends = await this.fetchService.getFriends();
@@ -123,7 +121,7 @@ export class FriendsComponent {
 	async unblockUser(user: AnyProfileUser)
 	{
 		await this.fetchService.unblockUser(user.user_id);
-		this.blockedUsers.splice(this.blockedUsers.indexOf(user), 1);		
+		this.blockedUsers.splice(this.blockedUsers.indexOf(user), 1);
 	}
 
 	async challenge(user: AnyProfileUser)

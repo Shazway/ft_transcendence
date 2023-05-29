@@ -442,8 +442,8 @@ export class ItemsService {
 		const user = await this.getUser(user_id);
 		const channel = await this.getChannel(channel_id);
 
-		if (!user || !channel || !chan_user || channel.is_dm)
-			return ;
+		if (!user || !channel || channel.is_dm)
+			return false;
 		chan_user.user = user;
 		chan_user.channel = channel;
 		channel.us_channel.push(chan_user);
@@ -451,6 +451,7 @@ export class ItemsService {
 		await this.userRepo.save(user);
 		await this.chanRepo.save(channel);
 		await this.chan_userRepo.save(chan_user);
+		return true;
 	}
 
 	public createFriendRequest() {
@@ -681,5 +682,16 @@ export class ItemsService {
 			.where('user.user_id = :id', { skindId })
 			.getOne();
 		return skin
+	}
+	async getChannelsFromUser(id: number) {
+		const channels = await this.chanRepo
+		.createQueryBuilder('channel')
+		.leftJoinAndSelect('channel.us_channel', 'us_channel')
+		.leftJoin('us_channel.user', 'user')
+		.where('channel.is_channel_private = false')
+		.orWhere('channel.is_channel_private = true AND user.user_id = ANY(:ids)', { ids: [id] })
+		.getMany();
+
+		return channels;
 	}
 }

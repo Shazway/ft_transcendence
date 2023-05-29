@@ -2,11 +2,11 @@ import { Injectable, TemplateRef, ViewChild } from '@angular/core';
 import { Socket, io } from 'socket.io-client';
 import { WebsocketService } from './websocket.service';
 import { ToastService } from './toast/toast.service';
-import { NotificationResponse } from '../dtos/Notification.dto';
+import { NotificationRequest, NotificationResponse } from '../dtos/Notification.dto';
 
 
 @Injectable({
-  providedIn: 'root'
+	providedIn: 'root'
 })
 export class NotificationService {
 	public client!: Socket;
@@ -20,6 +20,7 @@ export class NotificationService {
 	) {
 		if (!this.client || (this.client && !this.client.connected))
 			this.client = io('ws://localhost:3003', this.websocketService.getHeader());
+		this.setClientEvent();
 	}
 
 	initSocket() {
@@ -38,11 +39,12 @@ export class NotificationService {
 	setClientEvent() {
 		this.client.on('friendAnswer', (event) => { console.log('Answer ' + event);});
 		this.client.on('pendingRequest', (event) => {  console.log('pendingRequest' + event); });
-		this.client.on('friendInvite', (event) => { this.showFriendRequest(event.notification); console.log('friendInvite ', event); });
+		this.client.on('friendInvite', (event) => { this.showNotificationInvite(event.notification); console.log('friendInvite ', event); });
+		this.client.on('channelInvite', (event) => { this.showNotificationInvite(event.notification); console.log('channelInvite ', event); });
 	}
 
-	showFriendRequest(notification: NotificationResponse) {
-		this.toastService.show(this.toastFriendRequest, { classname: 'bg-success text-light p-0', delay: 10000, context: notification });
+	showNotificationInvite(notification: NotificationRequest) {
+		this.toastService.show(this.toastFriendRequest, { classname: 'p-0', delay: 10000, context: notification });
 	}
 
 	showAchievements() {

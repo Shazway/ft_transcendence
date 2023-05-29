@@ -8,7 +8,7 @@ export class Channel {
 	@PrimaryGeneratedColumn()
 	channel_id!: number;
 
-	@Column({ nullable: false, length: 20 })
+	@Column({ nullable: false, length: 41 })
 	channel_name!: string;
 
 	@Column({ default: null, length: 30 })
