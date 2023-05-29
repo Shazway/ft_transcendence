@@ -66,6 +66,7 @@ export class ChannelsService {
 			return false;
 		if (this.isUserAdmin(userId, channelId))
 			return true;
+		console.log('Cannot invite');
 		return false;
 	}
 
@@ -73,6 +74,8 @@ export class ChannelsService {
 		const chan_user = new ChannelUserRelation();
 		const channel = await this.itemsService.getChannel(chan_id);
 
+		if (await this.isUserMember(user_id, chan_id))
+			return false;
 		if (!channel || channel.is_dm) return false;
 		chan_user.is_creator = is_creator;
 		chan_user.is_admin = is_admin;

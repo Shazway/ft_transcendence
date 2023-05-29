@@ -465,16 +465,21 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	}
 
 	async changePotentialNewMembers(value : string) {
-		let allResults = await this.fetchService.inviteSubstring(value);
-		this.potentialNewMembers = allResults.slice(0, 10);
+		if (value.length > 0)
+		{
+			let allResults = await this.fetchService.inviteSubstring(value);
+			this.potentialNewMembers = allResults.slice(0, 10);}
+		else
+		this.potentialNewMembers = [];
 	}
 
 	addMember(newMember : AnyProfileUser) {
 		console.log("ajout de " + newMember.username + " au channel");
-		this.fetchService.channelInvite(newMember);
+		this.fetchService.channelInvite(newMember, this.currentChannel.channel_id);
+		this.openAddMember();
 	}
 
-	async openAddMember() {
+	openAddMember() {
 		const dropDownElm = this.elRef.nativeElement.querySelector('.dropdown-menu');
 		if(!dropDownElm)
 			return;
@@ -485,5 +490,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		this.potentialNewMembers = [];
 		console.log(this.potentialNewMembers);
 	}
+
 
 }

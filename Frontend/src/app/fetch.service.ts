@@ -387,11 +387,11 @@ export class FetchService {
 		return res;
 	}
 
-	async channelInvite(user : AnyProfileUser) {
+	async channelInvite(user : AnyProfileUser, channel_id : number) {
 		let res: AnyProfileUser[] = [];
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		await axios.post<Array<AnyProfileUser>>('http://localhost:3001/channels/invite', {}, this.getHeader())
+		await axios.post<Array<AnyProfileUser>>('http://localhost:3001/channels/invite', {channel_id : channel_id, username : user.username, targetId : user.user_id}, this.getHeader())
 		.then(function (response) {
 			res = response.data;
 		})

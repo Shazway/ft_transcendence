@@ -227,6 +227,8 @@ export class UsersController {
 	@Get(':username')
 	async getUser(@Param('username') us: string, @Req() req: Request, @Res() res: Response) {
 		const user = await this.itemsService.getUserByUsername(us);
+		if (!user)
+			return res.status(HttpStatus.BAD_REQUEST).send('CE USER EXISTE PAS :)');
 		const info = {
 			id: user.intra_id,
 			login: user.username
