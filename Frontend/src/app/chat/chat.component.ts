@@ -12,6 +12,7 @@ import { NotificationService } from '../notification.service';
 import { Router } from '@angular/router';
 import { AppComponent } from '../app.component';
 import { PopoverConfig } from 'src/dtos/Popover.dto';
+import { AnyProfileUser } from 'src/dtos/User.dto';
 
 @Component({
 	selector: 'app-chat',
@@ -29,6 +30,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	msgs$: Message[] = [];
 	test_msgs$ = new Array<Array<Message>>;
 	is_admin = false;
+	potentialNewMembers! : AnyProfileUser[];
 
 	icone_list = {
 		add_friend: "https://static.vecteezy.com/system/resources/previews/020/936/584/original/add-friend-icon-for-your-website-design-logo-app-ui-free-vector.jpg",
@@ -67,6 +69,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 				behavior: 'smooth',
 			});
 		}, 500)
+		this.potentialNewMembers
 	}
 
 	setClientEvent() {
@@ -449,4 +452,27 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			});
 		return true;
 	}
+
+	async changePotentialNewMembers(value : string) {
+		let allResults = await this.fetchService.inviteSubstring(value);
+		this.potentialNewMembers = allResults.slice(0, 10);
+	}
+
+	addMember(newMember : AnyProfileUser) {
+		console.log("ajout de " + newMember.username + " au channel");
+		this.fetchService.channelInvite(newMember);
+	}
+
+	async openAddMember() {
+		const dropDownElm = this.elRef.nativeElement.querySelector('.dropdown-menu');
+		if(!dropDownElm)
+			return;
+		if (dropDownElm.classList.contains('show'))
+			dropDownElm.classList.remove('show');
+		else
+			dropDownElm.classList.add('show');
+		this.potentialNewMembers = [];
+		console.log(this.potentialNewMembers);
+	}
+
 }

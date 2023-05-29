@@ -361,7 +361,6 @@ export class FetchService {
 		let res: AnyProfileUser[] = [];
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log("J' envoie " + value);
 		await axios.post<Array<AnyProfileUser>>('http://localhost:3001/users/userBySubstring', {substring: value}, this.getHeader())
 		.then(function (response) {
 			res = response.data;
@@ -372,4 +371,35 @@ export class FetchService {
 		.finally(function () {});
 		return res;
 	}
+
+	async inviteSubstring(value : string) {
+		let res: AnyProfileUser[] = [];
+		const teaFunc = this.teapotError;
+		const route = this.router;
+		await axios.post<Array<AnyProfileUser>>('http://localhost:3001/channels/inviteBySubstring', {substring: value}, this.getHeader())
+		.then(function (response) {
+			res = response.data;
+		})
+		.catch(function (error) {
+			teaFunc(error, route);
+		})
+		.finally(function () {});
+		return res;
+	}
+
+	async channelInvite(user : AnyProfileUser) {
+		let res: AnyProfileUser[] = [];
+		const teaFunc = this.teapotError;
+		const route = this.router;
+		await axios.post<Array<AnyProfileUser>>('http://localhost:3001/channels/invite', {}, this.getHeader())
+		.then(function (response) {
+			res = response.data;
+		})
+		.catch(function (error) {
+			teaFunc(error, route);
+		})
+		.finally(function () {});
+		return res;
+	}
+	
 }

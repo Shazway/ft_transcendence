@@ -238,3 +238,9 @@ img{ max-width:100%;}
 .text-input.set_error {
 	border-color: red;
 }
+
+.mondropup {
+	position: absolute;
+	bottom: 35px;
+	z-index: 50;
+}
