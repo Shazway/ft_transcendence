@@ -56,6 +56,7 @@ export class ItemsService {
 	public async getUsersBySubstring(substring: string) {
 		const users = await this.userRepo
 			.createQueryBuilder('user')
+			.leftJoinAndSelect('user.friend', 'friend')
 			.where('user.username LIKE :substring', { substring: `%${substring}%` })
 			.orderBy('user.username')
 			.getMany();
