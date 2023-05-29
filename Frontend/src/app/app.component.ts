@@ -110,18 +110,6 @@ export class AppComponent implements AfterViewInit {
 			dropDownElm.classList.add('show');
 	}
 
-	showFriendReq(notif : {notification: NotificationRequest}) {
-		this.notifService.showNotificationInvite(notif.notification);
-	}
-
-	showAchievements(notif : {notification: NotificationRequest}) {
-		this.notifService.showAchievements(notif.notification);
-	}
-
-	showChallenge(notif : {notification: NotificationRequest}) {
-		this.notifService.showChallenge(notif.notification);
-	}
-
 	notifDismiss(toast: any) {
 		this.notifService.notifDismiss(toast);
 	}

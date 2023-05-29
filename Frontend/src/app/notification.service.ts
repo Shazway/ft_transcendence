@@ -51,31 +51,31 @@ export class NotificationService {
 	}
 
 	showNotificationInvite(notification: NotificationRequest) {
-		this.toastService.show(this.toastFriendRequest, { classname: 'p-0', delay: 10000, context: notification });
+		this.toastService.show(this.toastFriendRequest, { classname: 'bg-light p-0', delay: 10000, context: notification });
 	}
 
 	showNewFriend(notification: NotificationRequest) {
-		this.toastService.show(this.toastNewFriend, { classname: 'p-0', delay: 10000, context: notification });
+		this.toastService.show(this.toastNewFriend, { classname: 'bg-light p-0', delay: 10000, context: notification });
 	}
 
 	showAchievements(notification: NotificationRequest) {
-		this.toastService.show(this.toastAchievement, { classname: 'p-0', delay: 10000, context: notification });
+		this.toastService.show(this.toastAchievement, { classname: 'bg-light p-0', delay: 10000, context: notification });
 	}
 
 	showChallenge(notification: NotificationRequest) {
-		this.toastService.show(this.toastChallenge, { classname: 'p-0', delay: 10000, context: notification });
+		this.toastService.show(this.toastChallenge, { classname: 'bg-light p-0', delay: 10000, context: notification });
 	}
 
 	showFailure(notification: NotificationRequest) {
-		this.toastService.show(this.toastFailure, { classname: 'p-0', delay: 10000, context: notification });
+		this.toastService.show(this.toastFailure, { classname: 'bg-danger p-0', delay: 10000, context: notification });
 	}
 
 	showSuccess(notification: NotificationRequest) {
-		this.toastService.show(this.toastSuccess, { classname: 'p-0', delay: 10000, context: notification });
+		this.toastService.show(this.toastSuccess, { classname: 'bg-success p-0', delay: 10000, context: notification });
 	}
 
 	showChannel(notification: NotificationRequest) {
-		this.toastService.show(this.toastChannel, { classname: 'p-0', delay: 10000, context: notification });
+		this.toastService.show(this.toastChannel, { classname: 'bg-light p-0', delay: 10000, context: notification });
 	}
 
 	initTemplates(
