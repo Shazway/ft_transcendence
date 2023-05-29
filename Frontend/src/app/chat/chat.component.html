@@ -56,12 +56,28 @@
 				</div>
 <!-- End of text area -->
 <!-- Start of channel Select Area -->
-				<div class="card-body p-0 h-100 channel_pan p-3 bg-light" data-mdb-perfect-scrollbar="true">
+				<div class="card-body p-0 channel_pan p-3 bg-light" style="height: 90%;">
 					<div class="w-100 d-flex mb-2">
 						<button type="button" (click)="createChannel()" class="btn btn-primary btn-sm m-auto" data-mdb-ripple-color="dark">create channel</button>
 					</div>
-					<div class="row" *ngFor="let channel of channels$">
-						<button type="button" (click)="openChannel(channel)" class="btn btn-secondary btn-sm mt-1" data-mdb-ripple-color="dark">{{ channel.channel_name }}</button>
+					<div class="row h-100">
+						<div class="col mh-100 me-3" style="overflow: auto;">
+							<h4 class="text-center">Private Channels</h4>
+							<div class="row" *ngFor="let channel of channels$.servers">
+								<button *ngIf="channel.is_channel_private" type="button" (click)="openChannel(channel)" class="btn btn-info btn-sm mt-1" data-mdb-ripple-color="dark">{{ channel.channel_name }}</button>
+							</div>
+							<hr>
+							<h4 class="text-center">Public Channels</h4>
+							<div class="row" *ngFor="let channel of channels$.servers">
+								<button *ngIf="!channel.is_channel_private" type="button" (click)="openChannel(channel)" class="btn btn-secondary btn-sm mt-1" data-mdb-ripple-color="dark">{{ channel.channel_name }}</button>
+							</div>
+						</div>
+						<div class="col mh-100" style="border-left: 1px solid #000000; overflow: auto;">
+							<h4 class="text-center">Direct Messages</h4>
+							<div class="row ms-1" *ngFor="let channel of channels$.dm">
+								<button type="button" (click)="openChannel(channel)" class="btn btn-primary btn-sm mt-1" data-mdb-ripple-color="dark">{{ channel.channel_name }}</button>
+							</div>
+						</div>
 					</div>
 				</div>
 <!-- End of channel Select Area -->
