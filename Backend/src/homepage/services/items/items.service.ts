@@ -30,6 +30,11 @@ export class ItemsService {
 		private readonly skinRepo: Repository<SkinEntity>,
 	) {}
 
+	public sanitizeEntry(entry: string)
+	{
+		return entry.replace(/'/g, "''");
+	}
+
 	public sendOptionRes(@Res() res) {
 		res.setHeader('Access-Control-Allow-Origin', '*');
 		res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
@@ -53,7 +58,9 @@ export class ItemsService {
 		return users;
 	}
 
-	public async getUsersBySubstring(substring: string) {
+	public async getUsersBySubstring(substring: string)
+	{
+		substring = this.sanitizeEntry(substring);
 		const users = await this.userRepo
 			.createQueryBuilder('user')
 			.leftJoinAndSelect('user.friend', 'friend')
@@ -87,6 +94,7 @@ export class ItemsService {
 	}
 
 	public async getUserByUsername(username: string) {
+		username = this.sanitizeEntry(username);
 		const user = await this.userRepo
 		.createQueryBuilder('user')
 		.leftJoinAndSelect('user.achievement', 'achievement')
@@ -672,6 +680,7 @@ export class ItemsService {
 	}
 
 	async changeImgUser(userId: number, img_url: string) {
+		img_url = this.sanitizeEntry(img_url);
 		const user = await this.getUser(userId);
 
 		if (!user)

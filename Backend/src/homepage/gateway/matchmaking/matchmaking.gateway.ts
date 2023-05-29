@@ -6,7 +6,10 @@ import { ChannelGateway } from '../channel/channel.gateway';
 import { ItemsService } from 'src/homepage/services/items/items.service';
 import { MatchsService } from 'src/homepage/services/matchs/matchs.service';
 import { FoundMatch, Player } from 'src/homepage/dtos/Matchmaking.dto';
+import { WsexceptionFilter } from 'src/homepage/filters/wsexception/wsexception.filter';
+import { UseFilters } from '@nestjs/common';
 
+@UseFilters(new WsexceptionFilter())
 @WebSocketGateway(3004, {
 	cors: {
 		origin: 'http://localhost:4200'

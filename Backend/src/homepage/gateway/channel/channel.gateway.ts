@@ -20,7 +20,10 @@ import { ItemsService } from 'src/homepage/services/items/items.service';
 import { ChannelUserRelation } from 'src/entities';
 import { NotificationRequest } from 'src/homepage/dtos/Notifications.dto';
 import { UsersService } from 'src/homepage/services/users/users.service';
+import { WsexceptionFilter } from 'src/homepage/filters/wsexception/wsexception.filter';
+import { UseFilters } from '@nestjs/common';
 
+@UseFilters(new WsexceptionFilter())
 @WebSocketGateway(3002, {
 	cors: {
 		origin: 'http://localhost:4200'
@@ -239,6 +242,35 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		return userEntity.user_id;
 	}
 
+	@SubscribeMessage('promote')
+	async handleOp(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
+		if (!body || (!body.target_id && !body.username))
+			throw new WsException('No body');
+		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
+		const channel_id = Number(client.handshake.query.channel_id);
+		const ret = await this.getPrivilegesFromBody(user.sub, body, channel_id);
+		const targetId = await this.getIdFromBody(body);
+		const channel = this.channelList.get(channel_id);
+
+		if (!body || !targetId)
+			throw new WsException('No body');
+		if (targetId == user.sub)
+			throw new WsException('You cannot ban yourself');
+		if (!channel)
+			throw new WsException('Channel no longer exists');
+		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
+		this.channelService.promoteUser(user.sub, targetId, channel_id);
+		const targets = channel.get(targetId);
+		this.socketEmit(
+			targets,
+			'onMessage',
+			'You have been promoted by ' + user.name
+		);
+		this.sendSystemMessageToChannel(channel_id, targetId, ' was promoted by ' + user.name)
+		this.socketDisconnect(targets);
+		this.notificationGateway.sendMessage([user.sub], 'Successful promotion');
+	}
+
 
 	@SubscribeMessage('addFriend')
 	async handleInvite(@ConnectedSocket() client: Socket, @MessageBody() body: NotificationRequest) {
@@ -287,7 +319,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const targetId = await this.getIdFromBody(body);
 
 		if (targetId == user.sub)
-			throw new WsException('You cannot mute yourself');
+			throw new WsException(ret.msg);
 		if (!channel)
 			throw new WsException('Channel no longer exists');
 		if (!ret.ret)
@@ -315,7 +347,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const targetId = await this.getIdFromBody(body);
 
 		if (!channel || !targetId)
-			throw new WsException('Channel no longer exists');
+			throw new WsException(ret.msg);
 		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
 		if (!this.channelService.unMuteUser(user.sub, targetId, channel_id))
 			return client.emit('onError', 'Error while unmuting some dude');
@@ -338,13 +370,13 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const targetId = await this.getIdFromBody(body);
 		const channel = this.channelList.get(channel_id);
 
-		if (!body || !targetId)
-			throw new WsException('No body');
+		if (!targetId)
+			throw new WsException(ret.msg);
 		if (targetId == user.sub)
 			throw new WsException('You cannot ban yourself');
 		if (!channel)
 			throw new WsException('Channel no longer exists');
-		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
+		if (!ret.ret) return client.emit('onError', ret.msg);
 		
 		this.channelService.banUser(user.sub, targetId, channel_id, body.time);
 		const targets = channel.get(targetId);
@@ -369,7 +401,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const targetId = await this.getIdFromBody(body);
 
 		if (!channel || !targetId)
-			throw new WsException('Channel no longer exists');
+			throw new WsException(ret.msg);
 		if (!ret.ret) return client.emit('onError', ret.msg);
 		this.channelService.unBanUser(user.sub, targetId, channel_id);
 		const targets = channel.get(targetId);
@@ -392,7 +424,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const targetId = await this.getIdFromBody(body);
 	
 		if (!channel || !targetId)
-			throw new WsException('Channel no longer exists');
+			throw new WsException(ret.msg);
 		if (!ret.ret && user.sub != targetId) return client.emit('onError', 'Lacking privileges');
 		const targets = channel.get(targetId);
 		if (user.sub === targetId) {
@@ -413,14 +445,16 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('message')
 	async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() body: Message) {
-		if (!body)
+		if (!body || !body.message_content)
 			throw new WsException('No body');
-		body.createdAt = new Date();
+		else if (body.message_content.length > 255)
+			throw new WsException('Message too long');
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
+		body.createdAt = new Date();
 		const channel_id = Number(client.handshake.query.channel_id);
 		const Validity = await this.messageService.addMessageToChannel(
 			body,
-			client.request.headers.authorization,
+			user.sub,
 			channel_id
 		);
 
@@ -467,5 +501,26 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			await this.sendMessageToChannel(user.sub, channel_id, body, 'delMessage');
 		} else {
 		}
+	}
+
+	@SubscribeMessage('isAdmin')
+	async isAdmin(@ConnectedSocket() client: Socket) {
+		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
+		const channel_id = Number(client.handshake.query.channel_id);
+
+		if (!channel_id)
+			throw new WsException('Channel doesn\'t exist.');
+
+		client.emit('isAdmin', await this.channelService.isUserAdmin(user.sub, channel_id));
+	}
+	@SubscribeMessage('isOwner')
+	async isOwner(@ConnectedSocket() client: Socket) {
+		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
+		const channel_id = Number(client.handshake.query.channel_id);
+
+		if (!channel_id)
+			throw new WsException('Channel doesn\'t exist.');
+
+		client.emit('isAdmin', await this.channelService.isUserOwner(user.sub, channel_id));
 	}
 }

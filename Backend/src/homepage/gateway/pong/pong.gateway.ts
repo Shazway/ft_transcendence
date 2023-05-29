@@ -16,7 +16,10 @@ import { GamesService } from 'src/homepage/services/game/game.service';
 import { MatchEntity, MatchSettingEntity } from 'src/entities';
 import { MatchsService } from 'src/homepage/services/matchs/matchs.service';
 import { Mutex } from 'async-mutex';
+import { WsexceptionFilter } from 'src/homepage/filters/wsexception/wsexception.filter';
+import { UseFilters } from '@nestjs/common';
 
+@UseFilters(new WsexceptionFilter())
 @WebSocketGateway(3005, {
 	cors: {
 		origin: 'http://localhost:4200'

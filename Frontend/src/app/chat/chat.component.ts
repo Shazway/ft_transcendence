@@ -75,10 +75,26 @@ export class ChatComponent implements OnInit, AfterViewInit {
 
 	setClientEvent() {
 		this.client.on('onMessage', (event) => { console.log('Message received ' + event); this.sortMessage(event); this.scrollBottom(event); });
-		this.client.on('onError', (event) => { console.log('WebSocket error: ' + event); });
+		this.client.on('onError', (event) => { this.handleError(event); });
 		this.client.on('connection', () => { console.log('Connected to WebSocket server'); });
 		this.client.on('disconnect', () => { console.log('Disconnected from WebSocket server'); });
-		this.client.on('delMessage', (event) => { console.log('Deleting message ' + event); this.deleteMessage(event); })
+		this.client.on('delMessage', (event) => { console.log('Deleting message ' + event); this.deleteMessage(event); });
+		this.client.on('isAdmin', (event) => { this.is_admin = event; console.log('You are admin ?: ' + event); });
+		this.client.on('isOwner', (event) => { console.log('You are Owner ?: ' + event); })
+	}
+
+	handleError(event: string) {
+		console.log('WebSocket error: ' + event);
+		if (event == 'Invalid Command') return;
+		if (event == 'No body sent') return;
+		if (event == 'User not found') return;
+		if (event == "Channel doesn't exist") return;
+		if (event == "User doesn't belong to channel") return;
+		if (event == 'User is banned') return;
+		if (event == 'User is not an admin') return;
+		if (event == 'Target is an admin') return;
+		if (event == 'No body') return;
+		if (event == 'Message too long') return;
 	}
 
 	scrollBottom(msg?: Message) {
@@ -302,10 +318,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			return;
 		for (let index = this.msgs$.length; index > 0; index--)
 			this.sortMessage(this.msgs$[index - 1]);
-		console.log('Switch');
 		this.client = io('ws://localhost:3002?channel_id=' + channel.channel_id, this.websocketService.getHeader());
 		this.currentChannel = channel;
 		this.setClientEvent();
+		this.client.emit('isAdmin');
 		const offscreenElm = this.elRef.nativeElement.querySelector('.channel_pan');
 		if (offscreenElm.classList.contains('show'))
 			this.slideChan();

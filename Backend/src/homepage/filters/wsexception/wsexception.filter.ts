@@ -1,5 +1,7 @@
-import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, SetMetadata } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
+
+export const UseWebSocketFilters = (...filters: any[]) => SetMetadata('wsFilters', filters);
 
 @Catch(WsException)
 export class WsexceptionFilter implements ExceptionFilter {
@@ -11,8 +13,9 @@ export class WsexceptionFilter implements ExceptionFilter {
 		};
 		console.log('Websocket Token Error:');
 		console.log(exception);
-		client.send(JSON.stringify(response));
-		client.disconnect();
+		// client.send(JSON.stringify(response));
+		client.emit('onError', exception.message);
+		// client.disconnect();
 		console.log('Note that the server is still up and running ✅');
 	}
 }
