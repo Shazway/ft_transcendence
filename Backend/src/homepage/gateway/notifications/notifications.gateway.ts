@@ -26,6 +26,7 @@ import { UseFilters } from '@nestjs/common';
 		origin: 'http://localhost:4200'
 	}
 })
+
 export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	OFFLINE = 0;
 	ONLINE = 1;
@@ -108,13 +109,14 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 	async handleInvite(
 		@ConnectedSocket() client: Socket,
 		@MessageBody() body: NotificationRequest
-	) {
-		body.sent_at = new Date();
+	)
+	{
 		const source = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		const answer = this.buildAnswer(source.sub, source.name, body.type);
-		const target = this.userList.get(body.target_id);
 		if(!body)
 			throw new WsException('Pas de body');
+		body.sent_at = new Date();
+		const answer = this.buildAnswer(source.sub, source.name, body.type);
+		const target = this.userList.get(body.target_id);
 		if (body.type == 'friend' && !(await this.requestService.handleFriendRequestInvite(source.sub, body.target_id)))
 			return client.emit('refusedInvite', 'Something went wrong');
 		else if (body.type == 'match' && !target)
@@ -130,7 +132,8 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 	}
 
 	@SubscribeMessage('inviteAnswer')
-	async handeAnswer(@ConnectedSocket() client: Socket, @MessageBody() body: NotificationRequest) {
+	async handeAnswer(@ConnectedSocket() client: Socket, @MessageBody() body: NotificationRequest)
+	{
 		const source = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		if (!body)
 			throw new WsException('No answer given is necessary');
