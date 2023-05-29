@@ -226,4 +226,11 @@ export class ChannelsService {
 			return false;
 		return true;
 	}
+
+	async promoteUser(sourceId: number, targetId: number, channel_id: number) {
+		if (this.isUserAdmin(targetId, channel_id) && this.isUserOwner(sourceId, channel_id))
+			return await this.setUserOwner(sourceId, targetId, channel_id);
+		else
+			return await this.setUserAdmin(sourceId, targetId, channel_id);
+	}
 }

@@ -239,6 +239,35 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		return userEntity.user_id;
 	}
 
+	@SubscribeMessage('promote')
+	async handleOp(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
+		if (!body || (!body.target_id && !body.username))
+			throw new WsException('No body');
+		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
+		const channel_id = Number(client.handshake.query.channel_id);
+		const ret = await this.getPrivilegesFromBody(user.sub, body, channel_id);
+		const targetId = await this.getIdFromBody(body);
+		const channel = this.channelList.get(channel_id);
+
+		if (!body || !targetId)
+			throw new WsException('No body');
+		if (targetId == user.sub)
+			throw new WsException('You cannot ban yourself');
+		if (!channel)
+			throw new WsException('Channel no longer exists');
+		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
+		this.channelService.promoteUser(user.sub, targetId, channel_id);
+		const targets = channel.get(targetId);
+		this.socketEmit(
+			targets,
+			'onMessage',
+			'You have been promoted by ' + user.name
+		);
+		this.sendSystemMessageToChannel(channel_id, targetId, ' was promoted by ' + user.name)
+		this.socketDisconnect(targets);
+		this.notificationGateway.sendMessage([user.sub], 'Successful promotion');
+	}
+
 
 	@SubscribeMessage('addFriend')
 	async handleInvite(@ConnectedSocket() client: Socket, @MessageBody() body: NotificationRequest) {
@@ -413,14 +442,14 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('message')
 	async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() body: Message) {
-		if (!body)
+		if (!body || !body.message_content || body.message_content.length > 255)
 			throw new WsException('No body');
-		body.createdAt = new Date();
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
+		body.createdAt = new Date();
 		const channel_id = Number(client.handshake.query.channel_id);
 		const Validity = await this.messageService.addMessageToChannel(
 			body,
-			client.request.headers.authorization,
+			user.sub,
 			channel_id
 		);
 
