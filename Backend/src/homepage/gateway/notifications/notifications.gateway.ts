@@ -17,7 +17,10 @@ import { MatchsService } from 'src/homepage/services/matchs/matchs.service';
 import { NotificationsService } from 'src/homepage/services/notifications/notifications.service';
 import { RequestService } from 'src/homepage/services/request/request.service';
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
+import { WsexceptionFilter } from 'src/homepage/filters/wsexception/wsexception.filter';
+import { UseFilters } from '@nestjs/common';
 
+@UseFilters(new WsexceptionFilter())
 @WebSocketGateway(3003, {
 	cors: {
 		origin: 'http://localhost:4200'

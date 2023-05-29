@@ -20,7 +20,10 @@ import { ItemsService } from 'src/homepage/services/items/items.service';
 import { ChannelUserRelation } from 'src/entities';
 import { NotificationRequest } from 'src/homepage/dtos/Notifications.dto';
 import { UsersService } from 'src/homepage/services/users/users.service';
+import { WsexceptionFilter } from 'src/homepage/filters/wsexception/wsexception.filter';
+import { UseFilters } from '@nestjs/common';
 
+@UseFilters(new WsexceptionFilter())
 @WebSocketGateway(3002, {
 	cors: {
 		origin: 'http://localhost:4200'
@@ -367,13 +370,15 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const targetId = await this.getIdFromBody(body);
 		const channel = this.channelList.get(channel_id);
 
-		if (!body || !targetId)
+		if (!body || !targetId) {
+			console.log('MAMAAAAAAAAAAAAAAAAAAAAAAAA');
 			throw new WsException('No body');
+		}
 		if (targetId == user.sub)
 			throw new WsException('You cannot ban yourself');
 		if (!channel)
 			throw new WsException('Channel no longer exists');
-		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
+		if (!ret.ret) return client.emit('onError', ret.msg);
 		
 		this.channelService.banUser(user.sub, targetId, channel_id, body.time);
 		const targets = channel.get(targetId);

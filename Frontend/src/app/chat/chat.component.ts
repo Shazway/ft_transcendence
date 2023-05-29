@@ -75,10 +75,15 @@ export class ChatComponent implements OnInit, AfterViewInit {
 
 	setClientEvent() {
 		this.client.on('onMessage', (event) => { console.log('Message received ' + event); this.sortMessage(event); this.scrollBottom(event); });
-		this.client.on('onError', (event) => { console.log('WebSocket error: ' + event); });
+		this.client.on('onError', (event) => { this.handleError(event); });
 		this.client.on('connection', () => { console.log('Connected to WebSocket server'); });
 		this.client.on('disconnect', () => { console.log('Disconnected from WebSocket server'); });
 		this.client.on('delMessage', (event) => { console.log('Deleting message ' + event); this.deleteMessage(event); })
+	}
+
+	handleError(event: string) {
+		console.log('WebSocket error: ' + event);
+		if (event == 'Invalid User') return;
 	}
 
 	scrollBottom(msg?: Message) {
