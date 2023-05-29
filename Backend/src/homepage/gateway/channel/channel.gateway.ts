@@ -445,8 +445,10 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 	@SubscribeMessage('message')
 	async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() body: Message) {
-		if (!body || !body.message_content || body.message_content.length > 255)
+		if (!body || !body.message_content)
 			throw new WsException('No body');
+		else if (body.message_content.length > 255)
+			throw new WsException('Message too long');
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		body.createdAt = new Date();
 		const channel_id = Number(client.handshake.query.channel_id);
