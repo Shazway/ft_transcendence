@@ -24,8 +24,12 @@ export class AppComponent implements AfterViewInit {
 	@ViewChild('popoverContent') profileTemplate!: TemplateRef<any>;
 	@ViewChild('chatInteractionTemplate') chatInteractionTemplate!: TemplateRef<any>;
 	@ViewChild('toastFriendRequest') toastFriendRequest!: TemplateRef<any>;
+	@ViewChild('toastNewFriend') toastNewFriend!: TemplateRef<any>;
 	@ViewChild('toastChallenge') toastChallenge!: TemplateRef<any>;
 	@ViewChild('toastAchievement') toastAchievement!: TemplateRef<any>;
+	@ViewChild('toastFailure') toastFailure!: TemplateRef<any>;
+	@ViewChild('toastSuccess') toastSuccess!: TemplateRef<any>;
+	@ViewChild('toastChannel') toastChannel!: TemplateRef<any>;
 	title = 'Frontend';
 	isExpanded = false;
 	myProfile? : MyProfileUser | null;
@@ -44,7 +48,14 @@ export class AppComponent implements AfterViewInit {
 	}
 
 	ngAfterViewInit(): void {
-		this.notifService.initTemplates(this.toastFriendRequest, this.toastChallenge, this.toastAchievement)
+		this.notifService.initTemplates(
+			this.toastFriendRequest,
+			this.toastNewFriend,
+			this.toastChallenge,
+			this.toastAchievement,
+			this.toastFailure,
+			this.toastSuccess,
+			this.toastChannel)
 	}
 
 	disconnect() {
@@ -103,12 +114,12 @@ export class AppComponent implements AfterViewInit {
 		this.notifService.showNotificationInvite(notif.notification);
 	}
 
-	showAchievements() {
-		this.notifService.showAchievements();
+	showAchievements(notif : {notification: NotificationRequest}) {
+		this.notifService.showAchievements(notif.notification);
 	}
 
-	showChallenge() {
-		this.notifService.showChallenge();
+	showChallenge(notif : {notification: NotificationRequest}) {
+		this.notifService.showChallenge(notif.notification);
 	}
 
 	notifDismiss(toast: any) {
@@ -143,6 +154,21 @@ export class AppComponent implements AfterViewInit {
 	rejectFriendRequest(context : NotificationRequest, toast: any) {
 		context.accepted = false;
 		this.notifService.emit('inviteAnswer', context);
+		console.log(context);
+
+		this.notifDismiss(toast);
+	}
+
+	acceptChallenge(context : NotificationRequest, toast: any) {
+		context.accepted = true;
+		this.notifService.emit('challengeAnswer', context);
+		console.log(context);
+		this.notifDismiss(toast);
+	}
+
+	rejectChallenge(context : NotificationRequest, toast: any) {
+		context.accepted = false;
+		this.notifService.emit('challengeAnswer', context);
 		console.log(context);
 
 		this.notifDismiss(toast);
