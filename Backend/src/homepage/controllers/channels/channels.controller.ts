@@ -106,12 +106,15 @@ export class ChannelsController {
 
 		let invitableUsers: UserEntity[];
 		invitableUsers = await this.itemsService.getUsersBySubstring(body.substring);
-		invitableUsers = invitableUsers.filter((user) => user.channelInviteAuth != this.NOT_ALLOWED);
-		invitableUsers = invitableUsers.filter((user) => {
-			if (user.channelInviteAuth == this.FRIENDS_ALLOWED && !(user.friend.find((friend) => friend.user_id == sourceId)))
-				return false;
-			return true;
-		})
+		if (invitableUsers)
+		{
+			invitableUsers = invitableUsers.filter((user) => user.channelInviteAuth != this.NOT_ALLOWED);
+			invitableUsers = invitableUsers.filter((user) => {
+				if (user.channelInviteAuth == this.FRIENDS_ALLOWED && !(user.friend.find((friend) => friend.user_id == sourceId)))
+					return false;
+				return true;
+			})
+		}
 		res.status(HttpStatus.OK).send(invitableUsers);
 	}
 
