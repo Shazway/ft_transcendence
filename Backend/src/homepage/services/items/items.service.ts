@@ -675,4 +675,11 @@ export class ItemsService {
 		const match = user.match_history.find((match) => {match.is_ongoing});
 		return match;
 	}
+	async getSkinById(skindId: number) {
+		const skin = await this.skinRepo.
+			createQueryBuilder('skin')
+			.where('user.user_id = :id', { skindId })
+			.getOne();
+		return skin
+	}
 }

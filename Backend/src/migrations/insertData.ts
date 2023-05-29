@@ -52,7 +52,21 @@ export class insertData666666666666666666 implements MigrationInterface {
 				type: 'Paddle',
 				name: 'Default',
 				img_url: 'assets/raquette-base.png',
-				description: 'A free paddle skin!',
+				description: 'The default paddle',
+				price : 0,
+			},
+			{
+				type: 'Ball',
+				name: 'Default',
+				img_url: '',
+				description: 'The default ball',
+				price : 0,
+			},
+			{
+				type: 'Background',
+				name: 'Default',
+				img_url: '',
+				description: 'The default background',
 				price : 0,
 			},
 			{

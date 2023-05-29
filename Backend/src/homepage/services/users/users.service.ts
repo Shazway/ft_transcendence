@@ -13,7 +13,7 @@ export class UsersService {
 		@InjectRepository(UserEntity)
 		private userRepository: Repository<UserEntity>,
 		private readonly httpClient: HttpService,
-		private itemsService: ItemsService,
+		private itemsService: ItemsService
 	) {}
 
 	async getIntraBody(accessToken: string) {
@@ -24,7 +24,7 @@ export class UsersService {
 
 	async fetchIntraInfo(token: string) {
 		return await axios.get<IntraInfo>('https://api.intra.42.fr/v2/me', {
-			headers: { Authorization: 'Bearer ' + token },
+			headers: { Authorization: 'Bearer ' + token }
 		});
 	}
 
@@ -44,7 +44,12 @@ export class UsersService {
 	}
 
 	async createUser(userInfo: IntraInfo) {
-		let user = new UserEntity();
+		const user = new UserEntity();
+		const defaultPaddle = await this.itemsService.getSkinById(1);
+		const defaultBall = await this.itemsService.getSkinById(2);
+		const defaultBackGround = await this.itemsService.getSkinById(3);
+
+		user.skin.push(defaultBackGround, defaultBall, defaultPaddle);
 		user.intra_id = userInfo.id;
 		user.username = userInfo.login;
 		user.img_url = userInfo.image.versions.large;
@@ -61,18 +66,14 @@ export class UsersService {
 		return userList;
 	}
 
-	async isBlockedCheck(sourceId: number, suspectId: number)
-	{
-		if (sourceId == 0)
-			return false;
+	async isBlockedCheck(sourceId: number, suspectId: number) {
+		if (sourceId == 0) return false;
 		const sourceUser = await this.itemsService.getUser(sourceId);
 		const targetUser = await this.itemsService.getUser(suspectId);
 
-		if (!sourceUser || !targetUser)
-			return true;
+		if (!sourceUser || !targetUser) return true;
 		sourceUser.blacklistEntry.forEach((blockedUser) => {
-			if (blockedUser.user_id == suspectId)
-				return true;
+			if (blockedUser.user_id == suspectId) return true;
 		});
 		return false;
 	}
