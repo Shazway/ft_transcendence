@@ -83,7 +83,14 @@ export class ChatComponent implements OnInit, AfterViewInit {
 
 	handleError(event: string) {
 		console.log('WebSocket error: ' + event);
-		if (event == 'Invalid User') return;
+		if (event == 'Invalid Command') return;
+		if (event == 'No body sent') return;
+		if (event == 'User not found') return;
+		if (event == "Channel doesn't exist") return;
+		if (event == "User doesn't belong to channel") return;
+		if (event == 'User is banned') return;
+		if (event == 'User is not an admin') return;
+		if (event == 'Target is an admin') return;
 	}
 
 	scrollBottom(msg?: Message) {
