@@ -1,22 +1,23 @@
-
-<form #searchField="ngForm" (ngSubmit)="onClickSearch(searchField.value.searchFld)" (input)="changeSearch(searchField.value.searchFld)" class="row g-3">
-	<div class="col-auto">
-		<label for="search" class="visually-hidden">Search</label>
-		<input class="form-control" name="searchFld" placeholder="Search" ngModel>
-	</div>
-	<div class="col-auto">
-		<button type="submit" class="btn btn-primary mb-3">Go</button>
-	</div>
-</form>
-<table class="table table-hover" style="color: aliceblue;">
-	<thead>
-		<tr>
-			<th>Username</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr *ngFor="let user of foundProfiles" (click)="goToProfile(user)" class="line">
-			<td>{{user.username}}</td>
-		</tr>
-	</tbody>
-</table>
+<div class="mx-2 mt-3">
+	<form #searchField="ngForm" (ngSubmit)="onClickSearch(searchField.value.searchFld)" (input)="changeSearch(searchField.value.searchFld)" class="row g-3">
+		<div class="col-auto">
+			<label for="search" class="visually-hidden">Search</label>
+			<input class="form-control" name="searchFld" placeholder="Search" ngModel>
+		</div>
+		<div class="col-auto">
+			<button type="submit" class="btn btn-primary mb-3">Go</button>
+		</div>
+	</form>
+	<table class="table table-hover" style="color: aliceblue;">
+		<thead>
+			<tr>
+				<th>Username</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr *ngFor="let user of foundProfiles" (click)="goToProfile(user)" class="line">
+				<td>{{user.username}}</td>
+			</tr>
+		</tbody>
+	</table>
+</div>

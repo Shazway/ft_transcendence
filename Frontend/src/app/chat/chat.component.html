@@ -1,59 +1,59 @@
 <div class="row d-flex justify-content-end fixed-bottom chat-card">
 	<div class="order-1 pe-1 chat-size">
 <!-- Start of chat app -->
-		<div class="card offscreen" style="height: 60vh;" id="chat2">
-			<div class="card-header d-flex justify-content-between align-items-center p-3 chat-card-header gap-3">
-				<h5 *ngIf="currentChannel" class="mb-0">{{currentChannel.channel_name}}</h5>
+		<div class="card offscreen mw-100" style="height: 60vh;" id="chat2">
+			<div class="card-header d-flex justify-content-between align-items-center p-3 chat-card-header gap-3 mw-100">
+				<h5 *ngIf="currentChannel" class="mb-0 channel-head" title="{{currentChannel.channel_name}}">{{currentChannel.channel_name}}</h5>
 				<div class="flex-grow-1"></div>
 				<button type="button" id="chanBtn" (click)="slideChan()" class="btn darkslategrey hoverable btn-sm" data-mdb-ripple-color="dark">Open channels</button>
 				<div (click)="slide()">
 					<img src="https://cdn.onlinewebfonts.com/svg/img_69492.png" id="chatBtn" class="rounded-circle" alt="Open Chat">
 				</div>
 			</div>
-			<div #chanBody class="scrollbar scrollbar-primary h-100 bg-light" #scrollbar style="overflow-y: auto; overflow-x: hidden;" #chatMsgs>
+			<div #chanBody class="scrollbar scrollbar-primary h-100 bg-light mw-100" #scrollbar style="overflow-y: auto; overflow-x: hidden;" #chatMsgs>
 <!-- Start of text area -->
-				<div >
-				<div class="channel_unpan">
-					<div class="card-body p-0" data-mdb-perfect-scrollbar="true" style="position: relative; " *ngFor="let msg_list of test_msgs$">
+				<div class="mw-100">
+					<div class="channel_unpan mw-100">
+						<div class="card-body p-0 mw-100" data-mdb-perfect-scrollbar="true" style="position: relative; " *ngFor="let msg_list of test_msgs$">
 <!-- Start of not current user field -->
-						<div *ngIf="!isMe(msg_list[0]) && !isSystem(msg_list[0])" class="d-flex flex-row justify-content-start" id="group-{{msg_list[0].message_id}}">
-							<img (click)="createChatPopup(msg_list[0], $event)" (contextmenu)="createChatPopup(msg_list[0], $event)" id="img-{{msg_list[0].message_id}}" class="rounded-circle" src="{{msg_list[0].author.img_url}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 1" style="width: 45px; height: 100%;">
-							<div>
-								<div class="d-flex align-items-end">
-									<p class="small ms-3 mb-0 text-muted">{{ getName(msg_list) }}</p>
+							<div *ngIf="!isMe(msg_list[0]) && !isSystem(msg_list[0])" class="d-flex flex-row justify-content-start mw-100" id="group-{{msg_list[0].message_id}}">
+								<img (click)="createChatPopup(msg_list[0], $event)" (contextmenu)="createChatPopup(msg_list[0], $event)" id="img-{{msg_list[0].message_id}}" class="rounded-circle" src="{{msg_list[0].author.img_url}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 1" style="width: 45px; height: 100%;">
+								<div class="mw-100">
+									<div class="d-flex align-items-end">
+										<p class="small ms-3 mb-0 text-muted">{{ getName(msg_list) }}</p>
+									</div>
+									<div *ngFor="let msg of msg_list" class="d-flex mw-100" id="message-{{msg.message_id}}">
+										<p class="small pb-1 ps-2 pe-2 pt-0 ms-2 me-2 mb-1 rounded-3 text-wrap d-block" (click)="onDropdownDel(msg)" style="background-color: rgb(206, 210, 216); word-wrap: break-word; max-width: 85%;">{{msg.message_content}}</p>
+										<img (click)="delMsg(msg_list[0])" class="m-0 ms-2 m-auto hidden_icon" style="height: 20px; width: 20px;" id="img-{{msg.message_id}}-del" src="{{icone_list.del_message}}" alt="del_message">
+									</div>
+									<p class="small ms-3 mb-0 rounded-3 text-muted">{{ getTime(msg_list) }}</p>
 								</div>
-								<div *ngFor="let msg of msg_list" class="d-flex" id="message-{{msg.message_id}}">
-									<p class="small pb-1 ps-2 pe-2 pt-0 ms-2 me-2 mb-1 rounded-3 text-wrap d-block" (click)="onDropdownDel(msg)" style="background-color: rgb(206, 210, 216);">{{msg.message_content}}</p>
-									<img (click)="delMsg(msg_list[0])" class="m-0 ms-2 m-auto hidden_icon" style="height: 20px; width: 20px;" id="img-{{msg.message_id}}-del" src="{{icone_list.del_message}}" alt="del_message">
-								</div>
-								<p class="small ms-3 mb-0 rounded-3 text-muted">{{ getTime(msg_list) }}</p>
 							</div>
-						</div>
 <!-- End of not current user field -->
 <!-- Start of current user field -->
-						<div *ngIf="isMe(msg_list[0]) && !isSystem(msg_list[0])" class="d-flex flex-row justify-content-end" id="group-{{msg_list[0].message_id}}">
-							<div>
-								<p class="small me-3 mb-0 rounded-3 text-muted d-flex justify-content-end">{{ getName(msg_list) }}</p>
-								<div *ngFor="let msg of msg_list" class="d-flex" id="message-{{msg.message_id}}">
-									<img (click)="delMsg(msg_list[0])" class="m-0 ms-2 m-auto hidden_icon" style="height: 20px; width: 20px;" id="img-{{msg.message_id}}-del" src="{{icone_list.del_message}}" alt="del_message">
-									<p class="small pb-1 ps-2 pe-2 pt-1 ms-3 mb-1 me-1 rounded-3 text-wrap float-end" (click)="onDropdownDel(msg)" style="background-color: #56a1ec;">{{msg.message_content}}</p>
+							<div *ngIf="isMe(msg_list[0]) && !isSystem(msg_list[0])" class="d-flex flex-row justify-content-end mw-100" id="group-{{msg_list[0].message_id}}">
+								<div class="mw-100">
+									<p class="small me-3 mb-0 rounded-3 text-muted d-flex justify-content-end">{{ getName(msg_list) }}</p>
+									<div *ngFor="let msg of msg_list" class="d-flex mw-100" id="message-{{msg.message_id}}">
+										<img (click)="delMsg(msg_list[0])" class="m-0 ms-2 m-auto hidden_icon" style="height: 20px; width: 20px;" id="img-{{msg.message_id}}-del" src="{{icone_list.del_message}}" alt="del_message">
+										<p class="small pb-1 ps-2 pe-2 pt-1 ms-3 mb-1 me-1 rounded-3 text-wrap float-end" (click)="onDropdownDel(msg)" style="background-color: #56a1ec; word-wrap: break-word; max-width: 85%;">{{msg.message_content}}</p>
+									</div>
+									<p class="small me-3 mb-0 rounded-3 text-muted float-end">{{ getTime(msg_list) }}</p>
 								</div>
-								<p class="small me-3 mb-0 rounded-3 text-muted float-end">{{ getTime(msg_list) }}</p>
+								<img class="rounded-circle" src="{{msg_list[0].author.img_url}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp';" alt="avatar 1" style="width: 45px; height: 100%;">
 							</div>
-							<img class="rounded-circle" src="{{msg_list[0].author.img_url}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp';" alt="avatar 1" style="width: 45px; height: 100%;">
-						</div>
 <!-- End of current user field -->
 <!-- Start of System field -->
-						<div *ngIf="isSystem(msg_list[0])" class="divider d-flex align-items-center">
-							<div *ngFor="let msg of msg_list">
-								<p class="text-center mx-3 mb-0" style="color: #a2aab7;">{{msg.message_content}}</p>
+							<div *ngIf="isSystem(msg_list[0])" class="divider d-flex align-items-center">
+								<div *ngFor="let msg of msg_list">
+									<p class="text-center mx-3 mb-0" style="color: #a2aab7;">{{msg.message_content}}</p>
+								</div>
 							</div>
-						</div>
 <!-- End of System field -->
-					</div>
+						</div>
 
+					</div>
 				</div>
-			</div>
 <!-- End of text area -->
 <!-- Start of channel Select Area -->
 				<div class="card-body p-0 h-100 channel_pan p-3 bg-light" data-mdb-perfect-scrollbar="true">

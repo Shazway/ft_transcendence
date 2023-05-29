@@ -238,3 +238,11 @@ img{ max-width:100%;}
 .text-input.set_error {
 	border-color: red;
 }
+
+.channel-head {
+	width: 200px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	cursor: default;
+}
