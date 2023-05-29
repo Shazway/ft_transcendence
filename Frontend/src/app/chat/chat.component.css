@@ -246,3 +246,9 @@ img{ max-width:100%;}
 	text-overflow: ellipsis;
 	cursor: default;
 }
+
+.mondropup {
+	position: absolute;
+	bottom: 35px;
+	z-index: 50;
+}

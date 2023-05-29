@@ -12,6 +12,7 @@ import { NotificationService } from '../notification.service';
 import { Router } from '@angular/router';
 import { AppComponent } from '../app.component';
 import { PopoverConfig } from 'src/dtos/Popover.dto';
+import { AnyProfileUser } from 'src/dtos/User.dto';
 
 @Component({
 	selector: 'app-chat',
@@ -24,11 +25,13 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	@ViewChild('scrollbar') scrollbar!: ElementRef;
 	currentMessage!: Message;
 	client!: Socket;
-	channels$: Channel[] = [];
+	// channels$: Channel[] = [];
+	channels$: {servers: Channel[], dm: Channel[]} = {servers: [], dm: []};
 	currentChannel!: Channel;
 	msgs$: Message[] = [];
 	test_msgs$ = new Array<Array<Message>>;
 	is_admin = false;
+	potentialNewMembers! : AnyProfileUser[];
 
 	icone_list = {
 		add_friend: "https://static.vecteezy.com/system/resources/previews/020/936/584/original/add-friend-icon-for-your-website-design-logo-app-ui-free-vector.jpg",
@@ -67,6 +70,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 				behavior: 'smooth',
 			});
 		}, 500)
+		this.potentialNewMembers
 	}
 
 	setClientEvent() {
@@ -96,12 +100,21 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			return;
 		for (let index = this.msgs$.length; index > 0; index--)
 			this.sortMessage(this.msgs$[index - 1]);
-		this.channels$ = await this.fetchService.getChannels();
+		this.sortChannels(await this.fetchService.getChannels());
 		const chan = await this.fetchService.getChannel(1);
 		if (chan)
 			this.currentChannel = chan;
 		else
 			console.log('error while fetching channel 1');
+	}
+
+	sortChannels(chanList: Channel[]) {
+		this.channels$.servers.splice(0);
+		this.channels$.dm.splice(0);
+		chanList.forEach(channel => {
+			if (channel.is_dm) this.channels$.dm.push(channel);
+			else this.channels$.servers.push(channel);
+		});
 	}
 
 	deleteMessage(msg: Message) {
@@ -275,7 +288,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			offscreenElm.classList.add('show');
 			onscreenElm.classList.add('hide');
 			offCreateChan.classList.remove('show');
-			this.channels$ = await this.fetchService.getChannels();
+			this.sortChannels(await this.fetchService.getChannels());
 		}
 	}
 
@@ -299,19 +312,20 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		this.scrollBottom();
 	}
 
-	async createChannel() {
+	async createChannel(waiter?: Promise<undefined>) {
 		const offCreateChan = this.elRef.nativeElement.querySelector('.channel_create_pan');
 		const offscreenElm = this.elRef.nativeElement.querySelector('.channel_pan');
 		if (offCreateChan.classList.contains('show')) {
 			offCreateChan.classList.remove('show');
 			offscreenElm.classList.add('show');
-			this.channels$ = await this.fetchService.getChannels();
+			if (waiter)
+				await waiter;
+			this.sortChannels(await this.fetchService.getChannels());
 		}
 		else {
 			offCreateChan.classList.add('show');
 			offscreenElm.classList.remove('show');
 		}
-		// this.fetchService.createChannel({ channel_name: 'chan2' });
 	}
 
 	togglePrivate(event: any) {
@@ -324,17 +338,17 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			offscreenElm.classList.add('show');
 	}
 
-	onClickCreateChannel(data: any) {
+	async onClickCreateChannel(data: any) {
 		if (data.is_channel_private == '')
 			data.is_channel_private = false;
 		if (data.channel_password == '')
 			data.channel_password = null;
-		console.log(data);
-		this.fetchService.createChannel({
+		const waiter = await this.fetchService.createChannel({
 			channel_name: data.channel_name,
 			is_channel_private: data.is_channel_private,
 			channel_password: data.channel_password,
 		});
+		this.createChannel(waiter);
 	}
 
 	getAvatar() {
@@ -449,4 +463,27 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			});
 		return true;
 	}
+
+	async changePotentialNewMembers(value : string) {
+		let allResults = await this.fetchService.inviteSubstring(value);
+		this.potentialNewMembers = allResults.slice(0, 10);
+	}
+
+	addMember(newMember : AnyProfileUser) {
+		console.log("ajout de " + newMember.username + " au channel");
+		this.fetchService.channelInvite(newMember);
+	}
+
+	async openAddMember() {
+		const dropDownElm = this.elRef.nativeElement.querySelector('.dropdown-menu');
+		if(!dropDownElm)
+			return;
+		if (dropDownElm.classList.contains('show'))
+			dropDownElm.classList.remove('show');
+		else
+			dropDownElm.classList.add('show');
+		this.potentialNewMembers = [];
+		console.log(this.potentialNewMembers);
+	}
+
 }
