@@ -39,6 +39,8 @@ export class UsersController {
 	) {
 		const currentUser = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!currentUser) return;
+		if (!body || !body.username || body.username.length > 20)
+			return res.status(HttpStatus.UNAUTHORIZED).send('Name too long');
 		const checkUser = await this.itemsService.getUserByUsername(body.username);
 
 		if (checkUser && checkUser.user_id == currentUser.sub)
@@ -56,7 +58,7 @@ export class UsersController {
 	{
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
-		if (!body || !body.substring)
+		if (!body || !body.substring || body.substring.length > 20)
 			return res.status(HttpStatus.UNAUTHORIZED).send(null);
 		const prefixedUsers = await this.itemsService.getUsersBySubstring(body.substring);
 		res.status(HttpStatus.OK).send(prefixedUsers);

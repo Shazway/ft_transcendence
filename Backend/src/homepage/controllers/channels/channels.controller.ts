@@ -87,6 +87,8 @@ export class ChannelsController {
 	async createChannel(@Req() req: Request, @Res() res: Response, @Body() newChannel: NewChan) {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
+		if (!newChannel || !newChannel.channel_name || newChannel.channel_name.length > 41)
+			return res.status(HttpStatus.UNAUTHORIZED).send('Either no body or channel name too long');
 		const channelEntity = await this.channelService.createChannel(newChannel, user.sub);
 		console.log(channelEntity);
 		res.status(HttpStatus.OK).send({ msg: 'Channel created' });
@@ -104,15 +106,13 @@ export class ChannelsController {
 		let messages = await this.messageService.getPage(chan_id, page_num);
 
 		const userEntity = await this.itemsService.getUser(user.sub);
-		if (!userEntity) return res.status(HttpStatus.NOT_FOUND).send("You don't exist wtf");
+		if (!userEntity) return res.status(HttpStatus.NOT_FOUND).send("You don't exist in the database, please log back in");
 		messages = messages.filter((message) => {
 			return !userEntity.blacklistEntry.find(
 				(blockedUser) => blockedUser.user_id == message.author.user_id
 			);
 		});
-		if (!messages)
-			res.status(HttpStatus.NOT_FOUND).send({ msg: 'No message in the channel: ' + chan_id });
-		else res.status(HttpStatus.OK).send(messages);
+		res.status(HttpStatus.OK).send(messages);
 	}
 
 	@Get(':id')

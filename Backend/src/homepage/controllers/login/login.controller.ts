@@ -59,7 +59,6 @@ export class LoginController {
 			{
 				console.log('Logging in');
 				console.log({email: intraInfo.data.email});
-				console.log(intraInfo.data.image);
 				if (!user.double_auth)
 					return res.status(HttpStatus.OK).send(await this.buildLoginBody(resToken, intraInfo.data, user.user_id));
 				const TwoFASecret = this.authService.generateSec()
@@ -71,7 +70,8 @@ export class LoginController {
 			else
 			{
 				console.log('Signing in');
-				console.log(intraInfo.data.image);
+				if (intraInfo.data.login.length > 20)
+					intraInfo.data.login.substring(0, 20);
 				const user = await this.usersService.createUser(intraInfo.data);
 				res.status(HttpStatus.CREATED).send(await this.buildLoginBody(resToken, intraInfo.data, user.user_id));
 			}
