@@ -71,7 +71,7 @@ export class LoginController {
 			{
 				console.log('Signing in');
 				if (intraInfo.data.login.length > 20)
-					intraInfo.data.login.substring(0, 20);
+					intraInfo.data.login = intraInfo.data.login.substring(0, 20);
 				const user = await this.usersService.createUser(intraInfo.data);
 				res.status(HttpStatus.CREATED).send(await this.buildLoginBody(resToken, intraInfo.data, user.user_id));
 			}
