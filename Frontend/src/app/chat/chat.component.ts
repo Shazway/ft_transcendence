@@ -78,8 +78,9 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		this.client.on('onError', (event) => { this.handleError(event); });
 		this.client.on('connection', () => { console.log('Connected to WebSocket server'); });
 		this.client.on('disconnect', () => { console.log('Disconnected from WebSocket server'); });
-		this.client.on('delMessage', (event) => { console.log('Deleting message ' + event); this.deleteMessage(event); })
-		this.client.on('isAdmin', (event) => { this.is_admin = event; console.log('You are admin ?: ' + event); })
+		this.client.on('delMessage', (event) => { console.log('Deleting message ' + event); this.deleteMessage(event); });
+		this.client.on('isAdmin', (event) => { this.is_admin = event; console.log('You are admin ?: ' + event); });
+		this.client.on('isOwner', (event) => { console.log('You are Owner ?: ' + event); })
 	}
 
 	handleError(event: string) {
@@ -317,7 +318,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			return;
 		for (let index = this.msgs$.length; index > 0; index--)
 			this.sortMessage(this.msgs$[index - 1]);
-		console.log('Switch');
 		this.client = io('ws://localhost:3002?channel_id=' + channel.channel_id, this.websocketService.getHeader());
 		this.currentChannel = channel;
 		this.setClientEvent();
