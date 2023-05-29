@@ -297,17 +297,17 @@ export class ItemsService {
 		await this.userRepo.save(user);
 	}
 
-	public async createPrivateChannel(user1: UserEntity, user2: UserEntity) {
+	public async createDMChannel(user1: UserEntity, user2: UserEntity) {
 		const channel = new ChannelEntity();
 	
-		channel.channel_name = user1.username + '/' + user2.username;
+		channel.channel_name = user1.user_id + '/' + user2.user_id;
 		channel.is_dm = true;
 		channel.is_channel_private = true;
 		const chan = this.chanRepo.create(channel);
 		return this.chanRepo.save(chan);
 	}
 
-	public async addUsersToPrivateChannel(user1: UserEntity, user2: UserEntity, channel: ChannelEntity) {
+	public async addUsersToDM(user1: UserEntity, user2: UserEntity, channel: ChannelEntity) {
 		const chanUser1 = new ChannelUserRelation();
 		const chanUser2 = new ChannelUserRelation();
 
@@ -324,14 +324,9 @@ export class ItemsService {
 		await this.chan_userRepo.save([chanUser1, chanUser2]);
 	}
 
-	public async addFriendsToPrivateChannel(user1: UserEntity, user2: UserEntity) {
-		const oldChannel = await this.createPrivateChannel(user1, user2);
-		if (!oldChannel)
-			return null;
-		const newChan = await this.getChannel(oldChannel.channel_id);
-		if (!newChan)
-			return null;
-		this.addUsersToPrivateChannel(user1, user2, newChan);
+	public async addFriendsToDM(user1: UserEntity, user2: UserEntity) {
+		const oldChannel = await this.createDMChannel(user1, user2);
+		this.addUsersToDM(user1, user2, oldChannel);
 	}
 
 	public async addFriendToUser(
@@ -355,7 +350,7 @@ export class ItemsService {
 		console.log(targetUser.username);
 		sourceUser.friend.push(targetUser);
 		targetUser.friend.push(sourceUser);
-		await this.addFriendsToPrivateChannel(sourceUser, targetUser);;
+		await this.addFriendsToDM(sourceUser, targetUser);;
 	}
 
 	public async removeFromPrivateChannel(source: UserEntity, friend: UserEntity) {
@@ -676,7 +671,13 @@ export class ItemsService {
 		const match = user.match_history.find((match) => {match.is_ongoing});
 		return match;
 	}
-
+	async getSkinById(skindId: number) {
+		const skin = await this.skinRepo.
+			createQueryBuilder('skin')
+			.where('skin.skin_id = :id', { id: skindId })
+			.getOne();
+		return skin
+	}
 	async getChannelsFromUser(id: number) {
 		const channels = await this.chanRepo
 		.createQueryBuilder('channel')

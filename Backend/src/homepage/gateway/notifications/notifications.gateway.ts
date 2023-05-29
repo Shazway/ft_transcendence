@@ -91,14 +91,14 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		return answer;
 	}
 
-	async onChannelInvite(sourceUser: any, targetUser: UserEntity)
+	async onChannelInvite(sourceUser: any, targetUser: UserEntity, channelName: string)
 	{
 		if (!targetUser)
 			return;
 		const client = this.userList.get(targetUser.user_id);
 
 		if (client && sourceUser)
-			client.emit('channelInvite', this.buildAnswer(sourceUser.user_id, sourceUser.username, 'channel'));
+			client.emit('channelInvite', this.buildAnswer(sourceUser.user_id, sourceUser.username, channelName));
 	}
 
 	@SubscribeMessage('inviteRequest')
