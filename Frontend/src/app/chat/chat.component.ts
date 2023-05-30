@@ -477,6 +477,14 @@ export class ChatComponent implements OnInit, AfterViewInit {
 					this.addMember(userToAdd);
 				return;
 			}
+			else if (split[0] == '/op') {
+				if (split.length < 2) return;
+				this.client.emit('op', {
+					username: split[1],
+					message: "You have been promoted to OP",
+				});
+				return;
+			}
 		}
 
 		this.elRef.nativeElement.querySelector('#exampleFormControlInput1').value = '';
