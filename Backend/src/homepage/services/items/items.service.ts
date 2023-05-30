@@ -340,6 +340,20 @@ export class ItemsService {
 		return await this.addUsersToDM(user1, user2, oldChannel);
 	}
 
+	public async friendAddingForced(
+		sourceId: number,
+		targetId: number,
+	) {
+		const sourceUser = await this.getUser(sourceId);
+		const targetUser = await this.getUser(targetId);
+
+		if (!sourceUser || !targetUser)
+			return null;
+		sourceUser.friend.push(targetUser);
+		targetUser.friend.push(sourceUser);
+		return await this.addFriendsToDM(sourceUser, targetUser);
+	}
+
 	public async addFriendToUser(
 		sourceId: number,
 		targetId: number,
@@ -349,14 +363,8 @@ export class ItemsService {
 
 		if (!sourceUser || !targetUser)
 			return null;
-		const receivedRequest = sourceUser.receivedFriendRequests.find((request) => request.sender.user_id == targetId);
-		const sentRequest = targetUser.sentFriendRequests.find((request) => request.receiver.user_id == sourceId);
-		if (!receivedRequest || !sentRequest)
+		if (!(await this.removeRequestFromUsers(sourceUser, targetUser)))
 			return null;
-		this.FriendRequestRepo.remove([
-			receivedRequest,
-			sentRequest
-		]);
 		sourceUser.friend.push(targetUser);
 		targetUser.friend.push(sourceUser);
 		return await this.addFriendsToDM(sourceUser, targetUser);
@@ -417,6 +425,20 @@ export class ItemsService {
 		return null;
 	}
 
+	public async removeRequestFromUsers(sourceUser: UserEntity, targetUser: UserEntity)
+	{
+		const targetId = targetUser.user_id;
+
+		if (!sourceUser || !targetUser)
+			return null;
+		const sentRequest = sourceUser.sentFriendRequests.find((request) => request.receiver.user_id == targetId);
+
+		if (!sentRequest)
+			return null;
+		await this.FriendRequestRepo.remove(sentRequest);
+		return true;
+	}
+
 	public async blockUser(source_id: number, target_id: number)
 	{
 		const sourceUser = await this.getUser(source_id);
@@ -426,6 +448,8 @@ export class ItemsService {
 			return false;
 		if (sourceUser.friend.find((user) => user.user_id === targetUser.user_id))
 			await this.removeFriendFromUsers(sourceUser, targetUser);
+		else
+			await this.removeRequestFromUsers(targetUser, sourceUser);
 		sourceUser.blacklistEntry.push(targetUser);
 		this.userRepo.save(sourceUser);
 		return true;
@@ -475,11 +499,7 @@ export class ItemsService {
 		if (sourceEntity.friend.find((friend) => targetEntity.user_id == friend.user_id) ||
 			sourceEntity.blacklistEntry.find((blockedUser) => targetEntity.user_id == blockedUser.user_id))
 			return false;
-		if
-			(
-			targetEntity.receivedFriendRequests
-				.find((request) => request.sender.user_id == sourceEntity.user_id)
-			)
+		if(targetEntity.receivedFriendRequests.find((request) => request.sender.user_id == sourceEntity.user_id))
 			return false;
 		return true;
 	}
@@ -491,6 +511,17 @@ export class ItemsService {
 		await this.matchRepo.save(match);
 	}
 
+	public async requestPending(sourceEntity: UserEntity, targetEntity: UserEntity)
+	{
+		const request = targetEntity.sentFriendRequests.find((request) => request.receiver.user_id == sourceEntity.user_id);
+		if (request)
+		{
+			await this.FriendRequestRepo.remove(request);
+			return true;
+		}
+		return false;
+	}
+
 	public async addFriendRequestToUsers(sourceId: number, targetId: number) {
 		const friendRequest = this.createFriendRequest();
 		const targetEntity = await this.getUser(targetId);
@@ -499,6 +530,8 @@ export class ItemsService {
 		console.log("source id = " + sourceId + " target id = " + targetId);
 		if (!friendRequest || !targetEntity || !sourceEntity)
 			return null;
+		if (await this.requestPending(sourceEntity, targetEntity))
+			return await this.friendAddingForced(sourceId, targetId);
 		friendRequest.receiver = targetEntity;
 		friendRequest.sender = sourceEntity;
 		targetEntity.receivedFriendRequests.push(friendRequest);
