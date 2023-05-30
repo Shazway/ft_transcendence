@@ -56,15 +56,25 @@ export class FriendsComponent {
 	async ngOnInit() {
 		if (!this.parent.isConnected())
 			this.router.navigateByUrl('login');
-		this.blockedUsers = await this.fetchService.getBlockedUsers();
-		this.blockedUsers.sort((a, b)=>{
-			return (a.username.localeCompare(b.username));
-		})
+		this.updateFriends();
+	}
+
+	async updateFriends() {
 		this.friends = await this.fetchService.getFriends();
 		this.friends.sort((a, b)=>{
 			return (a.username.localeCompare(b.username));
 		})
 		this.friends.sort((a, b) => b.activity_status - a.activity_status);
+	}
+
+	async updateBlocked() {
+		this.blockedUsers = await this.fetchService.getBlockedUsers();
+		this.blockedUsers.sort((a, b)=>{
+			return (a.username.localeCompare(b.username));
+		})
+	}
+
+	async updateRequests() {
 		this.friendshipRequests = await this.fetchService.getFriendshipRequests();
 	}
 
@@ -111,6 +121,7 @@ export class FriendsComponent {
 		if (validate) {
 			await this.fetchService.blockUser(user.user_id);
 			this.friends.splice(this.friends.indexOf(user), 1);
+			this.friendshipRequests.received.splice(this.friendshipRequests.received.findIndex((a)=>{return a.sender == user}), 1);
 			this.blockedUsers.push(user);
 			this.blockedUsers.sort((a, b)=>{
 				return (a.username.localeCompare(b.username));
@@ -167,6 +178,7 @@ export class FriendsComponent {
 	}
 
 	switchToFriends() {
+		this.updateFriends()
 		this.friendsTabElm = this.elRef.nativeElement.querySelector("#friends-tab0");
 		this.requestsTabElm = this.elRef.nativeElement.querySelector("#requests-tab0");
 		this.blockedTabElm = this.elRef.nativeElement.querySelector("#blocked-tab0");
@@ -191,6 +203,7 @@ export class FriendsComponent {
 	}
 
 	switchToRequests() {
+		this.updateRequests();
 		this.friendsTabElm = this.elRef.nativeElement.querySelector("#friends-tab0");
 		this.requestsTabElm = this.elRef.nativeElement.querySelector("#requests-tab0");
 		this.blockedTabElm = this.elRef.nativeElement.querySelector("#blocked-tab0");
@@ -215,6 +228,7 @@ export class FriendsComponent {
 	}
 
 	switchToBlocked() {
+		this.updateBlocked();
 		this.friendsTabElm = this.elRef.nativeElement.querySelector("#friends-tab0");
 		this.requestsTabElm = this.elRef.nativeElement.querySelector("#requests-tab0");
 		this.blockedTabElm = this.elRef.nativeElement.querySelector("#blocked-tab0");
@@ -239,6 +253,7 @@ export class FriendsComponent {
 	}
 
 	switchToSent() {
+		this.updateRequests();
 		this.friendsTabElm = this.elRef.nativeElement.querySelector("#friends-tab0");
 		this.requestsTabElm = this.elRef.nativeElement.querySelector("#requests-tab0");
 		this.blockedTabElm = this.elRef.nativeElement.querySelector("#blocked-tab0");
