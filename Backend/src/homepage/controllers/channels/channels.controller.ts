@@ -13,12 +13,13 @@ import {
 import { Request, Response } from 'express';
 import { ChannelsService } from 'src/homepage/services/channels/channels.service';
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
-import { NewChan } from '../../dtos/Chan.dto';
+import { NewChan, SerializedChan } from '../../dtos/Chan.dto';
 import { MessagesService } from 'src/homepage/services/messages/messages.service';
 import { ItemsService } from 'src/homepage/services/items/items.service';
 import { NotificationsGateway } from 'src/homepage/gateway/notifications/notifications.gateway';
 import { UserEntity } from 'src/entities';
 import { UsersService } from 'src/homepage/services/users/users.service';
+import { plainToClass } from 'class-transformer';
 
 @Controller('channels')
 export class ChannelsController {
@@ -56,6 +57,7 @@ export class ChannelsController {
 			}
 		});
 		const filteredChannelsWithoutNull = filteredList.filter((channel) => channel);
+		filteredChannelsWithoutNull.map((channel) => plainToClass(SerializedChan, channel));
 		res.status(HttpStatus.OK).send(filteredChannelsWithoutNull);
 	}
 
@@ -182,6 +184,6 @@ export class ChannelsController {
 		const channel = await this.channelService.getChannelById(chan_id);
 		if (!channel)
 			res.status(HttpStatus.NOT_FOUND).send({ msg: 'No channels with id ' + chan_id });
-		else res.status(HttpStatus.OK).send(channel);
+		else res.status(HttpStatus.OK).send(plainToClass(SerializedChan, channel));
 	}
 }
