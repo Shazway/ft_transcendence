@@ -50,6 +50,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		
 		if (!user)
 			return client.disconnect();
+		console.log('connected')
 		this.userList.set(user.sub, client);
 		await this.notificationService.setUserStatus(user.sub, this.ONLINE);
 	}
@@ -59,6 +60,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		
 		if (!user)
 			return client.disconnect();
+		console.log('disconnected')
 		this.userList.delete(user.sub);
 		await this.notificationService.setUserStatus(user.sub, this.OFFLINE);
 	}
@@ -140,11 +142,11 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		if (body.accepted)
 		{
 			if (body.type == 'friend' && !(await this.requestService.handleFriendRequestAnswer(source.sub, body.target_id)))
-				return client.emit('No request to answer to');
+				return client.emit('onError', 'Erreur');
 			if (body.type == 'match')
 			{
 				if (!target)
-					return client.emit('Disconnect', 'Opponent disconnected');
+					return client.emit('onError', 'Opponent disconnected');
 				const match = await this.matchService.createFullMatch(source.sub, body.target_id, body.match_setting);
 				if (!match)
 					return client.emit('Error', 'Something went wrong');
@@ -155,7 +157,24 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		}
 		else
 			this.itemsService.deleteFriendRequest(source.sub, body.target_id);
-		client.emit('success', 'Answer sent');
+		console.log('oui');
+		if (!client || !client.connected)
+		{
+			const sourceClient = this.userList.get(source.sub);
+			console.log('On a du fetch le nouveau client');
+			if (sourceClient)
+			{
+				console.log('success sent');
+				sourceClient.emit('success', 'Answer sent');
+			}
+		}
+		else
+		{
+			console.log('Le client etait deja connecte');
+			client.emit('success', 'Answer sent');
+		}
 		if (target) target.emit(body.type + 'Answer', { notification: answer });
+		else
+			console.log('target disconnected')
 	}
 }

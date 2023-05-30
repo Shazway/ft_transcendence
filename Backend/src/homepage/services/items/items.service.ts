@@ -332,11 +332,12 @@ export class ItemsService {
 		await this.userRepo.save(user2);
 		await this.chanRepo.save(channel);
 		await this.chan_userRepo.save([chanUser1, chanUser2]);
+		return true;
 	}
 
 	public async addFriendsToDM(user1: UserEntity, user2: UserEntity) {
 		const oldChannel = await this.createDMChannel(user1, user2);
-		this.addUsersToDM(user1, user2, oldChannel);
+		return await this.addUsersToDM(user1, user2, oldChannel);
 	}
 
 	public async addFriendToUser(
@@ -358,7 +359,7 @@ export class ItemsService {
 		]);
 		sourceUser.friend.push(targetUser);
 		targetUser.friend.push(sourceUser);
-		await this.addFriendsToDM(sourceUser, targetUser);;
+		return await this.addFriendsToDM(sourceUser, targetUser);
 	}
 
 	public async removeFromDM(source: UserEntity, friend: UserEntity) {
