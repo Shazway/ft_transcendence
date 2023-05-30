@@ -25,7 +25,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	@ViewChild('scrollbar') scrollbar!: ElementRef;
 	currentMessage!: Message;
 	client!: Socket;
-	// channels$: Channel[] = [];
 	channels$: {servers: Channel[], dm: Channel[]} = {servers: [], dm: []};
 	currentChannel!: Channel;
 	msgs$: Message[] = [];
