@@ -329,12 +329,41 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		this.client = io('ws://localhost:3002?channel_id=' + channel.channel_id, this.websocketService.getHeader());
 		this.currentChannel = channel;
 		this.setClientEvent();
-		this.client.emit('isAdmin');
-		this.client.emit('isOwner');
+		const us_channel = this.getUserFromCurrentChannel(localStorage.getItem('username'));
+		console.log('user', us_channel);
+		this.is_admin = us_channel ? us_channel.is_admin : false;
+		this.is_owner = us_channel ? us_channel.is_creator : false;
 		const offscreenElm = this.elRef.nativeElement.querySelector('.channel_pan');
 		if (offscreenElm.classList.contains('show'))
 			this.slideChan();
 		this.scrollBottom();
+	}
+
+	redirectToGlobal() {
+		let chan: Channel | undefined;
+		this.channels$.servers.forEach(channel => {
+			if (channel.channel_id == 1) {
+				chan = channel;
+				return;
+			}
+		});
+		if (chan)
+			this.openChannel(chan);
+		else
+			return;
+	}
+
+	getUserFromCurrentChannel(name: string | null): any {
+		if (!name)
+			return null;
+		let user;
+		this.currentChannel.us_channel.forEach((us_channel: any) => {
+			if (us_channel.user.username == name) {
+				user = us_channel;
+				return;
+			}
+		});
+		return user;
 	}
 
 	async createChannel(waiter?: Promise<undefined>) {
@@ -555,10 +584,12 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	async obliterateChannel() {
 		console.log('Obliterating');
 		if (this.is_owner) {
-			const confirm = await this.createPopup("Ban", "Time", 'ConfirmPopup');
+			const confirm = await this.createPopup("Obliterate channel", "", 'ConfirmPopup');
 			console.log(confirm);
-			if (confirm)
+			if (confirm) {
 				this.fetchService.obliterateChannel(this.currentChannel);
+				this.redirectToGlobal();
+			}
 		}
 	}
 }
