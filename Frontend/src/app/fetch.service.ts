@@ -367,6 +367,10 @@ export class FetchService {
 		return res;
 	}
 
+	async obliterateChannel(chan : Channel) {
+		console.log("Route du back a faire");
+	}
+
 	async searchingSubstring(value : string) {
 		let res: AnyProfileUser[] = [];
 		const teaFunc = this.teapotError;
