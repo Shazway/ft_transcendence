@@ -23,7 +23,7 @@
 				 <div >
 					<button class="btn btn-default" type="button" (click)="openDropdown()">
 						{{getUsername()}}
-						<img src="{{getAvatar()}}" class="rounded-circle" alt="Avatar" width = 30>
+						<img src="{{getAvatar()}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp';" class="rounded-circle" alt="Avatar" width = 30>
 					</button>
 					<ul class="dropdown-menu mondropdown">
 						<li>
