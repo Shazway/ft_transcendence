@@ -101,7 +101,7 @@ export class insertData666666666666666666 implements MigrationInterface {
 				type: 'Paddle',
 				name: 'Swirl',
 				img_url: 'assets/Skins/Paddle/Swirl.png',
-				description: 'Hypnothizing your adversaries is not cheating',
+				description: 'Hypnothizing your opponent is not cheating',
 				price : 120,
 			},
 			{
@@ -131,6 +131,20 @@ export class insertData666666666666666666 implements MigrationInterface {
 				img_url: 'assets/Skins/Ball/tarteFraise.png',
 				description: 'Who doesn\'t like pastries?',
 				price : 40,
+			},
+			{
+				type: 'Background',
+				name: 'Cloudy sky',
+				img_url: 'assets/Skins/Background/cloudySky.png',
+				description: 'For the air headed players',
+				price : 20,
+			},
+			{
+				type: 'Background',
+				name: 'Nathan',
+				img_url: 'assets/Skins/Background/Nathan.png',
+				description: 'Nathan\'s special, limited-edition skin',
+				price : 200,
 			},
 		]);
 
