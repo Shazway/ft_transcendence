@@ -148,6 +148,8 @@ export class ChannelsController {
 		if (!newChannel || !newChannel.channel_name || newChannel.channel_name.length > 41)
 			return res.status(HttpStatus.UNAUTHORIZED).send('Either no body or channel name too long');
 		const channelEntity = await this.channelService.createChannel(newChannel, user.sub);
+		if (!channelEntity)
+			return res.status(HttpStatus.UNAUTHORIZED).send({ msg: 'Password too long' })
 		console.log(channelEntity);
 		res.status(HttpStatus.OK).send({ msg: 'Channel created' });
 	}
@@ -165,6 +167,8 @@ export class ChannelsController {
 
 		const userEntity = await this.itemsService.getUser(user.sub);
 		if (!userEntity) return res.status(HttpStatus.NOT_FOUND).send("You don't exist in the database, please log back in");
+		if (!(await this.channelService.isUserMember(user.sub, chan_id)))
+			return res.status(HttpStatus.UNAUTHORIZED).send("You don't belong to the channel");
 		messages = messages.filter((message) => {
 			return !userEntity.blacklistEntry.find(
 				(blockedUser) => blockedUser.user_id == message.author.user_id

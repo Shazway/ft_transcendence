@@ -11,7 +11,7 @@ export class Channel {
 	@Column({ nullable: false, length: 41 })
 	channel_name!: string;
 
-	@Column({ default: null, length: 128 })
+	@Column({ default: null, length: 60 })
 	channel_password!: string;
 
 	@Column({ default: false })

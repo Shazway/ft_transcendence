@@ -34,9 +34,14 @@ export class ChannelsService {
 	async createChannel(chan: NewChan, user_id: number) {
 		const newChan = this.chan_repo.create(chan);
 		if (newChan.channel_password)
+		{
+			newChan.has_pwd = true;
+			if (newChan.channel_password.length > 15)
+				return null;
 			newChan.channel_password = await bcrypt.hash(newChan.channel_password, 10);
+		}
 		const ret = await this.chan_repo.save(newChan);
-		await this.addUserToChannel(user_id, newChan.channel_id, newChan.channel_password, true, true);
+		await this.addUserToChannel(user_id, newChan.channel_id, chan.channel_password, true, true);
 		return ret;
 	}
 
@@ -81,10 +86,15 @@ export class ChannelsService {
 		if (!channel || channel.is_dm) return false;
 		chan_user.is_creator = is_creator;
 		chan_user.is_admin = is_admin;
-		if (!channel.channel_password) await this.itemsService.addUserToChannel(chan_user, chan_id, user_id);
-		else if (await bcrypt.compare(pass, channel.channel_password))
+		if (!channel.channel_password) {
 			await this.itemsService.addUserToChannel(chan_user, chan_id, user_id);
-		else return false;
+		}
+		else if (pass && await bcrypt.compare(pass, channel.channel_password)) {
+			await this.itemsService.addUserToChannel(chan_user, chan_id, user_id);
+		}
+		else {
+			return false;
+		}
 		return true;
 	}
 

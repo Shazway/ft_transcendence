@@ -46,8 +46,6 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@WebSocketServer()
 	server;
 
-
-
 	async handleConnection(client: Socket) 
 	{
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'EEEE');
@@ -67,16 +65,18 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			return client.disconnect();
 		if (!channel.is_channel_private)
 		{
+			if (!isMember && channel.has_pwd && !client.handshake.query.pass)
+				return client.disconnect();
 			await this.channelService.isMuted(user.sub, channel_id);
 			if (await this.channelService.isBanned(user.sub, channel_id))
 				return client.disconnect();
-			this.addUserToList(client, user);
 			if (!isMember)
 			{
 				if (!(await this.addUserToChannel(user.sub, channel_id, client.handshake.query.pass)))
 					return client.disconnect();
 				this.sendMessageToChannel(0, channel_id, this.buildJoinChannel(user));
 			}
+			this.addUserToList(client, user);
 		}
 		else if (channel.is_channel_private && isMember)
 			this.addUserToList(client, user);
@@ -162,7 +162,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	async sendMessageToChannel(sourceId: number, channel_id: number, message: Message, dest = 'onMessage') {
 		const channel = this.channelList.get(channel_id);
 		if (!channel)
-			throw new WsException('Channel does not exist');
+			return false;
 		channel.forEach(async (userSockets, key) => {
 			if (!(await this.usersService.isBlockedCheck(sourceId, key)))
 				this.socketEmit(userSockets, dest, message);
@@ -178,18 +178,20 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		is_admin = false
 	) {
 		const channel = await this.itemService.getChannel(chan_id);
-		if (!channel || channel.is_dm)
-		{
+		if (!channel || channel.is_dm || (channel.has_pwd && !pass))
 			return false;
-		}
 		const chan_user = new ChannelUserRelation();
 		chan_user.is_creator = is_creator;
 		chan_user.is_admin = is_admin;
 
 		if (!channel.channel_password)
 			return await this.itemService.addUserToChannel(chan_user, chan_id, user_id);
-		else if (await bcrypt.compare(pass, channel.channel_password))
+		else if (pass)
+		{
+			if (!(await bcrypt.compare(pass, channel.channel_password)))
+				return false;
 			return await this.itemService.addUserToChannel(chan_user, chan_id, user_id);
+		}
 		return true;
 	}
 
