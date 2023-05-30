@@ -34,6 +34,21 @@ export class PunishmentPopup {
 }
 
 @Component({
+	selector: 'confirm-popup',
+	templateUrl: './confirm-popup.html',
+})
+export class ConfirmPopup {
+	@Input() title = "string";
+	@Input() label = "input";
+
+	constructor(public activeModal: NgbActiveModal) {}
+
+	onSubmit(pun: any) {
+		this.activeModal.close(pun);
+	}
+}
+
+@Component({
 	selector: 'confirmBuy-popup',
 	templateUrl: './confirmBuy-popup.html',
 })

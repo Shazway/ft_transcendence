@@ -1,0 +1,10 @@
+<div class="modal-header">
+	<h4 class="modal-title">{{title}}</h4>
+	<button type="button" class="close" aria-label="Close" (click)="onSubmit(false)">
+		<span aria-hidden="true">&times;</span>
+	</button>
+</div>
+<div class="modal-footer">
+	<button type="button" class="btn btn-secondary" (click)="onSubmit(false)">Cancel</button>
+	<button type="button" class="btn btn-primary" (click)="onSubmit(true)">Confirm</button>
+</div>

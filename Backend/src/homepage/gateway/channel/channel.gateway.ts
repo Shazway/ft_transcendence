@@ -548,6 +548,6 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		if (!channel_id)
 			throw new WsException('Channel doesn\'t exist.');
 
-		client.emit('isAdmin', await this.channelService.isUserOwner(user.sub, channel_id));
+		client.emit('isOwner', await this.channelService.isUserOwner(user.sub, channel_id));
 	}
 }

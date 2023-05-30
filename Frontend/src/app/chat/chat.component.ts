@@ -6,7 +6,7 @@ import { WebsocketService } from '../websocket.service';
 import { Socket, io } from 'socket.io-client';
 import { fromEvent } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { PunishmentPopup } from '../popup-component/popup-component.component';
+import { ConfirmPopup, PunishmentPopup } from '../popup-component/popup-component.component';
 import { NotificationRequest } from 'src/dtos/Notification.dto';
 import { NotificationService } from '../notification.service';
 import { Router } from '@angular/router';
@@ -227,8 +227,14 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		}
 	}
 
-	async createPopup(title: string, label: string) {
-		const modalRef = this.modalService.open(PunishmentPopup);
+	async createPopup(title: string, label: string, className: string) {
+		let modalRef;
+		if (className == 'PunishmentPopup')
+			modalRef = this.modalService.open(PunishmentPopup);
+		else if (className == 'ConfirmPopup')
+			modalRef = this.modalService.open(ConfirmPopup);
+		else
+			return false;
 		modalRef.componentInstance.title = title;
 		modalRef.componentInstance.label = label;
 		return await modalRef.result;
@@ -247,7 +253,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	blockUser(msg: Message) {}
 
 	async muteUser(msg: Message) {
-		const muteTime = await this.createPopup("Mute", "Time");
+		const muteTime = await this.createPopup("Mute", "Time", 'PunishmentPopup');
 		if (!muteTime)
 			return;
 		this.client.emit('mute', {
@@ -269,7 +275,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		const banUserElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-ban');
 		if (!banUserElm.classList.contains('show'))
 			return;
-		const banTime = await this.createPopup("Ban", "Time");
+		const banTime = await this.createPopup("Ban", "Time", 'PunishmentPopup');
 		if (!banTime)
 			return;
 		this.client.emit('ban', {
@@ -553,10 +559,13 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		return found;
 	}
 
-	obliterateChannel() {
-		if (this.is_owner)
-			this.fetchService.obliterateChannel(this.currentChannel);
+	async obliterateChannel() {
+		console.log('Obliterating');
+		if (this.is_owner) {
+			const confirm = await this.createPopup("Ban", "Time", 'ConfirmPopup');
+			console.log(confirm);
+			if (confirm)
+				this.fetchService.obliterateChannel(this.currentChannel);
+		}
 	}
-
-
 }
