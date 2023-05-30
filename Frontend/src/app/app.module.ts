@@ -13,7 +13,7 @@ import { WebsocketService } from './websocket.service';
 import { AuthModule } from './auth/auth.module';
 import { ValidateModule } from './validate/validate.module';
 import { MatchMakingComponent } from './match-making/match-making.component';
-import { ChatPopup, ConfirmBuyPopup, PunishmentPopup } from './popup-component/popup-component.component';
+import { ChatPopup, ConfirmBuyPopup, PasswordPopup, PunishmentPopup } from './popup-component/popup-component.component';
 import { NotificationService } from './notification.service';
 import { ProfileModule } from './profile/profile.module';
 import { ProfilePopupModule } from './profile-popup/profile-popup.module';
@@ -30,25 +30,26 @@ import { LeaderboardComponent } from './leaderboard/leaderboard.component';
 import { SearchComponent } from './search/search.component';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    PunishmentPopup,
-    ChatPopup,
-    ShopComponent,
+declarations: [
+	AppComponent,
+	PunishmentPopup,
+	PasswordPopup,
+	ChatPopup,
+	ShopComponent,
 	ConfirmBuyPopup,
- LeaderboardComponent,
- SearchComponent,
-  ],
-  imports: [
-    BrowserModule,
-    HttpClientModule,
-    AppRoutingModule,
-    UsersModule,
-    LoginModule,
-    ChatModule,
+	LeaderboardComponent,
+	SearchComponent,
+],
+imports: [
+	BrowserModule,
+	HttpClientModule,
+	AppRoutingModule,
+	UsersModule,
+	LoginModule,
+	ChatModule,
 	FormsModule,
-    AuthModule,
-    ValidateModule,
+	AuthModule,
+	ValidateModule,
 	ProfileModule,
 	FriendsModule,
 	ProfilePopupModule,
@@ -57,13 +58,13 @@ import { SearchComponent } from './search/search.component';
 	ToastsContainer,
 	HomeModule,
 	GlassdoorModule,
-  ],
-  providers: [
-    FetchService,
-    WebsocketService,
+],
+providers: [
+	FetchService,
+	WebsocketService,
 	NotificationService,
-  ],
-  bootstrap: [
+],
+bootstrap: [
 	AppComponent,
 ]
 })

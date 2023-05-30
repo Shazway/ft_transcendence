@@ -6,7 +6,7 @@ import { WebsocketService } from '../websocket.service';
 import { Socket, io } from 'socket.io-client';
 import { fromEvent } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmPopup, PunishmentPopup } from '../popup-component/popup-component.component';
+import { ConfirmPopup, PasswordPopup, PunishmentPopup } from '../popup-component/popup-component.component';
 import { NotificationRequest } from 'src/dtos/Notification.dto';
 import { NotificationService } from '../notification.service';
 import { Router } from '@angular/router';
@@ -233,6 +233,8 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			modalRef = this.modalService.open(PunishmentPopup);
 		else if (className == 'ConfirmPopup')
 			modalRef = this.modalService.open(ConfirmPopup);
+		else if (className == 'PasswordPopup')
+			modalRef = this.modalService.open(PasswordPopup);
 		else
 			return false;
 		modalRef.componentInstance.title = title;
@@ -316,6 +318,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	}
 
 	async openChannel(channel: Channel) {
+		let pwd;
+		if (channel.has_pwd) {
+			pwd = await this.createPopup(channel.channel_name, 'Password', 'PasswordPopup');
+		}
 		this.is_admin = false;
 		this.is_owner = false;
 		this.client.close();
@@ -326,7 +332,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			return;
 		for (let index = this.msgs$.length; index > 0; index--)
 			this.sortMessage(this.msgs$[index - 1]);
-		this.client = io('ws://localhost:3002?channel_id=' + channel.channel_id, this.websocketService.getHeader());
+		if (!channel.has_pwd)
+			this.client = io('ws://localhost:3002?channel_id=' + channel.channel_id, this.websocketService.getHeader());
+		else
+			this.client = io('ws://localhost:3002?channel_id=' + channel.channel_id + '&pass=' + pwd, this.websocketService.getHeader());
 		this.currentChannel = channel;
 		this.setClientEvent();
 		const us_channel = this.getUserFromCurrentChannel(localStorage.getItem('username'));
