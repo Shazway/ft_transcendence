@@ -486,10 +486,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			}
 			else if (split[0] == '/op') {
 				if (split.length < 2) return;
-				this.client.emit('op', {
-					username: split[1],
-					message: "You have been promoted to OP",
-				});
+				this.addOp(split[1]);
 				return;
 			}
 		}
@@ -510,8 +507,8 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		if (value.length > 0)
 		{
 			let allResults = await this.fetchService.inviteSubstring(value);
-			this.potentialNewMembers = allResults.slice(0, 10);
-			this.potentialNewMembers = this.sortSearched(this.potentialNewMembers, value);
+			this.potentialNewMembers = this.sortSearched(allResults, value);
+			this.potentialNewMembers = this.potentialNewMembers.slice(0, 10);
 		}
 		else
 		this.potentialNewMembers = [];
@@ -524,19 +521,15 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	}
 
 	async changePotentialNewOp(value : string) {
-		if (value.length > 0)
-		{
-			let allResults = await this.fetchService.opSubstring(value);
-			this.potentialNewOp = allResults.slice(0, 10);
-			this.potentialNewOp = this.sortSearched(this.potentialNewOp, value);
-		}
-		else
-		this.potentialNewOp = [];
+		this.potentialNewOp = this.currentChannel.us_channel.filter((a : any)=>{return (!a.is_admin)});
+		this.potentialNewOp = this.potentialNewOp.filter((a)=>{return (a.username.indexOf(value) != -1)})
 	}
 
-	addOp(newOp : AnyProfileUser) {
-		console.log(newOp.username + " est promu OP");
-		this.fetchService.channelAddOp(newOp, this.currentChannel.channel_id);
+	addOp(newOp : string) {
+		this.client.emit('op', {
+			username: newOp,
+			message: "You have been promoted to OP",
+		});
 		this.openAddMember('.secDropUp'); //change
 	}
 
