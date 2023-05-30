@@ -51,7 +51,6 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		if (!user)
 			return client.disconnect();
 		this.userList.set(user.sub, client);
-		console.log('connected ' + user.name);
 		await this.notificationService.setUserStatus(user.sub, this.ONLINE);
 	}
 	
@@ -60,7 +59,6 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		
 		if (!user)
 			return client.disconnect();
-		console.log('disconnected ' + user.name);
 		this.userList.delete(user.sub);
 		await this.notificationService.setUserStatus(user.sub, this.OFFLINE);
 	}
@@ -159,7 +157,5 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 			this.itemsService.deleteFriendRequest(source.sub, body.target_id);
 		client.emit('success', 'Answer sent');
 		if (target) target.emit(body.type + 'Answer', { notification: answer });
-		else
-			console.log('target deco pas de popup')
 	}
 }

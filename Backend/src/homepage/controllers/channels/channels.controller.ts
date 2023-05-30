@@ -75,8 +75,6 @@ export class ChannelsController {
 		@Res() res: Response,
 		@Body() body: { channel_id: number, username: string, targetId: number }
 	) {
-		console.log("POUR MARINA");
-		console.log(body);
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
 		if (!body || !body.channel_id || (!body.targetId && !body.username)) return res.status(HttpStatus.UNAUTHORIZED).send('No body');
@@ -89,19 +87,16 @@ export class ChannelsController {
 		const channelId = body.channel_id;
 		const targetEntity = await this.itemsService.getUser(userId);
 
-		console.log('coucou');
 		if (!targetEntity|| targetEntity.channelInviteAuth == this.NOT_ALLOWED || await this.channelService.isUserMember(userId, channelId))
 			return res.status(HttpStatus.UNAUTHORIZED).send('Not allowed');
 		else if ((targetEntity.channelInviteAuth == this.ALL_ALLOWED || ((targetEntity.channelInviteAuth == this.FRIENDS_ALLOWED &&
 				targetEntity.friend.find((friend) => friend.user_id == user.sub))) && await this.channelService.canInvite(user.sub, channelId)))
 		{
-			console.log('added?');
 			const channelEntity = await this.itemsService.getChannel(channelId);
 			await this.channelService.addUserToChannel(targetEntity.user_id, channelId);
 			this.notificationsGateway.onChannelInvite(user, targetEntity, channelEntity.channel_name);
 			return res.status(HttpStatus.ACCEPTED).send('User added to channel successfully');
 		}
-		console.log('Doesnt work ?');
 		res.status(HttpStatus.UNAUTHORIZED).send('Not allowed' + targetEntity.channelInviteAuth);
 	}
 

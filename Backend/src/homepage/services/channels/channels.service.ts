@@ -66,7 +66,6 @@ export class ChannelsService {
 			return false;
 		if (this.isUserAdmin(userId, channelId))
 			return true;
-		console.log('Cannot invite');
 		return false;
 	}
 

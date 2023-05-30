@@ -123,8 +123,6 @@ export class PongComponent {
 	}
 
 	updateScore(event: ScoreChange) {
-		if (this.isSpectator)
-			console.log('updateScore');
 		if (event.side == this.PLAYER_SCORED)
 			this.player.score++;
 		else if (event.side == this.OPPONENT_SCORED)

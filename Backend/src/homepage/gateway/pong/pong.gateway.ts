@@ -175,7 +175,7 @@ export class PongGateway {
 		if (!match ||!match.gameService) throw new WsException('Match/GameService aren\'t available');
 		match.gameService.changeInput(user.sub, 'ArrowDown', body);
 		const move = match.gameService.getMove(user.sub);
-		match.players.forEach((player, index) => {
+		match.players.forEach((player) => {
 			if (player.user_id == user.sub)
 				player.client.emit('onPlayerMove', move);
 			else
@@ -192,10 +192,9 @@ export class PongGateway {
 		const match = this.matchs.get(match_id);
 		if (!match.gameService) throw new WsException('No game service up');
 
-		// console.log('user ' + user.sub + ' pressed ArrowUp');
 		match.gameService.changeInput(user.sub, 'ArrowUp', body);
 		const move = match.gameService.getMove(user.sub);
-		match.players.forEach((player, index) => {
+		match.players.forEach((player) => {
 			if (player.user_id == 0){
 			}
 			else if (player.user_id == user.sub) player.client.emit('onPlayerMove', move);

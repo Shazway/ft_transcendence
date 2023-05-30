@@ -132,7 +132,6 @@ export class AppComponent implements AfterViewInit {
 	}
 
 	friendRequestToNotificationRequest(friend : any, bool : boolean) : NotificationRequest {
-		console.log(friend);
 		return ({
 			type : "friend",
 			target_name : friend.source_name,
@@ -155,14 +154,12 @@ export class AppComponent implements AfterViewInit {
 	acceptChallenge(context : NotificationRequest, toast: any) {
 		context.accepted = true;
 		this.notifService.emit('challengeAnswer', context);
-		console.log(context);
 		this.notifDismiss(toast);
 	}
 
 	rejectChallenge(context : NotificationRequest, toast: any) {
 		context.accepted = false;
 		this.notifService.emit('challengeAnswer', context);
-		console.log(context);
 
 		this.notifDismiss(toast);
 	}

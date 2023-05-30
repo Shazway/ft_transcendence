@@ -112,7 +112,6 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 		if (!query || !query.channel_id) {
 			client.emit('onError', 'Channel does not exist');
-			console.log('ohh wtf');
 			return false;
 		}
 		const channel_id = query.channel_id;
@@ -218,7 +217,6 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const targetEntity = await this.itemService.getUserByUsername(username);
 		if (!targetEntity)
 			return ({ret: false, msg: 'User not found'});
-		console.log('Get privi from username');
 		return await this.channelService.checkPrivileges(sourceId, targetEntity.user_id, channelId);
 	}
 
