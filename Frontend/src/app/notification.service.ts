@@ -63,11 +63,12 @@ export class NotificationService {
 	}
 
 	showNewFriend(notification: NotificationRequest) {
-		this.toastService.show(this.toastNewFriend, { classname: 'bg-light p-0', delay: 10000, context: notification });
+		if (notification.accepted)
+			this.toastService.show(this.toastNewFriend, { classname: 'bg-light p-0', delay: 1000, context: notification });
 	}
 
 	showAchievements(notification: NotificationRequest) {
-		this.toastService.show(this.toastAchievement, { classname: 'bg-light p-0', delay: 10000, context: notification });
+		this.toastService.show(this.toastAchievement, { classname: 'bg-light p-0', delay: 1000, context: notification });
 	}
 
 	showChallenge(notification: NotificationRequest) {

@@ -13,6 +13,7 @@ import { Router } from '@angular/router';
 import { AppComponent } from '../app.component';
 import { PopoverConfig } from 'src/dtos/Popover.dto';
 import { AnyProfileUser } from 'src/dtos/User.dto';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
 	selector: 'app-chat',
@@ -30,6 +31,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	msgs$: Message[] = [];
 	test_msgs$ = new Array<Array<Message>>;
 	is_admin = false;
+	is_owner = false;
 	potentialNewMembers! : AnyProfileUser[];
 
 	icone_list = {
@@ -79,7 +81,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		this.client.on('disconnect', () => { console.log('Disconnected from WebSocket server'); });
 		this.client.on('delMessage', (event) => { console.log('Deleting message ' + event); this.deleteMessage(event); });
 		this.client.on('isAdmin', (event) => { this.is_admin = event; console.log('You are admin ?: ' + event); });
-		this.client.on('isOwner', (event) => { console.log('You are Owner ?: ' + event); })
+		this.client.on('isOwner', (event) => { this.is_owner = event; console.log('You are Owner ?: ' + event); })
 	}
 
 	handleError(event: string) {
@@ -309,6 +311,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 
 	async openChannel(channel: Channel) {
 		this.is_admin = false;
+		this.is_owner = false;
 		this.client.close();
 		this.msgs$.splice(0, this.msgs$.length);
 		this.test_msgs$.splice(0, this.test_msgs$.length);
@@ -420,7 +423,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
 				});
 				return;
 			}
-			else if (split[0] == '/obliterate') return;
+			else if (split[0] == '/obliterate') {
+				this.obliterateChannel();
+				return;
+			}
 			else if (split[0] == '/kick') {
 				if (split.length < 2) return;
 				this.client.emit('kick', {
@@ -465,7 +471,13 @@ export class ChatComponent implements OnInit, AfterViewInit {
 				});
 				return;
 			}
-			else if (split[0] == '/invite') return;
+			else if (split[0] == '/invite') {
+				if (split.length < 2) return;
+				let userToAdd  = await this.fetchService.getUser(split[1]);
+				if (userToAdd)
+					this.addMember(userToAdd);
+				return;
+			}
 		}
 
 		this.elRef.nativeElement.querySelector('#exampleFormControlInput1').value = '';
@@ -514,4 +526,11 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		found.sort((a, b)=> a.username.indexOf(key) - b.username.indexOf(key))
 		return found;
 	}
+
+	obliterateChannel() {
+		if (this.is_owner)
+			this.fetchService.obliterateChannel(this.currentChannel);
+	}
+
+
 }

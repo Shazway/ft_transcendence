@@ -22,6 +22,10 @@ export class FetchService {
 		})
 	};
 
+	isConnected() {
+		return localStorage.getItem('Jwt_token') ? true : false;
+	}
+
 	getHeader() {
 		return {
 			headers: {
@@ -193,6 +197,8 @@ export class FetchService {
 		let res: AnyProfileUser[] = [];
 		const teaFunc = this.teapotError;
 		const route = this.router;
+		if (!this.isConnected())
+			return res;
 		await axios.get<Array<AnyProfileUser>>('http://localhost:3001/users/friends', this.getHeader())
 		.then(function (response) {
 			if (response && response.data)
@@ -209,6 +215,8 @@ export class FetchService {
 		let res: {received: FriendRequest[], sent: FriendRequest[]} = {received: [], sent: []};
 		const teaFunc = this.teapotError;
 		const route = this.router;
+		if (!this.isConnected())
+			return res;
 		await axios.get<{received: Array<FriendRequest>, sent: Array<FriendRequest>}>('http://localhost:3001/users/friendRequests', this.getHeader())
 		.then(function (response) {
 			res = response.data;
@@ -224,6 +232,8 @@ export class FetchService {
 		let res: AnyProfileUser[] = [];
 		const teaFunc = this.teapotError;
 		const route = this.router;
+		if (!this.isConnected())
+			return res;
 		await axios.get<Array<AnyProfileUser>>('http://localhost:3001/users/getBlockedUsers', this.getHeader())
 		.then(function (response) {
 			res = response.data;
@@ -355,6 +365,10 @@ export class FetchService {
 		})
 		.finally(function () {});
 		return res;
+	}
+
+	async obliterateChannel(chan : Channel) {
+		console.log("Route du back a faire");
 	}
 
 	async searchingSubstring(value : string) {
