@@ -141,7 +141,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		const target = this.userList.get(body.target_id);
 		if (body.accepted)
 		{
-			if (body.type == 'friend' && !this.requestService.handleFriendRequestAnswer(source.sub, body.target_id))
+			if (body.type == 'friend' && !(await this.requestService.handleFriendRequestAnswer(source.sub, body.target_id)))
 				return client.emit('No request to answer to');
 			if (body.type == 'match')
 			{

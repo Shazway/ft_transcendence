@@ -15,6 +15,6 @@ export class RequestService {
 	}
 
 	async handleFriendRequestAnswer(sourceId: number, targetId: number) {
-		return (await this.itemsService.addFriendToUser(sourceId, targetId))
+		return await this.itemsService.addFriendToUser(sourceId, targetId);
 	}
 }
