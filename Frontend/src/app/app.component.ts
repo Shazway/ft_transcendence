@@ -34,10 +34,12 @@ export class AppComponent implements AfterViewInit {
 	isExpanded = false;
 	myProfile? : MyProfileUser | null;
 
+
+
 	constructor(
 		private elRef: ElementRef,
 		private popover: NgbPopover,
-		private notifService: NotificationService,
+		public notifService: NotificationService,
 		private fetchService: FetchService,
 	){
 	}
@@ -166,5 +168,7 @@ export class AppComponent implements AfterViewInit {
 
 		this.notifDismiss(toast);
 	}
+
+
 
 }

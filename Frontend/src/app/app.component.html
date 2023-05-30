@@ -71,7 +71,7 @@
 					<a href="leaderboard">Leaderboard</a>
 				</li>
 				<li>
-					<a href="friends">Friends</a>
+					<a href="friends">Friends <span *ngIf="this.notifService.friendshipRequests.received?.length" class="badge badge-pill bg-danger rounded-circle" style="font-size: 10px;">{{this.notifService.friendshipRequests.received.length}}</span></a>
 				</li>
 				<li>
 					<a href="shop">Shop</a>
