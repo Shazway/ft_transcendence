@@ -269,8 +269,6 @@ export class ChannelsService {
 		const channel = await this.itemsService.getChannel(channelId);
 		if (!channel)
 			return false;
-		if (!(await bcrypt.compare(pass, channel.channel_password)))
-			return false;
-		return true;
+		return await bcrypt.compare(pass, channel.channel_password)
 	}
 }
