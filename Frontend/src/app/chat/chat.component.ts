@@ -329,12 +329,29 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		this.client = io('ws://localhost:3002?channel_id=' + channel.channel_id, this.websocketService.getHeader());
 		this.currentChannel = channel;
 		this.setClientEvent();
-		this.client.emit('isAdmin');
-		this.client.emit('isOwner');
+		const us_channel = this.getUserFromCurrentChannel(localStorage.getItem('username'));
+		console.log('user', us_channel);
+		this.is_admin = us_channel ? us_channel.is_admin : false;
+		this.is_owner = us_channel ? us_channel.is_owner : false;
+		console.log('Admin ?', this.is_admin);
+		console.log('Owner ?', this.is_owner);
+		// this.client.emit('isAdmin');
+		// this.client.emit('isOwner');
 		const offscreenElm = this.elRef.nativeElement.querySelector('.channel_pan');
 		if (offscreenElm.classList.contains('show'))
 			this.slideChan();
 		this.scrollBottom();
+	}
+
+	getUserFromCurrentChannel(name: string | null): any {
+		if (!name)
+			return null;
+		console.log(this.currentChannel.us_channel);
+		this.currentChannel.us_channel.forEach((us_channel: any) => {
+			if (us_channel.name == name)
+				return us_channel;
+		});
+		return null;
 	}
 
 	async createChannel(waiter?: Promise<undefined>) {
