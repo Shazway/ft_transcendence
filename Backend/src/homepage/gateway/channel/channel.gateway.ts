@@ -22,6 +22,7 @@ import { NotificationRequest } from 'src/homepage/dtos/Notifications.dto';
 import { UsersService } from 'src/homepage/services/users/users.service';
 import { WsexceptionFilter } from 'src/homepage/filters/wsexception/wsexception.filter';
 import { UseFilters } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 
 @UseFilters(new WsexceptionFilter())
 @WebSocketGateway(3002, {
@@ -177,7 +178,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		is_admin = false
 	) {
 		const channel = await this.itemService.getChannel(chan_id);
-		if (!channel || channel.is_dm || channel.channel_password != pass)
+		if (!channel || channel.is_dm)
 		{
 			return false;
 		}
@@ -187,7 +188,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 		if (!channel.channel_password)
 			return await this.itemService.addUserToChannel(chan_user, chan_id, user_id);
-		else if (pass === channel.channel_password)
+		else if (await bcrypt.compare(pass, channel.channel_password))
 			return await this.itemService.addUserToChannel(chan_user, chan_id, user_id);
 		return true;
 	}

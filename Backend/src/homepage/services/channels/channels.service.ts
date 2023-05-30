@@ -5,6 +5,7 @@ import { NewChan } from 'src/homepage/dtos/Chan.dto';
 import { Repository } from 'typeorm';
 import { ItemsService } from '../items/items.service';
 import { ChannelEntity, ChannelUserRelation } from 'src/entities';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class ChannelsService {
@@ -32,6 +33,8 @@ export class ChannelsService {
 
 	async createChannel(chan: NewChan, user_id: number) {
 		const newChan = this.chan_repo.create(chan);
+		if (newChan.channel_password)
+			newChan.channel_password = await bcrypt.hash(newChan.channel_password, 10);
 		const ret = await this.chan_repo.save(newChan);
 		await this.addUserToChannel(user_id, newChan.channel_id, newChan.channel_password, true, true);
 		return ret;
@@ -79,7 +82,7 @@ export class ChannelsService {
 		chan_user.is_creator = is_creator;
 		chan_user.is_admin = is_admin;
 		if (!channel.channel_password) await this.itemsService.addUserToChannel(chan_user, chan_id, user_id);
-		else if (pass === channel.channel_password)
+		else if (await bcrypt.compare(pass, channel.channel_password))
 			await this.itemsService.addUserToChannel(chan_user, chan_id, user_id);
 		else return false;
 		return true;

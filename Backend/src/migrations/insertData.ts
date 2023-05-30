@@ -72,7 +72,7 @@ export class insertData666666666666666666 implements MigrationInterface {
 			{
 				type: 'Paddle',
 				name: 'Baguette',
-				img_url: 'assets/raquette-baguette.png',
+				img_url: 'assets/Paddle/baguette.png',
 				description: 'The most French skin ever made',
 				price : 1,
 			},
