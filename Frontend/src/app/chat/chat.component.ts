@@ -484,7 +484,9 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		if (value.length > 0)
 		{
 			let allResults = await this.fetchService.inviteSubstring(value);
-			this.potentialNewMembers = allResults.slice(0, 10);}
+			this.potentialNewMembers = allResults.slice(0, 10);
+			this.potentialNewMembers = this.sortSearched(this.potentialNewMembers, value);
+		}
 		else
 		this.potentialNewMembers = [];
 	}
@@ -505,6 +507,12 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			dropDownElm.classList.add('show');
 		this.potentialNewMembers = [];
 		console.log(this.potentialNewMembers);
+	}
+
+	sortSearched(found : AnyProfileUser[], key : string) {
+		found.sort(); //sort par ordre alphabetique
+		found.sort((a, b)=> a.username.indexOf(key) - b.username.indexOf(key))
+		return found;
 	}
 
 

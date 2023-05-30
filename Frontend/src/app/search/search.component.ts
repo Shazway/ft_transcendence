@@ -27,13 +27,22 @@ export class SearchComponent {
 
 	async onClickSearch(value : string) {
 		if (value.length > 0)
+		{
 			this.foundProfiles = await this.fetchService.searchingSubstring(value);
+			this.foundProfiles = this.sortSearched(this.foundProfiles, value);
+		}
 	}
 
 	goToProfile(user: AnyProfileUser)
 	{
 		console.log(user);
 		this.router.navigateByUrl("profile?username=" + user.username);
+	}
+
+	sortSearched(found : AnyProfileUser[], key : string) {
+		found.sort(); //sort par ordre alphabetique
+		found.sort((a, b)=> a.username.indexOf(key) - b.username.indexOf(key))
+		return found;
 	}
 
 }
