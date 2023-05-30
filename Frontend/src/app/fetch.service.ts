@@ -401,6 +401,21 @@ export class FetchService {
 		return res;
 	}
 
+	async opSubstring(value : string) {
+		let res: AnyProfileUser[] = [];
+		const teaFunc = this.teapotError;
+		const route = this.router;
+		await axios.post<Array<AnyProfileUser>>('http://localhost:3001/channels/opBySubstring', {substring: value}, this.getHeader()) //chemin actuellement inexistant
+		.then(function (response) {
+			res = response.data;
+		})
+		.catch(function (error) {
+			teaFunc(error, route);
+		})
+		.finally(function () {});
+		return res;
+	}
+
 	async channelInvite(user : AnyProfileUser, channel_id : number) {
 		let res: AnyProfileUser[] = [];
 		const teaFunc = this.teapotError;
@@ -414,6 +429,10 @@ export class FetchService {
 		})
 		.finally(function () {});
 		return res;
+	}
+
+	async channelAddOp(user : AnyProfileUser, channel_id : number) {
+		console.log("a faire en back");
 	}
 	
 }
