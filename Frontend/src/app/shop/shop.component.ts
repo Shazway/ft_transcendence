@@ -38,9 +38,8 @@ export class ShopComponent implements AfterViewInit {
 		
 
 		this.existingTypes = new Array<string>;
-		this.existingTypes.push("kitten");
-		this.existingTypes.push("Skin");
-		this.existingTypes.push("Title");
+		this.existingTypes.push("Paddle");
+		this.existingTypes.push("Ball");
 		this.existingTypes.push("Background");
 	}
 
