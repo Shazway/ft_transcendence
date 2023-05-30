@@ -161,19 +161,12 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		if (!client || !client.connected)
 		{
 			const sourceClient = this.userList.get(source.sub);
-			console.log('On a du fetch le nouveau client');
 			if (sourceClient)
-			{
-				console.log('success sent');
 				sourceClient.emit('success', 'Answer sent');
-			}
 		}
 		else
-		{
-			console.log('Le client etait deja connecte');
 			client.emit('success', 'Answer sent');
-		}
-		if (target) target.emit(body.type + 'Answer', { notification: answer });
+		if (target && target.connected) target.emit(body.type + 'Answer', { notification: answer });
 		else
 			console.log('target disconnected')
 	}
