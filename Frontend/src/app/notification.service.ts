@@ -55,6 +55,7 @@ export class NotificationService {
 		this.client.on('failure', (event) => { this.showFailure(event.notification); console.log('failure ', event); this.updateFriendRequests(); });
 		this.client.on('success', (event) => { this.showSuccess(event.notification); console.log('success ', event); this.updateFriendRequests(); });
 		this.client.on('channel', (event) => { this.showChannel(event.notification); console.log('channel ', event); });
+		this.client.on('onError', (event) => { console.log('erreur + ' + event); });
 	}
 
 	showNotificationInvite(notification: NotificationRequest) {
