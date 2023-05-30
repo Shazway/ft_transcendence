@@ -9,6 +9,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FetchService } from '../fetch.service';
 import { AnyProfileUser } from 'src/dtos/User.dto';
 import { AchievementList } from 'src/dtos/Achievement.dto';
+import { ShopItem } from 'src/dtos/ShopItem.dto';
 
 interface MatchHistory {
 	Player1: string;
@@ -74,15 +75,14 @@ export class ProfileComponent implements AfterViewInit {
 	rank = 100;
 	maxScore = 100;
 	isLoaded = false;
-	paddleSkins = [
-		{ src: 'assets/Skins/Paddle/baguette.png' },
-		{ src: 'assets/Skins/Paddle/eclairAuChocolat.png' },
-		{ src: 'assets/Skins/Paddle/default.png' },
-		{ src: 'assets/Skins/Paddle/poele.png' },
-		{ src: 'assets/Skins/Paddle/torti.png' },
-		{ src: 'assets/Skins/Paddle/Swirl.png' },
-		{ src: 'assets/Skins/Paddle/red-gradient.png' },
-	];
+	allSkins! : ShopItem[];
+	// paddleSkins! : ShopItem[];
+	paddleSkins! : any;
+	windowPaddle : ShopItem[] = [];
+	ballSkins! : ShopItem[];
+	windowBall : ShopItem[] = [];
+	backgroundSkins! : ShopItem[];
+	windowBackground : ShopItem[] = [];
 	slideDirection = 'none';
 	settingState = 'closed';
 	achievements: AchievementList = {unlockedAchievements: [], lockedAchievements: []};
@@ -96,6 +96,20 @@ export class ProfileComponent implements AfterViewInit {
 	) {
 		Chart.register(ChartDataLabels);
 		this.matchHistory = new Array;
+		this.getSkins();
+	}
+
+	async getSkins() {
+		this.allSkins = await this.fetchService.getAllSkins();
+		this.paddleSkins = this.allSkins.filter((a)=>{return a.type == 'Paddle'});
+		this.ballSkins = this.allSkins.filter((a)=>{return a.type == 'Ball'});
+		this.backgroundSkins = this.allSkins.filter((a)=>{return a.type == 'Background'});
+		for(let i = 0; i < 5; i++) {
+			this.windowPaddle.push(this.paddleSkins[i % this.paddleSkins.length]);
+			this.windowBall.push(this.ballSkins[i % this.ballSkins.length]);
+			this.windowBackground.push(this.backgroundSkins[i % this.backgroundSkins.length]);
+		}
+		console.log(this.windowPaddle);
 	}
 	
 	async customOnInit() {
@@ -200,22 +214,31 @@ export class ProfileComponent implements AfterViewInit {
 		this.cdr.reattach();
 	}
 	
-	panLeft() {
+	panLeft(window : ShopItem[], skins : ShopItem[]) {
+		//ajouter une variable pour le slide, faire une variable par carousel
 		this.slideDirection = 'left';
 		setTimeout(() => {
-			const shift = this.paddleSkins.shift();
-			if (shift)
-				this.paddleSkins.push(shift);
+			let index = skins.indexOf(window[4]);
+			if (index < skins.length - 1)
+				index++;
+			else
+				index = 0;
+			window.shift();
+			window.push(skins[index]);
 			this.slideDirection = 'none';
 		}, 300);
 	}
 	
-	panRight() {
+	panRight(window : ShopItem[], skins : ShopItem[]) {
 		this.slideDirection = 'right';
 		setTimeout(() => {
-			const shift = this.paddleSkins.pop();
-			if (shift)
-				this.paddleSkins.unshift(shift);
+			let index = skins.indexOf(window[0]);
+			if (index > 0)
+				index--;
+			else
+				index = skins.length - 1;
+			window.pop();
+			window.unshift(skins[index]);
 			this.slideDirection = 'none';
 		}, 300);
 	}
