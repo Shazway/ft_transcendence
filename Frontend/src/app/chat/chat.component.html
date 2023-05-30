@@ -4,8 +4,8 @@
 		<div class="card offscreen mw-100" style="height: 60vh;" id="chat2">
 			<div class="card-header d-flex justify-content-between align-items-center p-3 chat-card-header gap-3 mw-100">
 				<h5 *ngIf="currentChannel" class="mb-0 channel-head" title="{{currentChannel.channel_name}}">{{currentChannel.channel_name}}</h5>
+				<img style="height: 20px; width: 20px;" src="https://cdn-icons-png.flaticon.com/512/64/64576.png" alt="Channel Menu">
 				<div class="flex-grow-1">
-					<img src="https://cdn-icons-png.flaticon.com/512/64/64576.png" alt="Channel Menu">
 					<div class="btn-group dropup">
 						<button (click)="openAddMember()" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 							Add member
