@@ -132,27 +132,23 @@ export class AppComponent implements AfterViewInit {
 	}
 
 	friendRequestToNotificationRequest(friend : any, bool : boolean) : NotificationRequest {
+		console.log(friend);
 		return ({
 			type : "friend",
-			target_name : friend.sender.username,
-			target_id : friend.sender.user_id,
+			target_name : friend.source_name,
+			target_id : friend.source_id,
 			accepted : bool
 		})
 
 	}
 
 	acceptFriendRequest(context : NotificationRequest, toast: any) {
-		context.accepted = true;
 		this.notifService.emit('inviteAnswer', this.friendRequestToNotificationRequest(context, true));
-		console.log(context);
 		this.notifDismiss(toast);
 	}
 
 	rejectFriendRequest(context : NotificationRequest, toast: any) {
-		context.accepted = false;
-		this.notifService.emit('inviteAnswer', context);
-		console.log(context);
-
+		this.notifService.emit('inviteAnswer', this.friendRequestToNotificationRequest(context, false));
 		this.notifDismiss(toast);
 	}
 
