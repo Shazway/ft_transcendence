@@ -173,6 +173,7 @@ export class ItemsService {
 		const chan_user = await this.chanRepo
 			.createQueryBuilder('channel')
 			.leftJoinAndSelect('channel.us_channel', 'channel_user')
+			.leftJoinAndSelect('channel_user.user', 'user')
 			.leftJoinAndSelect('channel.message', 'message')
 			.where('channel.is_channel_private = false')
 			.getMany();
