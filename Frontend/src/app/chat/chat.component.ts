@@ -13,6 +13,7 @@ import { Router } from '@angular/router';
 import { AppComponent } from '../app.component';
 import { PopoverConfig } from 'src/dtos/Popover.dto';
 import { AnyProfileUser } from 'src/dtos/User.dto';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
 	selector: 'app-chat',
@@ -30,7 +31,9 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	msgs$: Message[] = [];
 	test_msgs$ = new Array<Array<Message>>;
 	is_admin = false;
+	is_owner = false;
 	potentialNewMembers! : AnyProfileUser[];
+	potentialNewOp! : AnyProfileUser[];
 
 	icone_list = {
 		add_friend: "https://static.vecteezy.com/system/resources/previews/020/936/584/original/add-friend-icon-for-your-website-design-logo-app-ui-free-vector.jpg",
@@ -69,7 +72,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
 				behavior: 'smooth',
 			});
 		}, 500)
-		this.potentialNewMembers
 	}
 
 	setClientEvent() {
@@ -79,7 +81,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		this.client.on('disconnect', () => { console.log('Disconnected from WebSocket server'); });
 		this.client.on('delMessage', (event) => { console.log('Deleting message ' + event); this.deleteMessage(event); });
 		this.client.on('isAdmin', (event) => { this.is_admin = event; console.log('You are admin ?: ' + event); });
-		this.client.on('isOwner', (event) => { console.log('You are Owner ?: ' + event); })
+		this.client.on('isOwner', (event) => { this.is_owner = event; console.log('You are Owner ?: ' + event); })
 	}
 
 	handleError(event: string) {
@@ -309,6 +311,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 
 	async openChannel(channel: Channel) {
 		this.is_admin = false;
+		this.is_owner = false;
 		this.client.close();
 		this.msgs$.splice(0, this.msgs$.length);
 		this.test_msgs$.splice(0, this.test_msgs$.length);
@@ -321,6 +324,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		this.currentChannel = channel;
 		this.setClientEvent();
 		this.client.emit('isAdmin');
+		this.client.emit('isOwner');
 		const offscreenElm = this.elRef.nativeElement.querySelector('.channel_pan');
 		if (offscreenElm.classList.contains('show'))
 			this.slideChan();
@@ -419,7 +423,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
 				});
 				return;
 			}
-			else if (split[0] == '/obliterate') return;
+			else if (split[0] == '/obliterate') {
+				this.obliterateChannel();
+				return;
+			}
 			else if (split[0] == '/kick') {
 				if (split.length < 2) return;
 				this.client.emit('kick', {
@@ -464,7 +471,21 @@ export class ChatComponent implements OnInit, AfterViewInit {
 				});
 				return;
 			}
-			else if (split[0] == '/invite') return;
+			else if (split[0] == '/invite') {
+				if (split.length < 2) return;
+				let userToAdd  = await this.fetchService.getUser(split[1]);
+				if (userToAdd)
+					this.addMember(userToAdd);
+				return;
+			}
+			else if (split[0] == '/op') {
+				if (split.length < 2) return;
+				this.client.emit('op', {
+					username: split[1],
+					message: "You have been promoted to OP",
+				});
+				return;
+			}
 		}
 
 		this.elRef.nativeElement.querySelector('#exampleFormControlInput1').value = '';
@@ -493,11 +514,28 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	addMember(newMember : AnyProfileUser) {
 		console.log("ajout de " + newMember.username + " au channel");
 		this.fetchService.channelInvite(newMember, this.currentChannel.channel_id);
-		this.openAddMember();
+		this.openAddMember('.secDropUp');
 	}
 
-	openAddMember() {
-		const dropDownElm = this.elRef.nativeElement.querySelector('.dropdown-menu');
+	async changePotentialNewOp(value : string) {
+		if (value.length > 0)
+		{
+			let allResults = await this.fetchService.opSubstring(value);
+			this.potentialNewOp = allResults.slice(0, 10);
+			this.potentialNewOp = this.sortSearched(this.potentialNewOp, value);
+		}
+		else
+		this.potentialNewOp = [];
+	}
+
+	addOp(newOp : AnyProfileUser) {
+		console.log(newOp.username + " est promu OP");
+		this.fetchService.channelAddOp(newOp, this.currentChannel.channel_id);
+		this.openAddMember('.secDropUp'); //change
+	}
+
+	openAddMember(className: string) {
+		const dropDownElm = this.elRef.nativeElement.querySelector(className);
 		if(!dropDownElm)
 			return;
 		if (dropDownElm.classList.contains('show'))
@@ -508,10 +546,16 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		console.log(this.potentialNewMembers);
 	}
 
+
 	sortSearched(found : AnyProfileUser[], key : string) {
 		found.sort(); //sort par ordre alphabetique
 		found.sort((a, b)=> a.username.indexOf(key) - b.username.indexOf(key))
 		return found;
+	}
+
+	obliterateChannel() {
+		if (this.is_owner)
+			this.fetchService.obliterateChannel(this.currentChannel);
 	}
 
 

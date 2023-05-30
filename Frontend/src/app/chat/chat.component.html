@@ -1,17 +1,19 @@
 <div class="row d-flex justify-content-end fixed-bottom chat-card">
 	<div class="order-1 pe-1 chat-size">
 <!-- Start of chat app -->
-		<div class="card offscreen mw-100" style="height: 60vh;" id="chat2">
+		<div class="card offscreen mw-100 my-light2" style="height: 60vh;" id="chat2">
 			<div class="card-header d-flex justify-content-between align-items-center p-3 chat-card-header gap-3 mw-100">
 				<h5 *ngIf="currentChannel" class="mb-0 channel-head" title="{{currentChannel.channel_name}}">{{currentChannel.channel_name}}</h5>
-				<img style="height: 20px; width: 20px;" src="https://cdn-icons-png.flaticon.com/512/64/64576.png" alt="Channel Menu">
-				<div class="flex-grow-1">
-					<div class="btn-group dropup">
-						<button (click)="openAddMember()" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-							Add member
-						</button>
-						<div id="addMemberdiv" class="dropdown-menu mondropup">
-							<div class="text-center" (click)="openAddMember()"><div class="btn text-muted">close</div></div>
+				<div class="flex-grow-1"></div>
+				<div class="dropup">
+					<img (click)="openAddMember('.premDropUp')" style="height: 20px; width: 20px;" src="https://cdn-icons-png.flaticon.com/512/64/64576.png" alt="Channel Menu">
+					<div class="dropdown-menu mondropup premDropUp p-0 rounded-3 my-light2">
+						<div class="btn-group-vertical w-100">
+							<button (click)="openAddMember('.secDropUp')" type="button" class="btn btn-secondary w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Add member</button>
+							<button (click)="obliterateChannel()" type="button" class="btn btn-danger w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Destroy Channel</button>
+						</div>
+						<div id="addMemberdiv" class="dropdown-menu mondropright secDropUp p-0 my-light2">
+							<div class="w-100 btn btn-sm text-muted text-end" (click)="openAddMember('.secDropUp')"><span aria-hidden="true">&times;</span></div>
 							<a *ngFor="let person of potentialNewMembers" (click)="addMember(person)" class="dropdown-item">{{person.username}}</a>
 							<div>
 								<form #searchField="ngForm" (input)="changePotentialNewMembers(searchField.value.searchFld)">
@@ -23,7 +25,7 @@
 						</div>
 					</div>
 				</div>
-				<button type="button" id="chanBtn" (click)="slideChan()" class="btn darkslategrey hoverable btn-sm" data-mdb-ripple-color="dark">Open channels</button>
+				<button type="button" id="chanBtn" (click)="slideChan()" class="btn darkslategrey hoverable btn-sm" data-mdb-ripple-color="dark">Change channel</button>
 				<div (click)="slide()">
 					<img src="https://cdn.onlinewebfonts.com/svg/img_69492.png" id="chatBtn" class="rounded-circle" alt="Open Chat">
 				</div>

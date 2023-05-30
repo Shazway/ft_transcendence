@@ -249,6 +249,13 @@ img{ max-width:100%;}
 
 .mondropup {
 	position: absolute;
-	bottom: 35px;
+	bottom: 45px;
+	z-index: 50;
+}
+
+.mondropright {
+	position: absolute;
+	bottom: 0px;
+	right: 159px;
 	z-index: 50;
 }
