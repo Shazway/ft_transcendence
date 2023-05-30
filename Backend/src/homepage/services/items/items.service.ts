@@ -449,7 +449,7 @@ export class ItemsService {
 		if (sourceUser.friend.find((user) => user.user_id === targetUser.user_id))
 			await this.removeFriendFromUsers(sourceUser, targetUser);
 		else
-			await this.removeRequestFromUsers(sourceUser, targetUser);
+			await this.removeRequestFromUsers(targetUser, sourceUser);
 		sourceUser.blacklistEntry.push(targetUser);
 		this.userRepo.save(sourceUser);
 		return true;
