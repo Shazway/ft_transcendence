@@ -261,4 +261,14 @@ export class ChannelsService {
 		target.is_admin = false;
 		return await this.chan_userRepo.save(target);
 	}
+
+
+	async rightPass(channelId: number, pass: string): Promise<boolean> {
+		if (!channelId || !pass)
+			return false;
+		const channel = await this.itemsService.getChannel(channelId);
+		if (!channel)
+			return false;
+		return await bcrypt.compare(pass, channel.channel_password)
+	}
 }

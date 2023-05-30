@@ -6,7 +6,7 @@ import { WebsocketService } from '../websocket.service';
 import { Socket, io } from 'socket.io-client';
 import { fromEvent } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmPopup, PunishmentPopup } from '../popup-component/popup-component.component';
+import { ConfirmPopup, PasswordPopup, PunishmentPopup } from '../popup-component/popup-component.component';
 import { NotificationRequest } from 'src/dtos/Notification.dto';
 import { NotificationService } from '../notification.service';
 import { Router } from '@angular/router';
@@ -14,6 +14,7 @@ import { AppComponent } from '../app.component';
 import { PopoverConfig } from 'src/dtos/Popover.dto';
 import { AnyProfileUser } from 'src/dtos/User.dto';
 import { AsyncPipe } from '@angular/common';
+import { isUndefined } from 'mathjs';
 
 @Component({
 	selector: 'app-chat',
@@ -233,6 +234,8 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			modalRef = this.modalService.open(PunishmentPopup);
 		else if (className == 'ConfirmPopup')
 			modalRef = this.modalService.open(ConfirmPopup);
+		else if (className == 'PasswordPopup')
+			modalRef = this.modalService.open(PasswordPopup);
 		else
 			return false;
 		modalRef.componentInstance.title = title;
@@ -316,6 +319,15 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	}
 
 	async openChannel(channel: Channel) {
+		let pwd;
+		const checkPWD = !this.getUserFromChannel(localStorage.getItem("username"), channel) && channel.has_pwd;
+		if (checkPWD) {
+			pwd = await this.createPopup(channel.channel_name, 'Password', 'PasswordPopup');
+			const mdp = await this.fetchService.isRightPass({channel_id: channel.channel_id, pass: pwd});
+			if (isUndefined(mdp) || !mdp) {
+				return;
+			}
+		}
 		this.is_admin = false;
 		this.is_owner = false;
 		this.client.close();
@@ -326,7 +338,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			return;
 		for (let index = this.msgs$.length; index > 0; index--)
 			this.sortMessage(this.msgs$[index - 1]);
-		this.client = io('ws://localhost:3002?channel_id=' + channel.channel_id, this.websocketService.getHeader());
+		if (!checkPWD)
+			this.client = io('ws://localhost:3002?channel_id=' + channel.channel_id, this.websocketService.getHeader());
+		else
+			this.client = io('ws://localhost:3002?channel_id=' + channel.channel_id + '&pass=' + pwd, this.websocketService.getHeader());
 		this.currentChannel = channel;
 		this.setClientEvent();
 		const us_channel = this.getUserFromCurrentChannel(localStorage.getItem('username'));
@@ -358,6 +373,19 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			return null;
 		let user;
 		this.currentChannel.us_channel.forEach((us_channel: any) => {
+			if (us_channel.user.username == name) {
+				user = us_channel;
+				return;
+			}
+		});
+		return user;
+	}
+
+	getUserFromChannel(name: string | null, chan: Channel): any {
+		if (!name)
+			return null;
+		let user;
+		chan.us_channel.forEach((us_channel: any) => {
 			if (us_channel.user.username == name) {
 				user = us_channel;
 				return;

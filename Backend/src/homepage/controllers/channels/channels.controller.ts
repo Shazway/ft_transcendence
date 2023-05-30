@@ -154,6 +154,21 @@ export class ChannelsController {
 		res.status(HttpStatus.OK).send({ msg: 'Channel created' });
 	}
 
+	@Post('rightPass')
+	async rightPass(
+		@Req() req: Request,
+		@Res() res: Response,
+		@Body() body: { channel_id: number, pass: string })
+	{
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
+		if (!body || !body.channel_id || !body.pass) return res.status(HttpStatus.UNAUTHORIZED).send('No body');
+		const channelId = body.channel_id;
+		const pass = body.pass;
+		res.status(HttpStatus.ACCEPTED).send({rightPass: (await this.channelService.rightPass(channelId, pass))})
+	}
+
+
 	@Get(':id/messages/:page')
 	async getChannelMessages(
 		@Param('id', ParseIntPipe) chan_id: number,

@@ -322,6 +322,21 @@ export class FetchService {
 		return res;
 	}
 
+	async isRightPass(param: {channel_id: number, pass: string}) {
+		let res;
+		const teaFunc = this.teapotError;
+		const route = this.router;
+		await axios.post('http://localhost:3001/channels/rightPass', param, this.getHeader())
+		.then(function (response) {
+			res = response.data.rightPass;
+		})
+		.catch(function (error) {
+			teaFunc(error, route);
+		})
+		.finally(function () {});
+		return res;
+	}
+
 	async createChannel(param: NewChan) {
 		let res;
 		const teaFunc = this.teapotError;
