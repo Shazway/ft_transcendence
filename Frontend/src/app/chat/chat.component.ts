@@ -33,6 +33,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	is_admin = false;
 	is_owner = false;
 	potentialNewMembers! : AnyProfileUser[];
+	potentialNewOp! : AnyProfileUser[];
 
 	icone_list = {
 		add_friend: "https://static.vecteezy.com/system/resources/previews/020/936/584/original/add-friend-icon-for-your-website-design-logo-app-ui-free-vector.jpg",
@@ -71,7 +72,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
 				behavior: 'smooth',
 			});
 		}, 500)
-		this.potentialNewMembers
 	}
 
 	setClientEvent() {
@@ -478,6 +478,14 @@ export class ChatComponent implements OnInit, AfterViewInit {
 					this.addMember(userToAdd);
 				return;
 			}
+			else if (split[0] == '/op') {
+				if (split.length < 2) return;
+				this.client.emit('op', {
+					username: split[1],
+					message: "You have been promoted to OP",
+				});
+				return;
+			}
 		}
 
 		this.elRef.nativeElement.querySelector('#exampleFormControlInput1').value = '';
@@ -509,6 +517,23 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		this.openAddMember('.secDropUp');
 	}
 
+	async changePotentialNewOp(value : string) {
+		if (value.length > 0)
+		{
+			let allResults = await this.fetchService.opSubstring(value);
+			this.potentialNewOp = allResults.slice(0, 10);
+			this.potentialNewOp = this.sortSearched(this.potentialNewOp, value);
+		}
+		else
+		this.potentialNewOp = [];
+	}
+
+	addOp(newOp : AnyProfileUser) {
+		console.log(newOp.username + " est promu OP");
+		this.fetchService.channelAddOp(newOp, this.currentChannel.channel_id);
+		this.openAddMember('.secDropUp'); //change
+	}
+
 	openAddMember(className: string) {
 		const dropDownElm = this.elRef.nativeElement.querySelector(className);
 		if(!dropDownElm)
@@ -520,6 +545,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		this.potentialNewMembers = [];
 		console.log(this.potentialNewMembers);
 	}
+
 
 	sortSearched(found : AnyProfileUser[], key : string) {
 		found.sort(); //sort par ordre alphabetique
