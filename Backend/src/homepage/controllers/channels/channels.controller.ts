@@ -100,6 +100,21 @@ export class ChannelsController {
 		res.status(HttpStatus.UNAUTHORIZED).send('Not allowed' + targetEntity.channelInviteAuth);
 	}
 
+	@Post('delete')
+	async deleteChannel(
+		@Req() req: Request,
+		@Res() res: Response,
+		@Body() body: { channel_id: number })
+	{
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
+		if (!body || !body.channel_id) return res.status(HttpStatus.UNAUTHORIZED).send('No body');
+		const channelId = body.channel_id;
+		if (await this.channelService.deleteChannel(channelId, user.sub))
+			return res.status(HttpStatus.ACCEPTED).send('Success');
+		res.status(HttpStatus.UNAUTHORIZED).send('Failure');
+	}
+
 	@Post('inviteBySubstring')
 	async getAllowedInviteBySub(
 		@Req() req: Request,
