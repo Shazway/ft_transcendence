@@ -324,6 +324,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		this.currentChannel = channel;
 		this.setClientEvent();
 		this.client.emit('isAdmin');
+		this.client.emit('isOwner');
 		const offscreenElm = this.elRef.nativeElement.querySelector('.channel_pan');
 		if (offscreenElm.classList.contains('show'))
 			this.slideChan();
@@ -513,11 +514,11 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	addMember(newMember : AnyProfileUser) {
 		console.log("ajout de " + newMember.username + " au channel");
 		this.fetchService.channelInvite(newMember, this.currentChannel.channel_id);
-		this.openAddMember();
+		this.openAddMember('.secDropUp');
 	}
 
-	openAddMember() {
-		const dropDownElm = this.elRef.nativeElement.querySelector('.dropdown-menu');
+	openAddMember(className: string) {
+		const dropDownElm = this.elRef.nativeElement.querySelector(className);
 		if(!dropDownElm)
 			return;
 		if (dropDownElm.classList.contains('show'))
