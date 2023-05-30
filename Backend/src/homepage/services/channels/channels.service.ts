@@ -73,6 +73,8 @@ export class ChannelsService {
 		const chan_user = new ChannelUserRelation();
 		const channel = await this.itemsService.getChannel(chan_id);
 
+		if (await this.isUserMember(user_id, chan_id))
+			return false;
 		if (!channel || channel.is_dm) return false;
 		chan_user.is_creator = is_creator;
 		chan_user.is_admin = is_admin;
@@ -95,6 +97,7 @@ export class ChannelsService {
 		await this.chan_userRepo.save(target);
 		return true;
 	}
+
 	async setUserOwner(setter_id: number, target_id: number, chan_id: number) {
 		if (!(await this.isUserOwner(setter_id, chan_id)))
 			return true;
@@ -232,5 +235,17 @@ export class ChannelsService {
 			return await this.setUserOwner(sourceId, targetId, channel_id);
 		else
 			return await this.setUserAdmin(sourceId, targetId, channel_id);
+	}
+
+	async demoteAdmin(sourceId: number, targetId: number, chanId: number) {
+		if (!(await this.isUserOwner(sourceId, chanId)))
+			return false;
+		if (!(await this.isUserMember(targetId, chanId)) || !(await this.isUserAdmin(targetId, chanId)))
+			return false;
+		const target = await this.itemsService.getUserChan(targetId, chanId);
+		if (!target)
+			return false;
+		target.is_admin = false;
+		return await this.chan_userRepo.save(target);
 	}
 }

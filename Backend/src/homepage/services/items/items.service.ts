@@ -356,18 +356,20 @@ export class ItemsService {
 			receivedRequest,
 			sentRequest
 		]);
-		console.log(sourceUser.username);
-		console.log(targetUser.username);
 		sourceUser.friend.push(targetUser);
 		targetUser.friend.push(sourceUser);
 		await this.addFriendsToDM(sourceUser, targetUser);;
 	}
 
-	public async removeFromPrivateChannel(source: UserEntity, friend: UserEntity) {
-		const privateChannels = await this.getPvChannelsFromUser(source.user_id);
-		const channel = privateChannels.find((channel) => {
-			channel.us_channel.find((chanUser) => friend.user_id == chanUser.user.user_id)
-		});
+	public async removeFromDM(source: UserEntity, friend: UserEntity) {
+		const channels = await this.getChannelsFromUser(source.user_id);
+		if (!channels || !channels.length)
+			return false;
+		const channel = channels.find((chan) => {
+			if (chan && chan.is_dm && chan.us_channel.find((chanUser) => chanUser.user.user_id == friend.user_id))
+				return true;
+			return false;
+		})
 		if (channel)
 			await this.chanRepo.remove(channel);
 		return true;
@@ -381,9 +383,10 @@ export class ItemsService {
 			return null;
 		source.friend = source.friend.filter((source) => source.user_id !== friend.user_id);
 		friend.friend = friend.friend.filter((user) => user.user_id !== source.user_id);
-		this.removeFromPrivateChannel(source, friend);
+		this.removeFromDM(source, friend);
 		return await this.userRepo.save([source, friend]);
 	}
+
 	public async removeFriend(sourceId: number, targetId: number) {
 		const source = await this.getUser(sourceId);
 		const target = await this.getUser(targetId);
@@ -527,8 +530,6 @@ export class ItemsService {
 
 		if (!userOne || !userTwo)
 			return null;
-		console.log('Update left match:');
-		console.log(id);
 		if (player1.player.user_id != id)
 		{
 			match.is_victory[0] = true;

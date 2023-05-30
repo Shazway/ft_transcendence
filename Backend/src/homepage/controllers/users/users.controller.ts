@@ -118,7 +118,6 @@ export class UsersController {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
 
-		console.log({ UserToBlock: target_id });
 		if (await this.itemsService.blockUser(user.sub, target_id))
 			res.status(HttpStatus.ACCEPTED).send('User blocked');
 		else res.status(HttpStatus.FORBIDDEN).send('Failed to block user');
@@ -133,7 +132,6 @@ export class UsersController {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
 
-		console.log({ UserToBlock: target_id });
 		if (await this.itemsService.unblockUser(user.sub, target_id))
 			res.status(HttpStatus.ACCEPTED).send('User unblocked');
 		else res.status(HttpStatus.FORBIDDEN).send('Failed to unblock user');
@@ -157,7 +155,6 @@ export class UsersController {
 		const receivedRequests = await this.itemsService.getFriendRequestsReceived(user.sub);
 		const sentRequests = await this.itemsService.getFriendRequestsSent(user.sub);
 
-		console.log(receivedRequests);
 		res.status(HttpStatus.OK).send({ received: receivedRequests, sent: sentRequests });
 	}
 
@@ -179,7 +176,6 @@ export class UsersController {
 		const userEntity = await this.itemsService.getUser(user.sub);
 
 		if (!userEntity) return res.status(HttpStatus.BAD_REQUEST).send('User not found');
-		console.log(userEntity.blacklistEntry);
 		res.status(HttpStatus.OK).send(userEntity.blacklistEntry);
 	}
 
@@ -227,6 +223,8 @@ export class UsersController {
 	@Get(':username')
 	async getUser(@Param('username') us: string, @Req() req: Request, @Res() res: Response) {
 		const user = await this.itemsService.getUserByUsername(us);
+		if (!user)
+			return res.status(HttpStatus.BAD_REQUEST).send('CE USER EXISTE PAS :)');
 		const info = {
 			id: user.intra_id,
 			login: user.username

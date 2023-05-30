@@ -10,14 +10,15 @@
 							Add member
 						</button>
 						<div id="addMemberdiv" class="dropdown-menu mondropup">
-							<div class="dropdown-item">
+							<div class="text-center" (click)="openAddMember()"><div class="btn text-muted">close</div></div>
+							<a *ngFor="let person of potentialNewMembers" (click)="addMember(person)" class="dropdown-item">{{person.username}}</a>
+							<div>
 								<form #searchField="ngForm" (input)="changePotentialNewMembers(searchField.value.searchFld)">
 									<div class="col-auto">
 										<input class="form-control" name="searchFld" placeholder="Search" ngModel>
 									</div>
 								</form>
 							</div>
-							<a *ngFor="let person of potentialNewMembers" (click)="addMember(person)" class="dropdown-item">{{person.username}}</a>
 						</div>
 					</div>
 				</div>

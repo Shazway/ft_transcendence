@@ -3,7 +3,7 @@ import { AutoClose, Placement, PopoverConfig, Target } from '../dtos/Popover.dto
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { NotificationService } from './notification.service';
 import { NotificationRequest, NotificationResponse } from 'src/dtos/Notification.dto';
-import { MyProfileUser } from 'src/dtos/User.dto';
+import { FriendRequest, MyProfileUser } from 'src/dtos/User.dto';
 import { FetchService } from './fetch.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { Router } from '@angular/router';
@@ -34,10 +34,12 @@ export class AppComponent implements AfterViewInit {
 	isExpanded = false;
 	myProfile? : MyProfileUser | null;
 
+
+
 	constructor(
 		private elRef: ElementRef,
 		private popover: NgbPopover,
-		private notifService: NotificationService,
+		public notifService: NotificationService,
 		private fetchService: FetchService,
 	){
 	}
@@ -131,35 +133,39 @@ export class AppComponent implements AfterViewInit {
 		return (1);
 	}
 
+	friendRequestToNotificationRequest(friend : any, bool : boolean) : NotificationRequest {
+		return ({
+			type : "friend",
+			target_name : friend.source_name,
+			target_id : friend.source_id,
+			accepted : bool
+		})
+
+	}
 
 	acceptFriendRequest(context : NotificationRequest, toast: any) {
-		context.accepted = true;
-		this.notifService.emit('inviteAnswer', context);
-		console.log(context);
+		this.notifService.emit('inviteAnswer', this.friendRequestToNotificationRequest(context, true));
 		this.notifDismiss(toast);
 	}
 
 	rejectFriendRequest(context : NotificationRequest, toast: any) {
-		context.accepted = false;
-		this.notifService.emit('inviteAnswer', context);
-		console.log(context);
-
+		this.notifService.emit('inviteAnswer', this.friendRequestToNotificationRequest(context, false));
 		this.notifDismiss(toast);
 	}
 
 	acceptChallenge(context : NotificationRequest, toast: any) {
 		context.accepted = true;
 		this.notifService.emit('challengeAnswer', context);
-		console.log(context);
 		this.notifDismiss(toast);
 	}
 
 	rejectChallenge(context : NotificationRequest, toast: any) {
 		context.accepted = false;
 		this.notifService.emit('challengeAnswer', context);
-		console.log(context);
 
 		this.notifDismiss(toast);
 	}
+
+
 
 }

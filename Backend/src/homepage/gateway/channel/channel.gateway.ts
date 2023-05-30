@@ -112,7 +112,6 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
 		if (!query || !query.channel_id) {
 			client.emit('onError', 'Channel does not exist');
-			console.log('ohh wtf');
 			return false;
 		}
 		const channel_id = query.channel_id;
@@ -218,7 +217,6 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const targetEntity = await this.itemService.getUserByUsername(username);
 		if (!targetEntity)
 			return ({ret: false, msg: 'User not found'});
-		console.log('Get privi from username');
 		return await this.channelService.checkPrivileges(sourceId, targetEntity.user_id, channelId);
 	}
 
@@ -255,7 +253,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		if (!body || !targetId)
 			throw new WsException('No body');
 		if (targetId == user.sub)
-			throw new WsException('You cannot ban yourself');
+			throw new WsException('You cannot promote yourself');
 		if (!channel)
 			throw new WsException('Channel no longer exists');
 		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
@@ -266,9 +264,37 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			'onMessage',
 			'You have been promoted by ' + user.name
 		);
-		this.sendSystemMessageToChannel(channel_id, targetId, ' was promoted by ' + user.name)
-		this.socketDisconnect(targets);
+		this.sendSystemMessageToChannel(channel_id, targetId, ' was promoted by ' + user.name);
 		this.notificationGateway.sendMessage([user.sub], 'Successful promotion');
+	}
+
+	@SubscribeMessage('demote')
+	async handleDemote(@ConnectedSocket() client: Socket, @MessageBody() body: Punishment) {
+		if (!body || (!body.target_id && !body.username))
+			throw new WsException('No body');
+		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
+		const channel_id = Number(client.handshake.query.channel_id);
+		const ret = await this.getPrivilegesFromBody(user.sub, body, channel_id);
+		const targetId = await this.getIdFromBody(body);
+		const channel = this.channelList.get(channel_id);
+
+		if (!body || !targetId)
+			throw new WsException('No body');
+		if (targetId == user.sub)
+			throw new WsException('You cannot unpromote yourself');
+		if (!channel)
+			throw new WsException('Channel no longer exists');
+		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
+		const targets = channel.get(targetId);
+		if (!(await this.channelService.demoteAdmin(user.sub, targetId, channel_id)))
+			throw new WsException('The user is not an admin, or you are not an owner.');
+		this.socketEmit(
+			targets,
+			'onMessage',
+			'You have been demoted by ' + user.name
+		);
+		this.sendSystemMessageToChannel(channel_id, targetId, ' was demoted by ' + user.name);
+		this.notificationGateway.sendMessage([user.sub], 'Successful demotion');
 	}
 
 
@@ -350,7 +376,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			throw new WsException(ret.msg);
 		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
 		if (!this.channelService.unMuteUser(user.sub, targetId, channel_id))
-			return client.emit('onError', 'Error while unmuting some dude');
+			return client.emit('onError', 'Error while unmuting');
 		const users = channel.get(targetId);
 		this.socketEmit(
 			users,
@@ -378,7 +404,8 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			throw new WsException('Channel no longer exists');
 		if (!ret.ret) return client.emit('onError', ret.msg);
 		
-		this.channelService.banUser(user.sub, targetId, channel_id, body.time);
+		if ((await this.channelService.banUser(user.sub, targetId, channel_id, body.time)))
+			throw new WsException('Something went wrong');
 		const targets = channel.get(targetId);
 		this.socketEmit(
 			targets,
