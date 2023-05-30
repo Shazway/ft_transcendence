@@ -173,6 +173,7 @@ export class ItemsService {
 		const chan_user = await this.chanRepo
 			.createQueryBuilder('channel')
 			.leftJoinAndSelect('channel.us_channel', 'channel_user')
+			.leftJoinAndSelect('channel_user.user', 'user')
 			.leftJoinAndSelect('channel.message', 'message')
 			.where('channel.is_channel_private = false')
 			.getMany();
@@ -363,7 +364,7 @@ export class ItemsService {
 
 		if (!sourceUser || !targetUser)
 			return null;
-		if (!(await this.removeRequestFromUsers(sourceUser, targetUser)))
+		if (!(await this.removeRequestFromUsers(targetUser, sourceUser)))
 			return null;
 		sourceUser.friend.push(targetUser);
 		targetUser.friend.push(sourceUser);
