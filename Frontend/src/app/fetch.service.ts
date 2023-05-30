@@ -368,7 +368,18 @@ export class FetchService {
 	}
 
 	async obliterateChannel(chan : Channel) {
-		console.log("Route du back a faire");
+		let res: any;
+		const teaFunc = this.teapotError;
+		const route = this.router;
+		await axios.post<Array<AnyProfileUser>>('http://localhost:3001/channels/delete', {channel_id: chan.channel_id}, this.getHeader())
+		.then(function (response) {
+			res = response.data;
+		})
+		.catch(function (error) {
+			teaFunc(error, route);
+		})
+		.finally(function () {});
+		return res;
 	}
 
 	async searchingSubstring(value : string) {
@@ -431,8 +442,5 @@ export class FetchService {
 		return res;
 	}
 
-	async channelAddOp(user : AnyProfileUser, channel_id : number) {
-		console.log("a faire en back");
-	}
 	
 }
