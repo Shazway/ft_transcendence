@@ -8,4 +8,5 @@ export interface Channel {
 	is_dm: boolean;
 	messages: Message;
 	us_channel: any;
+	has_pwd: boolean;
 }
