@@ -363,7 +363,7 @@ export class ItemsService {
 
 		if (!sourceUser || !targetUser)
 			return null;
-		if (!(await this.removeRequestFromUsers(sourceUser, targetUser)))
+		if (!(await this.removeRequestFromUsers(targetUser, sourceUser)))
 			return null;
 		sourceUser.friend.push(targetUser);
 		targetUser.friend.push(sourceUser);
