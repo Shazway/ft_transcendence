@@ -14,6 +14,7 @@ import { AppComponent } from '../app.component';
 import { PopoverConfig } from 'src/dtos/Popover.dto';
 import { AnyProfileUser } from 'src/dtos/User.dto';
 import { AsyncPipe } from '@angular/common';
+import { isUndefined } from 'mathjs';
 
 @Component({
 	selector: 'app-chat',
@@ -319,8 +320,13 @@ export class ChatComponent implements OnInit, AfterViewInit {
 
 	async openChannel(channel: Channel) {
 		let pwd;
-		if (channel.has_pwd) {
+		const checkPWD = !this.getUserFromChannel(localStorage.getItem("username"), channel) && channel.has_pwd;
+		if (checkPWD) {
 			pwd = await this.createPopup(channel.channel_name, 'Password', 'PasswordPopup');
+			const mdp = await this.fetchService.isRightPass({channel_id: channel.channel_id, pass: pwd});
+			if (isUndefined(mdp) || !mdp) {
+				return;
+			}
 		}
 		this.is_admin = false;
 		this.is_owner = false;
@@ -332,7 +338,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			return;
 		for (let index = this.msgs$.length; index > 0; index--)
 			this.sortMessage(this.msgs$[index - 1]);
-		if (!channel.has_pwd)
+		if (!checkPWD)
 			this.client = io('ws://localhost:3002?channel_id=' + channel.channel_id, this.websocketService.getHeader());
 		else
 			this.client = io('ws://localhost:3002?channel_id=' + channel.channel_id + '&pass=' + pwd, this.websocketService.getHeader());
@@ -367,6 +373,19 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			return null;
 		let user;
 		this.currentChannel.us_channel.forEach((us_channel: any) => {
+			if (us_channel.user.username == name) {
+				user = us_channel;
+				return;
+			}
+		});
+		return user;
+	}
+
+	getUserFromChannel(name: string | null, chan: Channel): any {
+		if (!name)
+			return null;
+		let user;
+		chan.us_channel.forEach((us_channel: any) => {
 			if (us_channel.user.username == name) {
 				user = us_channel;
 				return;
