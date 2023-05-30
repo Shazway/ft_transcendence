@@ -83,19 +83,19 @@
 					<div class="row h-100">
 						<div class="col mh-100" style="overflow: auto; margin-right: 3px;">
 							<div class="me-3">
-								<h4 class="text-center">Private Channels</h4>
+								<h5 class="text-center">Private Channels</h5>
 								<div class="row" *ngFor="let channel of channels$.servers">
 									<button *ngIf="channel.is_channel_private" type="button" (click)="openChannel(channel)" class="btn btn-info btn-sm mt-1" data-mdb-ripple-color="dark">{{ channel.channel_name }}</button>
 								</div>
 								<hr>
-								<h4 class="text-center">Public Channels</h4>
+								<h5 class="text-center">Public Channels</h5>
 								<div class="row" *ngFor="let channel of channels$.servers">
 									<button *ngIf="!channel.is_channel_private" type="button" (click)="openChannel(channel)" class="btn btn-secondary btn-sm mt-1" data-mdb-ripple-color="dark">{{ channel.channel_name }}</button>
 								</div>
 							</div>
 						</div>
 						<div class="col mh-100" style="border-left: 1px solid #000000; overflow: auto;">
-							<h4 class="text-center">Direct Messages</h4>
+							<h5 class="text-center">Direct Messages</h5>
 							<div class="row ms-1" *ngFor="let channel of channels$.dm">
 								<button type="button" (click)="openChannel(channel)" class="btn btn-primary btn-sm mt-1" data-mdb-ripple-color="dark">{{ channel.channel_name }}</button>
 							</div>
