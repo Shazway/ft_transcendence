@@ -566,14 +566,25 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		const dropDownElm = this.elRef.nativeElement.querySelector(className);
 		if(!dropDownElm)
 			return;
-		if (dropDownElm.classList.contains('show'))
-			dropDownElm.classList.remove('show');
+		if (dropDownElm.classList.contains('show')) {
+			if (className == '.premDropUp')
+				this.hideAllDropdown();
+			else
+				dropDownElm.classList.remove('show');
+		}
 		else
 			dropDownElm.classList.add('show');
 		this.potentialNewMembers = [];
 		console.log(this.potentialNewMembers);
 	}
 
+	hideAllDropdown() {
+		const dropDownElm = this.elRef.nativeElement.querySelectorAll('.dropdown-menu');
+		dropDownElm.forEach((element: any) => {
+			if (element.classList.contains('show'))
+				element.classList.remove('show');
+		});
+	}
 
 	sortSearched(found : AnyProfileUser[], key : string) {
 		found.sort(); //sort par ordre alphabetique
@@ -589,6 +600,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			if (confirm) {
 				this.fetchService.obliterateChannel(this.currentChannel);
 				this.redirectToGlobal();
+				this.hideAllDropdown();
 			}
 		}
 	}

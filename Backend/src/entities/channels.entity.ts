@@ -11,7 +11,7 @@ export class Channel {
 	@Column({ nullable: false, length: 41 })
 	channel_name!: string;
 
-	@Column({ default: null, length: 30 })
+	@Column({ default: null, length: 128 })
 	channel_password!: string;
 
 	@Column({ default: false })
@@ -19,6 +19,9 @@ export class Channel {
 
 	@Column({ default: false })
 	is_dm: boolean;
+
+	@Column({ default: false })
+	has_pwd: boolean;
 
 	@OneToMany(() => ChannelUser, (us_channel) => us_channel.channel)
 	us_channel: ChannelUser[];
