@@ -43,8 +43,6 @@ export class GamesService {
 
 	startGame(settings: MatchSettingEntity) {
 		this.matchSetting = settings;
-		console.log('settings: ');
-		console.log(settings);
 		this.interval = setInterval(() => {
 			const date = new Date();
 			this.update((date.getTime() - this.oldDate.getTime()) / this.gamespeed);

@@ -7,15 +7,11 @@ export const UseWebSocketFilters = (...filters: any[]) => SetMetadata('wsFilters
 export class WsexceptionFilter implements ExceptionFilter {
 	catch(exception: WsException, host: ArgumentsHost) {
 		const client = host.switchToWs().getClient();
-		const response = {
-			status: exception.getError(),
-			message: exception.message
-		};
 		console.log('Websocket Token Error:');
 		console.log(exception);
 		// client.send(JSON.stringify(response));
 		client.emit('onError', exception.message);
-		// client.disconnect();
+		if (exception.message.includes('disconnect')) client.disconnect();
 		console.log('Note that the server is still up and running ✅');
 	}
 }

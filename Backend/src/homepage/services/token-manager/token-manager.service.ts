@@ -30,15 +30,9 @@ export class TokenManagerService {
 
 	public throwException(type: string, msg: string) {
 		if (type == 'Http')
-		{
-			console.log('Http throw');
 			throw new HttpException(msg, HttpStatus.UNAUTHORIZED);
-		}
 		else if (type == 'ws')
-		{
-			console.log('Ws throw');
 			throw new WsException(msg);
-		}
 		return null;
 	}
 
