@@ -3,7 +3,7 @@ import { AutoClose, Placement, PopoverConfig, Target } from '../dtos/Popover.dto
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { NotificationService } from './notification.service';
 import { NotificationRequest, NotificationResponse } from 'src/dtos/Notification.dto';
-import { FriendRequest, MyProfileUser } from 'src/dtos/User.dto';
+import { AnyProfileUser, FriendRequest, MyProfileUser } from 'src/dtos/User.dto';
 import { FetchService } from './fetch.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { Router } from '@angular/router';
@@ -32,7 +32,7 @@ export class AppComponent implements AfterViewInit {
 	@ViewChild('toastChannel') toastChannel!: TemplateRef<any>;
 	title = 'Frontend';
 	isExpanded = false;
-	myProfile? : MyProfileUser | null;
+	myProfile? : AnyProfileUser | null;
 
 
 
