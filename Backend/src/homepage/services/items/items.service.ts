@@ -697,12 +697,12 @@ export class ItemsService {
 		return await this.userRepo.save(user);
 	}
 
-	async applySelectedSkins(userId: number, applyProfile: ApplySkins)
+	async applySelectedSkins(userId: number, applySkins: ApplySkins)
 	{
 		const user = await this.getUser(userId);
 		if (!user)
 			return null;
-		user.current_skins = applyProfile.skins;
+		user.current_skins = applySkins.skins;
 		return await this.userRepo.save(user);
 	}
 

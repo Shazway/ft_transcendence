@@ -60,32 +60,56 @@
 		<div>&nbsp;</div>
 		<div *ngIf="settingState == 'open'" class="row px-5 mx-2" style="overflow: hidden;" @settingWindow>
 			<div class="d-flex p-3 border rounded-3 white">
-				<div class="col d-flex justify-content-center">
-					<div class="d-flex gap-2">
-						<button class="btn arrow left flex-shrink-0" type="button" (click)="panLeft(windowPaddle, paddleSkins)">&lt;</button>
-						<div class="d-flex gap-3 align-items-center border bg-black" style="overflow: hidden;">
-							<img src="{{windowPaddle[0].img_url}}" style="height: 50px; width: 10px; margin-left: -10px;" alt="Skin" [@slideFarLeft]="slideDirection">
-							<img src="{{windowPaddle[1].img_url}}" style="margin-left: 5px;" alt="Skin" [@slideLeft]="slideDirection">
-							<img src="{{windowPaddle[2].img_url}}" style="height: 200px; width: 40px;" alt="Skin" [@slideCenter]="slideDirection">
-							<img src="{{windowPaddle[3].img_url}}" style="margin-right: 5px;" alt="Skin" [@slideRight]="slideDirection">
-							<img src="{{windowPaddle[4].img_url}}" style="height: 50px; width: 10px; margin-right: -10px;" alt="Skin" [@slideFarRight]="slideDirection">
+				<div class="col d-flex justify-content-around">
+					<div class="text-center">
+						<div class="d-flex gap-2">
+							<button class="btn arrow left flex-shrink-0" type="button" (click)="panLeft(windowPaddle, paddleSkins, 'slideDirectionPaddle')">&lt;</button>
+							<div class="d-flex gap-3 align-items-center border bg-black" style="overflow: hidden; height: 200px;">
+								<img src="{{windowPaddle[0].img_url}}" style="height: 50px; width: 10px; margin-left: -10px;" alt="Skin" [@slideFarLeft]="slideDirectionPaddle">
+								<img src="{{windowPaddle[1].img_url}}" style="margin-left: 5px;" alt="Skin" [@slideLeft]="slideDirectionPaddle">
+								<img src="{{windowPaddle[2].img_url}}" style="height: 180px;" alt="Skin" [@slideCenter]="slideDirectionPaddle">
+								<img src="{{windowPaddle[3].img_url}}" style="margin-right: 5px;" alt="Skin" [@slideRight]="slideDirectionPaddle">
+								<img src="{{windowPaddle[4].img_url}}" style="height: 50px; width: 10px; margin-right: -10px;" alt="Skin" [@slideFarRight]="slideDirectionPaddle">
+							</div>
+							<button class="btn arrow right flex-shrink-0" type="button" (click)="panRight(windowPaddle, paddleSkins, 'slideDirectionPaddle')">&gt;</button>
 						</div>
-						<button class="btn arrow right flex-shrink-0" type="button" (click)="panRight(windowPaddle, paddleSkins)">&gt;</button>
+						<div>{{windowPaddle[2].name}}</div>
 					</div>
-					<div class="d-flex gap-2">
-						<button class="btn arrow left flex-shrink-0" type="button" (click)="panLeft(windowBall, ballSkins)">&lt;</button>
-						<div class="d-flex gap-3 align-items-center border bg-black" style="overflow: hidden;">
-							<img src="{{windowBall[0].img_url}}" style="height: 50px; width: 10px; margin-left: -10px;" alt="Skin" [@slideFarLeft]="slideDirection">
-							<img src="{{windowBall[1].img_url}}" style="margin-left: 5px;" alt="Skin" [@slideLeft]="slideDirection">
-							<img src="{{windowBall[2].img_url}}" style="height: 200px; width: 40px;" alt="Skin" [@slideCenter]="slideDirection">
-							<img src="{{windowBall[3].img_url}}" style="margin-right: 5px;" alt="Skin" [@slideRight]="slideDirection">
-							<img src="{{windowBall[4].img_url}}" style="height: 50px; width: 10px; margin-right: -10px;" alt="Skin" [@slideFarRight]="slideDirection">
+					<div class="text-center">
+						<div class="d-flex gap-2">
+							<button class="btn arrow left flex-shrink-0" type="button" (click)="panLeft(windowBall, ballSkins, 'slideDirectionBall')">&lt;</button>
+							<div class="d-flex gap-3 align-items-center border bg-black" style="overflow: hidden; height: 200px;">
+								<img src="{{windowBall[0].img_url}}" style="height: 50px; width: 10px; margin-left: -10px;" alt="Skin" [@slideFarLeft]="slideDirectionBall">
+								<img src="{{windowBall[1].img_url}}" style="margin-left: 5px;" alt="Skin" [@slideLeft]="slideDirectionBall">
+								<img src="{{windowBall[2].img_url}}" style="height: 100px;" alt="Skin" [@slideCenter]="slideDirectionBall">
+								<img src="{{windowBall[3].img_url}}" style="margin-right: 5px;" alt="Skin" [@slideRight]="slideDirectionBall">
+								<img src="{{windowBall[4].img_url}}" style="height: 50px; width: 10px; margin-right: -10px;" alt="Skin" [@slideFarRight]="slideDirectionBall">
+							</div>
+							<button class="btn arrow right flex-shrink-0" type="button" (click)="panRight(windowBall, ballSkins, 'slideDirectionBall')">&gt;</button>
 						</div>
-						<button class="btn arrow right flex-shrink-0" type="button" (click)="panRight(windowBall, ballSkins)">&gt;</button>
+						<div>{{windowBall[2].name}}</div>
 					</div>
-
-				</div>
-				<div class="col d-flex justify-content-center align-items-center">
+					<div>
+						<p>Accept channel invitations from:</p>
+						<div class="form-check" (click)="acceptChanInviteFrom('nobody')">
+							<input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+							<label class="form-check-label" for="flexRadioDefault1">
+								nobody
+							</label>
+						</div>
+						<div class="form-check" (click)="acceptChanInviteFrom('friends')">
+							<input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" checked>
+							<label class="form-check-label" for="flexRadioDefault2">
+								my friends
+							</label>
+						</div>
+						<div class="form-check" (click)="acceptChanInviteFrom('everyone')">
+							<input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+							<label class="form-check-label" for="flexRadioDefault1">
+								everyone
+							</label>
+						</div>
+					</div>
 					<div>
 						<label for="doubleAuthBox">Activate Double Auth:</label>
 						<input type="checkbox" #doubleAuthBox>
