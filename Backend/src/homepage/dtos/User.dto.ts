@@ -116,9 +116,8 @@ export class AvailableSkins {
 	intra_id!: number;
 }
 
-export class ApplyProfile {
+export class ApplySkins {
 	skins: number[];
-	title: string;
 }
 
 export class UserSettings {
