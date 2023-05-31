@@ -36,6 +36,12 @@ export class AnyProfileUser {
 	sentFriendRequests: Friendrequest[];
 	@Exclude()
 	receivedFriendRequests: Friendrequest[];
+	@Exclude()
+	channelInviteAuth: number;
+	@Exclude()
+	current_skins: number[];
+	@Exclude()
+	double_auth: boolean;
 }
 
 export class MyProfileUser {
