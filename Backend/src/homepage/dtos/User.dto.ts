@@ -36,6 +36,12 @@ export class AnyProfileUser {
 	sentFriendRequests: Friendrequest[];
 	@Exclude()
 	receivedFriendRequests: Friendrequest[];
+	@Exclude()
+	channelInviteAuth: number;
+	@Exclude()
+	current_skins: number[];
+	@Exclude()
+	double_auth: boolean;
 }
 
 export class MyProfileUser {
@@ -110,9 +116,8 @@ export class AvailableSkins {
 	intra_id!: number;
 }
 
-export class ApplyProfile {
+export class ApplySkins {
 	skins: number[];
-	title: string;
 }
 
 export class UserSettings {

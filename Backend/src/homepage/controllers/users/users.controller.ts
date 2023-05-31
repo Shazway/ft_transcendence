@@ -31,27 +31,6 @@ export class UsersController {
 		private channelService: ChannelsService
 	) {}
 
-	@Post('changeName')
-	async changeUsername(
-		@Req() req: Request,
-		@Res() res: Response,
-		@Body() body: { username: string }
-	) {
-		const currentUser = await this.tokenManager.getUserFromToken(req, 'Http', res);
-		if (!currentUser) return;
-		if (!body || !body.username || body.username.length > 20)
-			return res.status(HttpStatus.UNAUTHORIZED).send('Name too long');
-		const checkUser = await this.itemsService.getUserByUsername(body.username);
-
-		if (checkUser && checkUser.user_id == currentUser.sub)
-			return res.status(HttpStatus.NOT_MODIFIED).send('This is already your username');
-		if (checkUser && checkUser.user_id != currentUser.sub)
-			return res
-				.status(HttpStatus.UNAUTHORIZED)
-				.send('Trying to change someone elses username ?');
-		this.usersService.changeUserName(body.username, currentUser.sub);
-		return res.status(HttpStatus.ACCEPTED).send('Username changed');
-	}
 
 	@Post('userBySubstring')
 	async getUsersFromPrefix(@Req() req: Request, @Res() res: Response, @Body() body: { substring: string })
@@ -62,48 +41,6 @@ export class UsersController {
 			return res.status(HttpStatus.UNAUTHORIZED).send(null);
 		const prefixedUsers = await this.itemsService.getUsersBySubstring(body.substring);
 		res.status(HttpStatus.OK).send(prefixedUsers);
-	}
-
-	@Post('changeImg')
-	async changeImg(@Req() req: Request, @Res() res: Response, @Body() body: { img_url: string }) {
-		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
-		if (!user) return;
-		if (!body || !body.img_url || body.img_url.length > 350) return res.status(HttpStatus.UNAUTHORIZED).send('Error no body or url too long');
-		if (await this.itemsService.changeImgUser(user.sub, body.img_url))
-			return res.status(HttpStatus.ACCEPTED).send('Success');
-		return res.status(HttpStatus.NOT_MODIFIED);
-	}
-
-	@Post('changeChannelInviteAuth')
-	async changeChanInvAuth(@Req() req: Request, @Res() res: Response, @Body() body: { newSetting: number }) {
-		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
-		if (!user) return;
-		if (!body || !body.newSetting) return res.status(HttpStatus.UNAUTHORIZED).send('No body or parameters provided');
-		const userEntity = await this.itemsService.getUser(user.sub);
-		const newSetting = body.newSetting;
-
-		if (!userEntity || newSetting < 0 || newSetting > 2)
-			return res.status(HttpStatus.UNAUTHORIZED).send('Not saved');
-		userEntity.channelInviteAuth = newSetting;
-		if (await this.itemsService.saveUserState(userEntity))
-			return res.status(HttpStatus.OK).send('Success');
-		return res.status(HttpStatus.UNAUTHORIZED).send('Not saved');
-	}
-
-	@Post('changeImg')
-	async changeImgUrl(@Req() req: Request, @Res() res: Response, @Body() body: { newImg: string })
-	{
-		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
-		if (!user) return;
-		if (!body || !body.newImg || body.newImg.length > 350) return res.status(HttpStatus.UNAUTHORIZED).send('No body or wrong parameters');
-		
-		const userEntity = await this.itemsService.getUser(user.sub);
-		if (!userEntity)
-			return res.status(HttpStatus.UNAUTHORIZED).send('Not saved');
-		userEntity.img_url = body.newImg;
-		if (await this.itemsService.saveUserState(userEntity))
-			return res.status(HttpStatus.OK).send('Success');
-		res.status(HttpStatus.UNAUTHORIZED).send('Not saved');
 	}
 
 	@Post('create')
