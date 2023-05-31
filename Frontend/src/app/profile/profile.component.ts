@@ -95,7 +95,6 @@ export class ProfileComponent implements AfterViewInit {
 	friendsChecked = false;
 	everyoneChecked = false;
 	doubleAuthChecked = false;
-
 	
 	constructor(
 		private cdr: ChangeDetectorRef,

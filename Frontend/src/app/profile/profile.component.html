@@ -89,6 +89,16 @@
 						</div>
 						<div>{{windowBall[2].name}}</div>
 					</div>
+					<div class="text-center">
+						<div class="d-flex gap-2">
+							<button class="btn arrow left flex-shrink-0" type="button" (click)="panLeft(windowBackground, backgroundSkins, 'slideDirectionBackground')">&lt;</button>
+							<div class="d-flex gap-3 align-items-center border bg-black" style="overflow: hidden; height: 200px;">
+								<img src="{{windowBackground[2].img_url}}" style="height: 100px; width: 120px;" alt="Skin" [@slideCenter]="slideDirectionBackground">
+							</div>
+							<button class="btn arrow right flex-shrink-0" type="button" (click)="panRight(windowBackground, backgroundSkins, 'slideDirectionBackground')">&gt;</button>
+						</div>
+						<div>{{windowBackground[2].name}}</div>
+					</div>
 					<div>
 						<p>Accept channel invitations from:</p>
 						<div class="form-check" (click)="acceptChanInviteFrom(0)">
