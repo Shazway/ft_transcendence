@@ -322,13 +322,13 @@ export class FetchService {
 		return res;
 	}
 
-	async isRightPass(param: NewChan) {
+	async isRightPass(param: {channel_id: number, pass: string}) {
 		let res;
 		const teaFunc = this.teapotError;
 		const route = this.router;
 		await axios.post('http://localhost:3001/channels/rightPass', param, this.getHeader())
 		.then(function (response) {
-			res = response.data;
+			res = response.data.rightPass;
 		})
 		.catch(function (error) {
 			teaFunc(error, route);
@@ -457,5 +457,36 @@ export class FetchService {
 		return res;
 	}
 
+	async getAllSkins() {
+		let res : ShopItem[] = [];
+		const teaFunc = this.teapotError;
+		const route = this.router;
+		await axios.get<{skins: ShopItem[]}>('http://localhost:3001/shop/all', this.getHeader())
+		.then(function (response) {
+			if (response && response.data)
+				res = response.data.skins;
+		})
+		.catch(function (error) {
+			teaFunc(error, route);
+		})
+		.finally(function () {});
+		return (res);
+	}
+
+	async getUserSkins() {
+		let res : ShopItem[] = [];
+		const teaFunc = this.teapotError;
+		const route = this.router;
+		await axios.get<{skins: ShopItem[]}>('http://localhost:3001/shop/allUserSkins', this.getHeader())
+		.then(function (response) {
+			if (response && response.data)
+				res = response.data.skins;
+		})
+		.catch(function (error) {
+			teaFunc(error, route);
+		})
+		.finally(function () {});
+		return (res);
+	}
 	
 }

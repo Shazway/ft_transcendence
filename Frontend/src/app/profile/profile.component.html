@@ -62,16 +62,28 @@
 			<div class="d-flex p-3 border rounded-3 white">
 				<div class="col d-flex justify-content-center">
 					<div class="d-flex gap-2">
-						<button class="btn arrow left flex-shrink-0" type="button" (click)="panLeft()">&lt;</button>
+						<button class="btn arrow left flex-shrink-0" type="button" (click)="panLeft(windowPaddle, paddleSkins)">&lt;</button>
 						<div class="d-flex gap-3 align-items-center border bg-black" style="overflow: hidden;">
-							<img src="{{paddleSkins[0].src}}" style="height: 50px; width: 10px; margin-left: -10px;" alt="Skin" [@slideFarLeft]="slideDirection">
-							<img src="{{paddleSkins[1].src}}" style="margin-left: 5px;" alt="Skin" [@slideLeft]="slideDirection">
-							<img src="{{paddleSkins[2].src}}" style="height: 200px; width: 40px;" alt="Skin" [@slideCenter]="slideDirection">
-							<img src="{{paddleSkins[3].src}}" style="margin-right: 5px;" alt="Skin" [@slideRight]="slideDirection">
-							<img src="{{paddleSkins[4].src}}" style="height: 50px; width: 10px; margin-right: -10px;" alt="Skin" [@slideFarRight]="slideDirection">
+							<img src="{{windowPaddle[0].img_url}}" style="height: 50px; width: 10px; margin-left: -10px;" alt="Skin" [@slideFarLeft]="slideDirection">
+							<img src="{{windowPaddle[1].img_url}}" style="margin-left: 5px;" alt="Skin" [@slideLeft]="slideDirection">
+							<img src="{{windowPaddle[2].img_url}}" style="height: 200px; width: 40px;" alt="Skin" [@slideCenter]="slideDirection">
+							<img src="{{windowPaddle[3].img_url}}" style="margin-right: 5px;" alt="Skin" [@slideRight]="slideDirection">
+							<img src="{{windowPaddle[4].img_url}}" style="height: 50px; width: 10px; margin-right: -10px;" alt="Skin" [@slideFarRight]="slideDirection">
 						</div>
-						<button class="btn arrow right flex-shrink-0" type="button" (click)="panRight()">&gt;</button>
+						<button class="btn arrow right flex-shrink-0" type="button" (click)="panRight(windowPaddle, paddleSkins)">&gt;</button>
 					</div>
+					<div class="d-flex gap-2">
+						<button class="btn arrow left flex-shrink-0" type="button" (click)="panLeft(windowBall, ballSkins)">&lt;</button>
+						<div class="d-flex gap-3 align-items-center border bg-black" style="overflow: hidden;">
+							<img src="{{windowBall[0].img_url}}" style="height: 50px; width: 10px; margin-left: -10px;" alt="Skin" [@slideFarLeft]="slideDirection">
+							<img src="{{windowBall[1].img_url}}" style="margin-left: 5px;" alt="Skin" [@slideLeft]="slideDirection">
+							<img src="{{windowBall[2].img_url}}" style="height: 200px; width: 40px;" alt="Skin" [@slideCenter]="slideDirection">
+							<img src="{{windowBall[3].img_url}}" style="margin-right: 5px;" alt="Skin" [@slideRight]="slideDirection">
+							<img src="{{windowBall[4].img_url}}" style="height: 50px; width: 10px; margin-right: -10px;" alt="Skin" [@slideFarRight]="slideDirection">
+						</div>
+						<button class="btn arrow right flex-shrink-0" type="button" (click)="panRight(windowBall, ballSkins)">&gt;</button>
+					</div>
+
 				</div>
 				<div class="col d-flex justify-content-center align-items-center">
 					<div>
@@ -163,16 +175,3 @@
 	</div>
 </div>
 
-<ng-template #userSettingsTemplate>
-	<div class="d-flex gap-2">
-		<button class="btn arrow left flex-shrink-0" type="button" (click)="panLeft()">&lt;</button>
-		<div class="d-flex gap-3 align-items-center border bg-black" style="overflow: hidden;">
-			<img src="{{paddleSkins[0].src}}" style="height: 50px; width: 10px; margin-left: -10px;" alt="Skin" [@slideFarLeft]="slideDirection">
-			<img src="{{paddleSkins[1].src}}" style="margin-left: 5px;" alt="Skin" [@slideLeft]="slideDirection">
-			<img src="{{paddleSkins[2].src}}" style="height: 200px; width: 40px;" alt="Skin" [@slideCenter]="slideDirection">
-			<img src="{{paddleSkins[3].src}}" style="margin-right: 5px;" alt="Skin" [@slideRight]="slideDirection">
-			<img src="{{paddleSkins[4].src}}" style="height: 50px; width: 10px;" alt="Skin" [@slideFarRight]="slideDirection">
-		</div>
-		<button class="btn arrow right flex-shrink-0" type="button" (click)="panRight()">&gt;</button>
-	</div>
-</ng-template>

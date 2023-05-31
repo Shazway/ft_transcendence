@@ -120,3 +120,12 @@ export class ApplyProfile {
 	skins: number[];
 	title: string;
 }
+
+export class UserSettings {
+	username: string;
+	skins: number[];
+	title: string;
+	doubleAuth: boolean;
+	channelInviteAuth: number;
+	img_url: string;
+}
