@@ -7,7 +7,7 @@ import { PopoverConfig } from 'src/dtos/Popover.dto';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FetchService } from '../fetch.service';
-import { AnyProfileUser } from 'src/dtos/User.dto';
+import { AnyProfileUser, MyProfileUser } from 'src/dtos/User.dto';
 import { AchievementList } from 'src/dtos/Achievement.dto';
 import { ShopItem } from 'src/dtos/ShopItem.dto';
 
@@ -89,20 +89,26 @@ export class ProfileComponent implements AfterViewInit {
 	settingState = 'closed';
 	achievements: AchievementList = {unlockedAchievements: [], lockedAchievements: []};
 
+	changes : { skins : boolean, invite : boolean, doubleAuth : boolean } = {skins : false, invite : false, doubleAuth : false};
+	nobodyElm = this.elRef.nativeElement.querySelector("#nobody");
+	friendsElm = this.elRef.nativeElement.querySelector("#friends");
+	everyoneElm = this.elRef.nativeElement.querySelector("#everybody");
+	AuthElm = this.elRef.nativeElement.querySelector("#doubleAuthBox");
+	
 	constructor(
 		private cdr: ChangeDetectorRef,
 		private parent: AppComponent,
 		private route: ActivatedRoute,
+		private elRef: ElementRef,
 		private fetchService: FetchService,
 		private router: Router,
 	) {
 		Chart.register(ChartDataLabels);
 		this.matchHistory = new Array;
-		this.getSkins();
 	}
 
 	async getSkins() {
-		this.allSkins = await this.fetchService.getAllSkins();
+		this.allSkins = await this.fetchService.getUserSkins();
 		this.paddleSkins = this.allSkins.filter((a)=>{return a.type == 'Paddle'});
 		this.ballSkins = this.allSkins.filter((a)=>{return a.type == 'Ball'});
 		this.backgroundSkins = this.allSkins.filter((a)=>{return a.type == 'Background'});
@@ -111,7 +117,25 @@ export class ProfileComponent implements AfterViewInit {
 			this.windowBall.push(this.ballSkins[i % this.ballSkins.length]);
 			this.windowBackground.push(this.backgroundSkins[i % this.backgroundSkins.length]);
 		}
+		console.log(this.user.current_skins);
+		console.log(this.allSkins);
+		while (this.user.current_skins[0] != -1 && this.windowPaddle[2].skin_id != this.user.current_skins[0])
+			this.panRight(this.windowPaddle, this.paddleSkins, 'slideDirectionPaddle');
+		while (this.user.current_skins[1] != -1 && this.windowBall[2].skin_id != this.user.current_skins[0])
+			this.panRight(this.windowBall, this.ballSkins, 'slideDirectionBall');
+		while (this.user.current_skins[2] != -1 && this.windowBackground[2].skin_id != this.user.current_skins[0])
+			this.panRight(this.windowBackground, this.backgroundSkins, 'slideDirectionBackground');
 		console.log(this.windowPaddle);
+
+		if (this.user.channelInviteAuth == 0)
+			this.nobodyElm.setAttribute('checked', '');
+		else if (this.user.channelInviteAuth == 0)
+			this.friendsElm.setAttribute('checked', '');
+		else if (this.user.channelInviteAuth == 0)
+			this.everyoneElm.setAttribute('checked', '');
+
+		if (this.user.double_auth)
+			this.AuthElm.setAttribute('checked', '');
 	}
 	
 	async customOnInit() {
@@ -119,7 +143,7 @@ export class ProfileComponent implements AfterViewInit {
 			this.router.navigateByUrl('login');
 		const name = this.route.snapshot.queryParamMap.get('username');
 		if (!name) {
-			const newUser = await this.fetchService.getProfile(localStorage.getItem('username'));
+			const newUser = await this.fetchService.getMyProfile();
 			if (newUser)
 				this.user = newUser;
 		}
@@ -149,6 +173,8 @@ export class ProfileComponent implements AfterViewInit {
 			});
 			this.rank = this.user.rank_score;
 		}
+		this.getSkins();
+
 	}
 
 	isMyProfile() {
@@ -168,6 +194,34 @@ export class ProfileComponent implements AfterViewInit {
 			return (name == localStorage.getItem('username'));
 	}
 
+
+	updateSkins() {
+		if (this.user.current_skins[0] != this.windowPaddle[2].skin_id)
+		{
+			this.changes.skins = true;
+			this.user.current_skins[0] = this.windowPaddle[2].skin_id;
+		}
+		if (this.user.current_skins[1] != this.windowBall[2].skin_id)
+		{
+			this.changes.skins = true;
+			this.user.current_skins[1] = this.windowBall[2].skin_id;
+		}
+		if (this.user.current_skins[2] != this.windowBackground[2].skin_id)
+		{
+			this.changes.skins = true;
+			this.user.current_skins[2] = this.windowBackground[2].skin_id;
+		}
+	}
+
+	updateSettings() {
+		this.updateSkins();
+		if (this.changes.skins)
+			this.fetchService.applySkins(this.user.current_skins);
+		if (this.changes.invite)
+			this.fetchService.changeInvite(this.user.channelInviteAuth);
+		if (this.changes.doubleAuth)
+			this.fetchService.toggleDoubleAuth(this.user.double_auth)
+	}
 
 	generateMatches() {
 		const nbGenerate = 1000;
@@ -629,8 +683,33 @@ export class ProfileComponent implements AfterViewInit {
 		return (this.isCurrentProfile(player) ? match.P1URL : match.P2URL);
 	}
 
-	acceptChanInviteFrom(people : string) {
+	acceptChanInviteFrom(people : number) {
+		this.changes.invite = true;
+		this.user.channelInviteAuth = people;
+		this.nobodyElm.removeAttribute('checked');
+		this.friendsElm.removeAttribute('checked');
+		this.everyoneElm.removeAttribute('checked');
 
+		if (people == 0)
+			this.nobodyElm.setAttribute('checked', '');
+		else if (people == 0)
+			this.friendsElm.setAttribute('checked', '');
+		else if (people == 0)
+			this.everyoneElm.setAttribute('checked', '');
+	}
+
+	toggleAuth() {
+		this.changes.doubleAuth = true;
+		if (this.AuthElm.checked)
+		{
+			this.AuthElm.removeAttribute('checked');
+			this.user.double_auth = false;
+		}
+		else
+		{
+			this.AuthElm.setAttribute('checked', '');
+			this.user.double_auth = true;
+		}
 	}
 }
 

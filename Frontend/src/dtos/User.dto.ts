@@ -31,10 +31,14 @@ export interface AnyProfileUser {
 	wins: number;
 	losses: number;
 	achievements: AchievementList;
+	currency: number;
 	friend: User[];
 	user_id: number;
 	intra_id: number;
 	title: string;
+	channelInviteAuth: number;
+	current_skins: number[];
+	double_auth: boolean;
 }
 
 
@@ -56,6 +60,9 @@ export interface MyProfileUser {
 	user_id: number;
 	intra_id: number;
 	title: string;
+	channelInviteAuth: number;
+	current_skins: number[];
+	double_auth: boolean;
 }
 
 export interface FriendRequest {
