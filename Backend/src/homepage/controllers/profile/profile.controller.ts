@@ -90,6 +90,7 @@ export class ProfileController {
 		serializedUser.achievements = new AchievementList();
 		serializedUser.achievements.unlockedAchievements = achievements;
 		serializedUser.achievements.lockedAchievements = this.itemsService.getLockedAchievements(targetUser, allAchievements);
+		//serializedUser.match_history.forEach((match) => console.log(match));
 		res.status(HttpStatus.OK).send(serializedUser);
 	}
 }

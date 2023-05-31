@@ -6,7 +6,6 @@ import { ChannelUser } from 'src/entities/channel_user.entity';
 import { pongObject } from 'src/homepage/dtos/Pong.dto';
 import { ApplySkins } from 'src/homepage/dtos/User.dto';
 import { Repository } from 'typeorm';
-import { NotificationsService } from '../notifications/notifications.service';
 import { NotificationsGateway } from 'src/homepage/gateway/notifications/notifications.gateway';
 
 @Injectable()
@@ -103,12 +102,13 @@ export class ItemsService {
 		.leftJoinAndSelect('user.friend', 'friend')
 		.leftJoinAndSelect('user.blacklistEntry', 'blacklistEntry')
 		.leftJoinAndSelect('user.channel', 'channel')
-		.leftJoinAndSelect(
-			'user.match_history',
-			'match_history',
-			'match_history.match_id IN ' +
-			'(SELECT match.match_id FROM match ORDER BY match.match_id DESC LIMIT 100)'
-		)
+		.leftJoinAndSelect('user.match_history', 'match_history')
+		//.leftJoinAndSelect(
+		//	'user.match_history',
+		//	'match_history',
+		//	'match_history.match_id IN ' +
+		//	'(SELECT match.match_id FROM match ORDER BY match.match_id DESC LIMIT 100)'
+		//)
 		.leftJoinAndSelect('match_history.user', 'users')
 		.leftJoinAndSelect('user.skin', 'skin')
 		.where('user.username = :username', { username })
@@ -606,8 +606,8 @@ export class ItemsService {
 		else
 		{
 			console.log(userTwo.username + ' a gagné');
-			match.is_victory[1] = true;
-			match.is_victory[0] = false;
+			match.is_victory[0] = true;
+			match.is_victory[1] = false;
 			if (matchSetting.is_ranked)
 			{
 				userOne = this.updateLoser(userOne);

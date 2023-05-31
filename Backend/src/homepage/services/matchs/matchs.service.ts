@@ -53,9 +53,10 @@ export class MatchsService {
 		if (!matchSetting) await this.createRankedMatchSetting();
 		else await this.createCustomMatchSetting(matchSetting);
 
-		userOne.match_history.push(match);
-		userTwo.match_history.push(match);
-		await this.usersRepo.save([userOne, userTwo]);
+		match.user.push(userOne, userTwo);
+		//userOne.match_history.push(match);
+		//userTwo.match_history.push(match);
+		//await this.usersRepo.save([userOne, userTwo]);
 		return await this.matchRepo.save(match);
 	}
 
