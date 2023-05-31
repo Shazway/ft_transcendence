@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AchievementsEntity, ChannelEntity, ChannelUserRelation, FriendrequestRelation, MatchEntity, MatchSettingEntity, MessageEntity, SkinEntity, UserEntity } from 'src/entities';
 import { ChannelUser } from 'src/entities/channel_user.entity';
 import { pongObject } from 'src/homepage/dtos/Pong.dto';
-import { ApplyProfile } from 'src/homepage/dtos/User.dto';
+import { ApplySkins } from 'src/homepage/dtos/User.dto';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -638,13 +638,12 @@ export class ItemsService {
 		return await this.userRepo.save(user);
 	}
 
-	async applySelectedSkins(userId: number, applyProfile: ApplyProfile)
+	async applySelectedSkins(userId: number, applyProfile: ApplySkins)
 	{
 		const user = await this.getUser(userId);
 		if (!user)
 			return null;
 		user.current_skins = applyProfile.skins;
-		user.title = applyProfile.title;
 		return await this.userRepo.save(user);
 	}
 
