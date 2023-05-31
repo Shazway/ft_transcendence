@@ -489,16 +489,50 @@ export class FetchService {
 		return (res);
 	}
 
-	applySkins(skins : Number[]) {
-		console.log('appel au back a faire');
+	async applySkins(skins : Number[]) {
+		let res: any;
+		const teaFunc = this.teapotError;
+		const route = this.router;
+		await axios.post<any>('http://localhost:3001/profile/ApplySkins', { skins : skins }, this.getHeader())
+		.then(function (response) {
+			res = response.data;
+		})
+		.catch(function (error) {
+			teaFunc(error, route);
+		})
+		.finally(function () {});
+		return res;
 	}
 
-	changeInvite(param : Number) {
-		console.log('appel au back a faire');
+	async changeInvite(param : Number) {
+		console.log("sending invite=" + param);
+		let res: any;
+		const teaFunc = this.teapotError;
+		const route = this.router;
+		await axios.post<any>('http://localhost:3001/profile/changeChannelInviteAuth',{ newSetting : param }, this.getHeader())
+		.then(function (response) {
+			res = response.data;
+		})
+		.catch(function (error) {
+			teaFunc(error, route);
+		})
+		.finally(function () {});
+		return res;
 	}
 
-	toggleDoubleAuth(bool : boolean) {
-		console.log('appel au back a faire');
+	async toggleDoubleAuth() {
+		let res: any;
+		const teaFunc = this.teapotError;
+		const route = this.router;
+		await axios.get<any>('http://localhost:3001/login/toggleDoubleAuth', this.getHeader())
+		.then(function (response) {
+			res = response.data;
+		})
+		.catch(function (error) {
+			teaFunc(error, route);
+		})
+		.finally(function () {});
+		return res;
 	}
 	
 }
