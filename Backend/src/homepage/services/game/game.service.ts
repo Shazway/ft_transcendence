@@ -88,13 +88,17 @@ export class GamesService {
 	{
 		if (pointChecker.side == this.RIGHT)
 		{
-			this.match.current_score[1]++;
+			this.match.current_score[0]++;
+			console.log('score de 0');
+			console.log(this.player1.player.username);
 			this.ball.direction = 3 * (Math.PI / 4);
 		}
 		else
 		{
-			this.match.current_score[0]++;
+			this.match.current_score[1]++;
 			this.ball.direction = Math.PI / 4;
+			console.log('score de 1');
+			console.log(this.player2.player.username);
 		}
 		this.emitScore(pointChecker);
 		await this.itemsService.saveMatchState(this.match);
