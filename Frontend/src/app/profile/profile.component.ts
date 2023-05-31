@@ -46,7 +46,7 @@ interface Pair {
 		]),
 		trigger('slideLeft', [
 			state('left', style({ transform: 'translateX(-235%) scale(0.5)' })),
-			state('right', style({ transform: 'translateX(235%) scale(2)' })),
+			state('right', style({ transform: 'translateX(235%) scale(1.8)' })),
 			transition('none => left, none => right', animate('300ms ease-out'))
 		]),
 		trigger('slideCenter', [
@@ -55,7 +55,7 @@ interface Pair {
 			transition('none => left, none => right', animate('300ms ease-out'))
 		]),
 		trigger('slideRight', [
-			state('left', style({ transform: 'translateX(-235%) scale(2)' })),
+			state('left', style({ transform: 'translateX(-235%) scale(1.8)' })),
 			state('right', style({ transform: 'translateX(235%) scale(0.5)' })),
 			transition('none => left, none => right', animate('300ms ease-out'))
 		]),
@@ -83,7 +83,9 @@ export class ProfileComponent implements AfterViewInit {
 	windowBall : ShopItem[] = [];
 	backgroundSkins! : ShopItem[];
 	windowBackground : ShopItem[] = [];
-	slideDirection = 'none';
+	slideDirectionPaddle = 'none';
+	slideDirectionBall = 'none';
+	slideDirectionBackground = 'none';
 	settingState = 'closed';
 	achievements: AchievementList = {unlockedAchievements: [], lockedAchievements: []};
 
@@ -214,9 +216,14 @@ export class ProfileComponent implements AfterViewInit {
 		this.cdr.reattach();
 	}
 	
-	panLeft(window : ShopItem[], skins : ShopItem[]) {
+	panLeft(window : ShopItem[], skins : ShopItem[], slideDirection : string) {
 		//ajouter une variable pour le slide, faire une variable par carousel
-		this.slideDirection = 'left';
+		if (slideDirection == 'slideDirectionBall')
+			this.slideDirectionBall = 'left';
+		if (slideDirection == 'slideDirectionPaddle')
+			this.slideDirectionPaddle = 'left';
+		if (slideDirection == 'slideDirectionBackground')
+			this.slideDirectionBackground = 'left';
 		setTimeout(() => {
 			let index = skins.indexOf(window[4]);
 			if (index < skins.length - 1)
@@ -225,12 +232,22 @@ export class ProfileComponent implements AfterViewInit {
 				index = 0;
 			window.shift();
 			window.push(skins[index]);
-			this.slideDirection = 'none';
+			if (slideDirection == 'slideDirectionBall')
+				this.slideDirectionBall = 'none';
+			if (slideDirection == 'slideDirectionPaddle')
+				this.slideDirectionPaddle = 'none';
+			if (slideDirection == 'slideDirectionBackground')
+				this.slideDirectionBackground = 'none';
 		}, 300);
 	}
 	
-	panRight(window : ShopItem[], skins : ShopItem[]) {
-		this.slideDirection = 'right';
+	panRight(window : ShopItem[], skins : ShopItem[], slideDirection : string) {
+		if (slideDirection == 'slideDirectionBall')
+			this.slideDirectionBall = 'right';
+		if (slideDirection == 'slideDirectionPaddle')
+			this.slideDirectionPaddle = 'right';
+		if (slideDirection == 'slideDirectionBackground')
+			this.slideDirectionBackground = 'right';
 		setTimeout(() => {
 			let index = skins.indexOf(window[0]);
 			if (index > 0)
@@ -239,7 +256,12 @@ export class ProfileComponent implements AfterViewInit {
 				index = skins.length - 1;
 			window.pop();
 			window.unshift(skins[index]);
-			this.slideDirection = 'none';
+			if (slideDirection == 'slideDirectionBall')
+				this.slideDirectionBall = 'none';
+			if (slideDirection == 'slideDirectionPaddle')
+				this.slideDirectionPaddle = 'none';
+			if (slideDirection == 'slideDirectionBackground')
+				this.slideDirectionBackground = 'none';
 		}, 300);
 	}
 
@@ -599,6 +621,10 @@ export class ProfileComponent implements AfterViewInit {
 
 	getImg(match: MatchHistory, player: string) {
 		return (this.isCurrentProfile(player) ? match.P1URL : match.P2URL);
+	}
+
+	acceptChanInviteFrom(people : string) {
+
 	}
 }
 

@@ -488,5 +488,9 @@ export class FetchService {
 		.finally(function () {});
 		return (res);
 	}
+
+	async getSettings() {
+
+	}
 	
 }
