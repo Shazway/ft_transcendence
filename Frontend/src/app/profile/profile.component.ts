@@ -113,15 +113,20 @@ export class ProfileComponent implements AfterViewInit {
 			this.windowBall.push(this.ballSkins[i % this.ballSkins.length]);
 			this.windowBackground.push(this.backgroundSkins[i % this.backgroundSkins.length]);
 		}
-		console.log(this.allSkins);
+		console.log("My paddles");
+		console.log(this.paddleSkins);
+		console.log("My balls")
+		console.log(this.ballSkins);
+		console.log("My backgrounds")
+		console.log(this.backgroundSkins);
 		console.log(this.user.current_skins);
-		// while (this.user.current_skins[0] != -1 && this.windowPaddle[2].skin_id != this.user.current_skins[0])
-		// 	this.panRight(this.windowPaddle, this.paddleSkins, 'slideDirectionPaddle');
-		// while (this.user.current_skins[1] != -1 && this.windowBall[2].skin_id != this.user.current_skins[1])
-		// 	this.panRight(this.windowBall, this.ballSkins, 'slideDirectionBall');
+		while (this.user.current_skins[0] != -1 && this.windowPaddle[2].skin_id != this.user.current_skins[0])
+			this.panRight(this.windowPaddle, this.paddleSkins, 'slideDirectionPaddle');
+		while (this.user.current_skins[1] != -1 && this.windowBall[2].skin_id != this.user.current_skins[1])
+			this.panRight(this.windowBall, this.ballSkins, 'slideDirectionBall');
 		// while (this.user.current_skins[2] != -1 && this.windowBackground[2].skin_id != this.user.current_skins[2])
 		// 	this.panRight(this.windowBackground, this.backgroundSkins, 'slideDirectionBackground');
-		console.log(this.windowPaddle);
+		// console.log(this.windowPaddle);
 	}
 	
 	async customOnInit() {
@@ -159,8 +164,10 @@ export class ProfileComponent implements AfterViewInit {
 			});
 			this.rank = this.user.rank_score;
 		}
-		this.getSkins();
-		this.printSettings();
+		if (this.isMyProfile()) {
+			this.getSkins();
+			this.printSettings();
+		}
 	}
 
 	printSettings() {
@@ -215,6 +222,7 @@ export class ProfileComponent implements AfterViewInit {
 			this.fetchService.changeInvite(this.user.channelInviteAuth);
 		if (this.changes.doubleAuth)
 			this.fetchService.toggleDoubleAuth();
+		this.createSettingsPopup();
 	}
 
 	generateMatches() {
