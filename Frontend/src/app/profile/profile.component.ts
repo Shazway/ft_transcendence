@@ -90,10 +90,11 @@ export class ProfileComponent implements AfterViewInit {
 	achievements: AchievementList = {unlockedAchievements: [], lockedAchievements: []};
 
 	changes : { skins : boolean, invite : boolean, doubleAuth : boolean } = {skins : false, invite : false, doubleAuth : false};
-	nobodyElm = this.elRef.nativeElement.querySelector("#nobody");
-	friendsElm = this.elRef.nativeElement.querySelector("#friends");
-	everyoneElm = this.elRef.nativeElement.querySelector("#everybody");
-	AuthElm = this.elRef.nativeElement.querySelector("#doubleAuthBox");
+
+	nobodyChecked = false;
+	friendsChecked = false;
+	everyoneChecked = false;
+	doubleAuthChecked = false;
 	
 	constructor(
 		private cdr: ChangeDetectorRef,
@@ -117,25 +118,24 @@ export class ProfileComponent implements AfterViewInit {
 			this.windowBall.push(this.ballSkins[i % this.ballSkins.length]);
 			this.windowBackground.push(this.backgroundSkins[i % this.backgroundSkins.length]);
 		}
-		console.log(this.allSkins);
-		console.log(this.user.current_skins);
 		while (this.user.current_skins[0] != -1 && this.windowPaddle[2].skin_id != this.user.current_skins[0])
-			this.panRight(this.windowPaddle, this.paddleSkins, 'slideDirectionPaddle');
+			this.autoRotate(this.windowPaddle, this.paddleSkins);
 		while (this.user.current_skins[1] != -1 && this.windowBall[2].skin_id != this.user.current_skins[1])
-			this.panRight(this.windowBall, this.ballSkins, 'slideDirectionBall');
+			this.autoRotate(this.windowBall, this.ballSkins);
 		while (this.user.current_skins[2] != -1 && this.windowBackground[2].skin_id != this.user.current_skins[2])
-			this.panRight(this.windowBackground, this.backgroundSkins, 'slideDirectionBackground');
-		console.log(this.windowPaddle);
+			this.autoRotate(this.windowBackground, this.backgroundSkins);
+	}
 
+	initToggles() {
 		if (this.user.channelInviteAuth == 0)
-			this.nobodyElm.setAttribute('checked', '');
-		else if (this.user.channelInviteAuth == 0)
-			this.friendsElm.setAttribute('checked', '');
-		else if (this.user.channelInviteAuth == 0)
-			this.everyoneElm.setAttribute('checked', '');
+			this.nobodyChecked = true;
+		else if (this.user.channelInviteAuth == 1)
+			this.friendsChecked = true;
+		else
+			this.everyoneChecked = true;
 
 		if (this.user.double_auth)
-			this.AuthElm.setAttribute('checked', '');
+			this.doubleAuthChecked = true;
 	}
 	
 	async customOnInit() {
@@ -173,8 +173,19 @@ export class ProfileComponent implements AfterViewInit {
 			});
 			this.rank = this.user.rank_score;
 		}
-		this.getSkins();
+		if (this.isMyProfile()) {
+			this.initToggles();
+			this.getSkins();
+			this.printSettings();
+		}
+	}
 
+	printSettings() {
+		console.log("Paddle : " + this.user.current_skins[0]);
+		console.log("Ball : " + this.user.current_skins[1]);
+		console.log("Background : " + this.user.current_skins[2]);
+		console.log("Invites : " + this.user.channelInviteAuth);
+		console.log("Double Auth: " + this.user.double_auth);
 	}
 
 	isMyProfile() {
@@ -220,7 +231,8 @@ export class ProfileComponent implements AfterViewInit {
 		if (this.changes.invite)
 			this.fetchService.changeInvite(this.user.channelInviteAuth);
 		if (this.changes.doubleAuth)
-			this.fetchService.toggleDoubleAuth(this.user.double_auth)
+			this.fetchService.toggleDoubleAuth();
+		this.createSettingsPopup();
 	}
 
 	generateMatches() {
@@ -294,6 +306,16 @@ export class ProfileComponent implements AfterViewInit {
 				this.slideDirectionBackground = 'none';
 		}, 300);
 	}
+
+	autoRotate(window : ShopItem[], skins : ShopItem[]) {
+		let index = skins.indexOf(window[0]);
+		if (index > 0)
+			index--;
+		else
+			index = skins.length - 1;
+		window.pop();
+		window.unshift(skins[index]);
+	}
 	
 	panRight(window : ShopItem[], skins : ShopItem[], slideDirection : string) {
 		if (slideDirection == 'slideDirectionBall')
@@ -302,7 +324,9 @@ export class ProfileComponent implements AfterViewInit {
 			this.slideDirectionPaddle = 'right';
 		if (slideDirection == 'slideDirectionBackground')
 			this.slideDirectionBackground = 'right';
+		
 		setTimeout(() => {
+			console.log("boucle");
 			let index = skins.indexOf(window[0]);
 			if (index > 0)
 				index--;
@@ -444,6 +468,7 @@ export class ProfileComponent implements AfterViewInit {
 			}
 		});
 		this.matchHistory.reverse();
+		console.log(ret);
 		return ret;
 	}
 
@@ -686,30 +711,13 @@ export class ProfileComponent implements AfterViewInit {
 	acceptChanInviteFrom(people : number) {
 		this.changes.invite = true;
 		this.user.channelInviteAuth = people;
-		this.nobodyElm.removeAttribute('checked');
-		this.friendsElm.removeAttribute('checked');
-		this.everyoneElm.removeAttribute('checked');
-
-		if (people == 0)
-			this.nobodyElm.setAttribute('checked', '');
-		else if (people == 0)
-			this.friendsElm.setAttribute('checked', '');
-		else if (people == 0)
-			this.everyoneElm.setAttribute('checked', '');
+		console.log("invite : " + this.user.channelInviteAuth);
 	}
 
 	toggleAuth() {
-		this.changes.doubleAuth = true;
-		if (this.AuthElm.checked)
-		{
-			this.AuthElm.removeAttribute('checked');
-			this.user.double_auth = false;
-		}
-		else
-		{
-			this.AuthElm.setAttribute('checked', '');
-			this.user.double_auth = true;
-		}
+		this.changes.doubleAuth = !this.changes.doubleAuth;
+		this.user.double_auth = !this.user.double_auth;
+		console.log("double auth : " + this.user.double_auth);
 	}
 }
 

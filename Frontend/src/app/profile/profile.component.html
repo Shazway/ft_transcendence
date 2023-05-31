@@ -89,22 +89,32 @@
 						</div>
 						<div>{{windowBall[2].name}}</div>
 					</div>
+					<div class="text-center">
+						<div class="d-flex gap-2">
+							<button class="btn arrow left flex-shrink-0" type="button" (click)="panLeft(windowBackground, backgroundSkins, 'slideDirectionBackground')">&lt;</button>
+							<div class="d-flex gap-3 align-items-center border bg-black" style="overflow: hidden; height: 200px;">
+								<img src="{{windowBackground[2].img_url}}" style="height: 100px; width: 120px;" alt="Skin" [@slideCenter]="slideDirectionBackground">
+							</div>
+							<button class="btn arrow right flex-shrink-0" type="button" (click)="panRight(windowBackground, backgroundSkins, 'slideDirectionBackground')">&gt;</button>
+						</div>
+						<div>{{windowBackground[2].name}}</div>
+					</div>
 					<div>
 						<p>Accept channel invitations from:</p>
 						<div class="form-check" (click)="acceptChanInviteFrom(0)">
-							<input class="form-check-input" type="radio" name="flexRadioDefault" id="nobody">
+							<input class="form-check-input" type="radio" name="flexRadioDefault" [checked]="nobodyChecked">
 							<label class="form-check-label" for="flexRadioDefault1">
 								nobody
 							</label>
 						</div>
 						<div class="form-check" (click)="acceptChanInviteFrom(1)">
-							<input class="form-check-input" type="radio" name="flexRadioDefault" id="friends">
+							<input class="form-check-input" type="radio" name="flexRadioDefault" [checked]="friendsChecked">
 							<label class="form-check-label" for="flexRadioDefault2">
 								my friends
 							</label>
 						</div>
 						<div class="form-check" (click)="acceptChanInviteFrom(2)">
-							<input class="form-check-input" type="radio" name="flexRadioDefault" id="everyone">
+							<input class="form-check-input" type="radio" name="flexRadioDefault" [checked]="everyoneChecked">
 							<label class="form-check-label" for="flexRadioDefault1">
 								everyone
 							</label>
@@ -112,7 +122,7 @@
 					</div>
 					<div>
 						<label for="doubleAuthBox">Activate Double Auth:</label>
-						<input type="checkbox" id="doubleAuthBox" (click)="toggleAuth()">
+						<input type="checkbox" (click)="toggleAuth()" [checked]="doubleAuthChecked">
 					</div>
 				</div>
 			</div>
