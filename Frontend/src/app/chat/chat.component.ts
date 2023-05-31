@@ -338,10 +338,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			return;
 		for (let index = this.msgs$.length; index > 0; index--)
 			this.sortMessage(this.msgs$[index - 1]);
-		if (!checkPWD)
-			this.client = io('ws://localhost:3002?channel_id=' + channel.channel_id, this.websocketService.getHeader());
-		else
-			this.client = io('ws://localhost:3002?channel_id=' + channel.channel_id + '&pass=' + pwd, this.websocketService.getHeader());
+		this.client = io('ws://localhost:3002?channel_id=' + channel.channel_id, this.websocketService.getHeader());
 		this.currentChannel = channel;
 		this.setClientEvent();
 		const us_channel = this.getUserFromCurrentChannel(localStorage.getItem('username'));
@@ -379,6 +376,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			}
 		});
 		return user;
+	}
+
+	getMeFromChannel(chan: Channel): any {
+		return this.getUserFromChannel(localStorage.getItem("username"), chan);
 	}
 
 	getUserFromChannel(name: string | null, chan: Channel): any {

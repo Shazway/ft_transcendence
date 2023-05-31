@@ -276,7 +276,7 @@ export class ProfileComponent implements AfterViewInit {
 		await this.customOnInit();
 		this.isLoaded = true;
 		this.cdr.detectChanges();
-		if (this.user && this.user.match_history.length > 0) {
+		if (this.matchHistory.length > 0) {
 			this.matchChart = new Chart(document.getElementById('matchChart') as HTMLCanvasElement, this.getMatchChartConfig());
 			this.rankChart = new Chart(document.getElementById('rankChart') as HTMLCanvasElement, this.getRankedChartConfig());
 		}
@@ -470,8 +470,18 @@ export class ProfileComponent implements AfterViewInit {
 			}
 		});
 		this.matchHistory.reverse();
-		console.log(ret);
 		return ret;
+	}
+
+	getPercentAchieved() {
+		if (this.isCurrentProfile('Mr.Connasse')) {
+			return '72%';
+		}
+		if (!this.user.achievements.unlockedAchievements.length)
+			return '0%';
+		const total = this.user.achievements.lockedAchievements.length + this.user.achievements.unlockedAchievements.length;
+		const percent = round((this.user.achievements.unlockedAchievements.length / total) * 100);
+		return (percent + '%');
 	}
 
 	getStatus() {
