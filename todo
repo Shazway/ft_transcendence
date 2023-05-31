@@ -2,3 +2,5 @@
 setting de la double auth
 
 Emojis dans le chat peut etre
+
+@Get(':username') retirer cette route dans users controller, (i'm a dev pour creer des user ou se login comme on veut)

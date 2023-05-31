@@ -28,7 +28,7 @@ export class User {
 	@Column({ default: null, length: 30, unique: false })
 	title: string;
 
-	@Column({ default: null, length: 255 })
+	@Column({ default: null, length: 350 })
 	img_url!: string;
 
 	@Column({ default: 0, unsigned: true })
