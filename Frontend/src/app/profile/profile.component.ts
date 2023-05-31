@@ -574,11 +574,17 @@ export class ProfileComponent implements AfterViewInit {
 
 	getRatio() {
 		let ret = [0, 0];
-		const score = this.countScores();
-		for (let i = 0; i < 10; i++) {
-			ret[0] += score[i];
+		if (this.user) {
+			ret[1] = this.user.wins;
+			ret[0] = this.user.losses;
 		}
-		ret[1] = (this.matchHistory.length - ret[0]);
+		else if (this.isCurrentProfile('Mr.Connasse')) {
+			const score = this.countScores();
+			for (let i = 0; i < 10; i++) {
+				ret[0] += score[i];
+			}
+			ret[1] = (this.matchHistory.length - ret[0]);
+		}
 		return ret;
 	}
 
