@@ -1,0 +1,19 @@
+<div class="modal-header">
+	<h5 class="modal-title" id="exampleModalLongTitle">Change your avatar</h5>
+	<button type="button" class="close btn" (click)="onSubmit('')" aria-label="Close">
+	<span aria-hidden="true">&times;</span>
+	</button>
+</div>
+<form #AvatarForm="ngForm" (ngSubmit)="onSubmit(AvatarForm.value.input)">
+	<div class="modal-body">
+		<img src="user.img_url">
+		<div class="form-group">
+			<label>The link to your new avatar:</label>
+			<input name="input" type="string" class="form-control" ngModel>
+		</div>
+	</div>
+	<div class="modal-footer">
+		<button type="button" class="btn btn-secondary" (click)="activeModal.dismiss()">Close</button>
+		<button type="submit" class="btn btn-primary" value="submit">Save</button>
+	</div>
+</form>

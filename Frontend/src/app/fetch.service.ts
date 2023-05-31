@@ -534,5 +534,20 @@ export class FetchService {
 		.finally(function () {});
 		return res;
 	}
+
+	async changeAvatar(newAvatar : string) {
+		let res: any;
+		const teaFunc = this.teapotError;
+		const route = this.router;
+		await axios.post<any>('http://localhost:3001/profile/changeImg',{ img_url : newAvatar }, this.getHeader())
+		.then(function (response) {
+			res = response.status;
+		})
+		.catch(function (error) {
+			teaFunc(error, route);
+		})
+		.finally(function () {});
+		return res;
+	}
 	
 }

@@ -10,6 +10,8 @@ import { FetchService } from '../fetch.service';
 import { AnyProfileUser, MyProfileUser } from 'src/dtos/User.dto';
 import { AchievementList } from 'src/dtos/Achievement.dto';
 import { ShopItem } from 'src/dtos/ShopItem.dto';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ChangeAvatarPopup } from '../popup-component/popup-component.component';
 
 interface MatchHistory {
 	Player1: string;
@@ -100,8 +102,8 @@ export class ProfileComponent implements AfterViewInit {
 		private cdr: ChangeDetectorRef,
 		private parent: AppComponent,
 		private route: ActivatedRoute,
-		private elRef: ElementRef,
 		private fetchService: FetchService,
+		private modalService: NgbModal,
 		private router: Router,
 	) {
 		Chart.register(ChartDataLabels);
@@ -718,6 +720,27 @@ export class ProfileComponent implements AfterViewInit {
 		this.changes.doubleAuth = !this.changes.doubleAuth;
 		this.user.double_auth = !this.user.double_auth;
 		console.log("double auth : " + this.user.double_auth);
+	}
+
+	async popupAvatar() {
+		const modalRef = this.modalService.open(ChangeAvatarPopup);
+		modalRef.componentInstance.user = this.user;
+		return await modalRef.result;
+	}
+
+	async openChangeAvatar() {
+		let newAvatar = await this.popupAvatar();
+		if (newAvatar.length > 0)
+		{
+			const res = await this.fetchService.changeAvatar(newAvatar);
+			if (res == 202)
+			{
+				this.user.img_url = newAvatar;
+				localStorage.setItem('img_url', newAvatar);
+			}
+			else
+				console.log("echec");
+		}
 	}
 }
 

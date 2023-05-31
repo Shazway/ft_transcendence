@@ -13,7 +13,7 @@ import { WebsocketService } from './websocket.service';
 import { AuthModule } from './auth/auth.module';
 import { ValidateModule } from './validate/validate.module';
 import { MatchMakingComponent } from './match-making/match-making.component';
-import { ChatPopup, ConfirmBuyPopup, PasswordPopup, PunishmentPopup } from './popup-component/popup-component.component';
+import { ChangeAvatarPopup, ChatPopup, ConfirmBuyPopup, PasswordPopup, PunishmentPopup } from './popup-component/popup-component.component';
 import { NotificationService } from './notification.service';
 import { ProfileModule } from './profile/profile.module';
 import { ProfilePopupModule } from './profile-popup/profile-popup.module';
@@ -34,6 +34,7 @@ declarations: [
 	AppComponent,
 	PunishmentPopup,
 	PasswordPopup,
+	ChangeAvatarPopup,
 	ChatPopup,
 	ShopComponent,
 	ConfirmBuyPopup,
