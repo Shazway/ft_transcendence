@@ -184,7 +184,6 @@ export class ballObject {
 			opponent.score += 1;
 		if (side == this.RIGHT)
 			player.score += 1;
-
 	}
 
 	moveObject(delta: number, player: pongObject, opponent: pongObject) {
