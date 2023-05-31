@@ -119,13 +119,13 @@ export class ProfileComponent implements AfterViewInit {
 		}
 		console.log(this.allSkins);
 		console.log(this.user.current_skins);
-		// while (this.user.current_skins[0] != -1 && this.windowPaddle[2].skin_id != this.user.current_skins[0])
-		// 	this.panRight(this.windowPaddle, this.paddleSkins, 'slideDirectionPaddle');
-		// while (this.user.current_skins[1] != -1 && this.windowBall[2].skin_id != this.user.current_skins[0])
-		// 	this.panRight(this.windowBall, this.ballSkins, 'slideDirectionBall');
-		// while (this.user.current_skins[2] != -1 && this.windowBackground[2].skin_id != this.user.current_skins[0])
-		// 	this.panRight(this.windowBackground, this.backgroundSkins, 'slideDirectionBackground');
-		// console.log(this.windowPaddle);
+		while (this.user.current_skins[0] != -1 && this.windowPaddle[2].skin_id != this.user.current_skins[0])
+			this.panRight(this.windowPaddle, this.paddleSkins, 'slideDirectionPaddle');
+		while (this.user.current_skins[1] != -1 && this.windowBall[2].skin_id != this.user.current_skins[1])
+			this.panRight(this.windowBall, this.ballSkins, 'slideDirectionBall');
+		while (this.user.current_skins[2] != -1 && this.windowBackground[2].skin_id != this.user.current_skins[2])
+			this.panRight(this.windowBackground, this.backgroundSkins, 'slideDirectionBackground');
+		console.log(this.windowPaddle);
 
 		if (this.user.channelInviteAuth == 0)
 			this.nobodyElm.setAttribute('checked', '');
