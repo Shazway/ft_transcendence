@@ -444,6 +444,7 @@ export class ProfileComponent implements AfterViewInit {
 			}
 		});
 		this.matchHistory.reverse();
+		console.log(ret);
 		return ret;
 	}
 
