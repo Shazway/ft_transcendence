@@ -165,7 +165,10 @@ export class ChannelsController {
 		if (!body || !body.channel_id || !body.pass) return res.status(HttpStatus.UNAUTHORIZED).send('No body');
 		const channelId = body.channel_id;
 		const pass = body.pass;
-		res.status(HttpStatus.ACCEPTED).send({rightPass: (await this.channelService.rightPass(channelId, pass))})
+		const rightPass = await this.channelService.rightPass(channelId, pass);
+		if (rightPass)
+			await this.channelService.addUserToChannel(user.sub, channelId, pass);
+		res.status(HttpStatus.ACCEPTED).send({rightPass: rightPass})
 	}
 
 
