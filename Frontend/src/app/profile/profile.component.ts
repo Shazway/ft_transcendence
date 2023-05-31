@@ -475,10 +475,10 @@ export class ProfileComponent implements AfterViewInit {
 		if (this.isCurrentProfile('Mr.Connasse')) {
 			return '72%';
 		}
-		if (!this.achievements.unlockedAchievements.length)
+		if (!this.user.achievements.unlockedAchievements.length)
 			return '0%';
-		const total = this.achievements.lockedAchievements.length + this.achievements.unlockedAchievements.length;
-		const percent = round(this.achievements.unlockedAchievements.length / total);
+		const total = this.user.achievements.lockedAchievements.length + this.user.achievements.unlockedAchievements.length;
+		const percent = round((this.user.achievements.unlockedAchievements.length / total) * 100);
 		return (percent + '%');
 	}
 
