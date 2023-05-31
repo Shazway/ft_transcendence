@@ -18,6 +18,7 @@ import { MatchsService } from 'src/homepage/services/matchs/matchs.service';
 import { Mutex } from 'async-mutex';
 import { WsexceptionFilter } from 'src/homepage/filters/wsexception/wsexception.filter';
 import { UseFilters } from '@nestjs/common';
+import { NotificationsGateway } from '../notifications/notifications.gateway';
 
 @UseFilters(new WsexceptionFilter())
 @WebSocketGateway(3005, {
@@ -34,7 +35,8 @@ export class PongGateway {
 	constructor(
 		private tokenManager: TokenManagerService,
 		private itemsService: ItemsService,
-		private matchService: MatchsService
+		private matchService: MatchsService,
+		private notificationsGateway: NotificationsGateway
 	) {
 		this.connectMutex = new Mutex();
 		this.matchs = new Map<number, Match>();
@@ -121,7 +123,7 @@ export class PongGateway {
 	}
 
 	initMatch(match: Match, setting: MatchSettingEntity) {
-		match.gameService = new GamesService(this.itemsService);
+		match.gameService = new GamesService(this.itemsService, this.notificationsGateway);
 		match.gameService.initObjects(match.players[0], match.players[1]);
 		match.gameService.startGame(setting);
 		match.gameService.match = match.entity;
@@ -138,7 +140,7 @@ export class PongGateway {
 		if (!matchEntitiy)
 			return;
 		if (!matchEntitiy.is_ongoing)
-			return this.matchs.delete(matchEntitiy.match_id);;
+			return this.matchs.delete(matchEntitiy.match_id);
 		matchEntitiy.is_victory[this.getOtherPlayerIndex(matchEntitiy, user.sub)] = true;
 		await this.matchService.setMatchEnd(matchEntitiy);
 		const match = this.matchs.get(matchEntitiy.match_id);

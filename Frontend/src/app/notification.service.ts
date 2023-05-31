@@ -56,35 +56,36 @@ export class NotificationService {
 		this.client.on('success', (event) => { this.showSuccess(event.notification); console.log('success ', event); this.updateFriendRequests(); });
 		this.client.on('channel', (event) => { this.showChannel(event.notification); console.log('channel ', event); });
 		this.client.on('onError', (event) => { console.log('erreur + ' + event); });
+		this.client.on('newAchievement', (event) => { this.showAchievements(event); console.log(event); });
 	}
 
 	showNotificationInvite(notification: NotificationRequest) {
-		this.toastService.show(this.toastFriendRequest, { classname: 'bg-light p-0', delay: 10000, context: notification });
+		this.toastService.show(this.toastFriendRequest, { classname: 'bg-light p-0', delay: 5000, context: notification });
 	}
 
 	showNewFriend(notification: NotificationRequest) {
 		if (notification.accepted)
-			this.toastService.show(this.toastNewFriend, { classname: 'bg-light p-0', delay: 1000, context: notification });
+			this.toastService.show(this.toastNewFriend, { classname: 'bg-light p-0', delay: 5000, context: notification });
 	}
 
-	showAchievements(notification: NotificationRequest) {
-		this.toastService.show(this.toastAchievement, { classname: 'bg-light p-0', delay: 1000, context: notification });
+	showAchievements(notification: string) {
+		this.toastService.show(this.toastAchievement, { classname: 'bg-light p-0', delay: 10000, context: notification });
 	}
 
 	showChallenge(notification: NotificationRequest) {
-		this.toastService.show(this.toastChallenge, { classname: 'bg-light p-0', delay: 10000, context: notification });
+		this.toastService.show(this.toastChallenge, { classname: 'bg-light p-0', delay: 5000, context: notification });
 	}
 
 	showFailure(notification: NotificationRequest) {
-		this.toastService.show(this.toastFailure, { classname: 'bg-danger p-0', delay: 1000, context: notification });
+		this.toastService.show(this.toastFailure, { classname: 'bg-danger p-0', delay: 2000, context: notification });
 	}
 
 	showSuccess(notification: NotificationRequest) {
-		this.toastService.show(this.toastSuccess, { classname: 'bg-success p-0', delay: 1000, context: notification });
+		this.toastService.show(this.toastSuccess, { classname: 'bg-success p-0', delay: 2000, context: notification });
 	}
 
 	showChannel(notification: NotificationRequest) {
-		this.toastService.show(this.toastChannel, { classname: 'bg-light p-0', delay: 10000, context: notification });
+		this.toastService.show(this.toastChannel, { classname: 'bg-light p-0', delay: 5000, context: notification });
 	}
 
 	initTemplates(

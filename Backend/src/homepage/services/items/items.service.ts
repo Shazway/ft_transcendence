@@ -6,6 +6,8 @@ import { ChannelUser } from 'src/entities/channel_user.entity';
 import { pongObject } from 'src/homepage/dtos/Pong.dto';
 import { ApplySkins } from 'src/homepage/dtos/User.dto';
 import { Repository } from 'typeorm';
+import { NotificationsService } from '../notifications/notifications.service';
+import { NotificationsGateway } from 'src/homepage/gateway/notifications/notifications.gateway';
 
 @Injectable()
 export class ItemsService {
@@ -291,22 +293,6 @@ export class ItemsService {
 		return user;
 	}
 
-	public async addAchievementsToUser(
-		user_id: number,
-		achievement_id: number,
-	) {
-		const user = await this.getUser(user_id);
-		const achievement = await this.achieveRepo.findOneBy({
-			achievement_id,
-		});
-
-		if (!user ||!achievement)
-			return null;
-
-		user.achievement.push(achievement);
-		await this.userRepo.save(user);
-	}
-
 	public async createDMChannel(user1: UserEntity, user2: UserEntity) {
 		const channel = new ChannelEntity();
 	
@@ -558,26 +544,33 @@ export class ItemsService {
 		return player;
 	}
 
-	async updateLeftMatch(player1: pongObject, player2: pongObject, match: MatchEntity, id: number)
+	async updateLeftMatch(player1: pongObject, player2: pongObject, match: MatchEntity, id: number, matchSetting: MatchSettingEntity)
 	{
 		let userOne = await this.getUser(player1.player.user_id);
 		let userTwo = await this.getUser(player2.player.user_id);
 
 		if (!userOne || !userTwo)
 			return null;
+		console.log('leftMatch');
 		if (player1.player.user_id != id)
 		{
 			match.is_victory[0] = true;
 			match.is_victory[1] = false;
-			userOne = this.updateWinner(userOne);
-			userTwo = this.updateLoser(userTwo);
+			if (matchSetting.is_ranked)
+			{
+				userOne = this.updateWinner(userOne);
+				userTwo = this.updateLoser(userTwo);
+			}
 		}
 		else
 		{
 			match.is_victory[1] = true;
 			match.is_victory[0] = false;
-			userTwo = this.updateWinner(userTwo);
-			userOne = this.updateLoser(userOne);
+			if (matchSetting.is_ranked)
+			{
+				userOne = this.updateLoser(userOne);
+				userTwo = this.updateWinner(userTwo);
+			}
 		}
 		if (match.is_ongoing)
 			match.is_ongoing = false;
@@ -596,19 +589,32 @@ export class ItemsService {
 
 		if (!userOne || !userTwo)
 			return null;
-		if (player1.player.user_id == matchSetting.score_to_win)
+		console.log('done match');
+		if (player1.score == matchSetting.score_to_win)
 		{
+			console.log(userOne.username + ' a gagné');
 			match.is_victory[0] = true;
 			match.is_victory[1] = false;
-			userOne = this.updateWinner(userOne);
-			userTwo = this.updateLoser(userTwo);
+			if (matchSetting.is_ranked)
+			{
+				userOne = this.updateWinner(userOne);
+				userTwo = this.updateLoser(userTwo);
+			}
+			console.log(userOne);
+			console.log(userTwo);
 		}
 		else
 		{
+			console.log(userTwo.username + ' a gagné');
 			match.is_victory[1] = true;
 			match.is_victory[0] = false;
-			userTwo = this.updateWinner(userTwo);
-			userOne = this.updateLoser(userOne);
+			if (matchSetting.is_ranked)
+			{
+				userOne = this.updateLoser(userOne);
+				userTwo = this.updateWinner(userTwo);
+			}
+			console.log(userOne);
+			console.log(userTwo);
 		}
 		if (match.is_ongoing)
 			match.is_ongoing = false;
@@ -620,12 +626,65 @@ export class ItemsService {
 		return await this.userRepo.save([userOne, userTwo]);
 	}
 
+	hasAchievement(user: UserEntity, achievementName: string)
+	{
+		return user.achievement && user.achievement.find((achievement) => achievement.achievement_name == achievementName);
+	}
 
-	async updateRankScore(player1: pongObject, player2: pongObject, match: MatchEntity, matchSetting: MatchSettingEntity, id?: number)
+	async updateMatchAchievements(player: pongObject, matchSetting: MatchSettingEntity, notifGateway: NotificationsGateway) {
+		const user = await this.getUser(player.player.user_id);
+		const achievements = await this.getAllAchievements();
+		const leaderBoard = await this.getLeaderboard();
+
+		if (!user || !achievements || !achievements.length)
+			return null;
+		if (matchSetting.is_ranked && user.wins + user.losses == 1)
+		{
+			const firstRankedMatch = achievements[1];
+			user.achievement.push(firstRankedMatch);
+			notifGateway.sendAchievement(user.user_id, firstRankedMatch);
+		}
+		else if (!matchSetting.is_ranked && !this.hasAchievement(user, 'First Unranked Match'))
+		{
+			const firstUnrankedMatch = achievements[0];
+			user.achievement.push(firstUnrankedMatch);
+			notifGateway.sendAchievement(user.user_id, firstUnrankedMatch);
+		}
+		if (user.wins == 1 && !this.hasAchievement(user, 'Win a match'))
+		{
+			const firstWin = achievements[2];
+			user.achievement.push(firstWin);
+			notifGateway.sendAchievement(user.user_id, firstWin);
+		}
+		if (user.losses == 1 && !this.hasAchievement(user, 'Consolation prize'))
+		{
+			const firstLose = achievements[4];
+			user.achievement.push(firstLose);
+			notifGateway.sendAchievement(user.user_id, firstLose);
+		}
+		if (leaderBoard.length && leaderBoard[0].user_id == user.user_id && !this.hasAchievement(user, 'We are number one'))
+		{
+			const numberOne = achievements[3];
+			user.achievement.push(numberOne);
+			notifGateway.sendAchievement(user.user_id, numberOne);
+		}
+		return await this.userRepo.save(user);
+	}
+
+	async updatePlayersAchievement(player1: pongObject, player2: pongObject, matchSetting: MatchSettingEntity, notifGateway: NotificationsGateway) {
+		return (
+				await this.updateMatchAchievements(player1, matchSetting, notifGateway)
+				&& await this.updateMatchAchievements(player2, matchSetting, notifGateway)
+			)
+	}
+
+	async updateRankScore(player1: pongObject, player2: pongObject, match: MatchEntity, matchSetting: MatchSettingEntity, notifGateway: NotificationsGateway, id?: number)
 	{
 		if (id)
-			return this.updateLeftMatch(player1, player2, match, id);
-		return this.updateFinishedMatch(player1, player2, match, matchSetting);
+			await this.updateLeftMatch(player1, player2, match, id, matchSetting);
+		else
+			await this.updateFinishedMatch(player1, player2, match, matchSetting);
+		return await this.updatePlayersAchievement(player1, player2, matchSetting, notifGateway);
 	}
 
 	async toggleDoubleAuth(userId: number)
