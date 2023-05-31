@@ -72,11 +72,9 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		});
 	}
 
-	//Send achievements to user
 	async sendAchievement(user_id: number, achievement: AchievementsEntity) {
 		const client = this.userList.get(user_id);
 		if (!client) throw new WsException('Client not connected');
-		this.itemsService.addAchievementsToUser(user_id, achievement.achievement_id);
 		client.emit(
 			'newAchievement',
 			'Congratulations! You received the ' + achievement.achievement_name

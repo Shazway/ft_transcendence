@@ -4,6 +4,7 @@ import { MatchEntity, MatchSettingEntity } from 'src/entities';
 import { Player } from 'src/homepage/dtos/Matchmaking.dto';
 import { GameEnd, Move, ballObject, pongObject } from 'src/homepage/dtos/Pong.dto';
 import { ItemsService } from '../items/items.service';
+import { NotificationsGateway } from 'src/homepage/gateway/notifications/notifications.gateway';
 
 @Injectable()
 export class GamesService {
@@ -26,6 +27,7 @@ export class GamesService {
 	public spectators: Array<Player>;
 	constructor(
 		private itemsService: ItemsService,
+		private notifGateway: NotificationsGateway,
 	) {
 		this.spectators = new Array<Player>;
 		this.match = new MatchEntity();
@@ -53,8 +55,6 @@ export class GamesService {
 	endGame() {
 		clearTimeout(this.interval);
 		this.interval = null;
-		this.player1.player.client.disconnect();
-		this.player2.player.client.disconnect();
 	}
 
 	closeEnoughPlayer() {
@@ -132,7 +132,7 @@ export class GamesService {
 		if (this.player2.player.client)
 			this.player2.player.client.emit('onMatchEnd', this.buildEndEvent(this.player2, id));
 		if (this.matchSetting.is_ranked)
-			this.itemsService.updateRankScore(this.player1, this.player2, this.match, this.matchSetting, id);
+			this.itemsService.updateRankScore(this.player1, this.player2, this.match, this.matchSetting, this.notifGateway, id);
 		this.endGame();
 	}
 
