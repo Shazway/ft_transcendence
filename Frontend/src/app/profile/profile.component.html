@@ -92,19 +92,19 @@
 					<div>
 						<p>Accept channel invitations from:</p>
 						<div class="form-check" (click)="acceptChanInviteFrom(0)">
-							<input class="form-check-input" type="radio" name="flexRadioDefault" id="nobody">
+							<input class="form-check-input" type="radio" name="flexRadioDefault" [checked]="nobodyChecked">
 							<label class="form-check-label" for="flexRadioDefault1">
 								nobody
 							</label>
 						</div>
 						<div class="form-check" (click)="acceptChanInviteFrom(1)">
-							<input class="form-check-input" type="radio" name="flexRadioDefault" id="friends">
+							<input class="form-check-input" type="radio" name="flexRadioDefault" [checked]="friendsChecked">
 							<label class="form-check-label" for="flexRadioDefault2">
 								my friends
 							</label>
 						</div>
 						<div class="form-check" (click)="acceptChanInviteFrom(2)">
-							<input class="form-check-input" type="radio" name="flexRadioDefault" id="everyone">
+							<input class="form-check-input" type="radio" name="flexRadioDefault" [checked]="everyoneChecked">
 							<label class="form-check-label" for="flexRadioDefault1">
 								everyone
 							</label>
@@ -112,7 +112,7 @@
 					</div>
 					<div>
 						<label for="doubleAuthBox">Activate Double Auth:</label>
-						<input type="checkbox" (click)="toggleAuth()" >
+						<input type="checkbox" (click)="toggleAuth()" [checked]="doubleAuthChecked">
 					</div>
 				</div>
 			</div>

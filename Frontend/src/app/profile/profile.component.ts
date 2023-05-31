@@ -90,6 +90,12 @@ export class ProfileComponent implements AfterViewInit {
 	achievements: AchievementList = {unlockedAchievements: [], lockedAchievements: []};
 
 	changes : { skins : boolean, invite : boolean, doubleAuth : boolean } = {skins : false, invite : false, doubleAuth : false};
+
+	nobodyChecked = false;
+	friendsChecked = false;
+	everyoneChecked = false;
+	doubleAuthChecked = false;
+
 	
 	constructor(
 		private cdr: ChangeDetectorRef,
@@ -113,19 +119,24 @@ export class ProfileComponent implements AfterViewInit {
 			this.windowBall.push(this.ballSkins[i % this.ballSkins.length]);
 			this.windowBackground.push(this.backgroundSkins[i % this.backgroundSkins.length]);
 		}
-		console.log("My paddles");
-		console.log(this.paddleSkins);
-		console.log("My balls")
-		console.log(this.ballSkins);
-		console.log("My backgrounds")
-		console.log(this.backgroundSkins);
-		console.log(this.user.current_skins);
 		while (this.user.current_skins[0] != -1 && this.windowPaddle[2].skin_id != this.user.current_skins[0])
 			this.autoRotate(this.windowPaddle, this.paddleSkins);
 		while (this.user.current_skins[1] != -1 && this.windowBall[2].skin_id != this.user.current_skins[1])
 			this.autoRotate(this.windowBall, this.ballSkins);
 		while (this.user.current_skins[2] != -1 && this.windowBackground[2].skin_id != this.user.current_skins[2])
 			this.autoRotate(this.windowBackground, this.backgroundSkins);
+	}
+
+	initToggles() {
+		if (this.user.channelInviteAuth == 0)
+			this.nobodyChecked = true;
+		else if (this.user.channelInviteAuth == 1)
+			this.friendsChecked = true;
+		else
+			this.everyoneChecked = true;
+
+		if (this.user.double_auth)
+			this.doubleAuthChecked = true;
 	}
 	
 	async customOnInit() {
@@ -164,6 +175,7 @@ export class ProfileComponent implements AfterViewInit {
 			this.rank = this.user.rank_score;
 		}
 		if (this.isMyProfile()) {
+			this.initToggles();
 			this.getSkins();
 			this.printSettings();
 		}
