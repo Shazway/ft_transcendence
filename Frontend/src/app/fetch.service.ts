@@ -120,11 +120,11 @@ export class FetchService {
 		return null;
 	}
 
-	async getMyProfile() : Promise<MyProfileUser | null> {
-		let res: MyProfileUser | undefined;
+	async getMyProfile() : Promise<AnyProfileUser | null> {
+		let res: AnyProfileUser | undefined;
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		await axios.get<MyProfileUser>('http://localhost:3001/profile/' + localStorage.getItem('username'), this.getHeader())
+		await axios.get<AnyProfileUser>('http://localhost:3001/profile/' + localStorage.getItem('username'), this.getHeader())
 		.then(function (response) {
 			res = response.data;
 		})
@@ -138,7 +138,7 @@ export class FetchService {
 	}
 
 	async getBalance() {
-		let res: MyProfileUser | null;
+		let res: AnyProfileUser | null;
 		res = await this.getMyProfile();
 		if (res)
 			return (res.currency);
@@ -489,8 +489,16 @@ export class FetchService {
 		return (res);
 	}
 
-	async getSettings() {
+	applySkins(skins : Number[]) {
+		console.log('appel au back a faire');
+	}
 
+	changeInvite(param : Number) {
+		console.log('appel au back a faire');
+	}
+
+	toggleDoubleAuth(bool : boolean) {
+		console.log('appel au back a faire');
 	}
 	
 }
