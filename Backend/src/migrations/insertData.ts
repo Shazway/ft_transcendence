@@ -22,6 +22,7 @@ export class insertData666666666666666666 implements MigrationInterface {
 			{
 				achievement_name: 'We are number one',
 				achievement_description: 'Reach 1st rank',
+				achievement_reward: 'King of the hill'
 			},
 			{
 				achievement_name: 'Consolation prize',
@@ -30,18 +31,22 @@ export class insertData666666666666666666 implements MigrationInterface {
 			{
 				achievement_name: 'Social Butterfly',
 				achievement_description: 'Have a lot of friends',
+				achievement_reward: 'The friendly foe'
 			},
 			{
 				achievement_name: 'Whale',
 				achievement_description: 'Make the money rain',
+				achievement_reward: 'The buisenessman'
 			},
 			{
 				achievement_name: 'Oof',
 				achievement_description: '???',
+				achievement_reward: 'King of the pit'
 			},
 			{
 				achievement_name: 'Easter Egg',
 				achievement_description: '???',
+				achievement_reward: 'The beholder of secrets'
 			},
 		]);
 

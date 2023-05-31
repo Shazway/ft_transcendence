@@ -74,6 +74,24 @@ export class ProfileController {
 		return res.status(HttpStatus.UNAUTHORIZED).send('Not saved');
 	}
 
+	@Post('changeTitle')
+	async changeTitle(@Req() req: Request, @Res() res: Response, @Body() body: { newTitle: string }) {
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
+		if (!body || !body.newTitle) return res.status(HttpStatus.UNAUTHORIZED).send('No body or parameters provided');
+		const userEntity = await this.itemsService.getUser(user.sub);
+
+		if (!userEntity)
+			return res.status(HttpStatus.UNAUTHORIZED).send('Not saved');
+		if (userEntity.achievement.find((achievement) => achievement.achievement_reward == body.newTitle))
+		{
+			userEntity.title = body.newTitle;
+			await this.itemsService.saveUserState(userEntity)
+			return res.status(HttpStatus.OK).send('Success');
+		}
+		return res.status(HttpStatus.UNAUTHORIZED).send('Not saved');
+	}
+
 	@Get(':username')
 	async getProfile(@Param('username') us: string, @Req() req: Request, @Res() res: Response) {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
@@ -90,7 +108,6 @@ export class ProfileController {
 		serializedUser.achievements = new AchievementList();
 		serializedUser.achievements.unlockedAchievements = achievements;
 		serializedUser.achievements.lockedAchievements = this.itemsService.getLockedAchievements(targetUser, allAchievements);
-		//serializedUser.match_history.forEach((match) => console.log(match));
 		res.status(HttpStatus.OK).send(serializedUser);
 	}
 }
