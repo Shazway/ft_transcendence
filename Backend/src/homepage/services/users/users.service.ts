@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { SkinEntity, UserEntity } from 'src/entities';
 import { ItemsService } from '../items/items.service';
 import { HttpService } from '@nestjs/axios';
-import axios, { AxiosRequestConfig, AxiosRequestHeaders } from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import { IntraInfo } from 'src/homepage/dtos/Api.dto';
 
 @Injectable()

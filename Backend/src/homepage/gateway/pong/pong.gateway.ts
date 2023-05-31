@@ -124,6 +124,9 @@ export class PongGateway {
 
 	initMatch(match: Match, setting: MatchSettingEntity) {
 		match.gameService = new GamesService(this.itemsService, this.notificationsGateway);
+		if (match.entity.user[0].user_id != match.players[0].user_id) {
+			match.players.reverse();
+		}
 		match.gameService.initObjects(match.players[0], match.players[1]);
 		match.gameService.startGame(setting);
 		match.gameService.match = match.entity;

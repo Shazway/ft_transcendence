@@ -90,6 +90,11 @@ export class ProfileComponent implements AfterViewInit {
 	achievements: AchievementList = {unlockedAchievements: [], lockedAchievements: []};
 
 	changes : { skins : boolean, invite : boolean, doubleAuth : boolean } = {skins : false, invite : false, doubleAuth : false};
+
+	nobodyChecked = false;
+	friendsChecked = false;
+	everyoneChecked = false;
+	doubleAuthChecked = false;
 	
 	constructor(
 		private cdr: ChangeDetectorRef,
@@ -113,20 +118,24 @@ export class ProfileComponent implements AfterViewInit {
 			this.windowBall.push(this.ballSkins[i % this.ballSkins.length]);
 			this.windowBackground.push(this.backgroundSkins[i % this.backgroundSkins.length]);
 		}
-		console.log("My paddles");
-		console.log(this.paddleSkins);
-		console.log("My balls")
-		console.log(this.ballSkins);
-		console.log("My backgrounds")
-		console.log(this.backgroundSkins);
-		console.log(this.user.current_skins);
 		while (this.user.current_skins[0] != -1 && this.windowPaddle[2].skin_id != this.user.current_skins[0])
-			this.panRight(this.windowPaddle, this.paddleSkins, 'slideDirectionPaddle');
+			this.autoRotate(this.windowPaddle, this.paddleSkins);
 		while (this.user.current_skins[1] != -1 && this.windowBall[2].skin_id != this.user.current_skins[1])
-			this.panRight(this.windowBall, this.ballSkins, 'slideDirectionBall');
-		// while (this.user.current_skins[2] != -1 && this.windowBackground[2].skin_id != this.user.current_skins[2])
-		// 	this.panRight(this.windowBackground, this.backgroundSkins, 'slideDirectionBackground');
-		// console.log(this.windowPaddle);
+			this.autoRotate(this.windowBall, this.ballSkins);
+		while (this.user.current_skins[2] != -1 && this.windowBackground[2].skin_id != this.user.current_skins[2])
+			this.autoRotate(this.windowBackground, this.backgroundSkins);
+	}
+
+	initToggles() {
+		if (this.user.channelInviteAuth == 0)
+			this.nobodyChecked = true;
+		else if (this.user.channelInviteAuth == 1)
+			this.friendsChecked = true;
+		else
+			this.everyoneChecked = true;
+
+		if (this.user.double_auth)
+			this.doubleAuthChecked = true;
 	}
 	
 	async customOnInit() {
@@ -165,6 +174,7 @@ export class ProfileComponent implements AfterViewInit {
 			this.rank = this.user.rank_score;
 		}
 		if (this.isMyProfile()) {
+			this.initToggles();
 			this.getSkins();
 			this.printSettings();
 		}
@@ -296,6 +306,16 @@ export class ProfileComponent implements AfterViewInit {
 				this.slideDirectionBackground = 'none';
 		}, 300);
 	}
+
+	autoRotate(window : ShopItem[], skins : ShopItem[]) {
+		let index = skins.indexOf(window[0]);
+		if (index > 0)
+			index--;
+		else
+			index = skins.length - 1;
+		window.pop();
+		window.unshift(skins[index]);
+	}
 	
 	panRight(window : ShopItem[], skins : ShopItem[], slideDirection : string) {
 		if (slideDirection == 'slideDirectionBall')
@@ -304,7 +324,9 @@ export class ProfileComponent implements AfterViewInit {
 			this.slideDirectionPaddle = 'right';
 		if (slideDirection == 'slideDirectionBackground')
 			this.slideDirectionBackground = 'right';
+		
 		setTimeout(() => {
+			console.log("boucle");
 			let index = skins.indexOf(window[0]);
 			if (index > 0)
 				index--;
