@@ -103,6 +103,7 @@ export class ProfileComponent implements AfterViewInit {
 		private parent: AppComponent,
 		private route: ActivatedRoute,
 		private fetchService: FetchService,
+		private elRef: ElementRef,
 		private modalService: NgbModal,
 		private router: Router,
 	) {
@@ -279,6 +280,12 @@ export class ProfileComponent implements AfterViewInit {
 		if (this.matchHistory.length > 0) {
 			this.matchChart = new Chart(document.getElementById('matchChart') as HTMLCanvasElement, this.getMatchChartConfig());
 			this.rankChart = new Chart(document.getElementById('rankChart') as HTMLCanvasElement, this.getRankedChartConfig());
+		}
+		if (this.isMyProfile()) {
+			let elAvatar = this.elRef.nativeElement.querySelector('#avatarPic');
+			console.log("Avatar : ");
+			console.log(elAvatar);
+			elAvatar.classList.add('my-avatar');
 		}
 		this.cdr.detectChanges();
 		this.cdr.reattach();
@@ -739,6 +746,8 @@ export class ProfileComponent implements AfterViewInit {
 	}
 
 	async openChangeAvatar() {
+		if (!this.isMyProfile())
+			return ;
 		let newAvatar = await this.popupAvatar();
 		if (newAvatar.length > 0)
 		{
@@ -752,5 +761,6 @@ export class ProfileComponent implements AfterViewInit {
 				console.log("echec");
 		}
 	}
+
 }
 

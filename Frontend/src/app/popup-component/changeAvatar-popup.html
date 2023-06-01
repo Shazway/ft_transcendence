@@ -6,14 +6,14 @@
 </div>
 <form #AvatarForm="ngForm" (ngSubmit)="onSubmit(AvatarForm.value.input)">
 	<div class="modal-body">
-		<img src="user.img_url">
+		<img src="{{AvatarForm.value.input ? AvatarForm.value.input : user.img_url}}" style="max-width: 100px;">
 		<div class="form-group">
 			<label>The link to your new avatar:</label>
 			<input name="input" type="string" class="form-control" ngModel>
 		</div>
 	</div>
 	<div class="modal-footer">
-		<button type="button" class="btn btn-secondary" (click)="activeModal.dismiss()">Close</button>
+		<button type="button" class="btn btn-secondary" (click)="onSubmit('')">Close</button>
 		<button type="submit" class="btn btn-primary" value="submit">Save</button>
 	</div>
 </form>
