@@ -5,8 +5,8 @@
 				<div class="card profile-card my-light2" #profileCard>
 					<div class="card-body p-4">
 						<div class="d-flex text-black">
-							<div class="flex-shrink-0">
-								<img src="{{user ? user.img_url : 'https://i1.sndcdn.com/artworks-000329925816-3yu1fd-t500x500.jpg'}}" alt="Generic placeholder image" class="img-fluid card-profile-pic">
+							<div class="flex-shrink-0" id="avatarPic">
+								<img (click)="openChangeAvatar()" src="{{user ? user.img_url : 'https://i1.sndcdn.com/artworks-000329925816-3yu1fd-t500x500.jpg'}}" alt="Generic placeholder image" class="img-fluid card-profile-pic">
 							</div>
 							<div class="flex-grow-1 ms-3" style="display: flex; flex-direction: column;">
 
@@ -124,9 +124,6 @@
 					<div>
 						<label for="doubleAuthBox">Activate Double Auth:</label>
 						<input type="checkbox" (click)="toggleAuth()" [checked]="doubleAuthChecked">
-					</div>
-					<div class="btn" (click)="openChangeAvatar()">
-						Change your avatar
 					</div>
 				</div>
 			</div>
