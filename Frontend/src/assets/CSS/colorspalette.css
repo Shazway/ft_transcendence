@@ -103,3 +103,13 @@ opacity: 1;
 	z-index: 500;
 	box-shadow: 0px 0px 20px rgba(7, 7, 7, 0.185);
 }
+
+.input {
+	border: 1px solid gray;
+	border-radius: 6px;
+	outline: none;
+}
+
+.wrong-input {
+	border-color: red;
+}

@@ -227,7 +227,8 @@ export class ProfileComponent implements AfterViewInit {
 		}
 	}
 
-	updateSettings() {
+	updateSettings(newUsername : string) {
+		console.log("username : " + newUsername);
 		this.updateSkins();
 		if (this.changes.skins)
 			this.fetchService.applySkins(this.user.current_skins);
@@ -759,6 +760,33 @@ export class ProfileComponent implements AfterViewInit {
 			}
 			else
 				console.log("echec");
+		}
+	}
+
+	inputFormElm : any;
+
+	inputCheckList = {
+		tooLong : true,
+		tooShort : true};
+
+	checkInput(input: string) {
+		if (!this.inputFormElm)
+			this.inputFormElm = this.elRef.nativeElement.querySelector('#inputForm');
+
+		if (input.length > 20)
+			this.inputCheckList.tooLong = false;
+		else
+			this.inputCheckList.tooLong = true;
+
+		if (this.inputCheckList.tooLong && this.inputCheckList.tooShort)
+		{
+			if (this.inputFormElm.classList.contains('wrong-input'))
+				this.inputFormElm.classList.remove('wrong-input');
+		}
+		else
+		{
+			if (!this.inputFormElm.classList.contains('wrong-input'))
+				this.inputFormElm.classList.add('wrong-input');
 		}
 	}
 

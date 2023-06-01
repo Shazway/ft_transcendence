@@ -58,9 +58,11 @@
 	</div>
 	<div>
 		<div>&nbsp;</div>
+		<!-- Settings -->
 		<div *ngIf="settingState == 'open'" class="row px-5 mx-2" style="overflow: hidden;" @settingWindow>
 			<div class="d-flex p-3 border rounded-3 white">
 				<div class="col d-flex justify-content-around">
+					<!-- Carousel des Paddles -->
 					<div class="text-center">
 						<div class="d-flex gap-2">
 							<button class="btn arrow left flex-shrink-0" type="button" (click)="panLeft(windowPaddle, paddleSkins, 'slideDirectionPaddle')">&lt;</button>
@@ -75,6 +77,7 @@
 						</div>
 						<div>{{windowPaddle[2].name}}</div>
 					</div>
+					<!-- Carousel des Balls -->
 					<div class="text-center">
 						<div class="d-flex gap-2">
 							<button class="btn arrow left flex-shrink-0" type="button" (click)="panLeft(windowBall, ballSkins, 'slideDirectionBall')">&lt;</button>
@@ -89,6 +92,7 @@
 						</div>
 						<div>{{windowBall[2].name}}</div>
 					</div>
+					<!-- Carousel des Background -->
 					<div class="text-center">
 						<div class="d-flex gap-2">
 							<button class="btn arrow left flex-shrink-0" type="button" (click)="panLeft(windowBackground, backgroundSkins, 'slideDirectionBackground')">&lt;</button>
@@ -99,35 +103,50 @@
 						</div>
 						<div>{{windowBackground[2].name}}</div>
 					</div>
-					<div>
-						<p>Accept channel invitations from:</p>
-						<div class="form-check" (click)="acceptChanInviteFrom(0)">
-							<input class="form-check-input" type="radio" name="flexRadioDefault" [checked]="nobodyChecked">
-							<label class="form-check-label" for="flexRadioDefault1">
-								nobody
-							</label>
-						</div>
-						<div class="form-check" (click)="acceptChanInviteFrom(1)">
-							<input class="form-check-input" type="radio" name="flexRadioDefault" [checked]="friendsChecked">
-							<label class="form-check-label" for="flexRadioDefault2">
-								my friends
-							</label>
-						</div>
-						<div class="form-check" (click)="acceptChanInviteFrom(2)">
-							<input class="form-check-input" type="radio" name="flexRadioDefault" [checked]="everyoneChecked">
-							<label class="form-check-label" for="flexRadioDefault1">
-								everyone
-							</label>
+					<div class="col">
+						<!-- Choix dequi peut inviter -->
+						<div>
+							<p>Accept channel invitations and challenges from:</p>
+							<div class="form-check" (click)="acceptChanInviteFrom(0)">
+								<input class="form-check-input" type="radio" name="flexRadioDefault" [checked]="nobodyChecked">
+								<label class="form-check-label" for="flexRadioDefault1">
+									nobody
+								</label>
+							</div>
+							<div class="form-check" (click)="acceptChanInviteFrom(1)">
+								<input class="form-check-input" type="radio" name="flexRadioDefault" [checked]="friendsChecked">
+								<label class="form-check-label" for="flexRadioDefault2">
+									my friends
+								</label>
+							</div>
+							<div class="form-check" (click)="acceptChanInviteFrom(2)">
+								<input class="form-check-input" type="radio" name="flexRadioDefault" [checked]="everyoneChecked">
+								<label class="form-check-label" for="flexRadioDefault1">
+									everyone
+								</label>
 
+							</div>
+						</div>
+						<!-- Choix de la double authentification -->
+						<div>
+							<label>Activate Double Auth:</label>
+							<input type="checkbox" (click)="toggleAuth()" [checked]="doubleAuthChecked">
 						</div>
 					</div>
+					<!-- Choix du username -->
 					<div>
-						<label for="doubleAuthBox">Activate Double Auth:</label>
-						<input type="checkbox" (click)="toggleAuth()" [checked]="doubleAuthChecked">
+						<form #usernameField="ngForm" (input)="checkInput(usernameField.value.usernameFld)" class="row g-3">
+							<div class="col-auto">
+								<label for="username" class="visually-hidden">Change your username:</label>
+								<input id="inputForm" class="input" style="border-radius: 3px;" name="usernameFld" placeholder="new username" ngModel>
+								<div id="inputTooLong" class="text-muted" [hidden]="inputCheckList.tooLong">20 characters maximum</div>
+								<div id="inputTooShort" class="text-muted" [hidden]="inputCheckList.tooShort">1 character maximum</div>
+							</div>
+						</form>
 					</div>
 				</div>
 			</div>
-			<button type="submit" value="submit" (click)="updateSettings()" class="btn btn-primary flex-shrink-0 mt-1">Save changes</button>
+			<button type="submit" value="submit" (click)="updateSettings(usernameField.value.usernameFld)" class="btn btn-primary flex-shrink-0 mt-1">Save changes</button>
 		</div>
 		<div>&nbsp;</div>
 	</div>
