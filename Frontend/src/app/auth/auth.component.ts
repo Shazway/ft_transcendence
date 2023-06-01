@@ -31,9 +31,10 @@ export class AuthComponent {
 	async ngOnInit() {
 		const code = this.route.snapshot.queryParamMap.get('code');
 		let loginReturn: LogInReturn;
-		let user_data: User;
 		let statusCode = 0;
 		let bodyId = 0;
+
+		console.log(code);
 		await axios.post<LogInReturn>('http://localhost:3001/login', {api_code: code})
 		.then(function (response) {
 			statusCode = response.status;
