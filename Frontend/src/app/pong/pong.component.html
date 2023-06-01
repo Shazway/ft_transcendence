@@ -1,5 +1,38 @@
-<div id="pixiContainer" #pixiContainer></div>
-<div *ngIf="!isSpectator" class="modal-footer" id="removable">
-	<button type="button" class="btn btn-secondary">Forfeit</button>
-	<button type="button" class="btn btn-primary" (click)="setReady()">Ready</button>
+<div class="container h-100" style="max-width: 100%;">
+	<div class="d-flex row justify-content-center align-items-center h-100 w-100">
+		<div class="col-1"></div>
+		<div class="d-flex flex-column col gap-4 h-100 justify-content-center">
+			<div id="pixiContainer" #pixiContainer></div>
+<!-- Profile Zone -->
+			<div class="d-flex">
+				<div class="d-flex col my-light2 light-gunmetal p-2 gap-3">
+					<img class="col" src="https://i1.sndcdn.com/artworks-000329925816-3yu1fd-t500x500.jpg" class="rounded-circle" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp';" alt="avatar 3" style="width: 40px; height: 100%;">
+					<div class="col d-flex gap-3 align-items-center">
+						<h4 class="m-0">Player1</h4>
+						<p class="text-muted m-0">250</p>
+					</div>
+				</div>
+				<div class="col flex-grow-2 align-items-center text-center"><h1 style="font-family: 'Pixeloid', sans-serif;">VS</h1></div>
+				<div class="d-flex col text-end my-light2 light-gunmetal p-2 gap-3">
+					<div class="col d-flex gap-3 align-items-center justify-content-around">
+						<p class="flex-grow-1 text-muted m-0">178</p>
+						<h4 class="m-0">Player2</h4>
+					</div>
+					<img class="col" src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp" class="rounded-circle" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 3" style="width: 40px; height: 100%;">
+				</div>
+			</div>
+<!-- End of Profile Zone -->
+			<div id="arbiterContainer" #arbiterContainer></div>
+		</div>
+		<div class="ms-5 w-100 col" style="position: relative;">
+			<div class="d-flex row scroll-small light-gunmetal my-light2 rounded-3 specWindow">
+				<div *ngFor="let spec of specList" class="d-flex flex-column mb-3 col-3 justify-content-center align-items-center">
+					<img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp" style="width: 45px; height: 45px;" alt="">
+					<h4 class="flex-grow-1 m-0">{{spec.username}}</h4>
+				</div>
+			</div>
+			<button class="btn btn-info" (click)="hideSpecWindow()">hide spectators</button>
+			<button type="button" class="btn btn-primary" id="removable" (click)="setReady()">Ready</button>
+		</div>
+	</div>
 </div>

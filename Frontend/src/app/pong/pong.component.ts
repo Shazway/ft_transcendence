@@ -2,7 +2,7 @@ import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { Socket, io } from 'socket.io-client';
 import { WebsocketService } from '../websocket.service';
 import { Application, Graphics } from 'pixi.js';
-import { pongObject, ballObject, Move, VectorPos, ScoreChange, GameEnd } from 'src/dtos/Pong.dto';
+import { pongObject, ballObject, Move, VectorPos, ScoreChange, GameEnd, Player } from 'src/dtos/Pong.dto';
 import { ActivatedRoute } from '@angular/router';
 import { MatchSetting } from 'src/dtos/MatchSetting.dto';
 import { Mutex } from 'async-mutex';
@@ -14,23 +14,27 @@ import { AssetManager, WowText } from 'src/dtos/GraphElem.dto';
 	styleUrls: ['./pong.component.css']
 })
 export class PongComponent {
+	@ViewChild('pixiContainer') pixiContainer!: ElementRef;
+	@ViewChild('arbiterContainer') arbiterContainer!: ElementRef;
 	PLAYER_SCORED = 1;
 	OPPONENT_SCORED = 0;
 	LOSS = 0;
 	WIN = 1;
 	private client!: Socket;
-	private app;
-	private player;
-	private ball;
-	private opponent;
-	private oldDate: Date;
+	private app!: Application;
+	private arbiter!: Application;
+	private player!: pongObject;
+	private ball!: ballObject;
+	private opponent!: pongObject;
+	private oldDate!: Date;
 	private movespeed = 5;
 	private gamespeed = 13;
 	private timeoutId!: any;
 	private gameSettings!: MatchSetting;
-	private ballLock: Mutex;
+	private ballLock!: Mutex;
 	private isMatchOngoing = true;
 	public isSpectator = false;
+	public specList!: Array<Player>;
 
 	private scoreP1!: WowText;
 	private scoreP2!: WowText;
@@ -38,28 +42,46 @@ export class PongComponent {
 
 	constructor(
 		private websocketService: WebsocketService,
-		private pixiContainer: ElementRef,
 		private route: ActivatedRoute,
 		private elRef: ElementRef,
 		private assetManager: AssetManager,
 	) {
-			this.ballLock = new Mutex();
-			this.app = new Application({
-				height: 600,
-				width: 1000,
-				antialias: true,
-			});
+		this.initApp()
+	}
+
+	ngAfterViewInit(): void {
+		this.pixiContainer.nativeElement.appendChild(this.app.view);
+		this.arbiterContainer.nativeElement.appendChild(this.arbiter.view);
+	}
+
+	initApp() {
+		this.ballLock = new Mutex();
+		this.app = new Application({
+			height: 600,
+			width: 1000,
+			antialias: true,
+		});
+
+		this.initArbiter();
+		this.specList = new Array();
 		this.ball = new ballObject(this.app.view.width, this.app.view.height);
 		this.player	= new pongObject(this.app.view.width, this.app.view.height);
 		this.opponent = new pongObject(this.app.view.width, this.app.view.height);
 		this.initObjects();
 		this.setMatch(Number(this.route.snapshot.queryParamMap.get('match_id')));
-		this.pixiContainer.nativeElement.appendChild(this.app.view);
 		this.oldDate = new Date();
 		this.app.ticker.add(() => {
 			const date = new Date();
 			this.update((date.getTime() - this.oldDate.getTime()) / this.gamespeed);
 			this.oldDate = new Date();
+		});
+	}
+
+	initArbiter() {
+		this.arbiter = new Application({
+			height: 100,
+			width: 1000,
+			antialias: true,
 		});
 	}
 
@@ -76,6 +98,8 @@ export class PongComponent {
 		this.client.on('onScoreChange', (event) => { this.updateScore(event); });
 		this.client.on('onMatchEnd', (event) => {this.endMatch(event);});
 		this.client.on('spectateMatch', (event) => { this.setSpectate(event); console.log('You are spectating '); });
+		this.client.on('onSpectateMatch', (event) => { this.addSpectate(event); console.log('You are spectating '); });
+		this.client.on('onUnspectateMatch', (event) => { this.removeSpectate(event); console.log('You are spectating '); });
 	}
 
 	setSpectate(event: any) {
@@ -87,6 +111,20 @@ export class PongComponent {
 		this.player.score = event.playerScore;
 		this.opponent.setPos(event.opponentPos.x, event.opponentPos.y);
 		this.opponent.score = event.opponentScore;
+	}
+
+	addSpectate(event: Player) {
+		this.specList.push(event);
+	}
+
+	removeSpectate(event: Player) {
+		let playerIndex;
+		this.specList.forEach((spec, index) => {
+			if (spec.user_id == event.user_id)
+				playerIndex = index;
+		});
+		if (playerIndex)
+			this.specList.splice(playerIndex, 1);
 	}
 
 	startMatch(settings: MatchSetting) {
@@ -236,5 +274,13 @@ export class PongComponent {
 			this.client.emit('ArrowUp', true);
 		if (key == 'ArrowDown' && !this.player.inputs.ArrowDown)
 			this.client.emit('ArrowDown', true);
+	}
+
+	//DISPLAY FUNCTION
+	hideSpecWindow() {
+		const specWin = this.elRef.nativeElement.querySelector('.specWindow');
+		if (specWin.classList.contains('hide'))
+			specWin.classList.remove('hide');
+		else specWin.classList.add('hide');
 	}
 }
