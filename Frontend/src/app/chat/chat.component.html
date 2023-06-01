@@ -95,7 +95,7 @@
 								<hr>
 								<h5 class="text-center">Locked Channels</h5>
 								<div class="row" *ngFor="let channel of channels$.servers">
-									<button *ngIf="!channel.is_channel_private && channel.has_pwd" type="button" (click)="openChannel(channel)" class="btn btn-secondary btn-sm mt-1" data-mdb-ripple-color="dark">{{ channel.channel_name }} 🔒</button>
+									<button *ngIf="!channel.is_channel_private && channel.has_pwd" type="button" (click)="openChannel(channel)" class="btn btn-secondary btn-sm mt-1" data-mdb-ripple-color="dark">{{ channel.channel_name }} {{this.getMeFromChannel(channel) ? '' : '🔒'}}</button>
 								</div>
 							</div>
 						</div>

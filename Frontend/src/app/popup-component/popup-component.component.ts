@@ -108,3 +108,18 @@ export class ConfirmBlockPopup {
 		this.activeModal.close(bool);
 	}
 }
+
+@Component({
+	selector: 'changeAvatar-popup',
+	templateUrl: './changeAvatar-popup.html',
+})
+export class ChangeAvatarPopup {
+	@Input() user! : AnyProfileUser;
+
+	constructor(public activeModal: NgbActiveModal) {
+	}
+
+	onSubmit(new_img: string) {
+		this.activeModal.close(new_img);
+	}
+}

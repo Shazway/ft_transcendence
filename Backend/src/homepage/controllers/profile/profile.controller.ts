@@ -52,9 +52,13 @@ export class ProfileController {
 	async changeImg(@Req() req: Request, @Res() res: Response, @Body() body: { img_url: string }) {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
-		if (!body || !body.img_url || body.img_url.length > 350) return res.status(HttpStatus.UNAUTHORIZED).send('Error no body or url too long');
+
+		if (!body || !body.img_url || body.img_url.length > 350) 
+			return res.status(HttpStatus.UNAUTHORIZED).send('Error no body or url too long');
+
 		if (await this.itemsService.changeImgUser(user.sub, body.img_url))
 			return res.status(HttpStatus.ACCEPTED).send('Success');
+
 		return res.status(HttpStatus.NOT_MODIFIED);
 	}
 

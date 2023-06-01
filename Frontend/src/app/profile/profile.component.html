@@ -118,11 +118,15 @@
 							<label class="form-check-label" for="flexRadioDefault1">
 								everyone
 							</label>
+
 						</div>
 					</div>
 					<div>
 						<label for="doubleAuthBox">Activate Double Auth:</label>
 						<input type="checkbox" (click)="toggleAuth()" [checked]="doubleAuthChecked">
+					</div>
+					<div class="btn" (click)="openChangeAvatar()">
+						Change your avatar
 					</div>
 				</div>
 			</div>
