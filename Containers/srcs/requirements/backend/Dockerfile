@@ -8,4 +8,5 @@ RUN apt-get update && \
 WORKDIR /app
 
 CMD npm install && \
+	npm run migration:run && \
 	npm run start

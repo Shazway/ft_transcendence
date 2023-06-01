@@ -101,6 +101,7 @@ export class PongGateway {
 						opponentPos: match.gameService.player2.pos,
 						opponentScore: match.gameService.player2.score,
 					});
+					this.emitToMatch('onSpectateMatch', this.buildPlayer(client, user.sub, user.name), match);
 					return ;
 				}
 				if (match.players.length == 1 && match.players[0].user_id !== user.sub) {
@@ -136,17 +137,21 @@ export class PongGateway {
 	{
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'EEEE');
 		if (!user) return client.disconnect();
-		const userEntity = await this.itemsService.getUser(user.sub);
-		if (!userEntity)
-			return ;
-		const matchEntitiy = userEntity.match_history.find((match) => match.is_ongoing == true);
-		if (!matchEntitiy)
+		const match_id = Number(client.handshake.query.match_id);
+
+		if (!match_id)
 			return;
+		console.log(match_id);
+		const match = this.matchs.get(match_id);
+		const matchEntitiy = await this.itemsService.getMatch(match_id);
+		if (!matchEntitiy || !match)
+			return ;
+		if (!matchEntitiy.user.find((player) => player.user_id == user.sub))
+			return this.emitToMatch('onUnSpectateMatch', this.buildPlayer(client, user.sub, user.name), match);
 		if (!matchEntitiy.is_ongoing)
-			return this.matchs.delete(matchEntitiy.match_id);
+			return this.matchs.delete(match_id);
 		matchEntitiy.is_victory[this.getOtherPlayerIndex(matchEntitiy, user.sub)] = true;
 		await this.matchService.setMatchEnd(matchEntitiy);
-		const match = this.matchs.get(matchEntitiy.match_id);
 		if (!match)
 			return;
 		if (match.gameService) match.gameService.endMatch(user.sub);
@@ -229,15 +234,5 @@ export class PongGateway {
 				await this.itemsService.getMatchSetting(match.entity.match_id),
 				match
 			);
-	}
-
-	@SubscribeMessage('getSpectators')
-	async getSpectators(@ConnectedSocket() client: Socket) {
-		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		const match_id = Number(client.handshake.query.match_id);
-		const match = this.matchs.get(match_id);
-
-		if (!user || !match || !match.gameService) throw new WsException('Match/GameService aren\'t available');
-		client.emit('getSpectators', match.gameService.spectators);
 	}
 }
