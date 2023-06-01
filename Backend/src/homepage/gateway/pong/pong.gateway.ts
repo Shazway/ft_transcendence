@@ -235,4 +235,24 @@ export class PongGateway {
 				match
 			);
 	}
+
+	@SubscribeMessage('getProfiles')
+	async getProfiles(@ConnectedSocket() client: Socket) {
+		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
+		const match_id = Number(client.handshake.query.match_id);
+		const match = await this.itemsService.getMatch(match_id);
+
+		let player;
+		let opponent;
+		if (!match) throw new WsException('No matches ongoing');
+		if (match.user[0].user_id == user.sub) {
+			player = match.user[0];
+			opponent = match.user[1];
+		}
+		else {
+			player = match.user[1];
+			opponent = match.user[0];
+		}
+		client.emit('onRecieveProfile', {player, opponent});
+	}
 }

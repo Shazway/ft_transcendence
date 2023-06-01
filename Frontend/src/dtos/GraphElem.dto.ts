@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core";
+import { floor, round } from "mathjs";
 import { TextStyle, Text, Application, Color, Assets, Graphics, TextMetrics } from "pixi.js";
 
 @Injectable({
@@ -60,10 +61,40 @@ export class AssetManager {
 
 	addCountdown(timer: number) {
 		this.countdown = timer;
-		this.textArray.push({elem: new PlainText('', this.styles.p2, this.app.renderer.width/2, this.app.renderer.height/2, this.app), type: 'count'})
+		this.textArray.splice(0);
+		this.textArray.push({elem: new PlainText('', this.styles.p2, this.app.renderer.width/2 - 25, 10, this.app), type: 'count'})
 	}
 
-	updateArbiter() {}
+	addPanningText(text: string) {
+		this.textArray.splice(0);
+		this.textArray.push({elem: new PlainText(text, this.styles.p2, this.app.renderer.width, 10, this.app), type: 'pan'})
+	}
+
+	updateArbiter(delta: number) {
+		if (this.countdown - delta < 0)
+			this.textArray = this.textArray.filter((elem) => {
+				if (elem.type == 'count') {
+					elem.elem.destroy()
+					return false
+				}
+				return true
+			});
+		if (this.countdown > 0)
+			this.countdown -= delta;
+		this.textArray.forEach(element => {
+			if (element.type == 'count') {
+				let value = floor(this.countdown / 100);
+				if (value == 0) {
+					element.elem.setPos(this.app.renderer.width/2 - 50, 10);
+					element.elem.setText('GO');
+				}
+				else element.elem.setText(value.toString());
+			}
+			else if (element.type == 'pan') {
+				element.elem.moveText(-5, 0);
+			}
+		});
+	}
 }
 
 export class PlainText {
@@ -76,6 +107,28 @@ export class PlainText {
 		this.text.y = posY;
 		this.app = app;
 		this.app.stage.addChild(this.text);
+	}
+
+	setText(newText: string) {
+		this.text.text = newText;
+	}
+
+	moveText(panX: number, panY: number) {
+		this.text.x += panX;
+		this.text.y += panY;
+	}
+
+	setPos(posX: number, posY: number) {
+		this.text.x = posX;
+		this.text.y = posY;
+	}
+
+	clear() {
+		
+	}
+
+	destroy() {
+		this.app.stage.removeChild(this.text);
 	}
 }
 
@@ -103,6 +156,22 @@ export class WowText {
 		this.startPosY = posY;
 		this.style = style;
 		this.setText(content);
+	}
+
+	destroy() {
+		this.text.forEach(element => {
+			this.app.stage.removeChild(element);
+		});
+	}
+
+	moveText(panX: number, panY: number) {
+		this.startPosX += panX;
+		this.startPosY += panY;
+	}
+
+	setPos(posX: number, posY: number) {
+		this.startPosX = posX;
+		this.startPosY = posY;
 	}
 
 	setReverse(rev: boolean) {

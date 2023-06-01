@@ -1,6 +1,7 @@
 import { Graphics, Matrix, Texture } from "pixi.js";
 import { distance } from "mathjs";
 import { Socket } from "socket.io-client";
+import { AnyProfileUser } from "./User.dto";
 
 export interface Position {
 	x: number;
@@ -248,6 +249,7 @@ export class pongObject {
 	public upperRightCorner: Position = this.position(0, 0);
 	public upperLeftCorner: Position = this.position(0, 0);
 	public lowerCorner: Position = this.position(0, 0);
+	public user!: AnyProfileUser;
 	public inputs = {
 		ArrowUp: false,
 		ArrowDown: false,
@@ -258,6 +260,7 @@ export class pongObject {
 	public gameDim: Position;
 	public objDim: Position;
 	public score: number;
+
 	constructor(
 		private gameWidth: number,
 		private gameHeight: number,
