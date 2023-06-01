@@ -62,6 +62,7 @@ export class MyProfileUser {
 	user_id: number;
 	intra_id!: number;
 	title: string;
+	current_skins: number[];
 }
 
 export class LeaderBoardUser {

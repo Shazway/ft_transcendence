@@ -8,13 +8,16 @@ import { plainToClass } from 'class-transformer';
 import { ApplySkins, MyProfileUser } from 'src/homepage/dtos/User.dto';
 import { AnyProfileUser } from 'src/homepage/dtos/User.dto';
 import { AchievementList } from 'src/homepage/dtos/Achievement.dto';
+import { AuthService } from 'src/homepage/services/auth/auth.service';
+import { IntraInfo } from 'src/homepage/dtos/Api.dto';
 
 @Controller('profile')
 export class ProfileController {
 	constructor(
 		private itemsService: ItemsService,
 		private tokenManager: TokenManagerService,
-		private usersService: UsersService
+		private usersService: UsersService,
+		private authService: AuthService
 	) {}
 
 	@Post('applySkins')
@@ -26,26 +29,37 @@ export class ProfileController {
 		return res.status(HttpStatus.ACCEPTED).send('Success');
 	}
 
+	buildIntraInfo(username: string): IntraInfo
+	{
+		return {
+			id: 0,
+			login: username,
+			email: '',
+			image: null,
+		}
+	}
+
 	@Post('changeName')
 	async changeUsername(
 		@Req() req: Request,
 		@Res() res: Response,
 		@Body() body: { username: string }
 	) {
-		const currentUser = await this.tokenManager.getUserFromToken(req, 'Http', res);
-		if (!currentUser) return;
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
 		if (!body || !body.username || body.username.length > 20)
 			return res.status(HttpStatus.UNAUTHORIZED).send('Name too long');
 		const checkUser = await this.itemsService.getUserByUsername(body.username);
 
-		if (checkUser && checkUser.user_id == currentUser.sub)
+		if (checkUser && checkUser.user_id == user.sub)
 			return res.status(HttpStatus.NOT_MODIFIED).send('This is already your username');
-		if (checkUser && checkUser.user_id != currentUser.sub)
+		if (checkUser && checkUser.user_id != user.sub)
 			return res
 				.status(HttpStatus.UNAUTHORIZED)
 				.send('Trying to change someone elses username ?');
-		this.usersService.changeUserName(body.username, currentUser.sub);
-		return res.status(HttpStatus.ACCEPTED).send('Username changed');
+		this.usersService.changeUserName(body.username, user.sub);
+		const token = await this.authService.login(this.buildIntraInfo(body.username), user.sub, '');
+		return res.status(HttpStatus.ACCEPTED).send({newToken: token});
 	}
 
 	@Post('changeImg')
@@ -101,6 +115,8 @@ export class ProfileController {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
 		const targetUser = await this.itemsService.getUserByUsername(us);
+		if (!targetUser)
+			return res.status(HttpStatus.UNAUTHORIZED).send('Wrong name');
 		const achievements = targetUser.achievement;
 		const allAchievements = await this.itemsService.getAllAchievements();
 		let serializedUser: MyProfileUser | AnyProfileUser;

@@ -136,11 +136,12 @@
 					<!-- Choix du username -->
 					<div>
 						<form #usernameField="ngForm" (input)="checkInput(usernameField.value.usernameFld)" class="row g-3">
-							<div class="col-auto">
-								<label for="username" class="visually-hidden">Change your username:</label>
+							<div class="col">
+								<div>Change your username:</div>
 								<input id="inputForm" class="input" style="border-radius: 3px;" name="usernameFld" placeholder="new username" ngModel>
-								<div id="inputTooLong" class="text-muted" [hidden]="inputCheckList.tooLong">20 characters maximum</div>
-								<div id="inputTooShort" class="text-muted" [hidden]="inputCheckList.tooShort">1 character maximum</div>
+								<div class="text-muted" [hidden]="inputCheckList.tooLong">20 characters maximum</div>
+								<div class="text-muted" [hidden]="inputCheckList.tooShort">1 character maximum</div>
+								<div class="text-muted" [hidden]="inputCheckList.other">already taken</div>
 							</div>
 						</form>
 					</div>

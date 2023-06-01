@@ -59,6 +59,8 @@ export class LoginController {
 			{
 				console.log('Logging in');
 				console.log({email: intraInfo.data.email});
+				if (user.username != intraInfo.data.login)
+					intraInfo.data.login = user.username;
 				if (!user.double_auth)
 					return res.status(HttpStatus.OK).send(await this.buildLoginBody(resToken, intraInfo.data, user.user_id));
 				const TwoFASecret = this.authService.generateSec()

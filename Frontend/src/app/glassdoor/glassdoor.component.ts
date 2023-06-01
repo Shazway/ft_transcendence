@@ -17,5 +17,7 @@ export class GlassdoorComponent {
 	async ngOnInit() {
 		if (this.parent.isConnected())
 			this.router.navigateByUrl('home');
+		localStorage.clear();
+		
 	}
 }

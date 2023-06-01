@@ -158,6 +158,7 @@ export class ProfileComponent implements AfterViewInit {
 				this.user = newUser;
 		}
 		if (this.user && this.user.match_history) {
+			console.log(this.user);
 			this.user.match_history.reverse().forEach(match => {
 				console.log('mon match');
 				console.log(match);
@@ -193,9 +194,11 @@ export class ProfileComponent implements AfterViewInit {
 
 	isMyProfile() {
 		const name = this.route.snapshot.queryParamMap.get('username');
+		if (!name)
+			return true;
 		if (name == 'Mr.Connasse')
 			return false
-		if (!this.user || this.user.username == localStorage.getItem('username'))
+		if (this.user.username == localStorage.getItem('username'))
 			return true;
 		return false;
 	}
@@ -227,8 +230,9 @@ export class ProfileComponent implements AfterViewInit {
 		}
 	}
 
-	updateSettings(newUsername : string) {
+	async updateSettings(newUsername : string) {
 		console.log("username : " + newUsername);
+		
 		this.updateSkins();
 		if (this.changes.skins)
 			this.fetchService.applySkins(this.user.current_skins);
@@ -236,7 +240,24 @@ export class ProfileComponent implements AfterViewInit {
 			this.fetchService.changeInvite(this.user.channelInviteAuth);
 		if (this.changes.doubleAuth)
 			this.fetchService.toggleDoubleAuth();
+
 		this.createSettingsPopup();
+		let test = await this.checkInput(newUsername);
+		console.log(test);
+		console.log(this.inputCheckList);
+		if (newUsername.length > 0 && (test == true))
+		{
+			let res = await this.fetchService.changeUsername(newUsername);
+			console.log("code recu");
+			console.log(res);
+			if (res == 202)
+			{
+				localStorage.setItem('username', newUsername);
+				// let tmp = await this.fetchService.getMyProfile();
+				// if (tmp)
+				// 	this.user = tmp;
+			}
+		}
 	}
 
 	generateMatches() {
@@ -767,9 +788,10 @@ export class ProfileComponent implements AfterViewInit {
 
 	inputCheckList = {
 		tooLong : true,
-		tooShort : true};
+		tooShort : true,
+		other : true};
 
-	checkInput(input: string) {
+	async checkInput(input: string) {
 		if (!this.inputFormElm)
 			this.inputFormElm = this.elRef.nativeElement.querySelector('#inputForm');
 
@@ -778,15 +800,27 @@ export class ProfileComponent implements AfterViewInit {
 		else
 			this.inputCheckList.tooLong = true;
 
-		if (this.inputCheckList.tooLong && this.inputCheckList.tooShort)
+		if (input.length > 0 && await this.fetchService.getProfile(input))
+			this.inputCheckList.other = false;
+		else
+			this.inputCheckList.other = true;
+
+		if (this.inputCheckList.tooLong &&
+			this.inputCheckList.tooShort &&
+			this.inputCheckList.other)
 		{
 			if (this.inputFormElm.classList.contains('wrong-input'))
 				this.inputFormElm.classList.remove('wrong-input');
+			return (true);
+			//input valide
 		}
 		else
 		{
 			if (!this.inputFormElm.classList.contains('wrong-input'))
 				this.inputFormElm.classList.add('wrong-input');
+			return (false)
+			//input invalide
+
 		}
 	}
 
