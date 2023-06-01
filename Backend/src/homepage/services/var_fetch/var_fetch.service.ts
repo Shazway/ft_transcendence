@@ -38,7 +38,7 @@ export class VarFetchService {
 	public typeOrmAsyncConfig: TypeOrmModuleAsyncOptions = {
 		useFactory: async (): Promise<TypeOrmModuleOptions> => {
 			return this.getTypeOrmConfig();
-		},
+		}
 	};
 
 	public getTypeOrmConfig(): TypeOrmModuleOptions {
