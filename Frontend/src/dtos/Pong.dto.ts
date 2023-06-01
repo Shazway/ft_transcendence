@@ -1,5 +1,6 @@
 import { Graphics, Matrix, Texture } from "pixi.js";
 import { distance } from "mathjs";
+import { Socket } from "socket.io-client";
 
 export interface Position {
 	x: number;
@@ -25,6 +26,17 @@ export interface Move {
 	ArrowDown: boolean;
 	posX: number;
 	posY: number;
+}
+
+export interface Player {
+	client: Socket;
+	user_id: number;
+	username: string;
+	rounds_won?: number;
+	current_points?: number;
+	directionUp?: boolean;
+	directionDown?: boolean;
+	isReady: boolean;
 }
 
 export class ballObject {

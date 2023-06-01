@@ -33,6 +33,7 @@ export class PongDebugComponent implements AfterViewInit {
 	private scoreP2!: WowText;
 	private funkyText!: WowText;
 	bouncenumber: number = 0;
+	specs: string[] = [];
 
 	constructor(
 		private route: ActivatedRoute,
@@ -46,6 +47,16 @@ export class PongDebugComponent implements AfterViewInit {
 		this.pixiContainer.nativeElement.appendChild(this.app.view);
 		this.announcementCanvas.nativeElement.appendChild(this.announce.view);
 		this.arbiterContainer.nativeElement.appendChild(this.arbiter.view);
+		for (let index = 0; index < 0; index++) {
+			this.specs.push('spec' + index);
+		}
+	}
+
+	hideSpecWindow() {
+		const specWin = this.elRef.nativeElement.querySelector('.specWindow');
+		if (specWin.classList.contains('hide'))
+			specWin.classList.remove('hide');
+		else specWin.classList.add('hide');
 	}
 
 	@HostListener('window:resize', ['$event'])
