@@ -234,6 +234,8 @@ export class PongComponent {
 	}
 
 	async initObjects() {
+		const style = await this.assetManager.initAssets();
+		this.assetManager.setApp(this.arbiter);
 		this.player.init(10, 250, 20, 100, 0x83d0c9);
 		this.opponent.init(this.app.view.width - 30, 250, 20, 100, 0xFF0000);
 		this.ball.init(500, 300, 10, 0xFFFFFF);
@@ -242,15 +244,10 @@ export class PongComponent {
 		graphicElm.drawRect(490, 0, 20, 250);
 		graphicElm.drawRect(490, 350, 20, 250);
 		graphicElm.endFill();
-		const style = await this.assetManager.initAssets();
 		this.scoreP1 = new WowText('0', style.p1, 450, 50, this.app);
 		this.scoreP1.setReverse(true);
 		this.scoreP2 = new WowText('0', style.p2, 560, 50, this.app);
-		// this.funkyText = new WowText('this is my fun text', style.funText, 100, 200, this.app);
-		// this.funkyText.setRGB(true, 5000, 20);
-		// this.funkyText.setWavy(true, 50, 50);
 		this.app.stage.addChild(graphicElm, this.ball.graphic, this.player.graphic, this.opponent.graphic);
-		// this.assetManager.addRuler(this.app);
 	}
 
 	@HostListener('window:keyup', ['$event'])

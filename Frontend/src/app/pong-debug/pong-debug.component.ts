@@ -125,10 +125,20 @@ export class PongDebugComponent implements AfterViewInit {
 		this.ball.moveObject(delta);
 		if (this.funkyText)
 			this.funkyText.update();
+		this.assetManager.updateArbiter(delta);
+	}
+
+	addCountdown() {
+		this.assetManager.addCountdown(400);
+	}
+
+	addPanner() {
+		this.assetManager.addPanningText('my wow text');
 	}
 
 	async initObjects() {
 		const style = await this.assetManager.initAssets();
+		this.assetManager.setApp(this.arbiter);
 		this.player.init(10, 250, 20, 100, await this.assetManager.getAsset('SkinEclair'));
 		this.opponent.init(this.app.view.width - (10 + 20), 250, 20, 100, await this.assetManager.getAsset('SkinTorti'));
 		this.ball.init(500, 300, 10, await this.assetManager.getAsset('balleBallon'));
