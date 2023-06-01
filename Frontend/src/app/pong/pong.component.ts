@@ -7,6 +7,7 @@ import { ActivatedRoute } from '@angular/router';
 import { MatchSetting } from 'src/dtos/MatchSetting.dto';
 import { Mutex } from 'async-mutex';
 import { AssetManager, WowText } from 'src/dtos/GraphElem.dto';
+import { AnyProfileUser } from 'src/dtos/User.dto';
 
 @Component({
 	selector: 'app-pong',
@@ -23,9 +24,9 @@ export class PongComponent {
 	private client!: Socket;
 	private app!: Application;
 	private arbiter!: Application;
-	private player!: pongObject;
+	public player!: pongObject;
 	private ball!: ballObject;
-	private opponent!: pongObject;
+	public opponent!: pongObject;
 	private oldDate!: Date;
 	private movespeed = 5;
 	private gamespeed = 13;
@@ -38,7 +39,6 @@ export class PongComponent {
 
 	private scoreP1!: WowText;
 	private scoreP2!: WowText;
-	private funkyText!: WowText;
 
 	constructor(
 		private websocketService: WebsocketService,
@@ -98,8 +98,10 @@ export class PongComponent {
 		this.client.on('onScoreChange', (event) => { this.updateScore(event); });
 		this.client.on('onMatchEnd', (event) => {this.endMatch(event);});
 		this.client.on('spectateMatch', (event) => { this.setSpectate(event); console.log('You are spectating '); });
-		this.client.on('onSpectateMatch', (event) => { this.addSpectate(event); console.log('You are spectating '); });
-		this.client.on('onUnspectateMatch', (event) => { this.removeSpectate(event); console.log('You are spectating '); });
+		this.client.on('onSpectateMatch', (event) => { this.addSpectate(event); });
+		this.client.on('onUnspectateMatch', (event) => { this.removeSpectate(event); });
+		this.client.on('onRecieveProfile', (event) => { this.setProfile(event); });
+		this.client.emit('getProfiles');
 	}
 
 	setSpectate(event: any) {
@@ -111,6 +113,12 @@ export class PongComponent {
 		this.player.score = event.playerScore;
 		this.opponent.setPos(event.opponentPos.x, event.opponentPos.y);
 		this.opponent.score = event.opponentScore;
+	}
+
+	setProfile(event: {player: AnyProfileUser, opponent: AnyProfileUser}) {
+		console.log(event);
+		this.player.user = event.player;
+		this.opponent.user = event.opponent;
 	}
 
 	addSpectate(event: Player) {
