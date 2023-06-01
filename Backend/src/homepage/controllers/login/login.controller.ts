@@ -82,6 +82,15 @@ export class LoginController {
 			res.status(HttpStatus.UNAUTHORIZED).send('No token received');
 	}
 
+	@Get('getUID')
+	async sendUid(@Res() res: Response)
+	{
+		const uid = varFetchService.getAPIKeys();
+		if (uid)
+			return res.status(HttpStatus.OK).send(uid.u_key);
+		res.status(HttpStatus.OK).send(uid);
+	}
+
 	@Post('callback')
 	async callback2FA(@Res() res: Response, @Body() body: AuthCode) {
 		const twoFA = this.twoFaMap.get(Number(body.id));
