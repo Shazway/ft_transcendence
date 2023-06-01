@@ -53,7 +53,7 @@ export class UsersService {
 
 		user.intra_id = userInfo.id;
 		user.username = userInfo.login;
-		if (checkName) user.username += random(1000, 9999);
+		if (checkName) user.username += Math.round(random(1000, 9999));
 		user.img_url = userInfo.image.versions.large;
 		user.rank_score = 100;
 		if (user.username == 'ncaba') user.title = 'Overlord';

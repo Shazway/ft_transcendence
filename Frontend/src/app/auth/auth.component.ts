@@ -63,7 +63,7 @@ export class AuthComponent {
 		{
 			if (this.notifService.client && !this.notifService.client.connected)
 				this.notifService.initSocket();
-			this.router.navigateByUrl('home');
+			this.router.navigateByUrl('profile');
 		}
 	}
 }

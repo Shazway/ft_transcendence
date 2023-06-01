@@ -5,6 +5,7 @@ import { Player } from 'src/homepage/dtos/Matchmaking.dto';
 import { GameEnd, Move, ballObject, pongObject } from 'src/homepage/dtos/Pong.dto';
 import { ItemsService } from '../items/items.service';
 import { NotificationsGateway } from 'src/homepage/gateway/notifications/notifications.gateway';
+import { random } from 'mathjs';
 
 @Injectable()
 export class GamesService {
@@ -89,12 +90,12 @@ export class GamesService {
 		if (pointChecker.side == this.RIGHT)
 		{
 			this.match.current_score[0]++;
-			this.ball.direction = 3 * (Math.PI / 4);
+			this.ball.direction = random(-(Math.PI / 4), Math.PI / 4) + Math.PI;
 		}
 		else
 		{
 			this.match.current_score[1]++;
-			this.ball.direction = Math.PI / 4;
+			this.ball.direction = random(-(Math.PI / 4), Math.PI / 4);
 		}
 		this.emitScore(pointChecker);
 		await this.itemsService.saveMatchState(this.match);

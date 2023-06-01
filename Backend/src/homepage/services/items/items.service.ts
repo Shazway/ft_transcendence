@@ -33,7 +33,9 @@ export class ItemsService {
 
 	public sanitizeEntry(entry: string)
 	{
-		return entry.replace(/'/g, "''");
+		if (entry)
+			return entry.replace(/'/g, "''");
+		return entry;
 	}
 
 	public sendOptionRes(@Res() res) {
