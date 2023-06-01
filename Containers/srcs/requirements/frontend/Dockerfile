@@ -1,12 +1,15 @@
-FROM node:lts
-
-RUN apt-get update && \
-	apt-get install -y build-essential && \
-	apt-get clean && \
-	curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.3/install.sh | bash
+FROM node:12.16.1-alpine As builder
 
 WORKDIR /front
 
-CMD npm install && \
-	npm run build -- --prod && \
-	npm run start -- --prod
+COPY package-lock.json ./
+
+RUN npm install
+
+COPY . .
+
+RUN npm run build
+
+FROM nginx:1.15.8-alpine
+
+COPY --from=builder /front/dist/frontend/ /front/share/nginx/html
