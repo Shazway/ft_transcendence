@@ -14,7 +14,9 @@ services:
 
   backend:
     container_name: backend
-    build: ./requirements/backend
+    build:
+      context: ../../Backend
+      dockerfile: ./dockerfile/Dockerfile
     ports:
       - 3001:3001
     networks:
@@ -27,9 +29,11 @@ services:
 
   frontend:
     container_name: frontend
-    build: ./requirements/frontend
+    build:
+      context: ../../Frontend
+      dockerfile: ./dockerfile/Dockerfile
     ports:
-      - 4200:4200
+      - 8080:80
     networks:
       - transcend
     volumes:

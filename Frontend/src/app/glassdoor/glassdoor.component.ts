@@ -8,7 +8,7 @@ import { AppComponent } from '../app.component';
   styleUrls: ['./glassdoor.component.css']
 })
 export class GlassdoorComponent {
-	
+
 	constructor(
 		private router: Router,
 		private parent: AppComponent,
@@ -18,6 +18,5 @@ export class GlassdoorComponent {
 		if (this.parent.isConnected())
 			this.router.navigateByUrl('home');
 		localStorage.clear();
-		
 	}
 }

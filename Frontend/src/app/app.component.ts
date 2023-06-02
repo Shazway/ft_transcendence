@@ -41,6 +41,7 @@ export class AppComponent implements AfterViewInit {
 		private popover: NgbPopover,
 		public notifService: NotificationService,
 		private fetchService: FetchService,
+		private router: Router
 	){
 	}
 
@@ -58,6 +59,10 @@ export class AppComponent implements AfterViewInit {
 			this.toastFailure,
 			this.toastSuccess,
 			this.toastChannel)
+	}
+
+	navigateToLogin() {
+		this.router.navigateByUrl('login');
 	}
 
 	disconnect() {

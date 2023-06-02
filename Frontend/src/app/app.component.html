@@ -19,7 +19,7 @@
 				<div *ngIf="myProfile" @currencyFadeIn aria-label="wealth" class="d-flex text-muted mx-5 align-items-center" >
 					<img src="assets/MoneyLogo/Wheat1.png" alt="Currency" width="30" height="24">
 					{{getBalance()}}
-				</div> 
+				</div>
 				 <div >
 					<button class="btn btn-default" type="button" (click)="openDropdown()">
 						{{getUsername()}}
@@ -33,7 +33,7 @@
 				</div>
 			</div>
 			<div *ngIf="!isConnected()">
-				<a class="btn" href="login">Log in</a>
+				<a class="btn" (click)="navigateToLogin()">Log in</a>
 			</div>
 		</div>
 		<!-- <div class="d-flex justify-content-between w-100 px-5">
