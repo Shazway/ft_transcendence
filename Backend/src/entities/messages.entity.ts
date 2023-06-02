@@ -23,9 +23,9 @@ export class Message {
 	@CreateDateColumn()
 	createdAt!: Date;
 
-	@ManyToOne(() => User, (us_channel) => us_channel.message)
+	@ManyToOne(() => User, (us_channel) => us_channel.message, { onDelete: 'CASCADE' })
 	author: User;
 
-	@ManyToOne(() => Channel, (channel) => channel.channel_id)
+	@ManyToOne(() => Channel, (channel) => channel.channel_id, { onDelete: 'CASCADE' })
 	channel: Channel;
 }

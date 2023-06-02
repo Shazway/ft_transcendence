@@ -30,7 +30,7 @@
 					<img src="https://cdn.onlinewebfonts.com/svg/img_69492.png" id="chatBtn" class="rounded-circle" alt="Open Chat">
 				</div>
 			</div>
-			<div #chanBody class="scrollbar scrollbar-primary h-100 bg-light mw-100" #scrollbar style="overflow-y: auto; overflow-x: hidden;" #chatMsgs>
+			<div #chanBody class="scrollbar scrollbar-primary h-100 bg-light mw-100" #scrollbar (scroll)="onScroll($event)" style="overflow-y: auto; overflow-x: hidden;" #chatMsgs>
 <!-- Start of text area -->
 				<div class="mw-100">
 					<div class="channel_unpan mw-100">
@@ -124,11 +124,12 @@
 <!-- End of channel Create Area -->
 			</div>
 
-			<form #userChatBox="ngForm" (ngSubmit)="onClickChat(userChatBox.value)" >
+			<form #userChatBox="ngForm" (ngSubmit)="onClickChat(userChatBox.value)" (input)="checkInput(userChatBox.value.message_content, 0, 255, '#exampleFormControlInput1')">
 				<div class="card-footer text-muted d-flex justify-content-start align-items-center p-3 gap-3">
 					<img src="{{getAvatar()}}" class="rounded-circle" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp';" alt="avatar 3" style="width: 40px; height: 100%;">
 					<input type="text" name="message_content" autocomplete="off" class="form-control form-control-lg text-input" id="exampleFormControlInput1" placeholder="Type message" ngModel>
 					<input type="submit" class="btn btn-outline-secondary btn-sm rounded-5" value = "submit">
+					<div class="col-12 text-muted small w-100" [hidden]="chatCheckList.tooLong">255 characters maximum</div>
 				</div>
 			</form>
 		</div>

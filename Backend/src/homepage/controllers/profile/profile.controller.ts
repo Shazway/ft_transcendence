@@ -110,13 +110,14 @@ export class ProfileController {
 		return res.status(HttpStatus.UNAUTHORIZED).send('Not saved');
 	}
 
+
 	@Get(':username')
 	async getProfile(@Param('username') us: string, @Req() req: Request, @Res() res: Response) {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
 		const targetUser = await this.itemsService.getUserByUsername(us);
 		if (!targetUser)
-			return res.status(HttpStatus.UNAUTHORIZED).send('Wrong name');
+			return res.status(HttpStatus.OK).send(null);
 		const achievements = targetUser.achievement;
 		const allAchievements = await this.itemsService.getAllAchievements();
 		let serializedUser: MyProfileUser | AnyProfileUser;
@@ -124,7 +125,7 @@ export class ProfileController {
 		if (targetUser && user.name === targetUser.username)
 			serializedUser = plainToClass(MyProfileUser, targetUser);
 		else if (targetUser) serializedUser = plainToClass(AnyProfileUser, targetUser);
-		else return res.status(HttpStatus.NOT_FOUND).send(null);
+		else return res.status(HttpStatus.OK).send(null);
 		serializedUser.achievements = new AchievementList();
 		serializedUser.achievements.unlockedAchievements = achievements;
 		serializedUser.achievements.lockedAchievements = this.itemsService.getLockedAchievements(targetUser, allAchievements);

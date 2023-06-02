@@ -105,12 +105,6 @@ export class ItemsService {
 		.leftJoinAndSelect('user.blacklistEntry', 'blacklistEntry')
 		.leftJoinAndSelect('user.channel', 'channel')
 		.leftJoinAndSelect('user.match_history', 'match_history')
-		//.leftJoinAndSelect(
-		//	'user.match_history',
-		//	'match_history',
-		//	'match_history.match_id IN ' +
-		//	'(SELECT match.match_id FROM match ORDER BY match.match_id DESC LIMIT 100)'
-		//)
 		.leftJoinAndSelect('match_history.user', 'users')
 		.leftJoinAndSelect('user.skin', 'skin')
 		.where('user.username = :username', { username })
@@ -450,9 +444,8 @@ export class ItemsService {
 
 		if (!sourceUser)
 			return false;
-		sourceUser.blacklistEntry = sourceUser.blacklistEntry.filter((user) => user.user_id === target_id);
-		this.userRepo.save(sourceUser);
-		return true;
+		sourceUser.blacklistEntry = sourceUser.blacklistEntry.filter((user) => user.user_id !== target_id);
+		return this.userRepo.save(sourceUser);
 	}
 
 	public async addUserToChannel(

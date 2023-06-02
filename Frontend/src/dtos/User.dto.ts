@@ -39,6 +39,7 @@ export interface AnyProfileUser {
 	channelInviteAuth: number;
 	current_skins: number[];
 	double_auth: boolean;
+	inMatch: boolean;
 }
 
 

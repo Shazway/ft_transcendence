@@ -47,10 +47,10 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 
 	async handleConnection(client: Socket) {
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'EEEE');
-		
+
 		if (!user)
 			return client.disconnect();
-		console.log('connected')
+	//	console.log('connected')
 		this.userList.set(user.sub, client);
 		await this.notificationService.setUserStatus(user.sub, this.ONLINE);
 	}
@@ -60,7 +60,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		
 		if (!user)
 			return client.disconnect();
-		console.log('disconnected')
+		//console.log('disconnected')
 		this.userList.delete(user.sub);
 		await this.notificationService.setUserStatus(user.sub, this.OFFLINE);
 	}
@@ -155,7 +155,6 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		}
 		else
 			this.itemsService.deleteFriendRequest(source.sub, body.target_id);
-		console.log('oui');
 		if (!client || !client.connected)
 		{
 			const sourceClient = this.userList.get(source.sub);

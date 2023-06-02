@@ -27,7 +27,7 @@
 		<div class="ms-5 w-100 col" style="position: relative;">
 			<div class="d-flex row scroll-small light-gunmetal my-light2 rounded-3 specWindow">
 				<div *ngFor="let spec of specList" class="d-flex flex-column mb-3 col-3 justify-content-center align-items-center">
-					<img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp" style="width: 45px; height: 45px;" alt="">
+					<img class="rounded-circle" src="{{spec.img_url}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" style="width: 45px; height: 45px;" alt="">
 					<h4 class="flex-grow-1 m-0">{{spec.username}}</h4>
 				</div>
 			</div>

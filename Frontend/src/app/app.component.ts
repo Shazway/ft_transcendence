@@ -61,9 +61,12 @@ export class AppComponent implements AfterViewInit {
 			this.toastChannel)
 	}
 
-	navigateToLogin() {
-		this.router.navigateByUrl('login');
+
+	navTo(route : string) {
+		this.router.navigateByUrl(route);
 	}
+
+
 
 	disconnect() {
 		localStorage.clear();

@@ -140,7 +140,7 @@
 								<div>Change your username:</div>
 								<input id="inputForm" class="input" style="border-radius: 3px;" name="usernameFld" placeholder="new username" ngModel>
 								<div class="text-muted" [hidden]="inputCheckList.tooLong">20 characters maximum</div>
-								<div class="text-muted" [hidden]="inputCheckList.tooShort">1 character maximum</div>
+								<div class="text-muted" [hidden]="inputCheckList.tooShort">1 character minimum</div>
 								<div class="text-muted" [hidden]="inputCheckList.other">already taken</div>
 							</div>
 						</form>
@@ -193,7 +193,7 @@
 			</div>
 		</div>
 
-		<div class="col border rounded-3 white h-100 p-0 my-light2" style="overflow: hidden;">
+		<div class="col border rounded-3 white h-100 p-0 my-light2" #matchBody style="overflow: hidden;">
 			<table class="w-100 h-100">
 				<thead class="w-100">
 					<div class="d-flex w-100 justify-content-center">
@@ -204,7 +204,7 @@
 				<div class="w-100" style="height: 98%; overflow-y: auto;">
 					<div *ngIf="matchHistory.length">
 						<div *ngFor="let match of matchHistory" class="d-flex w-100 p-1 border-bottom">
-							<img class="rounded-circle versus-img player" src="{{ getImg(match, match.Player2) }}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 1">
+							<img class="rounded-circle versus-img player" (click)="createChatPopup(getName(match, match.Player2), getId(match, match.Player2))" src="{{ getImg(match, match.Player2) }}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 1">
 							<div class="flex-grow-1">
 								<div class="d-flex align-items-center justify-content-center px-2">
 									<h4 class="m-0">{{isVictory(match) ? 'Victory' : 'Defeat'}}</h4>

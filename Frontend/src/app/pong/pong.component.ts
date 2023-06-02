@@ -35,7 +35,7 @@ export class PongComponent {
 	private ballLock!: Mutex;
 	private isMatchOngoing = true;
 	public isSpectator = false;
-	public specList!: Array<Player>;
+	public specList!: Array<{username: string, img_url: string}>;
 
 	private scoreP1!: WowText;
 	private scoreP2!: WowText;
@@ -121,14 +121,14 @@ export class PongComponent {
 		this.opponent.user = event.opponent;
 	}
 
-	addSpectate(event: Player) {
+	addSpectate(event: {username: string, img_url: string}) {
 		this.specList.push(event);
 	}
 
-	removeSpectate(event: Player) {
+	removeSpectate(event: {username: string}) {
 		let playerIndex;
 		this.specList.forEach((spec, index) => {
-			if (spec.user_id == event.user_id)
+			if (spec.username == event.username)
 				playerIndex = index;
 		});
 		if (playerIndex)
@@ -164,7 +164,7 @@ export class PongComponent {
 				this.ball.setPos(this.ball.position(250, 150));
 			})
 			this.ballLock.release();
-		});	
+		});
 		this.isMatchOngoing = false;
 	}
 
@@ -257,9 +257,9 @@ export class PongComponent {
 		const key = event.key;
 		if (!this.client)
 			return;
-		if (key == 'ArrowUp')
+		if (key == 'ArrowUp' || key == 'z')
 			this.client.emit('ArrowUp', false);
-		if (key == 'ArrowDown')
+		if (key == 'ArrowDown' || key == 's')
 			this.client.emit('ArrowDown', false);
 	}
 
@@ -275,9 +275,9 @@ export class PongComponent {
 		}, 500);
 		if (!this.client)
 			return;
-		if (key == 'ArrowUp' && !this.player.inputs.ArrowUp)
+		if ((key == 'ArrowUp' || key == 'z') && !this.player.inputs.ArrowUp)
 			this.client.emit('ArrowUp', true);
-		if (key == 'ArrowDown' && !this.player.inputs.ArrowDown)
+		if ((key == 'ArrowDown' || key == 's') && !this.player.inputs.ArrowDown)
 			this.client.emit('ArrowDown', true);
 	}
 

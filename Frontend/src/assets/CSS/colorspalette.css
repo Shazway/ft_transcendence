@@ -111,5 +111,9 @@ opacity: 1;
 }
 
 .wrong-input {
-	border-color: red;
+	border-color: red !important;
+}
+
+.cursor-pointer{
+	cursor: pointer;
 }

@@ -12,16 +12,19 @@ import { AchievementList } from 'src/dtos/Achievement.dto';
 import { ShopItem } from 'src/dtos/ShopItem.dto';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ChangeAvatarPopup } from '../popup-component/popup-component.component';
+import { NotificationService } from '../notification.service';
 
 interface MatchHistory {
 	Player1: string;
 	P1URL: string;
 	P1score: number;
 	P1Victory: boolean;
+	P1ID: number;
 	Player2: string;
 	P2URL: string;
 	P2score: number;
 	P2Victory: boolean;
+	P2ID: number;
 	date: Date;
 }
 
@@ -70,6 +73,7 @@ interface Pair {
 export class ProfileComponent implements AfterViewInit {
 	@ViewChild('userSettingsTemplate') userSettingsTemplate!: TemplateRef<any>;
 	@ViewChild('profileCard') profileCard!: ElementRef;
+	@ViewChild('matchBody') matchBody!: ElementRef;
 	user!: AnyProfileUser;
 	matchHistory!: Array<MatchHistory>;
 	matchChart!: Chart;
@@ -97,7 +101,7 @@ export class ProfileComponent implements AfterViewInit {
 	friendsChecked = false;
 	everyoneChecked = false;
 	doubleAuthChecked = false;
-	
+
 	constructor(
 		private cdr: ChangeDetectorRef,
 		private parent: AppComponent,
@@ -106,6 +110,7 @@ export class ProfileComponent implements AfterViewInit {
 		private elRef: ElementRef,
 		private modalService: NgbModal,
 		private router: Router,
+		private notifService: NotificationService,
 	) {
 		Chart.register(ChartDataLabels);
 		this.matchHistory = new Array;
@@ -140,7 +145,7 @@ export class ProfileComponent implements AfterViewInit {
 		if (this.user.double_auth)
 			this.doubleAuthChecked = true;
 	}
-	
+
 	async customOnInit() {
 		if (!this.parent.isConnected())
 			this.router.navigateByUrl('login');
@@ -168,10 +173,12 @@ export class ProfileComponent implements AfterViewInit {
 					P1URL: match.user[0].img_url,
 					P1score: match.current_score[0],
 					P1Victory: match.is_victory[0],
+					P1ID: match.user[0].user_id,
 					Player2: match.user[1].username,
 					P2URL: match.user[1].img_url,
 					P2score: match.current_score[1],
 					P2Victory: match.is_victory[1],
+					P2ID: match.user[1].user_id,
 					date: new Date(date.setHours(date.getHours() + 2)),
 				});
 			});
@@ -182,6 +189,19 @@ export class ProfileComponent implements AfterViewInit {
 			this.getSkins();
 			this.printSettings();
 		}
+	}
+
+	createChatPopup(username: string, UID: number) {
+		console.log(username + UID);
+		if (UID == 0)
+			return;
+		this.parent.openPopover('profile', new PopoverConfig(
+			this.matchBody.nativeElement,
+			'profile arrow-hide',
+			'outside',
+			'start',
+			{name: username, id: UID, client: this.parent.notifService.client},
+		));
 	}
 
 	printSettings() {
@@ -232,7 +252,7 @@ export class ProfileComponent implements AfterViewInit {
 
 	async updateSettings(newUsername : string) {
 		console.log("username : " + newUsername);
-		
+
 		this.updateSkins();
 		if (this.changes.skins)
 			this.fetchService.applySkins(this.user.current_skins);
@@ -248,11 +268,12 @@ export class ProfileComponent implements AfterViewInit {
 		if (newUsername.length > 0 && (test == true))
 		{
 			let res = await this.fetchService.changeUsername(newUsername);
-			console.log("code recu");
-			console.log(res);
-			if (res == 202)
+			if (res.status == 202)
 			{
+				this.user.username = newUsername;
 				localStorage.setItem('username', newUsername);
+				localStorage.setItem('Jwt_token', res.data.newToken);
+				this.router.navigateByUrl('profile');
 				// let tmp = await this.fetchService.getMyProfile();
 				// if (tmp)
 				// 	this.user = tmp;
@@ -277,10 +298,12 @@ export class ProfileComponent implements AfterViewInit {
 				P1URL: 'https://i1.sndcdn.com/artworks-000329925816-3yu1fd-t500x500.jpg',
 				P1score: chooseWinner ? 10 : randScore,
 				P1Victory: Boolean(chooseWinner),
+				P1ID: 0,
 				Player2: 'Pedro',
 				P2URL: 'https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp',
 				P2score: !chooseWinner ? 10 : randScore,
 				P2Victory: !chooseWinner,
+				P2ID: 0,
 				date: time,
 			});
 		}
@@ -312,7 +335,7 @@ export class ProfileComponent implements AfterViewInit {
 		this.cdr.detectChanges();
 		this.cdr.reattach();
 	}
-	
+
 	panLeft(window : ShopItem[], skins : ShopItem[], slideDirection : string) {
 		//ajouter une variable pour le slide, faire une variable par carousel
 		if (slideDirection == 'slideDirectionBall')
@@ -347,7 +370,7 @@ export class ProfileComponent implements AfterViewInit {
 		window.pop();
 		window.unshift(skins[index]);
 	}
-	
+
 	panRight(window : ShopItem[], skins : ShopItem[], slideDirection : string) {
 		if (slideDirection == 'slideDirectionBall')
 			this.slideDirectionBall = 'right';
@@ -355,7 +378,7 @@ export class ProfileComponent implements AfterViewInit {
 			this.slideDirectionPaddle = 'right';
 		if (slideDirection == 'slideDirectionBackground')
 			this.slideDirectionBackground = 'right';
-		
+
 		setTimeout(() => {
 			console.log("boucle");
 			let index = skins.indexOf(window[0]);
@@ -443,7 +466,7 @@ export class ProfileComponent implements AfterViewInit {
 								const days = Math.floor(value);
 								const hours = Math.floor((value - days) * 24);
 								const minutes = Math.floor(((value - days) * 24 - hours) * 60);
-								
+
 								const secondDate = new Date(dateRange.today.getTime());
 								secondDate.setDate(dateRange.today.getDate() - days);
 								secondDate.setHours(dateRange.today.getHours() - hours);
@@ -485,17 +508,16 @@ export class ProfileComponent implements AfterViewInit {
 	getMatchRankData() {
 		const dateRange = this.getDateRange();
 		let ret = new Array<Pair>();
+		let pastRank = 100;
 		this.matchHistory.reverse().forEach((match, index) => {
 			if (ret.length == 0 && index != 0 && match.date.getTime() >= dateRange.past.getTime())
-				ret.push({x: this.getRealTimeDiff(dateRange.past, dateRange.today), y: this.rank})
-			if (this.isCurrentProfile('Mr.Connasse')) {
-				if (this.isVictory(match)) this.rank += 10;
-				else this.rank -= 10;
-				if (this.rank < 0) this.rank = 0;
-			}
+				ret.push({x: this.getRealTimeDiff(dateRange.past, dateRange.today), y: pastRank})
+			if (this.isVictory(match)) pastRank += 10;
+			else pastRank -= 10;
+			if (pastRank < 0) pastRank = 0;
 			if (match.date.getTime() >= dateRange.past.getTime()) {
-				if (this.rank > this.maxScore) this.maxScore = this.rank;
-				ret.push({x: this.getRealTimeDiff(match.date, dateRange.today), y: this.rank})
+				if (pastRank > this.maxScore) this.maxScore = pastRank;
+				ret.push({x: this.getRealTimeDiff(match.date, dateRange.today), y: pastRank})
 			}
 		});
 		this.matchHistory.reverse();
@@ -514,7 +536,7 @@ export class ProfileComponent implements AfterViewInit {
 	}
 
 	getStatus() {
-		if (this.user)
+		if (this.user && !this.isMyProfile())
 			return this.user.activity_status ? 'online' : 'offline';
 		else
 			return 'online';
@@ -741,6 +763,10 @@ export class ProfileComponent implements AfterViewInit {
 		return this.isCurrentProfile(player) ? match.Player1 : match.Player2;
 	}
 
+	getId(match: MatchHistory, player: string) {
+		return this.isCurrentProfile(player) ? match.P1ID : match.P2ID;
+	}
+
 	getScore(match: MatchHistory, player: string) {
 		return (this.isCurrentProfile(player) ? match.P1score : match.P2score);
 	}
@@ -789,8 +815,8 @@ export class ProfileComponent implements AfterViewInit {
 	inputCheckList = {
 		tooLong : true,
 		tooShort : true,
-		other : true};
-
+		other : true
+	};
 	async checkInput(input: string) {
 		if (!this.inputFormElm)
 			this.inputFormElm = this.elRef.nativeElement.querySelector('#inputForm');
@@ -823,6 +849,5 @@ export class ProfileComponent implements AfterViewInit {
 
 		}
 	}
-
 }
 

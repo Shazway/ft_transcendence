@@ -33,7 +33,7 @@
 				</div>
 			</div>
 			<div *ngIf="!isConnected()">
-				<a class="btn" (click)="navigateToLogin()">Log in</a>
+				<a class="btn" (click)="navTo('login')">Log in</a>
 			</div>
 		</div>
 		<!-- <div class="d-flex justify-content-between w-100 px-5">
@@ -45,33 +45,33 @@
 		<nav *ngIf="isConnected()" id="sidebar" class="offscreen light-gunmetal h-100 my-light2">
 			<ul class="list-group active">
 				<li class="active" aria-owns="#homeSubmenu">
-					<a data-toggle="collapse" class="dropdown-toggle " (click)="togglePlay()">Play</a>
-					<ul class="collapse list-unstyled show " id="play">
+					<a data-toggle="collapse" class="dropdown-toggle cursor-pointer" (click)="togglePlay()">Play</a>
+					<ul  class="collapse list-unstyled show " id="play">
 						<li>
-							<a href="matchmaking">Ranked match</a>
+							<a class="cursor-pointer" (click)="navTo('matchmaking')">Ranked match</a>
 						</li>
 						<li>
-							<a href="pong_debug">Casual match</a>
+							<a class="cursor-pointer" (click)="navTo('pong_debug')">Casual match</a>
 						</li>
 						<li>
-							<a href="#">Challenge a friend</a>
+							<a class="cursor-pointer" >Challenge a friend</a>
 						</li>
 					</ul>
 				</li>
 				<li>
-					<a href="profile">My profile</a>
+					<a class="cursor-pointer" (click)="navTo('profile')">My profile</a>
 				</li>
 				<li>
-					<a href="leaderboard">Leaderboard</a>
+					<a class="cursor-pointer" (click)="navTo('leaderboard')">Leaderboard</a>
 				</li>
 				<li>
-					<a href="friends">Friends <span *ngIf="this.notifService.friendshipRequests.received?.length" class="badge badge-pill bg-danger rounded-circle" style="font-size: 10px;">{{this.notifService.friendshipRequests.received.length}}</span></a>
+					<a class="cursor-pointer" (click)="navTo('friends')">Friends <span *ngIf="this.notifService.friendshipRequests.received?.length" class="badge badge-pill bg-danger rounded-circle" style="font-size: 10px;">{{this.notifService.friendshipRequests.received.length}}</span></a>
 				</li>
 				<li>
-					<a href="shop">Shop</a>
+					<a class="cursor-pointer" (click)="navTo('shop')">Shop</a>
 				</li>
 				<li>
-					<a href="search">Search</a>
+					<a class="cursor-pointer" (click)="navTo('search')">Search</a>
 				</li>
 			</ul>
 		</nav>

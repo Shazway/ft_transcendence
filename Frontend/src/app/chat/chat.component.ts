@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, ViewChild, TemplateRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, TemplateRef, AfterViewInit, HostListener } from '@angular/core';
 import { LessMessage, Message } from '../../dtos/message'
 import { Channel } from '../../dtos/Channel.dto'
 import { FetchService } from '../fetch.service';
@@ -8,13 +8,12 @@ import { fromEvent } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmPopup, PasswordPopup, PunishmentPopup } from '../popup-component/popup-component.component';
 import { NotificationRequest } from 'src/dtos/Notification.dto';
-import { NotificationService } from '../notification.service';
 import { Router } from '@angular/router';
 import { AppComponent } from '../app.component';
 import { PopoverConfig } from 'src/dtos/Popover.dto';
 import { AnyProfileUser } from 'src/dtos/User.dto';
-import { AsyncPipe } from '@angular/common';
 import { isUndefined } from 'mathjs';
+import { Mutex } from 'async-mutex';
 
 @Component({
 	selector: 'app-chat',
@@ -35,6 +34,8 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	is_owner = false;
 	potentialNewMembers! : AnyProfileUser[];
 	potentialNewOp! : AnyProfileUser[];
+	msg_page: number = 1;
+	msgLock: Mutex;
 
 	icone_list = {
 		add_friend: "https://static.vecteezy.com/system/resources/previews/020/936/584/original/add-friend-icon-for-your-website-design-logo-app-ui-free-vector.jpg",
@@ -53,6 +54,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		private router: Router,
 		private parent: AppComponent,
 	) {
+		this.msgLock = new Mutex();
 		this.client = io('ws://localhost:3002?channel_id=' + 1, websocketService.getHeader());
 		console.log('connected');
 		if (!this.client)
@@ -72,7 +74,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 				top: containerElement.scrollHeight,
 				behavior: 'smooth',
 			});
-		}, 500)
+		}, 500);
 	}
 
 	setClientEvent() {
@@ -97,6 +99,39 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		if (event == 'Target is an admin') return;
 		if (event == 'No body') return;
 		if (event == 'Message too long') return;
+	}
+
+	private prevScroll!: number;
+
+	async onScroll(event: Event) {
+		const containerElement: HTMLElement = this.scrollbar.nativeElement;
+
+		if (!this.prevScroll) {
+			this.prevScroll = containerElement.scrollTop;
+			return
+		}
+		if (this.prevScroll > containerElement.scrollTop) {
+			this.prevScroll = containerElement.scrollTop;
+			if (this.msgLock.isLocked())
+				return ;
+			await this.msgLock.acquire().then(async () => {
+				if ((containerElement.scrollTop) < 20)
+				{
+					const prevMsg = "message-" + this.test_msgs$[0][0].message_id;
+					const element = document.getElementById(prevMsg);
+					this.msgs$ = await this.fetchService.getMessages(this.currentChannel.channel_id, this.msg_page);
+					this.msgs$.forEach((msg) => {
+						if (msg.author.user_id != this.test_msgs$[0][0].author.user_id)
+							this.test_msgs$.unshift(new Array());
+						this.test_msgs$[0].unshift(msg)
+					});
+					this.msg_page++;
+					if (element && prevMsg != "message-" + this.test_msgs$[0][0].message_id)
+						element.scrollIntoView({ behavior: 'auto' });
+				}
+			});
+			this.msgLock.release();
+		}
 	}
 
 	scrollBottom(msg?: Message) {
@@ -155,7 +190,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		});
 		console.log('Message not deleted');
 	}
-	
+
 	slide() {
 		const offscreenElm = this.elRef.nativeElement.querySelector('.offscreen');
 		const offscreenBtn = this.elRef.nativeElement.querySelector('#chatBtn');
@@ -223,7 +258,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 				'profile arrow-hide',
 				'outside',
 				'start',
-				{msg: msg, client: this.client},
+				{name: msg.author.username, id: msg.author.user_id, client: this.parent.notifService.client},
 			));
 		}
 	}
@@ -248,9 +283,8 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	}
 
 	addFriend(msg: Message) {
-		console.log("on est dans addFriend Frontend");
 		const addFriendElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-add');
-		this.client.emit('addFriend', this.buildNotif("friend", msg.author.username, msg.author.user_id));
+		this.client.emit('inviteFriend', this.buildNotif("friend", msg.author.username, msg.author.user_id));
 	}
 
 	blockUser(msg: Message) {}
@@ -320,8 +354,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
 
 	async openChannel(channel: Channel) {
 		let pwd;
+		console.log(channel.has_pwd);
 		const checkPWD = !this.getUserFromChannel(localStorage.getItem("username"), channel) && channel.has_pwd;
 		if (checkPWD) {
+			console.log('RightPass');
 			pwd = await this.createPopup(channel.channel_name, 'Password', 'PasswordPopup');
 			const mdp = await this.fetchService.isRightPass({channel_id: channel.channel_id, pass: pwd});
 			if (isUndefined(mdp) || !mdp) {
@@ -331,13 +367,16 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		this.is_admin = false;
 		this.is_owner = false;
 		this.client.close();
-		this.msgs$.splice(0, this.msgs$.length);
+		if (this.msgs$ && this.msgs$.length)
+			this.msgs$.splice(0, this.msgs$.length);
 		this.test_msgs$.splice(0, this.test_msgs$.length);
+		this.msg_page = 1;
 		this.msgs$ = await this.fetchService.getMessages(channel.channel_id, 0);
-		if (!this.msgs$)
-			return;
-		for (let index = this.msgs$.length; index > 0; index--)
-			this.sortMessage(this.msgs$[index - 1]);
+		if (this.msgs$)
+		{
+			for (let index = this.msgs$.length; index > 0; index--)
+				this.sortMessage(this.msgs$[index - 1]);
+		}
 		this.client = io('ws://localhost:3002?channel_id=' + channel.channel_id, this.websocketService.getHeader());
 		this.currentChannel = channel;
 		this.setClientEvent();
@@ -631,6 +670,39 @@ export class ChatComponent implements OnInit, AfterViewInit {
 				this.redirectToGlobal();
 				this.hideAllDropdown();
 			}
+		}
+	}
+
+	chatCheckList = { tooLong : true, tooShort : true, other : true };
+	async checkInput(input: string, minVal: number, maxVal: number, form: string) {
+		const inputFormElm = this.elRef.nativeElement.querySelector(form);
+
+		if (input.length < minVal)
+			this.chatCheckList.tooShort = false;
+		else
+			this.chatCheckList.tooShort = true;
+
+		if (input.length > maxVal)
+			this.chatCheckList.tooLong = false;
+		else
+			this.chatCheckList.tooLong = true;
+
+		if (this.chatCheckList.tooLong &&
+			this.chatCheckList.tooShort &&
+			this.chatCheckList.other)
+		{
+			if (inputFormElm.classList.contains('wrong-input'))
+				inputFormElm.classList.remove('wrong-input');
+			return (true);
+			//input valide
+		}
+		else
+		{
+			if (!inputFormElm.classList.contains('wrong-input'))
+				inputFormElm.classList.add('wrong-input');
+			return (false)
+			//input invalide
+
 		}
 	}
 }

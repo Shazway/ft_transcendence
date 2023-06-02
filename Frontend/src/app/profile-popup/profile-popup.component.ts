@@ -18,8 +18,6 @@ import { trigger, transition, style, animate } from '@angular/animations';
 })
 export class ProfilePopupComponent implements OnInit {
 	@Input() data!: any;
-	msg!: Message;
-	client!: Socket;
 	user!: Promise<AnyProfileUser | null>;
 
 	constructor(
@@ -27,9 +25,7 @@ export class ProfilePopupComponent implements OnInit {
 	) { }
 
 	async ngOnInit() {
-		this.msg = this.data.msg;
-		this.client = this.data.client;
-		this.user = this.fetchService.getProfile(this.data.msg.author.username);
+		this.user = this.fetchService.getProfile(this.data.name);
 	}
 
 	buildNotif(type: string, target_name: string, target_id: number) : NotificationRequest {
@@ -37,6 +33,6 @@ export class ProfilePopupComponent implements OnInit {
 	}
 
 	addFriend() {
-		this.data.client.emit('addFriend', this.buildNotif("friend", this.data.msg.author.username, this.data.msg.author.user_id));
+		this.data.client.emit('inviteRequest', this.buildNotif("friend", this.data.name, this.data.id));
 	}
 }

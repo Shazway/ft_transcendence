@@ -186,11 +186,9 @@ export class ChannelsController {
 		const userEntity = await this.itemsService.getUser(user.sub);
 		if (!userEntity) return res.status(HttpStatus.NOT_FOUND).send("You don't exist in the database, please log back in");
 		if (!(await this.channelService.isUserMember(user.sub, chan_id)))
-			return res.status(HttpStatus.UNAUTHORIZED).send("You don't belong to the channel");
+			return res.status(HttpStatus.OK).send(null);
 		messages = messages.filter((message) => {
-			return !userEntity.blacklistEntry.find(
-				(blockedUser) => blockedUser.user_id == message.author.user_id
-			);
+			return !(userEntity.blacklistEntry.find((blockedUser) => blockedUser.user_id == message.author.user_id));
 		});
 		res.status(HttpStatus.OK).send(messages);
 	}

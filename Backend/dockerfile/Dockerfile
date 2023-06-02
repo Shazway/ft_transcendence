@@ -4,5 +4,5 @@ WORKDIR /app
 COPY ./package*.json /app/
 RUN npm ci
 COPY ./ /app/
-RUN npm run migration:run
-RUN npm run start
+CMD npm run migration:run && \
+	npm run start

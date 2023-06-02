@@ -137,12 +137,25 @@ export class FriendsComponent {
 
 	async challenge(user: AnyProfileUser)
 	{
-		const test = await this.createPopup("Challenge", "friend");
+		//const test = await this.createPopup("Challenge", "friend");
+	}
+
+	getActivityStatus(user : AnyProfileUser)
+	{
+		if (user.activity_status == 0)
+			return (0);
+		if (!user.inMatch)
+			return (1);
+		return (2);
 	}
 
 	async spectate(user: AnyProfileUser)
 	{
-		const test = await this.createPopup("Spectate", "friend");
+		//const test = await this.createPopup("Spectate", "friend");
+		console.log(user);
+		let it = await this.fetchService.getCurrentMatchId(user.user_id);
+		console.log('trying to stalk ' + it);
+		this.router.navigateByUrl('pong?match_id=' + it);
 	}
 
 	friendRequestToNotificationRequest(friend : FriendRequest, bool : boolean) : NotificationRequest {

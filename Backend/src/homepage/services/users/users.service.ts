@@ -77,9 +77,6 @@ export class UsersService {
 		const targetUser = await this.itemsService.getUser(suspectId);
 
 		if (!sourceUser || !targetUser) return true;
-		sourceUser.blacklistEntry.forEach((blockedUser) => {
-			if (blockedUser.user_id == suspectId) return true;
-		});
-		return false;
+		return sourceUser.blacklistEntry.find((user) => targetUser.user_id == user.user_id);
 	}
 }

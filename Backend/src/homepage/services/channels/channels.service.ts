@@ -36,7 +36,7 @@ export class ChannelsService {
 		if (newChan.channel_password)
 		{
 			newChan.has_pwd = true;
-			if (newChan.channel_password.length > 15)
+			if (newChan.channel_password.length > 20)
 				return null;
 			newChan.channel_password = await bcrypt.hash(newChan.channel_password, 10);
 		}

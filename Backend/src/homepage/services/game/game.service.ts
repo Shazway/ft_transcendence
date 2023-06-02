@@ -98,7 +98,7 @@ export class GamesService {
 			this.ball.direction = random(-(Math.PI / 4), Math.PI / 4);
 		}
 		this.emitScore(pointChecker);
-		await this.itemsService.saveMatchState(this.match);
+		this.itemsService.saveMatchState(this.match);
 	}
 
 	emitScore(pointChecker: {state: boolean, side: number})

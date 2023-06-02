@@ -193,6 +193,22 @@ export class FetchService {
 		return res;
 	}
 
+	async getCurrentMatchId(user_id : number) {
+		let matchId = 0;
+		const teaFunc = this.teapotError;
+		const route = this.router;
+		await axios.post<{match_id : number}>('http://localhost:3001/users/getCurrentMatch', {user_id : user_id}, this.getHeader())
+		.then(function (response) {
+			if (response.data)
+				matchId = response.data.match_id;
+		})
+		.catch(function (error) {
+			teaFunc(error, route);
+		})
+		.finally(function () {});
+		return matchId;
+	}
+
 	async getFriends() {
 		let res: AnyProfileUser[] = [];
 		const teaFunc = this.teapotError;
@@ -244,7 +260,7 @@ export class FetchService {
 		.finally(function () {});
 		return res;
 	}
-	
+
 	async blockUser(block_id : number) {
 		let res;
 		const teaFunc = this.teapotError;
@@ -549,14 +565,14 @@ export class FetchService {
 		.finally(function () {});
 		return res;
 	}
-	
+
 	async changeUsername(newUsername : string) {
 		let res: any;
 		const teaFunc = this.teapotError;
 		const route = this.router;
 		await axios.post<any>('http://localhost:3001/profile/changeName',{ username : newUsername }, this.getHeader())
 		.then(function (response) {
-			res = response.status;
+			res = response;
 		})
 		.catch(function (error) {
 			teaFunc(error, route);

@@ -78,9 +78,9 @@
 								<img (click)="blockUser(friend)" title="block" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{friend.user_id}}-block" src="{{icone_list.block_user}}" alt="block">
 							</div>
 						</td>
-						<td *ngIf="friend.activity_status == 0">offline</td>
-						<td (click)="challenge(friend)" *ngIf="friend.activity_status == 1">online</td> <!--transformer online en lien pour challenge-->
-						<td (click)="spectate(friend)" *ngIf="friend.activity_status == 2">playing</td> <!--transformer playing en lien pour spectate la partie-->
+						<td *ngIf="getActivityStatus(friend) == 0">offline</td>
+						<td (click)="challenge(friend)" class="cursor-pointer" *ngIf="getActivityStatus(friend) == 1">online</td> <!--transformer online en lien pour challenge-->
+						<td (click)="spectate(friend)" class="btn cursor-pointer" *ngIf="getActivityStatus(friend) == 2">playing</td> <!--transformer playing en lien pour spectate la partie-->
 						<td>{{friend.rank_score}}</td>
 					</tr>
 				</tbody>
@@ -125,7 +125,7 @@
 				</tbody>
 			</table>
 		</div>
-		
+
 		<div
 		class="tab-pane fade"
 		id="blocked0"

@@ -90,6 +90,22 @@ export class UsersController {
 		else res.status(HttpStatus.FORBIDDEN).send('Failed to unblock user');
 	}
 
+	@Post('getCurrentMatch')
+	async getCurrentMatch(@Req() req: Request, @Res() res: Response, @Body() body: {user_id: number})
+	{
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
+		if (!body || !body.user_id)
+			return res.status(HttpStatus.OK).send(null);
+		const userEntity = await this.itemsService.getUser(body.user_id);
+		if (!userEntity)
+			return res.status(HttpStatus.OK).send(null);
+		const goingMatch = userEntity.match_history.find((match) => match.is_ongoing);
+		if (!goingMatch)
+			return res.status(HttpStatus.OK).send({match_id: 0});
+		return res.status(HttpStatus.OK).send({match_id: goingMatch.match_id});
+	}
+
 	@Get('friends')
 	async getFriends(@Req() req: Request, @Res() res: Response) {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
@@ -162,13 +178,13 @@ export class UsersController {
 
 	@Get('ongoingMatch/:id')
 	async getOngoingMatch(
-		@Param('id', ParseIntPipe) target_id: number,
+		@Param('id', ParseIntPipe) userId: number,
 		@Req() req: Request,
 		@Res() res: Response
 	) {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
-		const match = await this.itemsService.getCurrentMatch(target_id);
+		const match = await this.itemsService.getCurrentMatch(userId);
 		if (!match) return res.status(HttpStatus.NOT_FOUND).send('Match not found');
 		return res.status(HttpStatus.OK).send(match.match_id);
 	}

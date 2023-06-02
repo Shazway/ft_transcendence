@@ -23,6 +23,7 @@ import { UsersService } from 'src/homepage/services/users/users.service';
 import { WsexceptionFilter } from 'src/homepage/filters/wsexception/wsexception.filter';
 import { UseFilters } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { cp } from 'fs';
 
 @UseFilters(new WsexceptionFilter())
 @WebSocketGateway(3002, {
@@ -46,18 +47,15 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	@WebSocketServer()
 	server;
 
-	async handleConnection(client: Socket) 
+	async handleConnection(client: Socket)
 	{
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'EEEE');
 		if (!user)
 			return client.disconnect();
 		const channel_id = Number(client.handshake.query.channel_id);
 		const channel = await this.channelService.getChannelById(channel_id);
-		if (!channel) {
-			client.emit('onError', 'Channel does not exist');
-			client.disconnect();
-			return;
-		}
+		if (!channel)
+			return client.disconnect();
 		const isMember = await this.channelService.isUserMember(user.sub, channel_id);
 		if (channel.is_dm && isMember)
 			return this.addUserToList(client, user);
@@ -164,7 +162,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		if (!channel)
 			return false;
 		channel.forEach(async (userSockets, key) => {
-			if (!(await this.usersService.isBlockedCheck(sourceId, key)))
+			if (!(await this.usersService.isBlockedCheck(key, sourceId)))
 				this.socketEmit(userSockets, dest, message);
 		});
 		return true;
@@ -301,7 +299,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 	}
 
 
-	@SubscribeMessage('addFriend')
+	@SubscribeMessage('friendInvite')
 	async handleInvite(@ConnectedSocket() client: Socket, @MessageBody() body: NotificationRequest) {
 		if (!body || !body.target_id)
 			throw new WsException('No body');
