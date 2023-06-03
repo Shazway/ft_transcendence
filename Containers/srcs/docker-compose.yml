@@ -19,10 +19,12 @@ services:
       dockerfile: ./dockerfile/Dockerfile
     ports:
       - 3001:3001
+      - 3002:3002
+      - 3003:3003
+      - 3004:3004
+      - 3005:3005
     networks:
       - transcend
-    volumes:
-      - ../../Backend:/app
     restart: unless-stopped
     depends_on:
       - postgres
@@ -33,11 +35,9 @@ services:
       context: ../../Frontend
       dockerfile: ./dockerfile/Dockerfile
     ports:
-      - 8080:80
+      - 4200:80
     networks:
       - transcend
-    volumes:
-      - ../../Frontend:/front
     restart: unless-stopped
     depends_on:
       - backend
