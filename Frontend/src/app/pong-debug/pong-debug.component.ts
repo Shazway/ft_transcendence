@@ -124,8 +124,6 @@ export class PongDebugComponent implements AfterViewInit {
 		else if (this.closeEnoughOpponent() && this.ball.collidesWithPlayer(this.opponent))
 			this.ball.changeDirectionOpponent(this.opponent);
 		this.ball.moveObject(delta);
-		// if (this.funkyText)
-			// this.funkyText.update();
 		this.assetManager.updateArbiter(delta);
 	}
 

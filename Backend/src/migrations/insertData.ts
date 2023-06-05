@@ -154,7 +154,7 @@ export class insertData666666666666666666 implements MigrationInterface {
 			{
 				type: 'Background',
 				name: 'Billard',
-				img_url: 'assets/Skins/Background/Nathan.png',
+				img_url: 'assets/Skins/Background/Pool.png',
 				description: 'Nathan\'s special, limited-edition skin',
 				price : 150,
 			},

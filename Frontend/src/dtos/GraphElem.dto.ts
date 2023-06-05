@@ -140,7 +140,7 @@ export class PlainText {
 	}
 
 	clear() {
-		
+
 	}
 
 	destroy() {
@@ -216,7 +216,7 @@ export class WowText {
 		this.resetSpacing();
 		return this;
 	}
-	
+
 	LerpRGB (a: Color,b: Color,t: number)
 	{
 		return new Color

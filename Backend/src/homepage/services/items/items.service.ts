@@ -7,6 +7,7 @@ import { pongObject } from 'src/homepage/dtos/Pong.dto';
 import { ApplySkins } from 'src/homepage/dtos/User.dto';
 import { Repository } from 'typeorm';
 import { NotificationsGateway } from 'src/homepage/gateway/notifications/notifications.gateway';
+import Achievement from 'src/entities/achievements.entity';
 
 @Injectable()
 export class ItemsService {
@@ -552,7 +553,6 @@ export class ItemsService {
 
 		if (!userOne || !userTwo)
 			return null;
-		console.log('leftMatch');
 		if (player1.player.user_id != id)
 		{
 			match.is_victory[0] = true;
@@ -590,10 +590,8 @@ export class ItemsService {
 
 		if (!userOne || !userTwo)
 			return null;
-		console.log('done match');
 		if (player1.score == matchSetting.score_to_win)
 		{
-			console.log(userOne.username + ' a gagné');
 			match.is_victory[0] = true;
 			match.is_victory[1] = false;
 			if (matchSetting.is_ranked)
@@ -601,12 +599,9 @@ export class ItemsService {
 				userOne = this.updateWinner(userOne);
 				userTwo = this.updateLoser(userTwo);
 			}
-			console.log(userOne);
-			console.log(userTwo);
 		}
 		else
 		{
-			console.log(userTwo.username + ' a gagné');
 			match.is_victory[0] = true;
 			match.is_victory[1] = false;
 			if (matchSetting.is_ranked)
@@ -614,8 +609,6 @@ export class ItemsService {
 				userOne = this.updateLoser(userOne);
 				userTwo = this.updateWinner(userTwo);
 			}
-			console.log(userOne);
-			console.log(userTwo);
 		}
 		if (match.is_ongoing)
 			match.is_ongoing = false;
@@ -629,7 +622,19 @@ export class ItemsService {
 
 	hasAchievement(user: UserEntity, achievementName: string)
 	{
-		return user.achievement && user.achievement.find((achievement) => achievement.achievement_name == achievementName);
+		return user.achievement.find((achievement) => achievement.achievement_name == achievementName);
+	}
+
+	async addAchievementToUser(achievements: Achievement[], user: UserEntity, name: string, notifGateway: NotificationsGateway)
+	{
+		const achievement = achievements.find((achievement) => achievement.achievement_name == name);
+		console.log(achievement);
+		if (achievement)
+		{
+			user.achievement.push(achievement);
+			notifGateway.sendAchievement(user.user_id, achievement);
+			await this.userRepo.save(user);
+		}
 	}
 
 	async updateMatchAchievements(player: pongObject, matchSetting: MatchSettingEntity, notifGateway: NotificationsGateway) {
@@ -637,39 +642,25 @@ export class ItemsService {
 		const achievements = await this.getAllAchievements();
 		const leaderBoard = await this.getLeaderboard();
 
+		console.log(user.achievement);
 		if (!user || !achievements || !achievements.length)
 			return null;
-		if (matchSetting.is_ranked && user.wins + user.losses == 1)
-		{
-			const firstRankedMatch = achievements[1];
-			user.achievement.push(firstRankedMatch);
-			notifGateway.sendAchievement(user.user_id, firstRankedMatch);
-		}
-		else if (!matchSetting.is_ranked && !this.hasAchievement(user, 'First Unranked Match'))
-		{
-			const firstUnrankedMatch = achievements[0];
-			user.achievement.push(firstUnrankedMatch);
-			notifGateway.sendAchievement(user.user_id, firstUnrankedMatch);
-		}
+
+		if (matchSetting.is_ranked && user.wins + user.losses == 1 && !this.hasAchievement(user, 'First Ranked Match'))
+			await this.addAchievementToUser(achievements, user, 'First Ranked Match', notifGateway);
+		else if (!matchSetting.is_ranked && user.wins + user.losses == 1 && !this.hasAchievement(user, 'First Unranked Match'))
+			await this.addAchievementToUser(achievements, user, 'First Unranked Match', notifGateway);
+
 		if (user.wins == 1 && !this.hasAchievement(user, 'Win a match'))
-		{
-			const firstWin = achievements[2];
-			user.achievement.push(firstWin);
-			notifGateway.sendAchievement(user.user_id, firstWin);
-		}
+			await this.addAchievementToUser(achievements, user, 'Win a match', notifGateway);
+
 		if (user.losses == 1 && !this.hasAchievement(user, 'Consolation prize'))
-		{
-			const firstLose = achievements[4];
-			user.achievement.push(firstLose);
-			notifGateway.sendAchievement(user.user_id, firstLose);
-		}
+			await this.addAchievementToUser(achievements, user, 'Consolation prize', notifGateway);
+
 		if (leaderBoard.length && leaderBoard[0].user_id == user.user_id && !this.hasAchievement(user, 'We are number one'))
-		{
-			const numberOne = achievements[3];
-			user.achievement.push(numberOne);
-			notifGateway.sendAchievement(user.user_id, numberOne);
-		}
-		return await this.userRepo.save(user);
+			await this.addAchievementToUser(achievements, user, 'We are number one', notifGateway);
+
+		return true;
 	}
 
 	async updatePlayersAchievement(player1: pongObject, player2: pongObject, matchSetting: MatchSettingEntity, notifGateway: NotificationsGateway) {

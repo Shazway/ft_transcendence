@@ -20,7 +20,4 @@ export class MatchSetting {
 
 	@Column({ default: 2 })
 	max_players!: number;
-
-	@Column({ default: 2 })
-	round_to_win!: number;
 }

@@ -3,6 +3,7 @@ import { Socket, io } from 'socket.io-client';
 import { WebsocketService } from '../websocket.service';
 import { MatchMaking } from '../../dtos/MatchMaking.dto';
 import { Router } from '@angular/router';
+import { AppComponent } from '../app.component';
 
 @Component({
 	selector: 'app-match-making',
@@ -13,9 +14,12 @@ export class MatchMakingComponent {
 	client: Socket;
 	constructor(
 		private websocketService: WebsocketService,
+		private parent: AppComponent,
 		private elRef: ElementRef,
 		private router: Router
 	) {
+		if (!this.parent.isConnected())
+			this.router.navigateByUrl('login');
 		this.client = io('ws://localhost:3004', websocketService.getHeader());
 		if (!localStorage.getItem('Jwt_token'))
 			return;

@@ -13,6 +13,9 @@ import { ShopItem } from 'src/dtos/ShopItem.dto';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ChangeAvatarPopup } from '../popup-component/popup-component.component';
 import { NotificationService } from '../notification.service';
+import { NotificationRequest } from 'src/dtos/Notification.dto';
+import { ChatComponent } from '../chat/chat.component';
+
 
 interface MatchHistory {
 	Player1: string;
@@ -94,13 +97,15 @@ export class ProfileComponent implements AfterViewInit {
 	slideDirectionBackground = 'none';
 	settingState = 'closed';
 	achievements: AchievementList = {unlockedAchievements: [], lockedAchievements: []};
+	titles : string[] = [];
 
-	changes : { skins : boolean, invite : boolean, doubleAuth : boolean } = {skins : false, invite : false, doubleAuth : false};
+	changes : { skins : boolean, invite : boolean, doubleAuth : boolean, title : boolean } = {skins : false, invite : false, doubleAuth : false, title : false};
 
 	nobodyChecked = false;
 	friendsChecked = false;
 	everyoneChecked = false;
 	doubleAuthChecked = false;
+	newTitle = '';
 
 	constructor(
 		private cdr: ChangeDetectorRef,
@@ -110,7 +115,6 @@ export class ProfileComponent implements AfterViewInit {
 		private elRef: ElementRef,
 		private modalService: NgbModal,
 		private router: Router,
-		private notifService: NotificationService,
 	) {
 		Chart.register(ChartDataLabels);
 		this.matchHistory = new Array;
@@ -144,6 +148,14 @@ export class ProfileComponent implements AfterViewInit {
 
 		if (this.user.double_auth)
 			this.doubleAuthChecked = true;
+	}
+
+	getTitles() {
+		this.user.achievements.unlockedAchievements.forEach(
+			(value) => {
+				if(value.achievement_reward && value.achievement_reward.length)
+					this.titles.push(value.achievement_reward);
+			})
 	}
 
 	async customOnInit() {
@@ -187,6 +199,7 @@ export class ProfileComponent implements AfterViewInit {
 		if (this.isMyProfile()) {
 			this.initToggles();
 			this.getSkins();
+			this.getTitles();
 			this.printSettings();
 		}
 	}
@@ -252,6 +265,7 @@ export class ProfileComponent implements AfterViewInit {
 
 	async updateSettings(newUsername : string) {
 		console.log("username : " + newUsername);
+		let tmp : any;
 
 		this.updateSkins();
 		if (this.changes.skins)
@@ -260,7 +274,12 @@ export class ProfileComponent implements AfterViewInit {
 			this.fetchService.changeInvite(this.user.channelInviteAuth);
 		if (this.changes.doubleAuth)
 			this.fetchService.toggleDoubleAuth();
-
+		if (this.changes.title && this.user.title != this.newTitle)
+		{
+			tmp = await this.fetchService.changeTitle(this.newTitle);
+			if (tmp.status == 200)
+				this.user.title = this.newTitle;
+		}
 		this.createSettingsPopup();
 		let test = await this.checkInput(newUsername);
 		console.log(test);
@@ -310,10 +329,10 @@ export class ProfileComponent implements AfterViewInit {
 
 		let index = 0
 		for (; index < 5; index++) {
-			this.achievements.unlockedAchievements.push({achievement_name: 'Achievement ' + index, achievement_description: 'Description ' + index});
+			this.achievements.unlockedAchievements.push({achievement_id: index, achievement_name: 'Achievement ' + index, achievement_description: 'Description ' + index});
 		}
 		for (; index < 15; index++) {
-			this.achievements.lockedAchievements.push({achievement_name: 'Achievement ' + index, achievement_description: 'Description ' + index});
+			this.achievements.lockedAchievements.push({achievement_id: index, achievement_name: 'Achievement ' + index, achievement_description: 'Description ' + index});
 		}
 	}
 
@@ -849,5 +868,25 @@ export class ProfileComponent implements AfterViewInit {
 
 		}
 	}
+
+	setTitle(input : any) {
+		this.changes.title = true;
+		this.newTitle = input.target.value;
+	}
+
+	buildNotif(type: string, target_name: string, target_id: number) : NotificationRequest {
+		return {type : type, target_id : target_id, target_name : target_name};
+	}
+
+	addFriend() {
+		if (this.user)
+			this.parent.notifService.client.emit('inviteRequest', this.buildNotif("friend", this.user.username, this.user.user_id));
+	}
+
+	challenge() {
+		if (this.user)
+			this.parent.notifService.client.emit('inviteRequest', this.buildNotif("match", this.user.username, this.user.user_id));
+	}
+
 }
 

@@ -1,0 +1,9 @@
+.specWindow {
+	max-height: 500px;
+	overflow: auto;
+	transition: opacity 300ms;
+}
+
+.specWindow.hide {
+	opacity: 0;
+}

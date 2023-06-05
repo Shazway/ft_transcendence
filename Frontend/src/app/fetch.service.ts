@@ -580,4 +580,19 @@ export class FetchService {
 		.finally(function () {});
 		return res;
 	}
+
+	async changeTitle(newTitle : string) {
+		let res: any;
+		const teaFunc = this.teapotError;
+		const route = this.router;
+		await axios.post<any>('http://localhost:3001/profile/changeTitle',{ newTitle : newTitle }, this.getHeader())
+		.then(function (response) {
+			res = response;
+		})
+		.catch(function (error) {
+			teaFunc(error, route);
+		})
+		.finally(function () {});
+		return res;
+	}
 }

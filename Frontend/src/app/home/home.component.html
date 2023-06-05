@@ -2,10 +2,11 @@
 	<div class="d-flex flex-grow-1 flex-column align-items-center" style="padding-top: 15%">
 		<p class="chatting">Hi {{getUsername()}}, it's good to see you there!</p>
 		<p class="chatting">How about playing a match?</p>
+		<h1 style="font-family: 'Pixeloid', sans-serif;">Ｏ(≧∇≦)Ｏ</h1>
 		<div class="row py-5">
-			<div class="col button-20">Play a ranked match</div>
+			<div (click)="navTo('matchmaking')" class="col mybutton my-light2">Play a ranked match</div>
 			<div class="col-1"></div>
-			<div class="col button-20">Play a casual match</div>
+			<div (click)="navTo('friends')" class="col mybutton my-light2">Play against a friend</div>
 		</div>
 	</div>
 </div>

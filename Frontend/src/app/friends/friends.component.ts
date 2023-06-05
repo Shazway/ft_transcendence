@@ -19,7 +19,6 @@ export class FriendsComponent {
 		tick : "https://cdn.discordapp.com/attachments/1041104785870438521/1109161609621950464/Tick.png",
 		cross : "https://cdn.discordapp.com/attachments/1041104785870438521/1109161609374474271/Cross.png",
 		go_to_profile: "https://cdn.discordapp.com/attachments/1041104785870438521/1103760104278458468/user.png",
-		go_to_messages: "https://cdn.discordapp.com/attachments/1041104785870438521/1103760105108930602/writing.png",
 		remove_friend: "https://cdn.discordapp.com/attachments/1041104785870438521/1103760104559493130/unfriend.png",
 		block_user: "https://cdn.discordapp.com/attachments/1041104785870438521/1103760104815349931/block.png"
 	}
@@ -89,11 +88,6 @@ export class FriendsComponent {
 
 	}
 
-	goToMessages(user: AnyProfileUser)
-	{
-
-	}
-
 	async unfriendPopup(user : AnyProfileUser) {
 		const modalRef = this.modalService.open(ConfirmUnfriendPopup);
 		modalRef.componentInstance.user = user;
@@ -135,9 +129,15 @@ export class FriendsComponent {
 		this.blockedUsers.splice(this.blockedUsers.indexOf(user), 1);
 	}
 
-	async challenge(user: AnyProfileUser)
+	buildNotif(type: string, target_name: string, target_id: number) : NotificationRequest {
+		return {type : type, target_id : target_id, target_name : target_name};
+	}
+
+	challenge(user: AnyProfileUser)
 	{
 		//const test = await this.createPopup("Challenge", "friend");
+		if (user)
+			this.notifService.client.emit('inviteRequest', this.buildNotif("match", user.username, user.user_id));
 	}
 
 	getActivityStatus(user : AnyProfileUser)

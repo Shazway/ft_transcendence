@@ -5,6 +5,7 @@ import { AnyProfileUser } from 'src/dtos/User.dto';
 import { Socket } from 'socket.io-client';
 import { NotificationRequest } from 'src/dtos/Notification.dto';
 import { trigger, transition, style, animate } from '@angular/animations';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-profile-popup',
@@ -22,6 +23,7 @@ export class ProfilePopupComponent implements OnInit {
 
 	constructor(
 		private fetchService: FetchService,
+		private router: Router
 	) { }
 
 	async ngOnInit() {
@@ -34,5 +36,10 @@ export class ProfilePopupComponent implements OnInit {
 
 	addFriend() {
 		this.data.client.emit('inviteRequest', this.buildNotif("friend", this.data.name, this.data.id));
+	}
+
+	redirectProfil()
+	{
+		this.router.navigateByUrl('profile?username=' + this.data.name);
 	}
 }

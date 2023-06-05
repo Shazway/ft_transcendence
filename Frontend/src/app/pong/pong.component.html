@@ -4,7 +4,7 @@
 		<div class="d-flex flex-column col gap-4 h-100 justify-content-center">
 			<div id="pixiContainer" #pixiContainer></div>
 <!-- Profile Zone -->
-			<div *ngIf="player.user" class="d-flex">
+			<div *ngIf="player.user && opponent.user" @viewFadeIn class="d-flex">
 				<div class="d-flex col my-light2 light-gunmetal p-2 gap-3">
 					<img class="col" src="{{player.user.img_url}}" class="rounded-circle" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp';" alt="avatar 3" style="width: 40px; height: 100%;">
 					<div class="col d-flex gap-3 align-items-center">

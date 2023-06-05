@@ -2,13 +2,13 @@
 <div *ngIf="user | async" class="card-body p-2">
 	<div class="d-flex text-black">
 		<div class="flex-shrink-0">
-			<img *ngIf="user | async as userConf" src="{{userConf.img_url}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="Generic placeholder image" class="img-fluid card-profile-pic">
+			<img *ngIf="user | async as userConf" (click)="redirectProfil()" src="{{userConf.img_url}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="Generic placeholder image" class="img-fluid card-profile-pic">
 		</div>
 		<div class="flex-grow-1 ms-3">
 
 			<div class="d-flex gap-2">
 				<div class="w-100">
-					<h5 *ngIf="user | async as userConf" class="mb-1 text-center">{{userConf.username}}</h5>
+					<h5 *ngIf="user | async as userConf" (click)="redirectProfil()" class="mb-1 text-center">{{userConf.username}}</h5>
 					<p *ngIf="user | async as userConf" class="mb-2 pb-1 text-center">{{userConf.title}}</p>
 					<div class="d-flex justify-content-start rounded-3 p-2 mb-2 stat-box">
 						<div class="col justify-content-center">

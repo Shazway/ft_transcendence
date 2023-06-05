@@ -73,14 +73,13 @@
 								<p class="small ms-3 mb-0 text-muted">{{ friend.username }}</p>
 								<div class="flex-grow-1"></div>
 								<img (click)="goToProfile(friend)" title="profile" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{friend.user_id}}-profile" src="{{icone_list.go_to_profile}}" alt="profile">
-								<img (click)="goToMessages(friend)" title="messages" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{friend.user_id}}-message" src="{{icone_list.go_to_messages}}" alt="message">
 								<img (click)="removeFriend(friend)" title="remove" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{friend.user_id}}-unfriend" src="{{icone_list.remove_friend}}" alt="unfriend">
 								<img (click)="blockUser(friend)" title="block" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{friend.user_id}}-block" src="{{icone_list.block_user}}" alt="block">
 							</div>
 						</td>
 						<td *ngIf="getActivityStatus(friend) == 0">offline</td>
-						<td (click)="challenge(friend)" class="cursor-pointer" *ngIf="getActivityStatus(friend) == 1">online</td> <!--transformer online en lien pour challenge-->
-						<td (click)="spectate(friend)" class="btn cursor-pointer" *ngIf="getActivityStatus(friend) == 2">playing</td> <!--transformer playing en lien pour spectate la partie-->
+						<td (click)="challenge(friend)" class="cursor-pointer" title="challenge" style="font-weight: 500;" *ngIf="getActivityStatus(friend) == 1">online</td> <!--transformer online en lien pour challenge-->
+						<td (click)="spectate(friend)" class="cursor-pointer" title="spectate" style="font-weight: 500;" *ngIf="getActivityStatus(friend) == 2">playing</td> <!--transformer playing en lien pour spectate la partie-->
 						<td>{{friend.rank_score}}</td>
 					</tr>
 				</tbody>
@@ -174,7 +173,6 @@
 						<td>
 							<div class="d-flex align-items-end">
 								<img (click)="goToProfile(request.sender)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.receiver.user_id}}-profile" src="{{icone_list.go_to_profile}}" alt="profile">
-								<img (click)="goToMessages(request.sender)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.receiver.user_id}}-message" src="{{icone_list.go_to_messages}}" alt="message">
 								<img (click)="blockUser(request.sender)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.receiver.user_id}}-block" src="{{icone_list.block_user}}" alt="block">
 								<div class="flex-grow-1"></div>
 							</div>

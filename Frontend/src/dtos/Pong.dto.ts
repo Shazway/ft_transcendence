@@ -88,6 +88,7 @@ export class ballObject {
 		this.texture = tex;
 		this.matrix = new Matrix();
 		this.matrix.set(1, 0, 0, 1, this.graphic.x, this.graphic.y);
+		this.applyMove(this.position(this.graphic.x, this.graphic.y))
 	}
 
 	applyMove(newPos: Position) {
@@ -304,6 +305,7 @@ export class pongObject {
 		this.texture = tex;
 		this.matrix = new Matrix();
 		this.matrix.set(1, 0, 0, 1, this.graphic.x, this.graphic.y);
+		this.applyMove(this.position(this.graphic.x, this.graphic.y))
 	}
 
 	checkWallCollision(newPos: Position, playerDim: Position) {

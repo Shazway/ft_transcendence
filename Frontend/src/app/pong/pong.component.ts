@@ -1,23 +1,29 @@
-import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, ViewChild } from '@angular/core';
 import { Socket, io } from 'socket.io-client';
 import { WebsocketService } from '../websocket.service';
 import { Application, Graphics, Texture } from 'pixi.js';
 import { pongObject, ballObject, Move, VectorPos, ScoreChange, GameEnd, Player } from 'src/dtos/Pong.dto';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatchSetting } from 'src/dtos/MatchSetting.dto';
 import { Mutex } from 'async-mutex';
 import { AssetManager, WowText } from 'src/dtos/GraphElem.dto';
 import { AnyProfileUser } from 'src/dtos/User.dto';
 import { FetchService } from '../fetch.service';
 import { ShopItem } from 'src/dtos/ShopItem.dto';
-import { isUndefined } from 'mathjs';
+import { trigger, state, style, transition, animate } from '@angular/animations';
+import { AppComponent } from '../app.component';
 
 @Component({
 	selector: 'app-pong',
 	templateUrl: './pong.component.html',
-	styleUrls: ['./pong.component.css']
+	styleUrls: ['./pong.component.css'],
+	animations: [
+		trigger('viewFadeIn', [
+			transition(':enter', [style({ opacity: '0' }), animate('300ms ease-out', style({ opacity: '1' }))]),
+		]),
+	],
 })
-export class PongComponent {
+export class PongComponent implements OnDestroy {
 	@ViewChild('pixiContainer') pixiContainer!: ElementRef;
 	@ViewChild('arbiterContainer') arbiterContainer!: ElementRef;
 	PLAYER_SCORED = 1;
@@ -39,19 +45,29 @@ export class PongComponent {
 	private isMatchOngoing = true;
 	public isSpectator = false;
 	public specList!: Array<{username: string, img_url: string}>;
+	private arbiterTimer = 1000;
 
 	private scoreP1!: WowText;
 	private scoreP2!: WowText;
 	private fieldTexture!: Texture;
+	private graphicElm!: Graphics;
 
 	constructor(
 		private websocketService: WebsocketService,
 		private route: ActivatedRoute,
+		private parent: AppComponent,
+		private router: Router,
 		private elRef: ElementRef,
 		private assetManager: AssetManager,
 		private fetchService: FetchService,
 	) {
+		if (!this.parent.isConnected())
+			this.router.navigateByUrl('login');
 		this.initApp()
+	}
+
+	ngOnDestroy(): void {
+		this.client.disconnect();
 	}
 
 	ngAfterViewInit(): void {
@@ -118,6 +134,8 @@ export class PongComponent {
 		this.player.score = event.playerScore;
 		this.opponent.setPos(event.opponentPos.x, event.opponentPos.y);
 		this.opponent.score = event.opponentScore;
+		this.scoreP1.setText(this.player.score.toString());
+		this.scoreP2.setText(this.opponent.score.toString());
 	}
 
 	async setProfile(event: {player: AnyProfileUser, opponent: AnyProfileUser}) {
@@ -126,20 +144,23 @@ export class PongComponent {
 		this.player.user = event.player;
 		this.player.setTexture(await this.getSkin(skins[0], skinRepo));
 		this.ball.setTexture(await this.getSkin(skins[1], skinRepo));
-		this.fieldTexture = await this.getSkin(skins[2], skinRepo);
+		if (skins[2] != 3)
+			this.fieldTexture = await this.getSkin(skins[2], skinRepo);
+		this.drawBG();
 		this.opponent.user = event.opponent;
 		this.opponent.setTexture(await this.getSkin(this.opponent.user.current_skins[0], skinRepo));
 	}
 
 	async getSkin(skin_id: number, skinRepo: ShopItem[]): Promise<Texture> {
-		let tex: Texture | undefined;
-		skinRepo.forEach(async skin => {
+		let tex: Texture = await this.assetManager.getAsset('SkinDefault');
+		let skin_name: string = '';
+		await skinRepo.forEach(skin => {
 			if (skin.skin_id == skin_id)
-				tex = await this.assetManager.getAsset(skin.name);
+				skin_name = skin.name;
 		});
-		if (isUndefined(tex))
-			return await this.assetManager.getAsset('SkinDefault');
-		return tex;
+		if (skin_name.length > 0)
+			return await this.assetManager.getAsset(skin_name);
+		return await this.assetManager.getAsset('SkinDefault');
 	}
 
 	addSpectate(event: {username: string, img_url: string}) {
@@ -147,17 +168,13 @@ export class PongComponent {
 	}
 
 	removeSpectate(event: {username: string}) {
-		let playerIndex;
-		this.specList.forEach((spec, index) => {
-			if (spec.username == event.username)
-				playerIndex = index;
-		});
-		if (playerIndex)
-			this.specList.splice(playerIndex, 1);
+		console.log(event.username + ' is unspectating');
+		this.specList = this.specList.filter((user) => user.username != event.username);
 	}
 
 	startMatch(settings: MatchSetting) {
 		this.gameSettings = settings;
+		this.assetManager.addCountdown(400);
 	}
 
 	setReady() {
@@ -172,12 +189,18 @@ export class PongComponent {
 			if (event.state == this.WIN)
 			{
 				this.scoreP1.setText("10");
-				console.log('You win');
+				if (this.isSpectator)
+					this.assetManager.addPanningText(this.player.user.username + " wins");
+				else
+					this.assetManager.addPanningText("You win ! Wow, you're such a CHAD * ੈ✩‧₊˚*˚(～ᗒ◡ᗕ)～˚* ੈ✩‧₊");
 			} //<-- faire des trucs avec un affichage mieux
 			else if (event.state == this.LOSS)
 			{
 				this.scoreP2.setText("10");
-				console.log('You lose');
+				if (this.isSpectator)
+					this.assetManager.addPanningText(this.opponent.user.username + " wins");
+				else
+					this.assetManager.addPanningText("You lost ! Oh well time for a drink ? ﾍ(ᗒ◡ᗕ)ﾉ c[_]");
 			} //<-- faire des trucs aussi x)
 		}
 		this.ballLock.waitForUnlock().then(() => {
@@ -190,19 +213,49 @@ export class PongComponent {
 	}
 
 	updateScore(event: ScoreChange) {
+		this.arbiterTimer = 0;
 		if (event.side == this.PLAYER_SCORED) {
 			this.player.score++;
-			this.assetManager.addPanningText(this.player.user.username + ' scored a point');
+			if (this.player.score < 10) {
+				if (this.player.score + this.opponent.score == 1)
+					this.assetManager.addPanningText(this.player.user.username + ' took the first point of the game ! (◕‿‿◕｡)');
+				else if (this.player.score - this.opponent.score == 1)
+					this.assetManager.addPanningText(this.player.user.username + ' takes the lead ! (～ᗒ◡ᗕ)～三二一');
+				else if (this.opponent.score - this.player.score == 0)
+					this.assetManager.addPanningText(this.player.user.username + ' is catching up ! (・◇・)');
+				else if (this.player.score - this.opponent.score == 7)
+					this.assetManager.addPanningText(this.opponent.user.username + ' is throwing the game ヽ(*´∀`)ﾉﾞ');
+				else if (this.player.score - this.opponent.score == 5)
+					this.assetManager.addPanningText(this.opponent.user.username + ' is weqwesting a pwoint (do you need a hug ?) ٩(⸝⸝⸝◕ั ௰ ◕ั⸝⸝⸝ )و');
+				else if (this.player.score - this.opponent.score == 3)
+					this.assetManager.addPanningText(this.player.user.username + ' is completely destroying the opposition ( ▀ 益 ▀ )');
+				else
+					this.assetManager.addPanningText(this.player.user.username + ' scored a point');
+			}
 		}
 		else if (event.side == this.OPPONENT_SCORED) {
 			this.opponent.score++;
-			this.assetManager.addPanningText(this.opponent.user.username + ' scored a point');
+			if (this.opponent.score < 10) {
+				if (this.opponent.score - this.player.score == 1)
+					this.assetManager.addPanningText(this.opponent.user.username + ' takes the lead ! (～ᗒ◡ᗕ)～三二一');
+				else if (this.opponent.score - this.player.score == 0)
+					this.assetManager.addPanningText(this.player.user.username + ' lost the lead ! (╯°□°)╯︵ ┻━┻');
+				else if (this.opponent.score - this.player.score == 1)
+					this.assetManager.addPanningText(this.player.user.username + ' can\'t focus right now (╬●∀●)');
+				else if (this.player.score - this.opponent.score == -5)
+					this.assetManager.addPanningText(this.player.user.username + ' seems like you\'re losing it, cheer up ! ٩(⸝⸝⸝◕ั ௰ ◕ั⸝⸝⸝ )و');
+				else if (this.player.score - this.opponent.score == -3)
+					this.assetManager.addPanningText(this.player.user.username + ' is getting further behind (⊙…⊙ )');
+				else
+					this.assetManager.addPanningText(this.opponent.user.username + ' scored a point');
+			}
 		}
 		this.ballLock.waitForUnlock().then(() => {
 			this.ballLock.acquire().then(() => {
 				this.ball.graphic.clear();
 				this.ball.setPos(this.ball.position(250, 150));
-				this.assetManager.addCountdown(400);
+				if (this.opponent.score < 10 && this.player.score < 10)
+					this.assetManager.addCountdown(400);
 				this.ball.speed = 0;
 			})
 			this.ballLock.release();
@@ -238,6 +291,14 @@ export class PongComponent {
 				this.ballLock.release();
 			});
 		}
+		if (this.arbiterTimer >= 3000)
+		{
+			this.assetManager.addPanningText('This match is getting boring...（；￣ェ￣） (￣□￣)');
+			this.arbiterTimer = -1;
+		}
+		if (this.arbiterTimer != -1)
+			this.arbiterTimer += delta;
+		this.assetManager.updateArbiter(delta);
 	}
 
 	updatePlayer(event: Move) {
@@ -265,22 +326,31 @@ export class PongComponent {
 		this.player.init(10, 250, 20, 100, 0x83d0c9);
 		this.opponent.init(this.app.view.width - 30, 250, 20, 100, 0xFF0000);
 		this.ball.init(500, 300, 10, 0xFFFFFF);
-		const graphicElm = new Graphics();
-		if (this.fieldTexture) {
-			graphicElm.beginTextureFill({texture: this.fieldTexture});
-			graphicElm.drawRect(0, 0, 1000, 600);
-			graphicElm.endFill();
-		}
-		else {
-			graphicElm.beginFill(0xFFFFFF, 0.8);
-			graphicElm.drawRect(490, 0, 20, 250);
-			graphicElm.drawRect(490, 350, 20, 250);
-			graphicElm.endFill();
-		}
+		this.graphicElm = new Graphics();
+		this.drawBG();
 		this.scoreP1 = new WowText('0', style.p1, 450, 50, this.app);
 		this.scoreP1.setReverse(true);
 		this.scoreP2 = new WowText('0', style.p2, 560, 50, this.app);
-		this.app.stage.addChild(graphicElm, this.ball.graphic, this.player.graphic, this.opponent.graphic);
+		this.app.stage.addChild(this.ball.graphic, this.player.graphic, this.opponent.graphic);
+	}
+
+	drawBG() {
+		// this.graphicElm.clear();
+		if (this.graphicElm)
+			this.graphicElm.destroy();
+		this.graphicElm = new Graphics();
+		if (this.fieldTexture) {
+			this.graphicElm.beginTextureFill({texture: this.fieldTexture});
+			this.graphicElm.drawRect(0, 0, 1000, 600);
+			this.graphicElm.endFill();
+		}
+		else {
+			this.graphicElm.beginFill(0xFFFFFF, 0.8);
+			this.graphicElm.drawRect(490, 0, 20, 250);
+			this.graphicElm.drawRect(490, 350, 20, 250);
+			this.graphicElm.endFill();
+		}
+		this.app.stage.addChildAt(this.graphicElm, 0);
 	}
 
 	@HostListener('window:keyup', ['$event'])

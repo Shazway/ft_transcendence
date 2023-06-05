@@ -42,9 +42,8 @@
 								</div>
 
 								<div *ngIf="!isMyProfile()" class="d-flex pt-1 gap-2">
-									<button type="button" class="btn btn-outline-primary flex-grow-1">Chat</button>
-									<button type="button" class="btn btn-outline-primary flex-grow-1">Challenge</button>
-									<button type="button" class="btn btn-primary" style="flex-grow: 5;">Add Friend</button>
+									<button type="button" class="btn btn-outline-primary flex-grow-1" (click)="challenge()">Challenge</button>
+									<button type="button" (click)="addFriend()" class="btn btn-primary" style="flex-grow: 5;">Add Friend</button>
 								</div>
 								<div *ngIf="isMyProfile()" class="d-flex pt-1 gap-2">
 									<button type="button" class="btn btn-outline-primary flex-grow-1" (click)="createSettingsPopup()">Settings</button>
@@ -144,6 +143,14 @@
 								<div class="text-muted" [hidden]="inputCheckList.other">already taken</div>
 							</div>
 						</form>
+						<div>
+							<div>Title:</div>
+							<select class="form-select" name="title" id="title-select" (change)="setTitle($event)">
+								<option value="this.user.title">---</option>
+								<option value="">no title</option>
+								<option *ngFor="let title of titles" value={{title}}>{{title}}</option>
+							</select>
+						</div>
 					</div>
 				</div>
 			</div>

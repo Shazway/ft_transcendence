@@ -6,6 +6,7 @@ import { NotificationRequest, NotificationResponse } from '../dtos/Notification.
 import { AppComponent } from './app.component';
 import { FriendRequest } from 'src/dtos/User.dto';
 import { FetchService } from './fetch.service';
+import { Router } from '@angular/router';
 
 
 @Injectable({
@@ -27,6 +28,7 @@ export class NotificationService {
 		private websocketService: WebsocketService,
 		private fetchService: FetchService,
 		private toastService: ToastService,
+		private router: Router
 	) {
 		if (!this.client || (this.client && !this.client.connected))
 			this.client = io('ws://localhost:3003', this.websocketService.getHeader());
@@ -51,12 +53,19 @@ export class NotificationService {
 		this.client.on('friendAnswer', (event) => { this.showNewFriend(event.notification); console.log('friendAnswer ' + event); this.updateFriendRequests();});
 		this.client.on('pendingRequest', (event) => {  console.log('pendingRequest' + event); this.updateFriendRequests(); });
 		this.client.on('friendInvite', (event) => { this.showNotificationInvite(event.notification); console.log('friendInvite ', event); this.updateFriendRequests();});
-		this.client.on('challenge', (event) => { this.showChallenge(event.notification); console.log('challenge ', event);});
-		this.client.on('failure', (event) => { this.showFailure(event.notification); console.log('failure ', event); this.updateFriendRequests(); });
-		this.client.on('success', (event) => { this.showSuccess(event.notification); console.log('success ', event); this.updateFriendRequests(); });
-		this.client.on('channel', (event) => { this.showChannel(event.notification); console.log('channel ', event); });
+		this.client.on('matchInvite', (event) => { this.showChallenge(event.notification); console.log('challenge ', event);});
+		this.client.on('failure', (event) => { this.showFailure(event); console.log('failure ', event); this.updateFriendRequests(); });
+		this.client.on('success', (event) => { this.showSuccess(event); console.log('success'); console.log(event); this.updateFriendRequests(); });
+		this.client.on('channel', (event) => { this.showSuccess(event); console.log('channel ', event); });
 		this.client.on('onError', (event) => { console.log('erreur + ' + event); });
 		this.client.on('newAchievement', (event) => { this.showAchievements(event); console.log(event); });
+		this.client.on('offline', (event)=> {this.showFailure(event); console.log("target offline");})
+		this.client.on('casualMatch', (event)=> {this.launchMatch(event);})
+	}
+
+	launchMatch(notification: number) {
+		if (notification && !Number.isNaN(notification))
+			this.router.navigateByUrl('pong?match_id=' + notification);
 	}
 
 	showNotificationInvite(notification: NotificationRequest) {
@@ -76,11 +85,12 @@ export class NotificationService {
 		this.toastService.show(this.toastChallenge, { classname: 'bg-light p-0', delay: 5000, context: notification });
 	}
 
-	showFailure(notification: NotificationRequest) {
+	showFailure(notification: string) {
 		this.toastService.show(this.toastFailure, { classname: 'bg-danger p-0', delay: 2000, context: notification });
 	}
 
-	showSuccess(notification: NotificationRequest) {
+	showSuccess(notification: string) {
+		console.log("success : " + notification);
 		this.toastService.show(this.toastSuccess, { classname: 'bg-success p-0', delay: 2000, context: notification });
 	}
 

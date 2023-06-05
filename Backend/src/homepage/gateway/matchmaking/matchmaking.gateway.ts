@@ -42,11 +42,19 @@ export class MatchmakingGateway {
 
 	async handleConnection(client: Socket) {
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'EEEE');
-		if (!user) return client.disconnect();
+		if (!user)
+		{
+			console.log('Wrong token matchmaking');
+			return client.disconnect();
+		}
 		console.log({ new_player: user });
 		const player = await this.itemsService.getUser(user.sub);
 		if (!player || player.inMatch)
+		{
+			console.log('No player, or player is already in a match');
+			console.log(player, player.inMatch);
 			return client.disconnect();
+		}
 		const rankFork = this.getRankFork(player.rank_score);
 		let bracket = this.userQueue.get(rankFork);
 		if (!bracket) {

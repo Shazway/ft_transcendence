@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class TwentysixthMigration1685739469210 implements MigrationInterface {
-    name = 'TwentysixthMigration1685739469210'
+export class TwentySeventhMigration1685982170772 implements MigrationInterface {
+    name = 'TwentySeventhMigration1685982170772'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE "friend_request" ("id" SERIAL NOT NULL, "senderUserId" integer, "receiverUserId" integer, CONSTRAINT "PK_4c9d23ff394888750cf66cac17c" PRIMARY KEY ("id"))`);
@@ -12,7 +12,7 @@ export class TwentysixthMigration1685739469210 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE "achievement" ("achievement_id" SERIAL NOT NULL, "achievement_name" character varying(255) NOT NULL, "achievement_description" character varying(1024), "achievement_reward" character varying(30), CONSTRAINT "PK_5cbaff867128cd6996d6aee95b1" PRIMARY KEY ("achievement_id"))`);
         await queryRunner.query(`CREATE TABLE "skin" ("skin_id" SERIAL NOT NULL, "type" character varying NOT NULL, "img_url" character varying, "name" character varying NOT NULL, "price" integer NOT NULL DEFAULT '0', "description" character varying, CONSTRAINT "PK_e99a5e8f33a2239976aba778556" PRIMARY KEY ("skin_id"))`);
         await queryRunner.query(`CREATE TABLE "user" ("user_id" SERIAL NOT NULL, "intra_id" integer, "username" character varying(20) NOT NULL, "title" character varying(30), "img_url" character varying(350), "rank_score" integer NOT NULL DEFAULT '0', "currency" integer NOT NULL DEFAULT '100', "activity_status" integer NOT NULL DEFAULT '0', "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "wins" integer NOT NULL DEFAULT '0', "losses" integer NOT NULL DEFAULT '0', "double_auth" boolean NOT NULL DEFAULT false, "current_skins" integer array NOT NULL DEFAULT '{1,2,3}', "inMatch" boolean NOT NULL DEFAULT false, "channelInviteAuth" integer NOT NULL DEFAULT '1', CONSTRAINT "UQ_b6b30080359ecd92bb2571c6336" UNIQUE ("intra_id"), CONSTRAINT "UQ_78a916df40e02a9deb1c4b75edb" UNIQUE ("username"), CONSTRAINT "PK_758b8ce7c18b9d347461b30228d" PRIMARY KEY ("user_id"))`);
-        await queryRunner.query(`CREATE TABLE "match settings" ("match_setting_id" SERIAL NOT NULL, "map_appearance" integer NOT NULL DEFAULT '0', "timer" integer NOT NULL DEFAULT '300', "is_ranked" boolean NOT NULL DEFAULT false, "score_to_win" integer NOT NULL DEFAULT '0', "max_players" integer NOT NULL DEFAULT '2', "round_to_win" integer NOT NULL DEFAULT '2', CONSTRAINT "PK_0622478bce499d0255260aa6816" PRIMARY KEY ("match_setting_id"))`);
+        await queryRunner.query(`CREATE TABLE "match settings" ("match_setting_id" SERIAL NOT NULL, "map_appearance" integer NOT NULL DEFAULT '0', "timer" integer NOT NULL DEFAULT '300', "is_ranked" boolean NOT NULL DEFAULT false, "score_to_win" integer NOT NULL DEFAULT '0', "max_players" integer NOT NULL DEFAULT '2', CONSTRAINT "PK_0622478bce499d0255260aa6816" PRIMARY KEY ("match_setting_id"))`);
         await queryRunner.query(`CREATE TABLE "user_friend_user" ("userUserId_1" integer NOT NULL, "userUserId_2" integer NOT NULL, CONSTRAINT "PK_639bd80ba4f7d224b9e27439624" PRIMARY KEY ("userUserId_1", "userUserId_2"))`);
         await queryRunner.query(`CREATE INDEX "IDX_d8ee6796c777b44ef29c026bdd" ON "user_friend_user" ("userUserId_1") `);
         await queryRunner.query(`CREATE INDEX "IDX_7d095a83a532ec46832d9783ee" ON "user_friend_user" ("userUserId_2") `);

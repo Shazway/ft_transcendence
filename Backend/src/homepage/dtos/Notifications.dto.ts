@@ -7,7 +7,6 @@ export class NotificationRequest {
 	sent_at: Date;
 	accepted: boolean;
 	channel_id: number;
-	match_setting: MatchSettingEntity;
 }
 
 export class NotificationResponse {

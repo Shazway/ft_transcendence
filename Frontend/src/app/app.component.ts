@@ -141,9 +141,9 @@ export class AppComponent implements AfterViewInit {
 		return (1);
 	}
 
-	friendRequestToNotificationRequest(friend : any, bool : boolean) : NotificationRequest {
+	friendRequestToNotificationRequest(friend : any, bool : boolean, type : string) : NotificationRequest {
 		return ({
-			type : "friend",
+			type : type,
 			target_name : friend.source_name,
 			target_id : friend.source_id,
 			accepted : bool
@@ -152,28 +152,24 @@ export class AppComponent implements AfterViewInit {
 	}
 
 	acceptFriendRequest(context : NotificationRequest, toast: any) {
-		this.notifService.emit('inviteAnswer', this.friendRequestToNotificationRequest(context, true));
+		console.log(this.friendRequestToNotificationRequest(context, true, 'friend'));
+		this.notifService.emit('inviteAnswer', this.friendRequestToNotificationRequest(context, true, 'friend'));
 		this.notifDismiss(toast);
 	}
 
 	rejectFriendRequest(context : NotificationRequest, toast: any) {
-		this.notifService.emit('inviteAnswer', this.friendRequestToNotificationRequest(context, false));
+		this.notifService.emit('inviteAnswer', this.friendRequestToNotificationRequest(context, false, 'friend'));
 		this.notifDismiss(toast);
 	}
 
 	acceptChallenge(context : NotificationRequest, toast: any) {
-		context.accepted = true;
-		this.notifService.emit('challengeAnswer', context);
+		this.notifService.emit('inviteAnswer', this.friendRequestToNotificationRequest(context, true, 'match'));
 		this.notifDismiss(toast);
 	}
 
 	rejectChallenge(context : NotificationRequest, toast: any) {
-		context.accepted = false;
-		this.notifService.emit('challengeAnswer', context);
-
+		this.notifService.emit('inviteAnswer', this.friendRequestToNotificationRequest(context, false, 'match'));
 		this.notifDismiss(toast);
 	}
-
-
 
 }

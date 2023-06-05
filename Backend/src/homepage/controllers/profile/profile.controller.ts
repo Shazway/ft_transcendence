@@ -96,18 +96,20 @@ export class ProfileController {
 	async changeTitle(@Req() req: Request, @Res() res: Response, @Body() body: { newTitle: string }) {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
-		if (!body || !body.newTitle) return res.status(HttpStatus.UNAUTHORIZED).send('No body or parameters provided');
+		if (!body)
+			return res.status(HttpStatus.UNAUTHORIZED).send('No body or parameters provided');
 		const userEntity = await this.itemsService.getUser(user.sub);
 
 		if (!userEntity)
 			return res.status(HttpStatus.UNAUTHORIZED).send('Not saved');
-		if (userEntity.achievement.find((achievement) => achievement.achievement_reward == body.newTitle))
+		if (!body.newTitle || userEntity.achievement.find((achievement) => achievement.achievement_reward == body.newTitle))
 		{
 			userEntity.title = body.newTitle;
 			await this.itemsService.saveUserState(userEntity)
 			return res.status(HttpStatus.OK).send('Success');
 		}
-		return res.status(HttpStatus.UNAUTHORIZED).send('Not saved');
+		console.log(body);
+		return res.status(HttpStatus.NOT_MODIFIED);
 	}
 
 

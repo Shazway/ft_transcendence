@@ -4,7 +4,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Wix+Madefor+Display:wght@600&display=swap');
 
 .chatting{
-	font-family: 'Wix Madefor Display', sans-serif;
+	font-family: 'Pixeloid', sans-serif;
 	font-size: 25px;
 	font-weight: 600;
 }
@@ -67,4 +67,22 @@
   box-shadow: none;
   opacity: .65;
   pointer-events: none;
+}
+
+.mybutton {
+  background-color: #4E8098;
+	color: white;
+  border-radius: 10px;
+  border-color: whitesmoke;
+  border-style: solid;
+  border-width: 3px;
+	cursor: pointer;
+  text-align: center;
+  padding: 5px;
+  margin: 2px;
+  min-width: 40px;
+}
+
+.mybutton:hover {
+	box-shadow: 0px 0px 50px rgba(255, 255, 255, 0.514);
 }

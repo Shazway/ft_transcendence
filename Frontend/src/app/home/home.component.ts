@@ -21,6 +21,10 @@ export class HomeComponent {
 			this.router.navigateByUrl('glassdoor');
 	}
 
+	navTo(route : string) {
+		this.router.navigateByUrl(route);
+	}
+
 	getUsername()
 	{
 		return(localStorage.getItem('username'));

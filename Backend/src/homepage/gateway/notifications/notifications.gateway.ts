@@ -10,7 +10,7 @@ import {
 	WsException
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
-import { AchievementsEntity, UserEntity } from 'src/entities';
+import { AchievementsEntity, MatchSettingEntity, UserEntity } from 'src/entities';
 import { NotificationRequest, NotificationResponse } from 'src/homepage/dtos/Notifications.dto';
 import { ItemsService } from 'src/homepage/services/items/items.service';
 import { MatchsService } from 'src/homepage/services/matchs/matchs.service';
@@ -50,7 +50,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 
 		if (!user)
 			return client.disconnect();
-	//	console.log('connected')
+		//console.log('connected ' + user.name);
 		this.userList.set(user.sub, client);
 		await this.notificationService.setUserStatus(user.sub, this.ONLINE);
 	}
@@ -60,7 +60,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		
 		if (!user)
 			return client.disconnect();
-		//console.log('disconnected')
+		//console.log('disconnected ' + user.name);
 		this.userList.delete(user.sub);
 		await this.notificationService.setUserStatus(user.sub, this.OFFLINE);
 	}
@@ -100,7 +100,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		const client = this.userList.get(targetUser.user_id);
 
 		if (client && sourceUser)
-			client.emit('channelInvite', this.buildAnswer(sourceUser.user_id, sourceUser.username, channelName));
+			client.emit('channel', sourceUser.name + " added you to the channel: " + channelName);
 	}
 
 	@SubscribeMessage('inviteRequest')
@@ -119,6 +119,8 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 			return client.emit('refusedInvite', 'Something went wrong');
 		else if (body.type == 'match' && !target)
 			return client.emit('offline', 'Your friend is currently offline');
+		else if (body.type == 'match' && target)
+			return target.emit(body.type + 'Invite', { notification: answer});
 		if (target && target.connected)
 			target.emit(body.type + 'Invite', { notification: answer});
 		else
@@ -127,6 +129,13 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 			client.emit('pendingRequest', 'Request sent and waiting for answer');
 		else
 			console.log('Pas connecte envoyeur');
+	}
+
+	buildCasualSetting(): MatchSettingEntity {
+		const matchSetting = new MatchSettingEntity();
+		matchSetting.is_ranked = false;
+		matchSetting.score_to_win = 10;
+		return matchSetting;
 	}
 
 	@SubscribeMessage('inviteAnswer')
@@ -143,11 +152,17 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 				return client.emit('onError', 'Erreur');
 			if (body.type == 'match')
 			{
+				console.log('match fait et envoyé a');
+				console.log('Target id: ');
+				console.log(body.target_id);
+				console.log('Target name: ');
+				console.log(body.target_name);
 				if (!target)
 					return client.emit('onError', 'Opponent disconnected');
-				const match = await this.matchService.createFullMatch(source.sub, body.target_id, body.match_setting);
+				const match = await this.matchService.createFullMatch(source.sub, body.target_id, this.buildCasualSetting());
 				if (!match)
-					return client.emit('Error', 'Something went wrong');
+					return client.emit('onError', 'Something went wrong');
+				console.log('match envoyé');
 				client.emit('casualMatch', match.match_id);
 				target.emit('casualMatch', match.match_id);
 				return;
