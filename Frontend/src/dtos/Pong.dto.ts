@@ -84,6 +84,12 @@ export class ballObject {
 		this.graphic.endFill();
 	}
 
+	setTexture(tex: Texture) {
+		this.texture = tex;
+		this.matrix = new Matrix();
+		this.matrix.set(1, 0, 0, 1, this.graphic.x, this.graphic.y);
+	}
+
 	applyMove(newPos: Position) {
 		this.graphic.clear();
 		if (this.texture) {
@@ -292,6 +298,12 @@ export class pongObject {
 			this.graphic.beginFill(this.color);
 		this.graphic.drawRect(posX / 2, posY / 2, width, height);
 		this.graphic.endFill();
+	}
+
+	setTexture(tex: Texture) {
+		this.texture = tex;
+		this.matrix = new Matrix();
+		this.matrix.set(1, 0, 0, 1, this.graphic.x, this.graphic.y);
 	}
 
 	checkWallCollision(newPos: Position, playerDim: Position) {

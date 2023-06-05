@@ -16,17 +16,21 @@ export class AssetManager {
 			PixeloidMono: 'assets/Fonts/PixeloidMono.ttf',
 			PixeloidSansBold: 'assets/Fonts/PixeloidSansBold.ttf',
 		});
-		Assets.add('SkinGradient' ,'assets/Skins/Paddle/red-gradient.png');
-		Assets.add('SkinHotDog' ,'assets/Skins/Paddle/hotdog.png');
-		Assets.add('Default' ,'assets/Skins/Paddle/default.png');
-		Assets.add('SkinSwirl' ,'assets/Skins/Paddle/Swirl.png');
-		Assets.add('SkinPoele' ,'assets/Skins/Paddle/poele.png');
-		Assets.add('SkinBaguette' ,'assets/Skins/Paddle/baguette.png');
-		Assets.add('SkinEclair' ,'assets/Skins/Paddle/eclairAuChocolat.png');
-		Assets.add('SkinTorti' ,'assets/Skins/Paddle/torti.png');
-		Assets.add('balleBallon' ,'assets/Skins/Ball/ballon.png');
-		Assets.add('balleCitron' ,'assets/Skins/Ball/tarteCitron.png');
-		Assets.add('balleFraise' ,'assets/Skins/Ball/tarteFraise.png');
+		Assets.add('Red gradient' ,'assets/Skins/Paddle/red-gradient.png');
+		Assets.add('SkinDefault' ,'assets/Skins/Paddle/default.png');
+		Assets.add('Swirl' ,'assets/Skins/Paddle/Swirl.png');
+		Assets.add('Poêle' ,'assets/Skins/Paddle/poele.png');
+		Assets.add('Baguette' ,'assets/Skins/Paddle/baguette.png');
+		Assets.add('Éclair au chocolat' ,'assets/Skins/Paddle/eclairAuChocolat.png');
+		Assets.add('Pasta' ,'assets/Skins/Paddle/torti.png');
+		Assets.add('Beach ball' ,'assets/Skins/Ball/ballon.png');
+		Assets.add('Lemon pie' ,'assets/Skins/Ball/tarteCitron.png');
+		Assets.add('balleDefault' ,'assets/Skins/Ball/default.png');
+		Assets.add('Strawberry pie' ,'assets/Skins/Ball/tarteFraise.png');
+		Assets.add('Cloudy sky' ,'assets/Skins/Background/cloudySky.png');
+		Assets.add('fieldDefault' ,'assets/Skins/Background/default.png');
+		Assets.add('Nathan' ,'assets/Skins/Background/Nathan.png');
+		Assets.add('Billard' ,'assets/Skins/Background/Pool.png');
 		this.styles = await Assets.loadBundle('fonts').then(() => {
 			return {
 				p1: new TextStyle({ fontFamily: 'PixeloidSansBold', fontSize: 70, fill: 0xaaaaaa, align: 'right' }),
@@ -61,13 +65,25 @@ export class AssetManager {
 
 	addCountdown(timer: number) {
 		this.countdown = timer;
-		this.textArray.splice(0);
-		this.textArray.push({elem: new PlainText('', this.styles.p2, this.app.renderer.width/2 - 25, 10, this.app), type: 'count'})
+		this.textArray = this.textArray.filter((elem) => {
+			if (elem.type == 'count') {
+				elem.elem.destroy()
+				return false
+			}
+			return true
+		});
+		this.textArray.push({elem: new PlainText('', this.styles.funText, this.app.renderer.width/2 - 25, 10, this.app), type: 'count'})
 	}
 
 	addPanningText(text: string) {
-		this.textArray.splice(0);
-		this.textArray.push({elem: new PlainText(text, this.styles.p2, this.app.renderer.width, 10, this.app), type: 'pan'})
+		this.textArray = this.textArray.filter((elem) => {
+			if (elem.type == 'pan') {
+				elem.elem.destroy()
+				return false
+			}
+			return true
+		});
+		this.textArray.push({elem: new PlainText(text, this.styles.funText, this.app.renderer.width, 50, this.app), type: 'pan'})
 	}
 
 	updateArbiter(delta: number) {
@@ -91,7 +107,7 @@ export class AssetManager {
 				else element.elem.setText(value.toString());
 			}
 			else if (element.type == 'pan') {
-				element.elem.moveText(-5, 0);
+				element.elem.moveText(-5 * delta, 0);
 			}
 		});
 	}

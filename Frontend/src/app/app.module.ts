@@ -55,7 +55,7 @@ imports: [
 	ProfileModule,
 	FriendsModule,
 	ProfilePopupModule,
-	PongModule,
+	// PongModule,
 	PongDebugModule,
 	ToastComponent,
 	ToastsContainer,

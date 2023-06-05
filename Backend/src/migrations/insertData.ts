@@ -55,21 +55,21 @@ export class insertData666666666666666666 implements MigrationInterface {
 		await SkinRepo.insert([
 			{
 				type: 'Paddle',
-				name: 'Default',
+				name: 'SkinDefault',
 				img_url: 'assets/Skins/Paddle/default.png',
 				description: 'The default paddle',
 				price : 0,
 			},
 			{
 				type: 'Ball',
-				name: 'Default',
+				name: 'balleDefault',
 				img_url: 'assets/Skins/Ball/default.png',
 				description: 'The default ball',
 				price : 0,
 			},
 			{
 				type: 'Background',
-				name: 'Default',
+				name: 'fieldDefault',
 				img_url: 'assets/Skins/Background/default.png',
 				description: 'The default background',
 				price : 0,
@@ -150,6 +150,13 @@ export class insertData666666666666666666 implements MigrationInterface {
 				img_url: 'assets/Skins/Background/Nathan.png',
 				description: 'Nathan\'s special, limited-edition skin',
 				price : 200,
+			},
+			{
+				type: 'Background',
+				name: 'Billard',
+				img_url: 'assets/Skins/Background/Nathan.png',
+				description: 'Nathan\'s special, limited-edition skin',
+				price : 150,
 			},
 		]);
 

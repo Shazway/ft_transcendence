@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { Socket, io } from 'socket.io-client';
 import { WebsocketService } from '../websocket.service';
-import { Application, Assets, Graphics, TextStyle, Text, Color } from 'pixi.js';
+import { Application, Assets, Graphics, TextStyle, Text, Color, Texture } from 'pixi.js';
 import { pongObject, ballObject, Move, VectorPos } from 'src/dtos/Pong.dto';
 import { ActivatedRoute } from '@angular/router';
 import { MatchSetting } from 'src/dtos/MatchSetting.dto';
@@ -31,7 +31,8 @@ export class PongDebugComponent implements AfterViewInit {
 	private gameSettings!: MatchSetting;
 	private scoreP1!: WowText;
 	private scoreP2!: WowText;
-	private funkyText!: WowText;
+	private fieldTexture!: Texture;
+	// private funkyText!: WowText;
 	bouncenumber: number = 0;
 	specs: string[] = [];
 
@@ -123,8 +124,8 @@ export class PongDebugComponent implements AfterViewInit {
 		else if (this.closeEnoughOpponent() && this.ball.collidesWithPlayer(this.opponent))
 			this.ball.changeDirectionOpponent(this.opponent);
 		this.ball.moveObject(delta);
-		if (this.funkyText)
-			this.funkyText.update();
+		// if (this.funkyText)
+			// this.funkyText.update();
 		this.assetManager.updateArbiter(delta);
 	}
 
@@ -138,23 +139,31 @@ export class PongDebugComponent implements AfterViewInit {
 
 	async initObjects() {
 		const style = await this.assetManager.initAssets();
+		this.fieldTexture = await this.assetManager.getAsset('Billard');
 		this.assetManager.setApp(this.arbiter);
-		this.player.init(10, 250, 20, 100, await this.assetManager.getAsset('SkinEclair'));
-		this.opponent.init(this.app.view.width - (10 + 20), 250, 20, 100, await this.assetManager.getAsset('SkinTorti'));
-		this.ball.init(500, 300, 10, await this.assetManager.getAsset('balleBallon'));
+		this.player.init(10, 250, 20, 100, await this.assetManager.getAsset('Baguette'));
+		this.opponent.init(this.app.view.width - (10 + 20), 250, 20, 100, await this.assetManager.getAsset('Swirl'));
+		this.ball.init(500, 300, 10, await this.assetManager.getAsset('Lemon pie'));
 		const graphicElm = new Graphics();
-		graphicElm.beginFill(0xFFFFFF, 0.8);
-		graphicElm.drawRect(490, 0, 20, 250);
-		graphicElm.drawRect(490, 350, 20, 250);
-		graphicElm.endFill();
+		if (this.fieldTexture) {
+			graphicElm.beginTextureFill({texture: this.fieldTexture});
+			graphicElm.drawRect(0, 0, 1000, 600);
+			graphicElm.endFill();
+		}
+		else {
+			graphicElm.beginFill(0xFFFFFF, 0.8);
+			graphicElm.drawRect(490, 0, 20, 250);
+			graphicElm.drawRect(490, 350, 20, 250);
+			graphicElm.endFill();
+		}
 		this.scoreP1 = new WowText('0', style.p1, 450, 50, this.app);
 		this.scoreP1.setReverse(true);
 		this.scoreP2 = new WowText('0', style.p2, 560, 50, this.app);
-		this.funkyText = new WowText('this is my fun text', style.funText, 500, 800, this.announce);
-		this.funkyText.setRGB(true, 5000, 20);
-		this.funkyText.setWavy(true, 10, 10);
+		// this.funkyText = new WowText('this is my fun text', style.funText, 500, 800, this.announce);
+		// this.funkyText.setRGB(true, 5000, 20);
+		// this.funkyText.setWavy(true, 10, 10);
 		this.app.stage.addChild(graphicElm, this.ball.graphic, this.player.graphic, this.opponent.graphic);
-		this.assetManager.addRuler(this.app);
+		// this.assetManager.addRuler(this.app);
 	}
 
 	@HostListener('window:keyup', ['$event'])

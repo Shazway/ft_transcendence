@@ -1,13 +1,16 @@
 import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { Socket, io } from 'socket.io-client';
 import { WebsocketService } from '../websocket.service';
-import { Application, Graphics } from 'pixi.js';
+import { Application, Graphics, Texture } from 'pixi.js';
 import { pongObject, ballObject, Move, VectorPos, ScoreChange, GameEnd, Player } from 'src/dtos/Pong.dto';
 import { ActivatedRoute } from '@angular/router';
 import { MatchSetting } from 'src/dtos/MatchSetting.dto';
 import { Mutex } from 'async-mutex';
 import { AssetManager, WowText } from 'src/dtos/GraphElem.dto';
 import { AnyProfileUser } from 'src/dtos/User.dto';
+import { FetchService } from '../fetch.service';
+import { ShopItem } from 'src/dtos/ShopItem.dto';
+import { isUndefined } from 'mathjs';
 
 @Component({
 	selector: 'app-pong',
@@ -39,12 +42,14 @@ export class PongComponent {
 
 	private scoreP1!: WowText;
 	private scoreP2!: WowText;
+	private fieldTexture!: Texture;
 
 	constructor(
 		private websocketService: WebsocketService,
 		private route: ActivatedRoute,
 		private elRef: ElementRef,
 		private assetManager: AssetManager,
+		private fetchService: FetchService,
 	) {
 		this.initApp()
 	}
@@ -115,10 +120,26 @@ export class PongComponent {
 		this.opponent.score = event.opponentScore;
 	}
 
-	setProfile(event: {player: AnyProfileUser, opponent: AnyProfileUser}) {
-		console.log(event);
+	async setProfile(event: {player: AnyProfileUser, opponent: AnyProfileUser}) {
+		const skinRepo = await this.fetchService.getAllSkins();
+		const skins = event.player.current_skins;
 		this.player.user = event.player;
+		this.player.setTexture(await this.getSkin(skins[0], skinRepo));
+		this.ball.setTexture(await this.getSkin(skins[1], skinRepo));
+		this.fieldTexture = await this.getSkin(skins[2], skinRepo);
 		this.opponent.user = event.opponent;
+		this.opponent.setTexture(await this.getSkin(this.opponent.user.current_skins[0], skinRepo));
+	}
+
+	async getSkin(skin_id: number, skinRepo: ShopItem[]): Promise<Texture> {
+		let tex: Texture | undefined;
+		skinRepo.forEach(async skin => {
+			if (skin.skin_id == skin_id)
+				tex = await this.assetManager.getAsset(skin.name);
+		});
+		if (isUndefined(tex))
+			return await this.assetManager.getAsset('SkinDefault');
+		return tex;
 	}
 
 	addSpectate(event: {username: string, img_url: string}) {
@@ -169,14 +190,19 @@ export class PongComponent {
 	}
 
 	updateScore(event: ScoreChange) {
-		if (event.side == this.PLAYER_SCORED)
+		if (event.side == this.PLAYER_SCORED) {
 			this.player.score++;
-		else if (event.side == this.OPPONENT_SCORED)
+			this.assetManager.addPanningText(this.player.user.username + ' scored a point');
+		}
+		else if (event.side == this.OPPONENT_SCORED) {
 			this.opponent.score++;
+			this.assetManager.addPanningText(this.opponent.user.username + ' scored a point');
+		}
 		this.ballLock.waitForUnlock().then(() => {
 			this.ballLock.acquire().then(() => {
 				this.ball.graphic.clear();
 				this.ball.setPos(this.ball.position(250, 150));
+				this.assetManager.addCountdown(400);
 				this.ball.speed = 0;
 			})
 			this.ballLock.release();
@@ -240,10 +266,17 @@ export class PongComponent {
 		this.opponent.init(this.app.view.width - 30, 250, 20, 100, 0xFF0000);
 		this.ball.init(500, 300, 10, 0xFFFFFF);
 		const graphicElm = new Graphics();
-		graphicElm.beginFill(0xFFFFFF, 0.8);
-		graphicElm.drawRect(490, 0, 20, 250);
-		graphicElm.drawRect(490, 350, 20, 250);
-		graphicElm.endFill();
+		if (this.fieldTexture) {
+			graphicElm.beginTextureFill({texture: this.fieldTexture});
+			graphicElm.drawRect(0, 0, 1000, 600);
+			graphicElm.endFill();
+		}
+		else {
+			graphicElm.beginFill(0xFFFFFF, 0.8);
+			graphicElm.drawRect(490, 0, 20, 250);
+			graphicElm.drawRect(490, 350, 20, 250);
+			graphicElm.endFill();
+		}
 		this.scoreP1 = new WowText('0', style.p1, 450, 50, this.app);
 		this.scoreP1.setReverse(true);
 		this.scoreP2 = new WowText('0', style.p2, 560, 50, this.app);
