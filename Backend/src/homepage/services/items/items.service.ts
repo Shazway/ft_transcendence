@@ -29,7 +29,7 @@ export class ItemsService {
 		@InjectRepository(MessageEntity)
 		private readonly messageRepo: Repository<MessageEntity>,
 		@InjectRepository(SkinEntity)
-		private readonly skinRepo: Repository<SkinEntity>,
+		private readonly skinRepo: Repository<SkinEntity>
 	) {}
 
 	public sanitizeEntry(entry: string)
@@ -336,9 +336,11 @@ export class ItemsService {
 	) {
 		const sourceUser = await this.getUser(sourceId);
 		const targetUser = await this.getUser(targetId);
+		const achievements = await this.getAllAchievements();
 
 		if (!sourceUser || !targetUser)
 			return null;
+		
 		sourceUser.friend.push(targetUser);
 		targetUser.friend.push(sourceUser);
 		return await this.addFriendsToDM(sourceUser, targetUser);
@@ -516,7 +518,6 @@ export class ItemsService {
 		const targetEntity = await this.getUser(targetId);
 		const sourceEntity = await this.getUser(sourceId);
 
-		console.log("source id = " + sourceId + " target id = " + targetId);
 		if (!friendRequest || !targetEntity || !sourceEntity)
 			return null;
 		if (await this.requestPending(sourceEntity, targetEntity))
@@ -628,7 +629,6 @@ export class ItemsService {
 	async addAchievementToUser(achievements: Achievement[], user: UserEntity, name: string, notifGateway: NotificationsGateway)
 	{
 		const achievement = achievements.find((achievement) => achievement.achievement_name == name);
-		console.log(achievement);
 		if (achievement)
 		{
 			user.achievement.push(achievement);
@@ -642,7 +642,6 @@ export class ItemsService {
 		const achievements = await this.getAllAchievements();
 		const leaderBoard = await this.getLeaderboard();
 
-		console.log(user.achievement);
 		if (!user || !achievements || !achievements.length)
 			return null;
 
@@ -660,6 +659,8 @@ export class ItemsService {
 		if (leaderBoard.length && leaderBoard[0].user_id == user.user_id && !this.hasAchievement(user, 'We are number one'))
 			await this.addAchievementToUser(achievements, user, 'We are number one', notifGateway);
 
+		if (leaderBoard.length && leaderBoard[leaderBoard.length - 1].user_id == user.user_id && !this.hasAchievement(user, 'Oof'))
+			await this.addAchievementToUser(achievements, user, 'Oof', notifGateway);
 		return true;
 	}
 
@@ -715,7 +716,7 @@ export class ItemsService {
 		});
 	}
 
-	async buySkin(userId: number, skinId: number) {
+	async buySkin(userId: number, skinId: number, notifGateway: NotificationsGateway) {
 		const user = await this.getUser(userId);
 		const skins = await this.getSkins();
 		if (!user || !skins)
@@ -723,8 +724,14 @@ export class ItemsService {
 		const skin = skins.find((skin) => skin.skin_id == skinId);
 		if (!skin)
 			return null;
-		if (user.currency < skin.price)
+		if (user.currency < skin.price || user.skin.find((userSkin) => userSkin.skin_id == skin.skin_id))
 			return null;
+		if (skin.price == 200)
+		{
+			const achievements = await this.getAllAchievements();
+			if (!this.hasAchievement(user, "Whale"))
+				await this.addAchievementToUser(achievements, user, "Whale", notifGateway);
+		}
 		user.currency -= skin.price;
 		user.skin.push(skin);
 		return (await this.userRepo.save(user));

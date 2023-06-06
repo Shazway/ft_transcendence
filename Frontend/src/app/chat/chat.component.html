@@ -3,14 +3,14 @@
 <!-- Start of chat app -->
 		<div class="card offscreen mw-100 my-light2" style="height: 60vh;" id="chat2">
 			<div class="card-header d-flex justify-content-between align-items-center p-3 chat-card-header gap-3 mw-100">
-				<h5 *ngIf="currentChannel" class="mb-0 channel-head" title="{{currentChannel.channel_name}}">{{currentChannel.channel_name}}</h5>
+				<h5 *ngIf="currentChannel" class="mb-0 channel-head" title="{{currentChannel.channel_name ? currentChannel.channel_name : 'Global'}}" style="user-select: none;">{{currentChannel.channel_name ? currentChannel.channel_name : 'Global'}}</h5>
 				<div class="flex-grow-1"></div>
-				<div class="dropup">
-					<img (click)="openAddMember('.premDropUp')" style="height: 20px; width: 20px;" src="https://cdn-icons-png.flaticon.com/512/64/64576.png" alt="Channel Menu">
+				<div *ngIf="is_admin" class="dropup">
+					<img (click)="openAddMember('.premDropUp')" style="height: 20px; width: 20px; user-select: none; cursor : pointer;" draggable="false" src="https://cdn-icons-png.flaticon.com/512/64/64576.png" alt="Channel Menu">
 					<div class="dropdown-menu mondropup premDropUp p-0 rounded-3 my-light2">
 						<div class="btn-group-vertical w-100">
-							<button (click)="openAddMember('.secDropUp')" type="button" class="btn btn-secondary w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Add member</button>
-							<button (click)="obliterateChannel()" type="button" class="btn btn-danger w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Destroy Channel</button>
+							<button (click)="openAddMember('.secDropUp')" type="button" class="btn btn-secondary w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="user-select: none; cursor : pointer;">Add member</button>
+							<button (click)="obliterateChannel()" type="button" class="btn btn-danger w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="user-select: none; cursor : pointer;">Destroy Channel</button>
 						</div>
 						<div id="addMemberdiv" class="dropdown-menu mondropright secDropUp p-0 my-light2">
 							<div class="w-100 btn btn-sm text-muted text-end" (click)="openAddMember('.secDropUp')"><span aria-hidden="true">&times;</span></div>
@@ -27,7 +27,7 @@
 				</div>
 				<button type="button" id="chanBtn" (click)="slideChan()" class="btn darkslategrey hoverable btn-sm" data-mdb-ripple-color="dark">Change channel</button>
 				<div (click)="slide()">
-					<img src="https://cdn.onlinewebfonts.com/svg/img_69492.png" id="chatBtn" class="rounded-circle" alt="Open Chat">
+					<img src="https://cdn.onlinewebfonts.com/svg/img_69492.png" id="chatBtn" class="rounded-circle" draggable="false" alt="Open Chat" style="user-select: none; cursor : pointer;">
 				</div>
 			</div>
 			<div #chanBody class="scrollbar scrollbar-primary h-100 bg-light mw-100" #scrollbar (scroll)="onScroll($event)" style="overflow-y: auto; overflow-x: hidden;" #chatMsgs>
@@ -37,14 +37,14 @@
 						<div class="card-body p-0 mw-100" data-mdb-perfect-scrollbar="true" style="position: relative; " *ngFor="let msg_list of test_msgs$">
 <!-- Start of not current user field -->
 							<div *ngIf="!isMe(msg_list[0]) && !isSystem(msg_list[0])" class="d-flex flex-row justify-content-start mw-100" id="group-{{msg_list[0].message_id}}">
-								<img (click)="createChatPopup(msg_list[0], $event)" (contextmenu)="createChatPopup(msg_list[0], $event)" id="img-{{msg_list[0].message_id}}" class="rounded-circle" src="{{msg_list[0].author.img_url}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 1" style="width: 45px; height: 100%;">
+								<img draggable="false" (click)="createChatPopup(msg_list[0], $event)" (contextmenu)="createChatPopup(msg_list[0], $event)" id="img-{{msg_list[0].message_id}}" class="rounded-circle" src="{{msg_list[0].author.img_url}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 1" style="width: 45px; height: 100%;">
 								<div class="mw-100">
 									<div class="d-flex align-items-end">
 										<p class="small ms-3 mb-0 text-muted">{{ getName(msg_list) }}</p>
 									</div>
 									<div *ngFor="let msg of msg_list" class="d-flex mw-100" id="message-{{msg.message_id}}">
 										<p class="small pb-1 ps-2 pe-2 pt-0 ms-2 me-2 mb-1 rounded-3 text-wrap d-block" (click)="onDropdownDel(msg)" style="background-color: rgb(206, 210, 216); word-wrap: break-word; max-width: 85%;">{{msg.message_content}}</p>
-										<img (click)="delMsg(msg_list[0])" class="m-0 ms-2 m-auto hidden_icon" style="height: 20px; width: 20px;" id="img-{{msg.message_id}}-del" src="{{icone_list.del_message}}" alt="del_message">
+										<img (click)="delMsg(msg_list[0])" draggable="false"class="m-0 ms-2 m-auto hidden_icon" style="height: 20px; width: 20px;" id="img-{{msg.message_id}}-del" src="{{icone_list.del_message}}" alt="del_message">
 									</div>
 									<p class="small ms-3 mb-0 rounded-3 text-muted">{{ getTime(msg_list) }}</p>
 								</div>
@@ -60,7 +60,7 @@
 									</div>
 									<p class="small me-3 mb-0 rounded-3 text-muted float-end">{{ getTime(msg_list) }}</p>
 								</div>
-								<img class="rounded-circle" src="{{msg_list[0].author.img_url}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp';" alt="avatar 1" style="width: 45px; height: 100%;">
+								<img draggable="false" class="rounded-circle" src="{{msg_list[0].author.img_url}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp';" alt="avatar 1" style="width: 45px; height: 100%;">
 							</div>
 <!-- End of current user field -->
 <!-- Start of System field -->
@@ -114,9 +114,11 @@
 						<button type="button" (click)="createChannel()" class="btn btn-primary btn-sm m-auto">back</button>
 					</div>
 					<form #createChannelBox="ngForm" class="form-check p-0" (ngSubmit)="onClickCreateChannel(createChannelBox.value)">
-						<input type="text" class="form-control form-control-lg text-input" name="channel_name" autocomplete="off" placeholder="Channel name" ngModel><br>
-						<input type="password" name="channel_password" class="chanPass show form-control form-control-lg text-input" autocomplete="off" placeholder="Password" ngModel><br>
-						<input type="checkbox" class="form-check-input ms-2 me-1" value="false" name="is_channel_private" (change)="togglePrivate($event)" ngModel #privateCheckbox>
+						<input type="text" class="form-control form-control-lg text-input" name="channel_name" autocomplete="off" (input)="checkInputChat(createChannelBox.value.channel_name, 0, 41, '#exampleFormControlInput2', true, channelNameCheckList)" placeholder="Channel name" id="exampleFormControlInput2" ngModel>
+						<div class="col-12 text-muted small w-100 text-center" [hidden]="channelNameCheckList.tooLong">41 characters maximum</div><br>
+						<input type="password" name="channel_password" class="chanPass show form-control form-control-lg text-input" (input)="checkInputChat(createChannelBox.value.channel_password, 0, 15, '#exampleFormControlInput3', true, channelPwdCheckList)" autocomplete="off" placeholder="Password" id="exampleFormControlInput3" ngModel>
+						<div class="col-12 text-muted small w-100 text-center" [hidden]="channelPwdCheckList.tooLong">15 characters maximum</div><br>
+						<input type="checkbox" class="form-check-input ms-2 me-1" value="false" name="is_channel_private"  id="exampleFormControlInput4" (change)="togglePrivate($event)" ngModel #privateCheckbox>
 						<label for="privateCheckbox" class="text-black form-check-label">Set channel private</label><br>
 						<input type="submit" class="btn btn-outline-secondary btn-sm rounded-5 mt-2" value = "submit">
 					</form>
@@ -124,12 +126,14 @@
 <!-- End of channel Create Area -->
 			</div>
 
-			<form #userChatBox="ngForm" (ngSubmit)="onClickChat(userChatBox.value)" (input)="checkInput(userChatBox.value.message_content, 0, 255, '#exampleFormControlInput1')">
-				<div class="card-footer text-muted d-flex justify-content-start align-items-center p-3 gap-3">
-					<img src="{{getAvatar()}}" class="rounded-circle" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp';" alt="avatar 3" style="width: 40px; height: 100%;">
-					<input type="text" name="message_content" autocomplete="off" class="form-control form-control-lg text-input" id="exampleFormControlInput1" placeholder="Type message" ngModel>
-					<input type="submit" class="btn btn-outline-secondary btn-sm rounded-5" value = "submit">
-					<div class="col-12 text-muted small w-100" [hidden]="chatCheckList.tooLong">255 characters maximum</div>
+			<form #userChatBox="ngForm" (ngSubmit)="onClickChat(userChatBox.value)" (input)="checkInputChat(userChatBox.value.message_content, 0, 255, '#exampleFormControlInput1', true, chatCheckList)">
+				<div class="card-footer d-flex flex-column text-muted justify-content-start align-items-center px-0 mx-0">
+					<div class="d-flex justify-content-start align-items-center p-3 gap-3 w-100">
+						<img draggable="false" src="{{getAvatar()}}" class="rounded-circle" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp';" alt="avatar 3" style="width: 40px; height: 100%;">
+						<input type="text" name="message_content" autocomplete="off" class="form-control form-control-lg text-input" id="exampleFormControlInput1" placeholder="Type message" ngModel>
+						<input type="submit" class="btn btn-outline-secondary btn-sm rounded-5" value = "submit">
+					</div>
+					<div class="col-12 text-muted small w-100 text-center" [hidden]="chatCheckList.tooLong">255 characters maximum</div>
 				</div>
 			</form>
 		</div>

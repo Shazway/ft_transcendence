@@ -3,6 +3,7 @@ import { AnyProfileUser } from 'src/dtos/User.dto';
 import { FetchService } from '../fetch.service';
 import { AppComponent } from '../app.component';
 import { PopoverConfig } from 'src/dtos/Popover.dto';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-leaderboard',
@@ -16,6 +17,7 @@ export class LeaderboardComponent {
 	public currentStatus = 0;
 
 	constructor(
+		private router: Router,
 		private parent: AppComponent,
 		private fetchService: FetchService
 	) {}
@@ -23,6 +25,7 @@ export class LeaderboardComponent {
 	async ngOnInit() {
 		this.users = await this.fetchService.getLeaderboard();
 		this.currentUser = this.users[0];
+		this.currentStatus = this.currentUser.activity_status;
 	}
 
 	async updateCurrentUser(newUser : AnyProfileUser) {
@@ -40,8 +43,8 @@ export class LeaderboardComponent {
 	async spectate(friend: AnyProfileUser) {
 		if (friend.activity_status != 2)
 			return;
-		//todo
-		console.log("Tentative de spectate");
+		let it = await this.fetchService.getCurrentMatchId(friend.user_id);
+		this.router.navigateByUrl('pong?match_id=' + it);
 	}
 
 	getCurrentStatus(status: number) {
@@ -53,5 +56,9 @@ export class LeaderboardComponent {
 		return 'WTF?';
 	}
 
-	
+	goToProfile(user : AnyProfileUser) {
+		if (user)
+			this.router.navigateByUrl("profile?username=" + user.username);
+	}
+
 }

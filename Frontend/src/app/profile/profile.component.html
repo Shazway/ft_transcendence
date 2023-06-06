@@ -6,7 +6,7 @@
 					<div class="card-body p-4">
 						<div class="d-flex text-black">
 							<div class="flex-shrink-0" id="avatarPic">
-								<img (click)="openChangeAvatar()" src="{{user ? user.img_url : 'https://i1.sndcdn.com/artworks-000329925816-3yu1fd-t500x500.jpg'}}" alt="Generic placeholder image" class="img-fluid card-profile-pic">
+								<img draggable="false" (click)="openChangeAvatar()" src="{{user ? user.img_url : 'https://i1.sndcdn.com/artworks-000329925816-3yu1fd-t500x500.jpg'}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="Generic placeholder image" class="img-fluid card-profile-pic">
 							</div>
 							<div class="flex-grow-1 ms-3" style="display: flex; flex-direction: column;">
 
@@ -62,47 +62,51 @@
 			<div class="d-flex p-3 border rounded-3 white">
 				<div class="col d-flex justify-content-around">
 					<!-- Carousel des Paddles -->
-					<div class="text-center">
-						<div class="d-flex gap-2">
-							<button class="btn arrow left flex-shrink-0" type="button" (click)="panLeft(windowPaddle, paddleSkins, 'slideDirectionPaddle')">&lt;</button>
-							<div class="d-flex gap-3 align-items-center border bg-black" style="overflow: hidden; height: 200px;">
-								<img src="{{windowPaddle[0].img_url}}" style="height: 50px; width: 10px; margin-left: -10px;" alt="Skin" [@slideFarLeft]="slideDirectionPaddle">
-								<img src="{{windowPaddle[1].img_url}}" style="margin-left: 5px;" alt="Skin" [@slideLeft]="slideDirectionPaddle">
-								<img src="{{windowPaddle[2].img_url}}" style="height: 180px;" alt="Skin" [@slideCenter]="slideDirectionPaddle">
-								<img src="{{windowPaddle[3].img_url}}" style="margin-right: 5px;" alt="Skin" [@slideRight]="slideDirectionPaddle">
-								<img src="{{windowPaddle[4].img_url}}" style="height: 50px; width: 10px; margin-right: -10px;" alt="Skin" [@slideFarRight]="slideDirectionPaddle">
+					<div class="col d-flex flex-column align-items-center justify-content-center">
+						<div class="d-flex">
+							<div class="text-center">
+								<div class="d-flex gap-2">
+									<button class="btn arrow left flex-shrink-0" type="button" (click)="panLeft(windowPaddle, paddleSkins, 'slideDirectionPaddle')">&lt;</button>
+									<div class="d-flex gap-3 align-items-center border bg-black" style="overflow: hidden; height: 200px;">
+										<img draggable="false" src="{{windowPaddle[0].img_url}}" style="height: 50px; width: 10px; margin-left: -10px;" alt="Skin" [@slideFarLeft]="slideDirectionPaddle">
+										<img draggable="false" src="{{windowPaddle[1].img_url}}" style="margin-left: 5px;" alt="Skin" [@slideLeft]="slideDirectionPaddle">
+										<img draggable="false" src="{{windowPaddle[2].img_url}}" style="height: 180px;" alt="Skin" [@slideCenter]="slideDirectionPaddle">
+										<img draggable="false" src="{{windowPaddle[3].img_url}}" style="margin-right: 5px;" alt="Skin" [@slideRight]="slideDirectionPaddle">
+										<img draggable="false" src="{{windowPaddle[4].img_url}}" style="height: 50px; width: 10px; margin-right: -10px;" alt="Skin" [@slideFarRight]="slideDirectionPaddle">
+									</div>
+									<button class="btn arrow right flex-shrink-0" type="button" (click)="panRight(windowPaddle, paddleSkins, 'slideDirectionPaddle')">&gt;</button>
+								</div>
+								<div>{{windowPaddle[2].name}}</div>
 							</div>
-							<button class="btn arrow right flex-shrink-0" type="button" (click)="panRight(windowPaddle, paddleSkins, 'slideDirectionPaddle')">&gt;</button>
-						</div>
-						<div>{{windowPaddle[2].name}}</div>
-					</div>
-					<!-- Carousel des Balls -->
-					<div class="text-center">
-						<div class="d-flex gap-2">
-							<button class="btn arrow left flex-shrink-0" type="button" (click)="panLeft(windowBall, ballSkins, 'slideDirectionBall')">&lt;</button>
-							<div class="d-flex gap-3 align-items-center border bg-black" style="overflow: hidden; height: 200px;">
-								<img src="{{windowBall[0].img_url}}" style="height: 50px; width: 10px; margin-left: -10px;" alt="Skin" [@slideFarLeft]="slideDirectionBall">
-								<img src="{{windowBall[1].img_url}}" style="margin-left: 5px;" alt="Skin" [@slideLeft]="slideDirectionBall">
-								<img src="{{windowBall[2].img_url}}" style="height: 100px;" alt="Skin" [@slideCenter]="slideDirectionBall">
-								<img src="{{windowBall[3].img_url}}" style="margin-right: 5px;" alt="Skin" [@slideRight]="slideDirectionBall">
-								<img src="{{windowBall[4].img_url}}" style="height: 50px; width: 10px; margin-right: -10px;" alt="Skin" [@slideFarRight]="slideDirectionBall">
+							<!-- Carousel des Balls -->
+							<div class="text-center">
+								<div class="d-flex gap-2">
+									<button class="btn arrow left flex-shrink-0" type="button" (click)="panLeft(windowBall, ballSkins, 'slideDirectionBall')">&lt;</button>
+									<div class="d-flex gap-3 align-items-center border bg-black" style="overflow: hidden; height: 200px;">
+										<img draggable="false" src="{{windowBall[0].img_url}}" style="height: 10px; width: 10px; margin-left: -10px;" alt="Skin" [@slideFarLeft]="slideDirectionBall">
+										<img draggable="false" src="{{windowBall[1].img_url}}" style="margin-left: 5px;" alt="Skin" [@slideLeft]="slideDirectionBall">
+										<img draggable="false" src="{{windowBall[2].img_url}}" style="height: 37px;" alt="Skin" [@slideCenter]="slideDirectionBall">
+										<img draggable="false" src="{{windowBall[3].img_url}}" style="margin-right: 5px;" alt="Skin" [@slideRight]="slideDirectionBall">
+										<img draggable="false" src="{{windowBall[4].img_url}}" style="height: 10px; width: 10px; margin-right: -10px;" alt="Skin" [@slideFarRight]="slideDirectionBall">
+									</div>
+									<button class="btn arrow right flex-shrink-0" type="button" (click)="panRight(windowBall, ballSkins, 'slideDirectionBall')">&gt;</button>
+								</div>
+								<div>{{windowBall[2].name}}</div>
 							</div>
-							<button class="btn arrow right flex-shrink-0" type="button" (click)="panRight(windowBall, ballSkins, 'slideDirectionBall')">&gt;</button>
 						</div>
-						<div>{{windowBall[2].name}}</div>
-					</div>
-					<!-- Carousel des Background -->
-					<div class="text-center">
-						<div class="d-flex gap-2">
-							<button class="btn arrow left flex-shrink-0" type="button" (click)="panLeft(windowBackground, backgroundSkins, 'slideDirectionBackground')">&lt;</button>
-							<div class="d-flex gap-3 align-items-center border bg-black" style="overflow: hidden; height: 200px;">
-								<img src="{{windowBackground[2].img_url}}" style="height: 100px; width: 120px;" alt="Skin" [@slideCenter]="slideDirectionBackground">
+						<!-- Carousel des Background -->
+						<div class="text-center">
+							<div class="d-flex gap-2">
+								<button class="btn arrow left flex-shrink-0" type="button" (click)="panLeft(windowBackground, backgroundSkins, 'slideDirectionBackground')">&lt;</button>
+								<div class="d-flex gap-3 align-items-center border bg-black" style="overflow: hidden; height: 200px; width: 300px;">
+									<img draggable="false" src="{{windowBackground[2].img_url}}" style="height: 180px;" alt="Skin">
+								</div>
+								<button class="btn arrow right flex-shrink-0" type="button" (click)="panRight(windowBackground, backgroundSkins, 'slideDirectionBackground')">&gt;</button>
 							</div>
-							<button class="btn arrow right flex-shrink-0" type="button" (click)="panRight(windowBackground, backgroundSkins, 'slideDirectionBackground')">&gt;</button>
+							<div>{{windowBackground[2].name}}</div>
 						</div>
-						<div>{{windowBackground[2].name}}</div>
 					</div>
-					<div class="col">
+					<div class="col d-flex flex-column gap-4 ms-2 me-5 mt-5">
 						<!-- Choix dequi peut inviter -->
 						<div>
 							<p>Accept channel invitations and challenges from:</p>
@@ -123,21 +127,18 @@
 								<label class="form-check-label" for="flexRadioDefault1">
 									everyone
 								</label>
-
 							</div>
 						</div>
 						<!-- Choix de la double authentification -->
 						<div>
 							<label>Activate Double Auth:</label>
-							<input type="checkbox" (click)="toggleAuth()" [checked]="doubleAuthChecked">
+							<input class="ms-2" type="checkbox" (click)="toggleAuth()" [checked]="doubleAuthChecked">
 						</div>
-					</div>
-					<!-- Choix du username -->
-					<div>
+						<!-- Choix du username -->
 						<form #usernameField="ngForm" (input)="checkInput(usernameField.value.usernameFld)" class="row g-3">
 							<div class="col">
 								<div>Change your username:</div>
-								<input id="inputForm" class="input" style="border-radius: 3px;" name="usernameFld" placeholder="new username" ngModel>
+								<input id="inputForm" class="input form-control" style="border-radius: 3px;" name="usernameFld" placeholder="new username" ngModel>
 								<div class="text-muted" [hidden]="inputCheckList.tooLong">20 characters maximum</div>
 								<div class="text-muted" [hidden]="inputCheckList.tooShort">1 character minimum</div>
 								<div class="text-muted" [hidden]="inputCheckList.other">already taken</div>
@@ -211,7 +212,7 @@
 				<div class="w-100" style="height: 98%; overflow-y: auto;">
 					<div *ngIf="matchHistory.length">
 						<div *ngFor="let match of matchHistory" class="d-flex w-100 p-1 border-bottom">
-							<img class="rounded-circle versus-img player" (click)="createChatPopup(getName(match, match.Player2), getId(match, match.Player2))" src="{{ getImg(match, match.Player2) }}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 1">
+							<img draggable="false" class="rounded-circle versus-img player" (click)="createChatPopup(getName(match, match.Player2), getId(match, match.Player2))" src="{{ getImg(match, match.Player2) }}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 1">
 							<div class="flex-grow-1">
 								<div class="d-flex align-items-center justify-content-center px-2">
 									<h4 class="m-0">{{isVictory(match) ? 'Victory' : 'Defeat'}}</h4>
@@ -225,7 +226,7 @@
 									<p class="m-0 small text-muted">{{getTimeDiff(match.date)}}</p>
 								</div>
 							</div>
-							<img class="rounded-circle versus-img opponent" src="{{ getImg(match, match.Player1) }}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 2">
+							<img draggable="false" class="rounded-circle versus-img opponent" src="{{ getImg(match, match.Player1) }}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 2">
 						</div>
 					</div>
 					<div *ngIf="!matchHistory.length" class="d-flex justify-content-center align-items-center h-100">

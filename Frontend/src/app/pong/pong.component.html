@@ -6,7 +6,7 @@
 <!-- Profile Zone -->
 			<div *ngIf="player.user && opponent.user" @viewFadeIn class="d-flex">
 				<div class="d-flex col my-light2 light-gunmetal p-2 gap-3">
-					<img class="col" src="{{player.user.img_url}}" class="rounded-circle" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp';" alt="avatar 3" style="width: 40px; height: 100%;">
+					<img draggable="false" class="col" src="{{player.user.img_url}}" class="rounded-circle" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp';" alt="avatar 3" style="width: 40px; height: 100%;">
 					<div class="col d-flex gap-3 align-items-center">
 						<h4 class="m-0">{{player.user.username}}</h4>
 						<p class="text-muted m-0">{{player.user.rank_score}}</p>
@@ -18,7 +18,7 @@
 						<p class="flex-grow-1 text-muted m-0">{{opponent.user.rank_score}}</p>
 						<h4 class="m-0">{{opponent.user.username}}</h4>
 					</div>
-					<img class="col" src="{{opponent.user.img_url}}" class="rounded-circle" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 3" style="width: 40px; height: 100%;">
+					<img draggable="false" class="col" src="{{opponent.user.img_url}}" class="rounded-circle" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 3" style="width: 40px; height: 100%;">
 				</div>
 			</div>
 <!-- End of Profile Zone -->
@@ -27,7 +27,7 @@
 		<div class="ms-5 w-100 col" style="position: relative;">
 			<div class="d-flex row scroll-small light-gunmetal my-light2 rounded-3 specWindow">
 				<div *ngFor="let spec of specList" class="d-flex flex-column mb-3 col-3 justify-content-center align-items-center">
-					<img class="rounded-circle" src="{{spec.img_url}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" style="width: 45px; height: 45px;" alt="">
+					<img draggable="false" class="rounded-circle" src="{{spec.img_url}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" style="width: 45px; height: 45px;" alt="">
 					<h4 class="flex-grow-1 m-0">{{spec.username}}</h4>
 				</div>
 			</div>

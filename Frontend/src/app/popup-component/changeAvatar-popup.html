@@ -6,10 +6,11 @@
 </div>
 <form #AvatarForm="ngForm" (ngSubmit)="onSubmit(AvatarForm.value.input)">
 	<div class="modal-body">
-		<img class="rounded-3" src="{{AvatarForm.value.input ? AvatarForm.value.input : user.img_url}}" style="max-width: 100px;">
+		<img draggable="false" class="rounded-3" src="{{AvatarForm.value.input ? AvatarForm.value.input : user.img_url}}" style="max-width: 100px;">
 		<div class="form-group">
 			<label>The link to your new avatar:</label>
-			<input name="input" type="string" class="form-control" ngModel>
+			<input name="input" id="inputForm" (input)="checkInput(AvatarForm.value.input)" type="string" class="form-control" ngModel>
+			<div class="text-muted" [hidden]="inputCheckList.tooLong">350 characters maximum</div>
 		</div>
 	</div>
 	<div class="modal-footer">

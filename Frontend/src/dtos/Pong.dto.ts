@@ -190,7 +190,6 @@ export class ballObject {
 
 	changeDirectionPlayer(player: pongObject)
 	{
-		//if (Number.isNaN(this.direction)) this.printGameState('1');
 		const maxSinus = 0.8;
 		const minSinus = -maxSinus;
 		const paddleSize = this.position(player.objDim.x / 2, player.objDim.y / 2);
@@ -206,7 +205,6 @@ export class ballObject {
 			(!this.goingUp(pos)) && this.distancePos(pos, lowerCorner) > this.distancePos(pos, upperCorner))
 			{
 				this.direction = -this.direction; //Applying same direction change as wall, like the original pong
-				//if (Number.isNaN(this.direction)) this.printGameState('2');
 			}
 			return ;
 		}
@@ -225,7 +223,6 @@ export class ballObject {
 		if (sinus >= 1 || sinus <= -1)
 			return ;
 		this.direction = -Math.asin(sinus); // New angle to apply
-	//	if (Number.isNaN(this.direction)) this.printGameState('3');
 	}
 
 	setPos(pos: Position) {
@@ -235,7 +232,6 @@ export class ballObject {
 
 	setDir(dir: number) {
 		this.direction = dir;
-		//if (Number.isNaN(this.direction)) this.printGameState('4');
 	}
 
 	updateVec(delta: number): Position {

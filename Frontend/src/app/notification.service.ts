@@ -50,16 +50,16 @@ export class NotificationService {
 	}
 
 	setClientEvent() {
-		this.client.on('friendAnswer', (event) => { this.showNewFriend(event.notification); console.log('friendAnswer ' + event); this.updateFriendRequests();});
-		this.client.on('pendingRequest', (event) => {  console.log('pendingRequest' + event); this.updateFriendRequests(); });
-		this.client.on('friendInvite', (event) => { this.showNotificationInvite(event.notification); console.log('friendInvite ', event); this.updateFriendRequests();});
-		this.client.on('matchInvite', (event) => { this.showChallenge(event.notification); console.log('challenge ', event);});
-		this.client.on('failure', (event) => { this.showFailure(event); console.log('failure ', event); this.updateFriendRequests(); });
-		this.client.on('success', (event) => { this.showSuccess(event); console.log('success'); console.log(event); this.updateFriendRequests(); });
-		this.client.on('channel', (event) => { this.showSuccess(event); console.log('channel ', event); });
-		this.client.on('onError', (event) => { console.log('erreur + ' + event); });
-		this.client.on('newAchievement', (event) => { this.showAchievements(event); console.log(event); });
-		this.client.on('offline', (event)=> {this.showFailure(event); console.log("target offline");})
+		this.client.on('friendAnswer', (event) => { this.showNewFriend(event.notification); this.updateFriendRequests(); });
+		this.client.on('pendingRequest', (event) => { this.updateFriendRequests(); });
+		this.client.on('friendInvite', (event) => { this.showNotificationInvite(event.notification); this.updateFriendRequests(); });
+		this.client.on('matchInvite', (event) => { this.showChallenge(event.notification); });
+		this.client.on('failure', (event) => { this.showFailure(event); this.updateFriendRequests(); });
+		this.client.on('success', (event) => { this.showSuccess(event); this.updateFriendRequests(); });
+		this.client.on('channel', (event) => { this.showSuccess(event); });
+		this.client.on('onError', (event) => { this.showFailure(event); });
+		this.client.on('newAchievement', (event) => { this.showAchievements(event); });
+		this.client.on('offline', (event)=> {this.showFailure(event); })
 		this.client.on('casualMatch', (event)=> {this.launchMatch(event);})
 	}
 
@@ -90,7 +90,6 @@ export class NotificationService {
 	}
 
 	showSuccess(notification: string) {
-		console.log("success : " + notification);
 		this.toastService.show(this.toastSuccess, { classname: 'bg-success p-0', delay: 2000, context: notification });
 	}
 

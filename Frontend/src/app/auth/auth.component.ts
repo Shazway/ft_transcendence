@@ -34,7 +34,6 @@ export class AuthComponent {
 		let statusCode = 0;
 		let bodyId = 0;
 
-		console.log(code);
 		await axios.post<LogInReturn>('http://localhost:3001/login', {api_code: code})
 		.then(function (response) {
 			statusCode = response.status;
@@ -46,18 +45,10 @@ export class AuthComponent {
 				localStorage.setItem('id', "" + loginReturn.user_id);
 				localStorage.setItem('username', loginReturn.intraInfo.login);
 				localStorage.setItem('img_url', loginReturn.intraInfo.image.versions.small);
-				console.log("Jwt token: " + loginReturn.jwt_token);
-				console.log("42 token: " + loginReturn.tokenInfo.access_token);
-				console.log("Expires in: " + loginReturn.tokenInfo.expires_in);
-				console.log("Intra ID: " + loginReturn.intraInfo.id);
-				console.log("User login: " + loginReturn.intraInfo.login);
-				console.log('img_url: ' + loginReturn.intraInfo.image.versions.large);
 			} else if (statusCode == 202) {
-				console.log(loginReturn);
 				bodyId = loginReturn.user_id;
 			}
 		});
-		console.log('Testing');
 		if (statusCode == 202)
 			this.router.navigateByUrl('validate?bodyId=' + bodyId + '&code=' + code);
 		else

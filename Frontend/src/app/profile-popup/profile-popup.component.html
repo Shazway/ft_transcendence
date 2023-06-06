@@ -2,7 +2,7 @@
 <div *ngIf="user | async" class="card-body p-2">
 	<div class="d-flex text-black">
 		<div class="flex-shrink-0">
-			<img *ngIf="user | async as userConf" (click)="redirectProfil()" src="{{userConf.img_url}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="Generic placeholder image" class="img-fluid card-profile-pic">
+			<img draggable="false" *ngIf="user | async as userConf" (click)="redirectProfil()" src="{{userConf.img_url}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="Generic placeholder image" class="img-fluid card-profile-pic">
 		</div>
 		<div class="flex-grow-1 ms-3">
 
@@ -31,8 +31,7 @@
 			</div>
 
 			<div class="d-flex pt-1 gap-2">
-				<button type="button" class="btn btn-outline-primary flex-grow-1">Chat</button>
-				<button type="button" class="btn btn-outline-primary flex-grow-1">Challenge</button>
+				<button type="button" (click)="challenge()" class="btn btn-outline-primary flex-grow-1">Challenge</button>
 				<button type="button" (click)="addFriend()" class="btn btn-primary" style="flex-grow: 5;">Add Friend</button>
 			</div>
 		</div>

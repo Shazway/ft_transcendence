@@ -133,10 +133,8 @@ export class PongGateway {
 
 	async handleDisconnect(client: Socket)
 	{
-		console.log('disconnected from websocket');
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'EEEE');
 		if (!user) return ;
-		console.log('disconnect from match + ' + user.name);
 		const match_id = Number(client.handshake.query.match_id);
 
 		if (Number.isNaN(match_id) || !match_id)

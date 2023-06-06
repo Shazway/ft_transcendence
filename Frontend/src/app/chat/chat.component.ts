@@ -56,13 +56,11 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	) {
 		this.msgLock = new Mutex();
 		this.client = io('ws://localhost:3002?channel_id=' + 1, websocketService.getHeader());
-		console.log('connected');
 		if (!this.client)
 		{
 			this.router.navigateByUrl('login');
 			return;
 		}
-		console.log('JWT token: ' + localStorage.getItem('Jwt_token'));
 		this.setClientEvent();
 		return;
 	}
@@ -78,27 +76,13 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	}
 
 	setClientEvent() {
-		this.client.on('onMessage', (event) => { console.log('Message received ' + event); this.sortMessage(event); this.scrollBottom(event); });
-		this.client.on('onError', (event) => { this.handleError(event); });
-		this.client.on('connection', () => { console.log('Connected to WebSocket server'); });
-		this.client.on('disconnect', () => { console.log('Disconnected from WebSocket server'); });
-		this.client.on('delMessage', (event) => { console.log('Deleting message ' + event); this.deleteMessage(event); });
-		this.client.on('isAdmin', (event) => { this.is_admin = event; console.log('You are admin ?: ' + event); });
-		this.client.on('isOwner', (event) => { this.is_owner = event; console.log('You are Owner ?: ' + event); })
-	}
-
-	handleError(event: string) {
-		console.log('WebSocket error: ' + event);
-		if (event == 'Invalid Command') return;
-		if (event == 'No body sent') return;
-		if (event == 'User not found') return;
-		if (event == "Channel doesn't exist") return;
-		if (event == "User doesn't belong to channel") return;
-		if (event == 'User is banned') return;
-		if (event == 'User is not an admin') return;
-		if (event == 'Target is an admin') return;
-		if (event == 'No body') return;
-		if (event == 'Message too long') return;
+		this.client.on('onMessage', (event) => { this.sortMessage(event); this.scrollBottom(event); });
+		this.client.on('onError', (event) => { });
+		this.client.on('connection', () => { });
+		this.client.on('disconnect', () => { });
+		this.client.on('delMessage', (event) => { this.deleteMessage(event); });
+		this.client.on('isAdmin', (event) => { this.is_admin = event; });
+		this.client.on('isOwner', (event) => { this.is_owner = event; })
 	}
 
 	private prevScroll!: number;
@@ -157,8 +141,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		const chan = await this.fetchService.getChannel(1);
 		if (chan)
 			this.currentChannel = chan;
-		else
-			console.log('error while fetching channel 1');
 	}
 
 	sortChannels(chanList: Channel[]) {
@@ -171,12 +153,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	}
 
 	deleteMessage(msg: Message) {
-		console.log('deleting message');
 		this.test_msgs$.forEach(element => {
 			const index = element.findIndex(mess => mess.message_id == msg.message_id)
 			if (index != -1) {
 				element.splice(index, 1);
-				console.log('Message deleted');
 				if (element.length <= 0) {
 					const delGrpElm = this.elRef.nativeElement.querySelector('#group-' + msg.message_id);
 					delGrpElm.remove();
@@ -188,7 +168,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			if (element.length <= 0)
 				this.test_msgs$.splice(this.test_msgs$.findIndex(arr => arr.length <= 0), 1);
 		});
-		console.log('Message not deleted');
 	}
 
 	slide() {
@@ -354,10 +333,8 @@ export class ChatComponent implements OnInit, AfterViewInit {
 
 	async openChannel(channel: Channel) {
 		let pwd;
-		console.log(channel.has_pwd);
 		const checkPWD = !this.getUserFromChannel(localStorage.getItem("username"), channel) && channel.has_pwd;
 		if (checkPWD) {
-			console.log('RightPass');
 			pwd = await this.createPopup(channel.channel_name, 'Password', 'PasswordPopup');
 			const mdp = await this.fetchService.isRightPass({channel_id: channel.channel_id, pass: pwd});
 			if (isUndefined(mdp) || !mdp) {
@@ -381,7 +358,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		this.currentChannel = channel;
 		this.setClientEvent();
 		const us_channel = this.getUserFromCurrentChannel(localStorage.getItem('username'));
-		console.log('user', us_channel);
 		this.is_admin = us_channel ? us_channel.is_admin : false;
 		this.is_owner = us_channel ? us_channel.is_creator : false;
 		const offscreenElm = this.elRef.nativeElement.querySelector('.channel_pan');
@@ -470,6 +446,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			is_channel_private: data.is_channel_private,
 			channel_password: data.channel_password,
 		});
+		this.elRef.nativeElement.querySelector('#exampleFormControlInput2').value = '';
+		this.elRef.nativeElement.querySelector('#exampleFormControlInput3').value = '';
+		this.elRef.nativeElement.querySelector('#exampleFormControlInput4').checked= false;
+		this.togglePrivate({target: {checked: false}});
 		this.createChannel(waiter);
 	}
 
@@ -516,6 +496,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			this.openChannel(this.currentChannel);
 		if (!this.client || data.message_content.trim().length == 0)
 			return false;
+		const textRef = this.elRef.nativeElement.querySelector('#exampleFormControlInput1');
 
 		if (data.message_content[0] == '/') {
 			const split = data.message_content.split(' ');
@@ -524,18 +505,21 @@ export class ChatComponent implements OnInit, AfterViewInit {
 					username: localStorage.getItem('username'),
 					message: "You left the channel",
 				});
+				textRef.value = '';
 				return;
 			}
 			else if (split[0] == '/obliterate') {
 				this.obliterateChannel();
+				textRef.value = '';
 				return;
 			}
 			else if (split[0] == '/kick') {
-				if (split.length < 2) return;
+				if (split.length < 2) return this.checkInputChat(data.message_content, 0, 255, '#exampleFormControlInput1', false, this.chatCheckList);
 				this.client.emit('kick', {
 					username: split[1],
 					message: "You have been kicked",
 				});
+				textRef.value = '';
 				return;
 			}
 			else if (split[0] == '/ban') {
@@ -546,49 +530,55 @@ export class ChatComponent implements OnInit, AfterViewInit {
 					message: "You have been banned",
 					time,
 				});
+				textRef.value = '';
 				return;
 			}
 			else if (split[0] == '/unban') {
-				if (split.length < 2) return;
+				if (split.length < 2) return this.checkInputChat(data.message_content, 0, 255, '#exampleFormControlInput1', false, this.chatCheckList);
 				this.client.emit('unban', {
 					username: split[1],
 					message: "You have been unbanned",
 				});
+				textRef.value = '';
 				return;
 			}
 			else if (split[0] == '/mute') {
-				if (split.length < 2) return;
+				if (split.length < 2) return this.checkInputChat(data.message_content, 0, 255, '#exampleFormControlInput1', false, this.chatCheckList);
 				const time = split[2] ? Number(split[2]) : 0;
 				this.client.emit('mute', {
 					username: split[1],
 					message: "You have been muted",
 					time,
 				});
+				textRef.value = '';
 				return;
 			}
 			else if (split[0] == '/unmute') {
-				if (split.length < 2) return;
+				if (split.length < 2) return this.checkInputChat(data.message_content, 0, 255, '#exampleFormControlInput1', false, this.chatCheckList);
 				this.client.emit('unmute', {
 					username: split[1],
 					message: "You have been unmuted",
 				});
+				textRef.value = '';
 				return;
 			}
 			else if (split[0] == '/invite') {
-				if (split.length < 2) return;
+				if (split.length < 2) return this.checkInputChat(data.message_content, 0, 255, '#exampleFormControlInput1', false, this.chatCheckList);
 				let userToAdd  = await this.fetchService.getUser(split[1]);
 				if (userToAdd)
 					this.addMember(userToAdd);
+				textRef.value = '';
 				return;
 			}
 			else if (split[0] == '/op') {
-				if (split.length < 2) return;
+				if (split.length < 2) return this.checkInputChat(data.message_content, 0, 255, '#exampleFormControlInput1', false, this.chatCheckList);
 				this.addOp(split[1]);
+				textRef.value = '';
 				return;
 			}
 		}
 
-		this.elRef.nativeElement.querySelector('#exampleFormControlInput1').value = '';
+		textRef.value = '';
 		const author = localStorage.getItem('username');
 		const id = localStorage.getItem('id');
 
@@ -612,7 +602,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	}
 
 	addMember(newMember : AnyProfileUser) {
-		console.log("ajout de " + newMember.username + " au channel");
 		this.fetchService.channelInvite(newMember, this.currentChannel.channel_id);
 		this.openAddMember('.secDropUp');
 	}
@@ -643,7 +632,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		else
 			dropDownElm.classList.add('show');
 		this.potentialNewMembers = [];
-		console.log(this.potentialNewMembers);
 	}
 
 	hideAllDropdown() {
@@ -661,10 +649,8 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	}
 
 	async obliterateChannel() {
-		console.log('Obliterating');
 		if (this.is_owner) {
 			const confirm = await this.createPopup("Obliterate channel", "", 'ConfirmPopup');
-			console.log(confirm);
 			if (confirm) {
 				this.fetchService.obliterateChannel(this.currentChannel);
 				this.redirectToGlobal();
@@ -674,22 +660,25 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	}
 
 	chatCheckList = { tooLong : true, tooShort : true, other : true };
-	async checkInput(input: string, minVal: number, maxVal: number, form: string) {
+	channelNameCheckList = { tooLong : true, tooShort : true, other : true };
+	channelPwdCheckList = { tooLong : true, tooShort : true, other : true };
+	async checkInputChat(input: string, minVal: number, maxVal: number, form: string, fromHTML: boolean, checkList: { tooLong : boolean, tooShort : boolean, other : boolean }) {
 		const inputFormElm = this.elRef.nativeElement.querySelector(form);
+		checkList.other = fromHTML;
 
 		if (input.length < minVal)
-			this.chatCheckList.tooShort = false;
+			checkList.tooShort = false;
 		else
-			this.chatCheckList.tooShort = true;
+			checkList.tooShort = true;
 
 		if (input.length > maxVal)
-			this.chatCheckList.tooLong = false;
+			checkList.tooLong = false;
 		else
-			this.chatCheckList.tooLong = true;
+			checkList.tooLong = true;
 
-		if (this.chatCheckList.tooLong &&
-			this.chatCheckList.tooShort &&
-			this.chatCheckList.other)
+		if (checkList.tooLong &&
+			checkList.tooShort &&
+			checkList.other)
 		{
 			if (inputFormElm.classList.contains('wrong-input'))
 				inputFormElm.classList.remove('wrong-input');

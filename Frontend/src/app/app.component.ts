@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, TemplateRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, TemplateRef, ViewChild } from '@angular/core';
 import { AutoClose, Placement, PopoverConfig, Target } from '../dtos/Popover.dto';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { NotificationService } from './notification.service';
@@ -20,7 +20,7 @@ import { Router } from '@angular/router';
 	])
   ],
 })
-export class AppComponent implements AfterViewInit {
+export class AppComponent implements AfterViewInit, OnDestroy {
 	@ViewChild('popoverContent') profileTemplate!: TemplateRef<any>;
 	@ViewChild('chatInteractionTemplate') chatInteractionTemplate!: TemplateRef<any>;
 	@ViewChild('toastFriendRequest') toastFriendRequest!: TemplateRef<any>;
@@ -43,6 +43,11 @@ export class AppComponent implements AfterViewInit {
 		private fetchService: FetchService,
 		private router: Router
 	){
+	}
+
+	ngOnDestroy() {
+		if (this.notifService.client.connected)
+			this.notifService.client.disconnect();
 	}
 
 	async ngOnInit() {
@@ -152,7 +157,6 @@ export class AppComponent implements AfterViewInit {
 	}
 
 	acceptFriendRequest(context : NotificationRequest, toast: any) {
-		console.log(this.friendRequestToNotificationRequest(context, true, 'friend'));
 		this.notifService.emit('inviteAnswer', this.friendRequestToNotificationRequest(context, true, 'friend'));
 		this.notifDismiss(toast);
 	}

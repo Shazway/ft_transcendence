@@ -36,7 +36,6 @@ export class SearchComponent {
 
 	goToProfile(user: AnyProfileUser)
 	{
-		console.log(user);
 		this.router.navigateByUrl("profile?username=" + user.username);
 	}
 
@@ -69,14 +68,12 @@ export class SearchComponent {
 			if (this.inputFormElm.classList.contains('wrong-input'))
 				this.inputFormElm.classList.remove('wrong-input');
 			return (true);
-			//input valide
 		}
 		else
 		{
 			if (!this.inputFormElm.classList.contains('wrong-input'))
 				this.inputFormElm.classList.add('wrong-input');
 			return (false)
-			//input invalide
 
 		}
 	}

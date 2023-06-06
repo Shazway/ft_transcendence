@@ -108,7 +108,6 @@ export class ProfileController {
 			await this.itemsService.saveUserState(userEntity)
 			return res.status(HttpStatus.OK).send('Success');
 		}
-		console.log(body);
 		return res.status(HttpStatus.NOT_MODIFIED);
 	}
 

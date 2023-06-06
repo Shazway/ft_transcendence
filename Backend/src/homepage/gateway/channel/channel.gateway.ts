@@ -100,9 +100,9 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const channel_id = Number(client.handshake.query.channel_id);
 		const channel = this.channelList.get(channel_id)
 		if (!channel)
-			return client.disconnect();
+			return ;
 		const chanUser = channel.get(user.sub);
-		if(chanUser)
+		if (chanUser)
 			this.deleteUserFromList(client, chanUser);
 	}
 

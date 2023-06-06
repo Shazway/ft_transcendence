@@ -19,6 +19,8 @@ import { RequestService } from 'src/homepage/services/request/request.service';
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
 import { WsexceptionFilter } from 'src/homepage/filters/wsexception/wsexception.filter';
 import { UseFilters } from '@nestjs/common';
+import { ChannelsService } from 'src/homepage/services/channels/channels.service';
+import { UsersService } from 'src/homepage/services/users/users.service';
 
 @UseFilters(new WsexceptionFilter())
 @WebSocketGateway(3003, {
@@ -38,6 +40,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		private itemsService: ItemsService,
 		private requestService: RequestService,
 		private matchService: MatchsService,
+		private usersService: UsersService
 	) {
 		this.userList = new Map<number, Socket>();
 	}
@@ -50,7 +53,6 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 
 		if (!user)
 			return client.disconnect();
-		//console.log('connected ' + user.name);
 		this.userList.set(user.sub, client);
 		await this.notificationService.setUserStatus(user.sub, this.ONLINE);
 	}
@@ -59,8 +61,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'EEEE');
 		
 		if (!user)
-			return client.disconnect();
-		//console.log('disconnected ' + user.name);
+			return ;
 		this.userList.delete(user.sub);
 		await this.notificationService.setUserStatus(user.sub, this.OFFLINE);
 	}
@@ -103,6 +104,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 			client.emit('channel', sourceUser.name + " added you to the channel: " + channelName);
 	}
 
+	
 	@SubscribeMessage('inviteRequest')
 	async handleInvite(
 		@ConnectedSocket() client: Socket,
@@ -115,12 +117,19 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		body.sent_at = new Date();
 		const answer = this.buildAnswer(source.sub, source.name, body.type);
 		const target = this.userList.get(body.target_id);
+
+		if (await this.usersService.isBlockedCheck(body.target_id, source.sub))
+			return client.emit('onError', 'User blocked you');
 		if (body.type == 'friend' && !(await this.requestService.handleFriendRequestInvite(source.sub, body.target_id)))
 			return client.emit('refusedInvite', 'Something went wrong');
 		else if (body.type == 'match' && !target)
 			return client.emit('offline', 'Your friend is currently offline');
 		else if (body.type == 'match' && target)
-			return target.emit(body.type + 'Invite', { notification: answer});
+		{
+			if (await this.usersService.canInvite(source.sub, body.target_id))
+				return target.emit(body.type + 'Invite', { notification: answer});
+			return client.emit('failure', 'Refused invite');
+		}
 		if (target && target.connected)
 			target.emit(body.type + 'Invite', { notification: answer});
 		else
@@ -148,21 +157,34 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		const target = this.userList.get(body.target_id);
 		if (body.accepted)
 		{
-			if (body.type == 'friend' && !(await this.requestService.handleFriendRequestAnswer(source.sub, body.target_id)))
-				return client.emit('onError', 'Erreur');
+			if (body.type == 'friend')
+			{
+				if ((await this.requestService.handleFriendRequestAnswer(source.sub, body.target_id)))
+				{
+					const userEntity = await this.itemsService.getUser(source.sub);
+					const targetEntity = await this.itemsService.getUser(body.target_id);
+					if (userEntity.friend.length == 3 && !this.itemsService.hasAchievement(userEntity, "Social Butterfly"))
+					{
+						const achievements = await this.itemsService.getAllAchievements();
+						this.itemsService.addAchievementToUser(achievements, userEntity, "Social Butterfly", this);
+					}
+					if (targetEntity.friend.length == 3 && !this.itemsService.hasAchievement(targetEntity, "Social Butterfly"))
+					{
+						const achievements = await this.itemsService.getAllAchievements();
+						this.itemsService.addAchievementToUser(achievements, targetEntity, "Social Butterfly", this);
+					}
+				}
+				else
+					return client.emit('onError', 'Erreur');
+			}
+
 			if (body.type == 'match')
 			{
-				console.log('match fait et envoyé a');
-				console.log('Target id: ');
-				console.log(body.target_id);
-				console.log('Target name: ');
-				console.log(body.target_name);
 				if (!target)
 					return client.emit('onError', 'Opponent disconnected');
 				const match = await this.matchService.createFullMatch(source.sub, body.target_id, this.buildCasualSetting());
 				if (!match)
 					return client.emit('onError', 'Something went wrong');
-				console.log('match envoyé');
 				client.emit('casualMatch', match.match_id);
 				target.emit('casualMatch', match.match_id);
 				return;

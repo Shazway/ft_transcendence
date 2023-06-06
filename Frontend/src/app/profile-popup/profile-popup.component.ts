@@ -23,7 +23,7 @@ export class ProfilePopupComponent implements OnInit {
 
 	constructor(
 		private fetchService: FetchService,
-		private router: Router
+		private router: Router,
 	) { }
 
 	async ngOnInit() {
@@ -38,8 +38,11 @@ export class ProfilePopupComponent implements OnInit {
 		this.data.client.emit('inviteRequest', this.buildNotif("friend", this.data.name, this.data.id));
 	}
 
-	redirectProfil()
-	{
+	redirectProfil() {
 		this.router.navigateByUrl('profile?username=' + this.data.name);
+	}
+
+	challenge() {
+		this.data.client.emit('inviteRequest', this.buildNotif("match", this.data.name, this.data.id));
 	}
 }

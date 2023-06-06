@@ -112,13 +112,13 @@ export class PongComponent implements OnDestroy {
 		this.client = io('ws://localhost:3005?match_id=' + match_id, this.websocketService.getHeader());
 		this.client.on('onPlayerMove', (event) => { this.updatePlayer(event); });
 		this.client.on('onOpponentMove', (event) => { this.updateOpponent(event); });
-		this.client.on('onBallCollide', (event) => { this.updateBall(event); if (this.isSpectator) console.log('BallCollide')});
-		this.client.on('startMatch', (event) => { console.log('Match is starting ' + event); this.startMatch(event); });
-		this.client.on('onPlayerReady', (event) => { console.log('You are ready '); });
-		this.client.on('onOpponentReady', (event) => { console.log('Opponent is ready '); });
+		this.client.on('onBallCollide', (event) => { this.updateBall(event); });
+		this.client.on('startMatch', (event) => { this.startMatch(event); });
+		this.client.on('onPlayerReady', (event) => { });
+		this.client.on('onOpponentReady', (event) => { });
 		this.client.on('onScoreChange', (event) => { this.updateScore(event); });
 		this.client.on('onMatchEnd', (event) => {this.endMatch(event);});
-		this.client.on('spectateMatch', (event) => { this.setSpectate(event); console.log('You are spectating '); });
+		this.client.on('spectateMatch', (event) => { this.setSpectate(event); });
 		this.client.on('onSpectateMatch', (event) => { this.addSpectate(event); });
 		this.client.on('onUnspectateMatch', (event) => { this.removeSpectate(event); });
 		this.client.on('onRecieveProfile', (event) => { this.setProfile(event); });
@@ -168,7 +168,6 @@ export class PongComponent implements OnDestroy {
 	}
 
 	removeSpectate(event: {username: string}) {
-		console.log(event.username + ' is unspectating');
 		this.specList = this.specList.filter((user) => user.username != event.username);
 	}
 
@@ -193,7 +192,7 @@ export class PongComponent implements OnDestroy {
 					this.assetManager.addPanningText(this.player.user.username + " wins");
 				else
 					this.assetManager.addPanningText("You win ! Wow, you're such a CHAD * ੈ✩‧₊˚*˚(～ᗒ◡ᗕ)～˚* ੈ✩‧₊");
-			} //<-- faire des trucs avec un affichage mieux
+			}
 			else if (event.state == this.LOSS)
 			{
 				this.scoreP2.setText("10");
@@ -201,7 +200,7 @@ export class PongComponent implements OnDestroy {
 					this.assetManager.addPanningText(this.opponent.user.username + " wins");
 				else
 					this.assetManager.addPanningText("You lost ! Oh well time for a drink ? ﾍ(ᗒ◡ᗕ)ﾉ c[_]");
-			} //<-- faire des trucs aussi x)
+			}
 		}
 		this.ballLock.waitForUnlock().then(() => {
 			this.ballLock.acquire().then(() => {
@@ -335,7 +334,6 @@ export class PongComponent implements OnDestroy {
 	}
 
 	drawBG() {
-		// this.graphicElm.clear();
 		if (this.graphicElm)
 			this.graphicElm.destroy();
 		this.graphicElm = new Graphics();
@@ -384,7 +382,6 @@ export class PongComponent implements OnDestroy {
 			this.client.emit('ArrowDown', true);
 	}
 
-	//DISPLAY FUNCTION
 	hideSpecWindow() {
 		const specWin = this.elRef.nativeElement.querySelector('.specWindow');
 		if (specWin.classList.contains('hide'))

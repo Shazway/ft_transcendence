@@ -72,9 +72,9 @@
 							<div class="d-flex align-items-end ">
 								<p class="small ms-3 mb-0 text-muted">{{ friend.username }}</p>
 								<div class="flex-grow-1"></div>
-								<img (click)="goToProfile(friend)" title="profile" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{friend.user_id}}-profile" src="{{icone_list.go_to_profile}}" alt="profile">
-								<img (click)="removeFriend(friend)" title="remove" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{friend.user_id}}-unfriend" src="{{icone_list.remove_friend}}" alt="unfriend">
-								<img (click)="blockUser(friend)" title="block" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{friend.user_id}}-block" src="{{icone_list.block_user}}" alt="block">
+								<img draggable="false" (click)="goToProfile(friend)" title="profile" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{friend.user_id}}-profile" src="{{icone_list.go_to_profile}}" alt="profile">
+								<img draggable="false" (click)="removeFriend(friend)" title="remove" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{friend.user_id}}-unfriend" src="{{icone_list.remove_friend}}" alt="unfriend">
+								<img draggable="false" (click)="blockUser(friend)" title="block" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{friend.user_id}}-block" src="{{icone_list.block_user}}" alt="block">
 							</div>
 						</td>
 						<td *ngIf="getActivityStatus(friend) == 0">offline</td>
@@ -108,15 +108,15 @@
 						</td>
 						<td>
 							<div class="d-flex align-items-end">
-								<img (click)="goToProfile(request.sender)" title="profile" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.sender.user_id}}-profile" src="{{icone_list.go_to_profile}}" alt="profile">
-								<img (click)="blockUser(request.sender)" title="block" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.sender.user_id}}-block" src="{{icone_list.block_user}}" alt="block">
+								<img draggable="false" (click)="goToProfile(request.sender)" title="profile" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.sender.user_id}}-profile" src="{{icone_list.go_to_profile}}" alt="profile">
+								<img draggable="false" (click)="blockUser(request.sender)" title="block" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.sender.user_id}}-block" src="{{icone_list.block_user}}" alt="block">
 								<div class="flex-grow-1"></div>
 							</div>
 						</td>
 						<td>
 							<div class="d-flex align-items-end ">
-								<img (click)="accept(request)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.sender.user_id}}-profile" src="{{icone_list.tick}}" alt="accept">
-								<img (click)="reject(request)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.sender.user_id}}-message" src="{{icone_list.cross}}" alt="reject">
+								<img draggable="false" (click)="accept(request)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.sender.user_id}}-profile" src="{{icone_list.tick}}" alt="accept">
+								<img draggable="false" (click)="reject(request)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.sender.user_id}}-message" src="{{icone_list.cross}}" alt="reject">
 								<div class="flex-grow-1"></div>
 							</div>
 						</td>
@@ -144,7 +144,7 @@
 					</td>
 					<td>
 						<div class="d-flex align-items-end ">
-							<img (click)="unblockUser(userb)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{userb.user_id}}-profile" src="{{icone_list.tick}}" alt="accept">
+							<img draggable="false" (click)="unblockUser(userb)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{userb.user_id}}-profile" src="{{icone_list.tick}}" alt="accept">
 						</div>
 					</td>
 				</tr>
@@ -172,14 +172,14 @@
 						</td>
 						<td>
 							<div class="d-flex align-items-end">
-								<img (click)="goToProfile(request.sender)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.receiver.user_id}}-profile" src="{{icone_list.go_to_profile}}" alt="profile">
-								<img (click)="blockUser(request.sender)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.receiver.user_id}}-block" src="{{icone_list.block_user}}" alt="block">
+								<img draggable="false" (click)="goToProfile(request.sender)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.receiver.user_id}}-profile" src="{{icone_list.go_to_profile}}" alt="profile">
+								<img draggable="false" (click)="blockUser(request.sender)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.receiver.user_id}}-block" src="{{icone_list.block_user}}" alt="block">
 								<div class="flex-grow-1"></div>
 							</div>
 						</td>
 						<td>
 							<div class="d-flex align-items-end ">
-								<img (click)="cancel(request)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.receiver.user_id}}-message" src="{{icone_list.cross}}" alt="reject">
+								<img draggable="false" (click)="cancel(request)" class="rounded-circle border border-2 m-0 ms-2 m-auto icon" id="img-{{request.receiver.user_id}}-message" src="{{icone_list.cross}}" alt="reject">
 								<div class="flex-grow-1"></div>
 							</div>
 						</td>

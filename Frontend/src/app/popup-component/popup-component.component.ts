@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, TemplateRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, TemplateRef, ViewChild } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ShopItem } from 'src/dtos/ShopItem.dto';
 import { AnyProfileUser } from 'src/dtos/User.dto';
@@ -116,10 +116,50 @@ export class ConfirmBlockPopup {
 export class ChangeAvatarPopup {
 	@Input() user! : AnyProfileUser;
 
-	constructor(public activeModal: NgbActiveModal) {
+	constructor(
+		public activeModal: NgbActiveModal,
+		private elRef: ElementRef,
+		) {
 	}
 
 	onSubmit(new_img: string) {
 		this.activeModal.close(new_img);
 	}
+
+
+	inputFormElm : any;
+
+	inputCheckList = {
+		tooLong : true,
+		tooShort : true,
+		other : true
+	};
+	async checkInput(input: string) {
+		if (!this.inputFormElm)
+			this.inputFormElm = this.elRef.nativeElement.querySelector('#inputForm');
+
+		if (input.length > 350)
+			this.inputCheckList.tooLong = false;
+		else
+			this.inputCheckList.tooLong = true;
+
+		if (this.inputCheckList.tooLong &&
+			this.inputCheckList.tooShort &&
+			this.inputCheckList.other)
+		{
+			if (this.inputFormElm.classList.contains('wrong-input'))
+				this.inputFormElm.classList.remove('wrong-input');
+			return (true);
+			//input valide
+		}
+		else
+		{
+			if (!this.inputFormElm.classList.contains('wrong-input'))
+				this.inputFormElm.classList.add('wrong-input');
+			return (false)
+			//input invalide
+
+		}
+	}
+
 }

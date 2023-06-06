@@ -13,17 +13,17 @@
 	<nav id="upperbar" class="navbar navbar-light bg-light navbar-fixed-top my-light">
 		<div class="d-flex justify-content-between w-100 ps-5 pe-3">
 			<div class="sidebar-header">
-				<a class="inox" href="home">Transcendence</a>
+				<a class="inox" (click)="navTo('home')" >Transcendence</a>
 			</div>
 			<div *ngIf="isConnected()" class="d-flex justify-content-between align-middle">
-				<div *ngIf="myProfile" @currencyFadeIn aria-label="wealth" class="d-flex text-muted mx-5 align-items-center" style="cursor: default;">
-					<img src="assets/MoneyLogo/Wheat1.png" alt="Currency" width="30" height="24">
+	<div *ngIf="myProfile" @currencyFadeIn aria-label="wealth" class="d-flex text-muted mx-5 align-items-center" style="cursor: default; user-select: none;">
+					<img src="assets/MoneyLogo/Wheat1.png" draggable="false" alt="Currency" width="30" height="24">
 					{{getBalance()}}
 				</div>
 				 <div >
 					<button class="btn btn-default" type="button" (click)="openDropdown()">
 						{{getUsername()}}
-						<img src="{{getAvatar()}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp';" class="rounded-circle" alt="Avatar" width = 30>
+						<img src="{{getAvatar()}}" draggable="false" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp';" class="rounded-circle" alt="Avatar" width = 30>
 					</button>
 					<ul class="dropdown-menu mondropdown">
 						<li>
@@ -49,9 +49,6 @@
 					<ul  class="collapse list-unstyled show " id="play">
 						<li>
 							<a class="cursor-pointer" (click)="navTo('matchmaking')">Ranked match</a>
-						</li>
-						<li>
-							<a class="cursor-pointer" (click)="navTo('pong_debug')">Casual match</a>
 						</li>
 						<li>
 							<a class="cursor-pointer"(click)="navTo('friends')" >Challenge a friend</a>

@@ -50,10 +50,10 @@ export class WebsocketService {
 		const client = io('ws://localhost:3002?channel_id=' + channel_id, this.getHeader());
 		if (!client)
 			return false;
-		client.on('onMessage', (event) => { console.log('Messaged received'); });
-		client.on('onError', (event) => { console.log('WebSocket error:', event); });
-		client.on('connection', (event) => { console.log('Connected to WebSocket server'); });
-		client.on('disconnect', (event) => { console.log('Disconnected from WebSocket server'); });
+		client.on('onMessage', (event) => { });
+		client.on('onError', (event) => { });
+		client.on('connection', (event) => { });
+		client.on('disconnect', (event) => { });
 		this.chanList.set(channel_id, client);
 		return (true);
 	}

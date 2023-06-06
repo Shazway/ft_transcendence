@@ -85,7 +85,6 @@ export class ProfileComponent implements AfterViewInit {
 	maxScore = 100;
 	isLoaded = false;
 	allSkins! : ShopItem[];
-	// paddleSkins! : ShopItem[];
 	paddleSkins! : any;
 	windowPaddle : ShopItem[] = [];
 	ballSkins! : ShopItem[];
@@ -175,10 +174,7 @@ export class ProfileComponent implements AfterViewInit {
 				this.user = newUser;
 		}
 		if (this.user && this.user.match_history) {
-			console.log(this.user);
 			this.user.match_history.reverse().forEach(match => {
-				console.log('mon match');
-				console.log(match);
 				const date = new Date(match.date);
 				this.matchHistory.push({
 					Player1: match.user[0].username,
@@ -200,12 +196,10 @@ export class ProfileComponent implements AfterViewInit {
 			this.initToggles();
 			this.getSkins();
 			this.getTitles();
-			this.printSettings();
 		}
 	}
 
 	createChatPopup(username: string, UID: number) {
-		console.log(username + UID);
 		if (UID == 0)
 			return;
 		this.parent.openPopover('profile', new PopoverConfig(
@@ -215,14 +209,6 @@ export class ProfileComponent implements AfterViewInit {
 			'start',
 			{name: username, id: UID, client: this.parent.notifService.client},
 		));
-	}
-
-	printSettings() {
-		console.log("Paddle : " + this.user.current_skins[0]);
-		console.log("Ball : " + this.user.current_skins[1]);
-		console.log("Background : " + this.user.current_skins[2]);
-		console.log("Invites : " + this.user.channelInviteAuth);
-		console.log("Double Auth: " + this.user.double_auth);
 	}
 
 	isMyProfile() {
@@ -264,7 +250,6 @@ export class ProfileComponent implements AfterViewInit {
 	}
 
 	async updateSettings(newUsername : string) {
-		console.log("username : " + newUsername);
 		let tmp : any;
 
 		this.updateSkins();
@@ -282,8 +267,6 @@ export class ProfileComponent implements AfterViewInit {
 		}
 		this.createSettingsPopup();
 		let test = await this.checkInput(newUsername);
-		console.log(test);
-		console.log(this.inputCheckList);
 		if (newUsername.length > 0 && (test == true))
 		{
 			let res = await this.fetchService.changeUsername(newUsername);
@@ -293,9 +276,6 @@ export class ProfileComponent implements AfterViewInit {
 				localStorage.setItem('username', newUsername);
 				localStorage.setItem('Jwt_token', res.data.newToken);
 				this.router.navigateByUrl('profile');
-				// let tmp = await this.fetchService.getMyProfile();
-				// if (tmp)
-				// 	this.user = tmp;
 			}
 		}
 	}
@@ -347,8 +327,6 @@ export class ProfileComponent implements AfterViewInit {
 		}
 		if (this.isMyProfile()) {
 			let elAvatar = this.elRef.nativeElement.querySelector('#avatarPic');
-			console.log("Avatar : ");
-			console.log(elAvatar);
 			elAvatar.classList.add('my-avatar');
 		}
 		this.cdr.detectChanges();
@@ -356,13 +334,20 @@ export class ProfileComponent implements AfterViewInit {
 	}
 
 	panLeft(window : ShopItem[], skins : ShopItem[], slideDirection : string) {
-		//ajouter une variable pour le slide, faire une variable par carousel
 		if (slideDirection == 'slideDirectionBall')
 			this.slideDirectionBall = 'left';
 		if (slideDirection == 'slideDirectionPaddle')
 			this.slideDirectionPaddle = 'left';
-		if (slideDirection == 'slideDirectionBackground')
-			this.slideDirectionBackground = 'left';
+		if (slideDirection == 'slideDirectionBackground') {
+			let index = skins.indexOf(window[4]);
+			if (index < skins.length - 1)
+				index++;
+			else
+				index = 0;
+			window.shift();
+			window.push(skins[index]);
+			return;
+		}
 		setTimeout(() => {
 			let index = skins.indexOf(window[4]);
 			if (index < skins.length - 1)
@@ -395,11 +380,18 @@ export class ProfileComponent implements AfterViewInit {
 			this.slideDirectionBall = 'right';
 		if (slideDirection == 'slideDirectionPaddle')
 			this.slideDirectionPaddle = 'right';
-		if (slideDirection == 'slideDirectionBackground')
-			this.slideDirectionBackground = 'right';
+		if (slideDirection == 'slideDirectionBackground') {
+			let index = skins.indexOf(window[0]);
+			if (index > 0)
+				index--;
+			else
+				index = skins.length - 1;
+			window.pop();
+			window.unshift(skins[index]);
+			return;
+		}
 
 		setTimeout(() => {
-			console.log("boucle");
 			let index = skins.indexOf(window[0]);
 			if (index > 0)
 				index--;
@@ -626,7 +618,6 @@ export class ProfileComponent implements AfterViewInit {
 									return;
 								const percentage = Math.round((value / (total as number)) * 100);
 								return percentage + "%";
-								// return context.dataIndex;
 							},
 						}
 					},
@@ -649,7 +640,6 @@ export class ProfileComponent implements AfterViewInit {
 			},
 			options: {
 				responsive: true,
-				// aspectRatio: 1.5,
 				layout: {
 					padding: 20,
 				},
@@ -797,13 +787,11 @@ export class ProfileComponent implements AfterViewInit {
 	acceptChanInviteFrom(people : number) {
 		this.changes.invite = true;
 		this.user.channelInviteAuth = people;
-		console.log("invite : " + this.user.channelInviteAuth);
 	}
 
 	toggleAuth() {
 		this.changes.doubleAuth = !this.changes.doubleAuth;
 		this.user.double_auth = !this.user.double_auth;
-		console.log("double auth : " + this.user.double_auth);
 	}
 
 	async popupAvatar() {
@@ -824,8 +812,6 @@ export class ProfileComponent implements AfterViewInit {
 				this.user.img_url = newAvatar;
 				localStorage.setItem('img_url', newAvatar);
 			}
-			else
-				console.log("echec");
 		}
 	}
 
@@ -857,14 +843,12 @@ export class ProfileComponent implements AfterViewInit {
 			if (this.inputFormElm.classList.contains('wrong-input'))
 				this.inputFormElm.classList.remove('wrong-input');
 			return (true);
-			//input valide
 		}
 		else
 		{
 			if (!this.inputFormElm.classList.contains('wrong-input'))
 				this.inputFormElm.classList.add('wrong-input');
 			return (false)
-			//input invalide
 
 		}
 	}

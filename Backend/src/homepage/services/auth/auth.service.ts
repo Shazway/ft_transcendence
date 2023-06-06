@@ -57,7 +57,6 @@ export class AuthService {
 			'h:X-Mailgun-Variables': JSON.stringify({ Username: user.login, Code: code })
 		};
 		mg.messages().send(data, function (error, body) {
-			console.log(body);
 		});
 	}
 

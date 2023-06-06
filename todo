@@ -2,6 +2,6 @@
 @Get(':username') retirer cette route dans users controller, (i'm a dev pour creer des user ou se login comme on veut)
 
 
-maj de la position de la raquette entrée d'un spectateur
-
 update spectator list when spec connect
+
+favicon

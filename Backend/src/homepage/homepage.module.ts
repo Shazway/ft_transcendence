@@ -91,28 +91,5 @@ export class HomepageModule {
 			path: '*',
 			method: RequestMethod.OPTIONS,
 		});
-		//auth.apply(AuthVerifMiddleware)
-		//	.exclude(
-		//		{
-		//			path: 'users/create',
-		//			method: RequestMethod.ALL,
-		//		},
-		//		{
-		//			path: 'users/:username',
-		//			method: RequestMethod.ALL,
-		//		},
-		//		{
-		//			path: 'login',
-		//			method: RequestMethod.ALL,
-		//		},
-		//		{
-		//			path: 'login/callback',
-		//			method: RequestMethod.ALL,
-		//		},
-		//	)
-		//	.forRoutes({
-		//		path: '*',
-		//		method: RequestMethod.ALL,
-		//	});
 	}
 }

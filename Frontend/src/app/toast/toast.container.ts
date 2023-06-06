@@ -13,8 +13,6 @@ import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
 })
 export class ToastsContainer {
 	constructor(public toastService: ToastService) {
-
-		console.log("constructeur de toast");
 	}
 
 	isTemplate(toast: { textOrTpl: any; }) {

@@ -10,6 +10,9 @@ import { random } from 'mathjs';
 
 @Injectable()
 export class UsersService {
+	public FRIENDS_ALLOWED = 1;
+	public NOT_ALLOWED = 0;
+	public ALL_ALLOWED = 2;
 	constructor(
 		@InjectRepository(UserEntity)
 		private userRepository: Repository<UserEntity>,
@@ -78,5 +81,16 @@ export class UsersService {
 
 		if (!sourceUser || !targetUser) return true;
 		return sourceUser.blacklistEntry.find((user) => targetUser.user_id == user.user_id);
+	}
+
+	async canInvite(userId: number, target_id: number) {
+		const targetEntity = await this.itemsService.getUser(target_id);
+
+		if (!targetEntity|| targetEntity.channelInviteAuth == this.NOT_ALLOWED)
+			return false;
+		else if (targetEntity.channelInviteAuth == this.FRIENDS_ALLOWED
+				&& !targetEntity.friend.find((friend) => userId == friend.user_id))
+			return false;
+		return true;
 	}
 }

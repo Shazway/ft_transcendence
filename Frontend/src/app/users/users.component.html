@@ -1,7 +1,7 @@
 <div class="row">
 	<h1>YOP</h1>
 	<div class="card" style="width: 18rem;" *ngFor="let user of users$ | async">
-		<img src="{{user.img_url}}" class="card-img-top" alt="...">
+		<img draggable="false" src="{{user.img_url}}" class="card-img-top" alt="...">
 		<div class="card-body">
 			<h3 class="card-title">{{ user.username }}</h3>
 			<p class="card-text">{{ user.rank_score }}</p>

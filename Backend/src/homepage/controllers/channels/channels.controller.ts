@@ -184,7 +184,7 @@ export class ChannelsController {
 		let messages = await this.messageService.getPage(chan_id, page_num);
 
 		const userEntity = await this.itemsService.getUser(user.sub);
-		if (!userEntity) return res.status(HttpStatus.NOT_FOUND).send("You don't exist in the database, please log back in");
+		if (!userEntity) return res.status(HttpStatus.I_AM_A_TEAPOT);
 		if (!(await this.channelService.isUserMember(user.sub, chan_id)))
 			return res.status(HttpStatus.OK).send(null);
 		messages = messages.filter((message) => {
@@ -202,8 +202,8 @@ export class ChannelsController {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
 		const channel = await this.channelService.getChannelById(chan_id);
-		if (!channel)
-			res.status(HttpStatus.NOT_FOUND).send({ msg: 'No channels with id ' + chan_id });
+		if (!channel || !(await this.channelService.isUserMember(user.sub, chan_id) || await this.channelService.isBanned(user.sub, chan_id)))
+			res.status(HttpStatus.OK).send(null);
 		else res.status(HttpStatus.OK).send(plainToClass(SerializedChan, channel));
 	}
 }

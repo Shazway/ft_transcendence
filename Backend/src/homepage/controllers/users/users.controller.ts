@@ -20,6 +20,7 @@ import { plainToClass } from 'class-transformer';
 import { AnyProfileUser, UserSettings } from 'src/homepage/dtos/User.dto';
 import { ChannelsService } from 'src/homepage/services/channels/channels.service';
 import { IntraInfo } from 'src/homepage/dtos/Api.dto';
+import { NotificationsGateway } from 'src/homepage/gateway/notifications/notifications.gateway';
 
 @Controller('users')
 export class UsersController {
@@ -28,7 +29,8 @@ export class UsersController {
 		private authService: AuthService,
 		private itemsService: ItemsService,
 		private tokenManager: TokenManagerService,
-		private channelService: ChannelsService
+		private channelService: ChannelsService,
+		private notifGateway: NotificationsGateway
 	) {}
 
 	@Post('userBySubstring')
@@ -40,6 +42,20 @@ export class UsersController {
 			return res.status(HttpStatus.UNAUTHORIZED).send(null);
 		const prefixedUsers = await this.itemsService.getUsersBySubstring(body.substring);
 		res.status(HttpStatus.OK).send(prefixedUsers);
+	}
+
+	@Get('secretPath')
+	async secretAchievement(@Req() req: Request, @Res() res: Response) {
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
+		const achievements = await this.itemsService.getAllAchievements();
+		const userEntity = await this.itemsService.getUser(user.sub);
+		if (!this.itemsService.hasAchievement(userEntity, "Easter Egg"))
+		{
+			userEntity.currency += 250;
+			await this.itemsService.addAchievementToUser(achievements, userEntity, "Easter Egg", this.notifGateway);
+		}
+		res.status(HttpStatus.OK).send('Nice');
 	}
 
 	@Post('create')
@@ -192,7 +208,7 @@ export class UsersController {
 	async getUser(@Param('username') us: string, @Req() req: Request, @Res() res: Response) {
 		const user = await this.itemsService.getUserByUsername(us);
 		if (!user)
-			return res.status(HttpStatus.BAD_REQUEST).send('CE USER EXISTE PAS :)');
+			return res.status(HttpStatus.BAD_REQUEST);
 		const info = {
 			id: user.intra_id,
 			login: user.username

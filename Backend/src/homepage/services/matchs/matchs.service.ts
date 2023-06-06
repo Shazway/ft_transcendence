@@ -29,7 +29,6 @@ export class MatchsService {
 		return await this.matchSettingRepo.save(newSettings);
 	}
 
-	//For new matchmaking based matches
 	public async createMatch(playerOne: UserEntity, playerTwo: UserEntity) {
 		const match = new MatchEntity();
 		const users = [playerOne, playerTwo];
@@ -54,13 +53,9 @@ export class MatchsService {
 		else await this.createCustomMatchSetting(matchSetting);
 
 		match.user.push(userOne, userTwo);
-		//userOne.match_history.push(match);
-		//userTwo.match_history.push(match);
-		//await this.usersRepo.save([userOne, userTwo]);
 		return await this.matchRepo.save(match);
 	}
 
-	//For custom matches
 	public async addUserToMatch(user_id: number, match_id: number) {
 		const user = await this.itemsService.getUser(user_id);
 		const match = await this.itemsService.getMatch(match_id);

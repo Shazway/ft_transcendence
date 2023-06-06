@@ -42,7 +42,6 @@ export class LoginComponent {
 
 	showDevDoor() {
 		this.devModeElm = this.elRef.nativeElement.querySelector("#modeDev");
-		console.log(this.devModeElm);
 		if (this.devModeElm.classList.contains('fade'))
 			this.devModeElm.classList.remove('fade');
 		else

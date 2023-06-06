@@ -9,7 +9,6 @@ export class WsexceptionFilter implements ExceptionFilter {
 		const client = host.switchToWs().getClient();
 		console.log('Websocket Token Error:');
 		console.log(exception);
-		// client.send(JSON.stringify(response));
 		client.emit('onError', exception.message);
 		if (exception.message.includes('disconnect')) client.disconnect();
 		console.log('Note that the server is still up and running ✅');

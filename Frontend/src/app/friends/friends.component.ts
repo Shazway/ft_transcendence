@@ -135,7 +135,6 @@ export class FriendsComponent {
 
 	challenge(user: AnyProfileUser)
 	{
-		//const test = await this.createPopup("Challenge", "friend");
 		if (user)
 			this.notifService.client.emit('inviteRequest', this.buildNotif("match", user.username, user.user_id));
 	}
@@ -151,10 +150,7 @@ export class FriendsComponent {
 
 	async spectate(user: AnyProfileUser)
 	{
-		//const test = await this.createPopup("Spectate", "friend");
-		console.log(user);
 		let it = await this.fetchService.getCurrentMatchId(user.user_id);
-		console.log('trying to stalk ' + it);
 		this.router.navigateByUrl('pong?match_id=' + it);
 	}
 

@@ -10,7 +10,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr *ngFor="let user of users" (mouseover)="updateCurrentUser(user)" class="line">
+				<tr *ngFor="let user of users" (mouseover)="updateCurrentUser(user)" class="line" style="cursor: default;">
 					<td>{{users.indexOf(user) + 1}}</td>
 					<td>{{user.username}}</td>
 					<td>{{user.rank_score}}</td>
@@ -18,11 +18,11 @@
 			</tbody>
 		</table>
 	</div>
-	<div class="d-flex flex-column m-5 text-center card text-black my-light2" style="width: 30%; height: 80%;">
-		<div *ngIf="currentUser" class="card-body p-4">
+	<div class="d-flex flex-column m-5 text-center card text-black my-light2 cursor-pointer" style="width: 30%; height: 80%;">
+		<div *ngIf="currentUser" (click)="goToProfile(currentUser)" class="card-body p-4">
 			<h2 class="mb-1 text-center">{{currentUser.username}}</h2>
 			<h2>Rank : {{users.indexOf(currentUser) + 1}}</h2>
-			<img src="{{currentUser.img_url}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" class="img-fluid rounded-circle">
+			<img draggable="false" src="{{currentUser.img_url}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" class="img-fluid rounded-circle">
 			<div class="text-start">
 				<h5 (click)="spectate(currentUser)">{{ getCurrentStatus(currentStatus)[0] }}<span class="badge {{ getCurrentStatus(currentStatus)[1]}} dot rounded-circle status-dot">&nbsp;</span></h5>
 				<h4>Wins/Losses : {{currentUser.wins}}/{{currentUser.losses}}</h4>

@@ -86,15 +86,14 @@ export class ChannelsService {
 		if (!channel || channel.is_dm) return false;
 		chan_user.is_creator = is_creator;
 		chan_user.is_admin = is_admin;
-		if (!channel.channel_password) {
+
+		if (!channel.channel_password)
 			await this.itemsService.addUserToChannel(chan_user, chan_id, user_id);
-		}
-		else if (pass && await bcrypt.compare(pass, channel.channel_password)) {
+		else if (pass && await bcrypt.compare(pass, channel.channel_password))
 			await this.itemsService.addUserToChannel(chan_user, chan_id, user_id);
-		}
-		else {
+		else
 			return false;
-		}
+
 		return true;
 	}
 
@@ -238,6 +237,16 @@ export class ChannelsService {
 
 	async isUserMember(user_id: number, chan_id: number) {
 		const chan_user = await this.itemsService.getUserChan(user_id, chan_id);
+		const channel = await this.itemsService.getChannel(chan_id);
+		if (!channel)
+			return false;
+		if (!channel.is_channel_private && !chan_user && !channel.is_dm)
+		{
+			const newChanUser = new ChannelUserRelation();
+			newChanUser.is_creator = false;
+			newChanUser.is_admin = false;
+			return this.itemsService.addUserToChannel(newChanUser, chan_id, user_id);
+		}
 		if (!chan_user)
 			return false;
 		return true;

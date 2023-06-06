@@ -57,6 +57,7 @@ a, a:hover, a:focus {
     /* don't forget to add all the previously mentioned styles here too */
     color: #fff;
     transition: all 0.3s;
+    user-select: none;
 }
 
 #sidebar .sidebar-header {
@@ -92,6 +93,8 @@ ul ul a {
 .inox {
 	font-size: 1.6rem;
 	font-weight: bold;
+    user-select: none;
+    cursor: pointer;
 }
 
 .body-text {

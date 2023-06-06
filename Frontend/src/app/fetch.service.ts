@@ -310,7 +310,6 @@ export class FetchService {
 		let res;
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log("id = " + friend_id);
 		await axios.get('http://localhost:3001/users/removeFriendRequest/' + friend_id, this.getHeader())
 		.then(function (response) {
 			res = response.data;
@@ -521,7 +520,6 @@ export class FetchService {
 	}
 
 	async changeInvite(param : Number) {
-		console.log("sending invite=" + param);
 		let res: any;
 		const teaFunc = this.teapotError;
 		const route = this.router;
@@ -588,6 +586,21 @@ export class FetchService {
 		await axios.post<any>('http://localhost:3001/profile/changeTitle',{ newTitle : newTitle }, this.getHeader())
 		.then(function (response) {
 			res = response;
+		})
+		.catch(function (error) {
+			teaFunc(error, route);
+		})
+		.finally(function () {});
+		return res;
+	}
+
+	async secret() {
+		let res: any;
+		const teaFunc = this.teapotError;
+		const route = this.router;
+		await axios.get<any>('http://localhost:3001/users/secretPath', this.getHeader())
+		.then(function (response) {
+			res = response.data;
 		})
 		.catch(function (error) {
 			teaFunc(error, route);

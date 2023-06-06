@@ -25,10 +25,10 @@ export class MatchMakingComponent {
 			return;
 		if (!this.client)
 			return;
-		this.client.on('foundMatch', (event) => { console.log(event); this.matchFound(event); });
-		this.client.on('onError', (event) => { console.log('WebSocket error: ' + event);});
-		this.client.on('connection', () => { console.log('Connected to WebSocket server'); });
-		this.client.on('disconnect', () => { console.log('Disconnected from WebSocket server'); });
+		this.client.on('foundMatch', (event) => { this.matchFound(event); });
+		this.client.on('onError', (event) => {});
+		this.client.on('connection', () => { });
+		this.client.on('disconnect', () => { });
 	}
 
 	matchFound(match: MatchMaking) {

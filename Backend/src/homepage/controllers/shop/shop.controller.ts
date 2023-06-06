@@ -2,10 +2,13 @@ import { Request, Response } from 'express';
 import { Controller, Get, HttpStatus, Req, Res, Param } from '@nestjs/common';
 import { ItemsService } from 'src/homepage/services/items/items.service';
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
+import { NotificationsGateway } from 'src/homepage/gateway/notifications/notifications.gateway';
 
 @Controller('shop')
 export class ShopController {
-	constructor(private itemsService: ItemsService, private tokenManager: TokenManagerService) {}
+	constructor(private itemsService: ItemsService,
+				private tokenManager: TokenManagerService,
+				private notifGateway: NotificationsGateway) {}
 
 	@Get('availableItems')
 	async getMissingSkins(@Req() req: Request, @Res() res: Response) {
@@ -21,7 +24,7 @@ export class ShopController {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
 
-		if (!(await this.itemsService.buySkin(user.sub, Number(skinId))))
+		if (!(await this.itemsService.buySkin(user.sub, Number(skinId), this.notifGateway)))
 			return res.status(HttpStatus.BAD_REQUEST).send('Refused');
 		const skinsList = await this.itemsService.getAvailableSkins(user.sub);
 		const userEntity = await this.itemsService.getUser(user.sub);
