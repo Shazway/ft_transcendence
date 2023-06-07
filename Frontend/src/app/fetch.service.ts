@@ -608,4 +608,17 @@ export class FetchService {
 		.finally(function () {});
 		return res;
 	}
+
+
+	async checkToken() {
+		const teaFunc = this.teapotError;
+		const route = this.router;
+		await axios.get<any>('http://localhost:3001/login/tokenCheck', this.getHeader())
+		.then(function () {
+		})
+		.catch(function (error) {
+			teaFunc(error, route);
+		})
+		.finally(function () {});
+	}
 }

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
 import { Message } from 'src/dtos/message';
 import { FetchService } from '../fetch.service';
 import { AnyProfileUser } from 'src/dtos/User.dto';
@@ -17,14 +17,22 @@ import { Router } from '@angular/router';
 	])
   ],
 })
-export class ProfilePopupComponent implements OnInit {
+export class ProfilePopupComponent implements OnInit, AfterViewInit {
 	@Input() data!: any;
 	user!: Promise<AnyProfileUser | null>;
+	disable = true;
 
 	constructor(
 		private fetchService: FetchService,
 		private router: Router,
 	) { }
+
+	async ngAfterViewInit() {
+		const us = await this.user;
+		if (us) {
+			this.canChallenge(us);
+		}
+	}
 
 	async ngOnInit() {
 		this.user = this.fetchService.getProfile(this.data.name);
@@ -44,5 +52,20 @@ export class ProfilePopupComponent implements OnInit {
 
 	challenge() {
 		this.data.client.emit('inviteRequest', this.buildNotif("match", this.data.name, this.data.id));
+	}
+
+	canChallenge(us : AnyProfileUser) {
+		console.log(us);
+		if (us.channelInviteAuth == 2)
+		{
+			this.disable = false;
+			return ;
+		}
+		const username = localStorage.getItem('username');
+		if (us.channelInviteAuth  == 1 && us.friend.some((a) => {return a.username == username}))
+		{
+			this.disable = false;
+			return ;
+		}
 	}
 }

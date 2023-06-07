@@ -32,7 +32,7 @@
 				</div>
 			</div>
 			<button class="btn btn-info" (click)="hideSpecWindow()">hide spectators</button>
-			<button type="button" class="btn btn-primary" id="removable" (click)="setReady()">Ready</button>
+			<button *ngIf="!isSpectator" type="button" class="btn btn-primary" id="removable" (click)="setReady()">Ready</button>
 		</div>
 	</div>
 </div>

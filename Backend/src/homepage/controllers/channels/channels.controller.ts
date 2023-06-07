@@ -150,7 +150,6 @@ export class ChannelsController {
 		const channelEntity = await this.channelService.createChannel(newChannel, user.sub);
 		if (!channelEntity)
 			return res.status(HttpStatus.UNAUTHORIZED).send({ msg: 'Password too long' })
-		console.log(channelEntity);
 		res.status(HttpStatus.OK).send({ msg: 'Channel created' });
 	}
 

@@ -4,6 +4,7 @@ import { WebsocketService } from '../websocket.service';
 import { MatchMaking } from '../../dtos/MatchMaking.dto';
 import { Router } from '@angular/router';
 import { AppComponent } from '../app.component';
+import { FetchService } from '../fetch.service';
 
 @Component({
 	selector: 'app-match-making',
@@ -16,8 +17,10 @@ export class MatchMakingComponent {
 		private websocketService: WebsocketService,
 		private parent: AppComponent,
 		private elRef: ElementRef,
-		private router: Router
+		private router: Router,
+		private fetchService: FetchService
 	) {
+		this.fetchService.checkToken();
 		if (!this.parent.isConnected())
 			this.router.navigateByUrl('login');
 		this.client = io('ws://localhost:3004', websocketService.getHeader());

@@ -5,3 +5,7 @@
 update spectator list when spec connect
 
 favicon
+
+message d'erreur si owner essaye de leave
+bouton pour leave un chat
+update onPromote et onDemote

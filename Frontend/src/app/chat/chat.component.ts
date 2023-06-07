@@ -82,7 +82,26 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		this.client.on('disconnect', () => { });
 		this.client.on('delMessage', (event) => { this.deleteMessage(event); });
 		this.client.on('isAdmin', (event) => { this.is_admin = event; });
-		this.client.on('isOwner', (event) => { this.is_owner = event; })
+		this.client.on('isOwner', (event) => { this.is_owner = event; });
+		this.client.on('onPromote', (event) => { this.promote(event); });
+		this.client.on('onDemote', (event) => { this.demote(event); });
+	}
+
+	promote(event: Message) {
+		const user = this.getUserFromCurrentChannel(event.message_content);
+		if (!user)
+			return;
+		if (user.is_admin) user.is_creator = true;
+		else user.is_admin = true;
+		console.log(user);
+	}
+
+	demote(event: Message) {
+		const user = this.getUserFromCurrentChannel(event.message_content);
+		if (!user)
+			return;
+		if (user.is_creator) user.is_creator = false;
+		else user.is_admin = false;
 	}
 
 	private prevScroll!: number;
@@ -99,7 +118,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			if (this.msgLock.isLocked())
 				return ;
 			await this.msgLock.acquire().then(async () => {
-				if ((containerElement.scrollTop) < 20)
+				if ((containerElement.scrollTop) < 20 && this.test_msgs$.length > 1)
 				{
 					const prevMsg = "message-" + this.test_msgs$[0][0].message_id;
 					const element = document.getElementById(prevMsg);
@@ -307,6 +326,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	}
 
 	async slideChan() {
+		this.hideAllDropdown();
 		const offscreenChat = this.elRef.nativeElement.querySelector('.offscreen');
 		const offscreenChatBtn = this.elRef.nativeElement.querySelector('#chatBtn');
 		const offscreenElm = this.elRef.nativeElement.querySelector('.channel_pan');
@@ -321,11 +341,13 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		}
 		if (offscreenElm.classList.contains('show')) {
 			offscreenElm.classList.remove('show');
-			onscreenElm.classList.remove('hide');
+			if (onscreenElm)
+				onscreenElm.classList.remove('hide');
 			offCreateChan.classList.remove('show');
 		} else {
 			offscreenElm.classList.add('show');
-			onscreenElm.classList.add('hide');
+			if (onscreenElm)
+				onscreenElm.classList.add('hide');
 			offCreateChan.classList.remove('show');
 			this.sortChannels(await this.fetchService.getChannels());
 		}
@@ -458,6 +480,8 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	}
 
 	sortMessage(new_msg: Message) {
+		if (new_msg.author.username == 'System')
+			console.log(new_msg);
 		if (this.test_msgs$.length && this.test_msgs$[this.test_msgs$.length - 1][0].author.user_id == new_msg.author.user_id) {
 			this.test_msgs$[this.test_msgs$.length - 1].push(new_msg);
 			return;
@@ -486,9 +510,49 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		return (msg.author.user_id == 0)
 	}
 
-	setErrorPrompt() {
-		const prompt = this.elRef.nativeElement.querySelector('.text-input');
-		prompt.classList.add('set_error');
+	sendSystemMessage(msg: string) {
+		this.sortMessage({
+			message_id : 0,
+			author : {
+				email: '',
+				login: '',
+				img_url: '',
+				image: {
+					link: '',
+					versions: {
+						large: '',
+					}
+				},
+				username: 'System',
+				user_id: 0,
+			},
+			createdAt : new Date(),
+			message_content : msg,
+		});
+	}
+
+	leaveChannel() {
+		this.client.emit('kick', {
+			username: localStorage.getItem('username'),
+			message: "You left the channel",
+		});
+		this.redirectToGlobal();
+		this.hideAllDropdown();
+	}
+
+	printHelp() {
+		this.sendSystemMessage("/help : show system help");
+		this.sendSystemMessage("/leave : leave the current channel");
+		this.sendSystemMessage("/invite <username> : invite a user to a channel, admin only");
+		this.sendSystemMessage("/kick <username> : kick a user from a channel, admin only");
+		this.sendSystemMessage("/mute <username> <mutetime> : mute a user from a channel for x seconds, admin only");
+		this.sendSystemMessage("/unmute <username> : unmute a user from a channel, admin only");
+		this.sendSystemMessage("/ban <username> <bantime?> : ban a user from a channel for x seconds, indefinite if not precised, admin only");
+		this.sendSystemMessage("/unban <username> : unban a user from a channel, admin only");
+		this.sendSystemMessage("/obliterate : destroy the current channel, owner only");
+		this.sendSystemMessage("/op <username> : promote a user, if target is admin, promote to owner, owner only");
+		this.sendSystemMessage("/deop <username> : demote a user, owner only");
+		this.scrollBottom();
 	}
 
 	async onClickChat(data: LessMessage) {
@@ -501,10 +565,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		if (data.message_content[0] == '/') {
 			const split = data.message_content.split(' ');
 			if (split[0] == '/leave') {
-				this.client.emit('kick', {
-					username: localStorage.getItem('username'),
-					message: "You left the channel",
-				});
+				this.leaveChannel();
 				textRef.value = '';
 				return;
 			}
@@ -513,8 +574,14 @@ export class ChatComponent implements OnInit, AfterViewInit {
 				textRef.value = '';
 				return;
 			}
+			else if (split[0] == '/help') {
+				this.printHelp();
+				textRef.value = '';
+				return;
+			}
+			else if (split.length < 2)
+				return this.checkInputChat(data.message_content, 0, 255, '#exampleFormControlInput1', false, this.chatCheckList);
 			else if (split[0] == '/kick') {
-				if (split.length < 2) return this.checkInputChat(data.message_content, 0, 255, '#exampleFormControlInput1', false, this.chatCheckList);
 				this.client.emit('kick', {
 					username: split[1],
 					message: "You have been kicked",
@@ -523,7 +590,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
 				return;
 			}
 			else if (split[0] == '/ban') {
-				if (split.length < 2) return this.setErrorPrompt();
 				const time = split[2] ? Number(split[2]) : 0;
 				this.client.emit('ban', {
 					username: split[1],
@@ -534,7 +600,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
 				return;
 			}
 			else if (split[0] == '/unban') {
-				if (split.length < 2) return this.checkInputChat(data.message_content, 0, 255, '#exampleFormControlInput1', false, this.chatCheckList);
 				this.client.emit('unban', {
 					username: split[1],
 					message: "You have been unbanned",
@@ -543,7 +608,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
 				return;
 			}
 			else if (split[0] == '/mute') {
-				if (split.length < 2) return this.checkInputChat(data.message_content, 0, 255, '#exampleFormControlInput1', false, this.chatCheckList);
 				const time = split[2] ? Number(split[2]) : 0;
 				this.client.emit('mute', {
 					username: split[1],
@@ -554,7 +618,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
 				return;
 			}
 			else if (split[0] == '/unmute') {
-				if (split.length < 2) return this.checkInputChat(data.message_content, 0, 255, '#exampleFormControlInput1', false, this.chatCheckList);
 				this.client.emit('unmute', {
 					username: split[1],
 					message: "You have been unmuted",
@@ -563,7 +626,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
 				return;
 			}
 			else if (split[0] == '/invite') {
-				if (split.length < 2) return this.checkInputChat(data.message_content, 0, 255, '#exampleFormControlInput1', false, this.chatCheckList);
 				let userToAdd  = await this.fetchService.getUser(split[1]);
 				if (userToAdd)
 					this.addMember(userToAdd);
@@ -571,8 +633,12 @@ export class ChatComponent implements OnInit, AfterViewInit {
 				return;
 			}
 			else if (split[0] == '/op') {
-				if (split.length < 2) return this.checkInputChat(data.message_content, 0, 255, '#exampleFormControlInput1', false, this.chatCheckList);
 				this.addOp(split[1]);
+				textRef.value = '';
+				return;
+			}
+			else if (split[0] == '/deop') {
+				this.deOp(split[1]);
 				textRef.value = '';
 				return;
 			}
@@ -612,7 +678,15 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	}
 
 	addOp(newOp : string) {
-		this.client.emit('op', {
+		this.client.emit('promote', {
+			username: newOp,
+			message: "You have been promoted to OP",
+		});
+		this.openAddMember('.secDropUp'); //change
+	}
+
+	deOp(newOp : string) {
+		this.client.emit('demote', {
 			username: newOp,
 			message: "You have been promoted to OP",
 		});
@@ -657,6 +731,17 @@ export class ChatComponent implements OnInit, AfterViewInit {
 				this.hideAllDropdown();
 			}
 		}
+	}
+
+	getRole(username: string, prefix: string = '') {
+		const name = this.getUserFromCurrentChannel(username);
+		if (!name)
+			return;
+		if (name.is_creator)
+			return 'owner'
+		if (name.is_admin)
+			return 'admin'
+		return prefix + '';
 	}
 
 	chatCheckList = { tooLong : true, tooShort : true, other : true };

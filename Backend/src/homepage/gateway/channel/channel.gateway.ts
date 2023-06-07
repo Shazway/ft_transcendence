@@ -72,8 +72,8 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			{
 				if (!(await this.addUserToChannel(user.sub, channel_id, client.handshake.query.pass)))
 					return client.disconnect();
-				this.sendMessageToChannel(0, channel_id, this.buildJoinChannel(user));
 			}
+			this.sendSystemMessageToChannel(channel_id, user.sub, ' is online');
 			this.addUserToList(client, user);
 		}
 		else if (channel.is_channel_private && isMember)
@@ -162,7 +162,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		if (!channel)
 			return false;
 		channel.forEach(async (userSockets, key) => {
-			if (!(await this.usersService.isBlockedCheck(key, sourceId)))
+			if (message.author.user_id == 0 || !(await this.usersService.isBlockedCheck(key, sourceId)))
 				this.socketEmit(userSockets, dest, message);
 		});
 		return true;
@@ -200,7 +200,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			});
 	}
 
-	async sendSystemMessageToChannel(channel_id: number, targetId: number, content: string) {
+	async sendSystemMessageToChannel(channel_id: number, targetId: number, content: string, dest = 'onMessage') {
 		const user = await this.itemService.getUser(targetId);
 		const channel = await this.itemService.getChannel(channel_id);
 		if (!user || !channel)
@@ -210,7 +210,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			message_content: user.username + content,
 			author: { username: 'System', user_id: 0 },
 			createdAt: new Date()
-		});
+		}, dest);
 		return true;
 	}
 
@@ -258,13 +258,10 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		if (!channel)
 			throw new WsException('Channel no longer exists');
 		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
-		this.channelService.promoteUser(user.sub, targetId, channel_id);
-		const targets = channel.get(targetId);
-		this.socketEmit(
-			targets,
-			'onMessage',
-			'You have been promoted by ' + user.name
-		);
+		if (this.channelService.isUserOwner(user.sub, channel_id) && await this.channelService.isUserAdmin(targetId, channel_id))
+			this.sendSystemMessageToChannel(channel_id, user.sub, '', 'onDemote');
+		await this.channelService.promoteUser(user.sub, targetId, channel_id);
+		this.sendSystemMessageToChannel(channel_id, targetId, '', 'onPromote');
 		this.sendSystemMessageToChannel(channel_id, targetId, ' was promoted by ' + user.name);
 		this.notificationGateway.sendMessage([user.sub], 'Successful promotion');
 	}
@@ -289,11 +286,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const targets = channel.get(targetId);
 		if (!(await this.channelService.demoteAdmin(user.sub, targetId, channel_id)))
 			throw new WsException('The user is not an admin, or you are not an owner.');
-		this.socketEmit(
-			targets,
-			'onMessage',
-			'You have been demoted by ' + user.name
-		);
+		this.sendSystemMessageToChannel(channel_id, targetId, '', 'onDemote');
 		this.sendSystemMessageToChannel(channel_id, targetId, ' was demoted by ' + user.name);
 		this.notificationGateway.sendMessage([user.sub], 'Successful demotion');
 	}
@@ -454,9 +447,12 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		if (!channel || !targetId)
 			throw new WsException(ret.msg);
 		if (!ret.ret && user.sub != targetId) return client.emit('onError', 'Lacking privileges');
+		if (user.sub === targetId && await this.channelService.isUserOwner(user.sub, channel_id))
+			throw new WsException('Give owner permissions before leaving channel');
+		await this.channelService.kickUser(user.sub, targetId, channel_id);
 		const targets = channel.get(targetId);
 		if (user.sub === targetId) {
-			this.sendSystemMessageToChannel(channel_id, targetId, ' was kicked by ' + user.name);
+			this.sendSystemMessageToChannel(channel_id, targetId, ' left the chat');
 			return this.notificationGateway.sendMessage([user.sub], 'You have left the room');
 		}
 		if (targets) {

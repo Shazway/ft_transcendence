@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { ItemsService } from '../items/items.service';
 import { ChannelEntity, ChannelUserRelation } from 'src/entities';
 import * as bcrypt from 'bcrypt';
+import { ChannelUser } from 'src/entities/channel_user.entity';
 
 @Injectable()
 export class ChannelsService {
@@ -25,6 +26,7 @@ export class ChannelsService {
 		{ ret: false, msg: 'User is banned' },
 		{ ret: false, msg: 'User is not an admin' },
 		{ ret: false, msg: 'Target is an admin' },
+		{ ret: false, msg: 'Channel is DM' },
 	];
 
 	async getChannelById(channel_id: number) {
@@ -80,9 +82,10 @@ export class ChannelsService {
 	async addUserToChannel(user_id: number, chan_id: number, pass = null, is_creator = false, is_admin = false) {
 		const chan_user = new ChannelUserRelation();
 		const channel = await this.itemsService.getChannel(chan_id);
+		const checkChanUser = await this.itemsService.getUserChan(user_id, chan_id);
 
-		if (await this.isUserMember(user_id, chan_id))
-			return false;
+		if (checkChanUser)
+			return true;
 		if (!channel || channel.is_dm) return false;
 		chan_user.is_creator = is_creator;
 		chan_user.is_admin = is_admin;
@@ -128,6 +131,9 @@ export class ChannelsService {
 	}
 
 	async checkPrivileges(source_id: number, target_id: number, chan_id: number) {
+		const chan = await this.itemsService.getChannel(chan_id);
+		if (!chan || chan.is_dm)
+			return this.error_tab[7];
 		if (!(await this.isUserMember(target_id, chan_id)))
 			return this.error_tab[2];
 		if (!(await this.isUserAdmin(source_id, chan_id)))
@@ -138,14 +144,20 @@ export class ChannelsService {
 		return {ret: true, msg: 'OK'};
 	}
 
+	async removeUserFromChannel(chanUser: ChannelUser) {
+		if (!chanUser)
+			return false;
+		return await this.chan_userRepo.delete(chanUser.channel_user_id);
+	}
+
 	async kickUser(user_id: number, target_id: number, chan_id: number) {
-		if (!(await (this.checkPrivileges(user_id, target_id, chan_id))).ret)
-			return false;
 		const target = await this.itemsService.getUserChan(target_id, chan_id);
-		if (!target)
+
+		if ((user_id == target_id && !(await this.isUserOwner(user_id, chan_id))))
+			return await this.removeUserFromChannel(target);
+		else if (!((await this.checkPrivileges(user_id, target_id, chan_id)).ret))
 			return false;
-		await this.chan_userRepo.delete(target.channel_user_id);
-		return true;
+		return await this.removeUserFromChannel(target);
 	}
 
 	async muteUser(user_id: number, target_id: number, channel_id: number, timer: number) {
@@ -253,7 +265,7 @@ export class ChannelsService {
 	}
 
 	async promoteUser(sourceId: number, targetId: number, channel_id: number) {
-		if (this.isUserAdmin(targetId, channel_id) && this.isUserOwner(sourceId, channel_id))
+		if ((await this.isUserAdmin(targetId, channel_id)) && (await this.isUserOwner(sourceId, channel_id)))
 			return await this.setUserOwner(sourceId, targetId, channel_id);
 		else
 			return await this.setUserAdmin(sourceId, targetId, channel_id);

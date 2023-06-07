@@ -259,3 +259,11 @@ img{ max-width:100%;}
 	right: 159px;
 	z-index: 50;
 }
+
+.color-admin {
+  color: rgb(21, 129, 148) !important;
+}
+
+.color-owner {
+  color: rgb(150, 0, 0) !important;
+}

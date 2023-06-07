@@ -44,7 +44,7 @@ export class AuthComponent {
 				localStorage.setItem('Jwt_token', loginReturn.jwt_token);
 				localStorage.setItem('id', "" + loginReturn.user_id);
 				localStorage.setItem('username', loginReturn.intraInfo.login);
-				localStorage.setItem('img_url', loginReturn.intraInfo.image.versions.small);
+				localStorage.setItem('img_url', loginReturn.intraInfo.image.link);
 			} else if (statusCode == 202) {
 				bodyId = loginReturn.user_id;
 			}

@@ -106,12 +106,6 @@ export class ItemsService {
 		.leftJoinAndSelect('user.blacklistEntry', 'blacklistEntry')
 		.leftJoinAndSelect('user.channel', 'channel')
 		.leftJoinAndSelect('user.match_history', 'match_history')
-		//.leftJoinAndSelect(
-		//	'user.match_history',
-		//	'match_history',
-		//	'match_history.match_id IN ' +
-		//	'(SELECT match.match_id FROM match ORDER BY match.match_id DESC LIMIT 100)'
-		//)
 		.leftJoinAndSelect('match_history.user', 'users')
 		.leftJoinAndSelect('user.skin', 'skin')
 		.where('user.username = :username', { username })

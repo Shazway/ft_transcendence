@@ -28,6 +28,8 @@ export class AnyProfileUser {
 	user_id: number;
 	intra_id!: number;
 	title: string;
+	channelInviteAuth: number;
+
 	@Exclude()
 	channel: ChannelUser[];
 	@Exclude()
@@ -36,8 +38,6 @@ export class AnyProfileUser {
 	sentFriendRequests: Friendrequest[];
 	@Exclude()
 	receivedFriendRequests: Friendrequest[];
-	@Exclude()
-	channelInviteAuth: number;
 	@Exclude()
 	current_skins: number[];
 	@Exclude()
@@ -50,6 +50,7 @@ export class MyProfileUser {
 	match_history: Match[];
 	rank_score: number;
 	activity_status!: number;
+	channelInviteAuth: number;
 	createdAt: Date;
 	wins: number;
 	losses: number;

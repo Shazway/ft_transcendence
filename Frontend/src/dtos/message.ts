@@ -6,7 +6,6 @@ export interface Message {
 	author : User;
 	createdAt : Date;
 	message_content : string;
-	0: Message;
 }
 
 export interface LessMessage {

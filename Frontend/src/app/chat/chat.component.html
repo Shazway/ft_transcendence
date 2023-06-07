@@ -5,12 +5,13 @@
 			<div class="card-header d-flex justify-content-between align-items-center p-3 chat-card-header gap-3 mw-100">
 				<h5 *ngIf="currentChannel" class="mb-0 channel-head" title="{{currentChannel.channel_name ? currentChannel.channel_name : 'Global'}}" style="user-select: none;">{{currentChannel.channel_name ? currentChannel.channel_name : 'Global'}}</h5>
 				<div class="flex-grow-1"></div>
-				<div *ngIf="is_admin" class="dropup">
+				<div class="dropup">
 					<img (click)="openAddMember('.premDropUp')" style="height: 20px; width: 20px; user-select: none; cursor : pointer;" draggable="false" src="https://cdn-icons-png.flaticon.com/512/64/64576.png" alt="Channel Menu">
 					<div class="dropdown-menu mondropup premDropUp p-0 rounded-3 my-light2">
 						<div class="btn-group-vertical w-100">
-							<button (click)="openAddMember('.secDropUp')" type="button" class="btn btn-secondary w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="user-select: none; cursor : pointer;">Add member</button>
-							<button (click)="obliterateChannel()" type="button" class="btn btn-danger w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="user-select: none; cursor : pointer;">Destroy Channel</button>
+							<button (click)="leaveChannel()" type="button" class="btn btn-secondary w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="user-select: none; cursor : pointer;">Leave Channel</button>
+							<button *ngIf="is_admin" (click)="openAddMember('.secDropUp')" type="button" class="btn btn-secondary w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="user-select: none; cursor : pointer;">Add member</button>
+							<button *ngIf="is_admin" (click)="obliterateChannel()" type="button" class="btn btn-danger w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="user-select: none; cursor : pointer;">Destroy Channel</button>
 						</div>
 						<div id="addMemberdiv" class="dropdown-menu mondropright secDropUp p-0 my-light2">
 							<div class="w-100 btn btn-sm text-muted text-end" (click)="openAddMember('.secDropUp')"><span aria-hidden="true">&times;</span></div>
@@ -33,14 +34,14 @@
 			<div #chanBody class="scrollbar scrollbar-primary h-100 bg-light mw-100" #scrollbar (scroll)="onScroll($event)" style="overflow-y: auto; overflow-x: hidden;" #chatMsgs>
 <!-- Start of text area -->
 				<div class="mw-100">
-					<div class="channel_unpan mw-100">
+					<div *ngIf="currentChannel" class="channel_unpan mw-100">
 						<div class="card-body p-0 mw-100" data-mdb-perfect-scrollbar="true" style="position: relative; " *ngFor="let msg_list of test_msgs$">
 <!-- Start of not current user field -->
 							<div *ngIf="!isMe(msg_list[0]) && !isSystem(msg_list[0])" class="d-flex flex-row justify-content-start mw-100" id="group-{{msg_list[0].message_id}}">
 								<img draggable="false" (click)="createChatPopup(msg_list[0], $event)" (contextmenu)="createChatPopup(msg_list[0], $event)" id="img-{{msg_list[0].message_id}}" class="rounded-circle" src="{{msg_list[0].author.img_url}}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 1" style="width: 45px; height: 100%;">
 								<div class="mw-100">
 									<div class="d-flex align-items-end">
-										<p class="small ms-3 mb-0 text-muted">{{ getName(msg_list) }}</p>
+										<p class="small ms-3 mb-0 text-muted color-{{getRole(getName(msg_list))}}">{{ getName(msg_list) }}</p>
 									</div>
 									<div *ngFor="let msg of msg_list" class="d-flex mw-100" id="message-{{msg.message_id}}">
 										<p class="small pb-1 ps-2 pe-2 pt-0 ms-2 me-2 mb-1 rounded-3 text-wrap d-block" (click)="onDropdownDel(msg)" style="background-color: rgb(206, 210, 216); word-wrap: break-word; max-width: 85%;">{{msg.message_content}}</p>
@@ -53,7 +54,7 @@
 <!-- Start of current user field -->
 							<div *ngIf="isMe(msg_list[0]) && !isSystem(msg_list[0])" class="d-flex flex-row justify-content-end mw-100" id="group-{{msg_list[0].message_id}}">
 								<div class="mw-100">
-									<p class="small me-3 mb-0 rounded-3 text-muted d-flex justify-content-end">{{ getName(msg_list) }}</p>
+									<p class="small me-3 mb-0 rounded-3 text-muted d-flex justify-content-end color-{{getRole(getName(msg_list))}}">{{ getName(msg_list) }}</p>
 									<div *ngFor="let msg of msg_list" class="d-flex mw-100" id="message-{{msg.message_id}}">
 										<img (click)="delMsg(msg_list[0])" class="m-0 ms-2 m-auto hidden_icon" style="height: 20px; width: 20px;" id="img-{{msg.message_id}}-del" src="{{icone_list.del_message}}" alt="del_message">
 										<p class="small pb-1 ps-2 pe-2 pt-1 ms-3 mb-1 me-1 rounded-3 text-wrap float-end" (click)="onDropdownDel(msg)" style="background-color: #56a1ec; word-wrap: break-word; max-width: 85%;">{{msg.message_content}}</p>
@@ -64,7 +65,7 @@
 							</div>
 <!-- End of current user field -->
 <!-- Start of System field -->
-							<div *ngIf="isSystem(msg_list[0])" class="divider d-flex align-items-center">
+							<div *ngIf="isSystem(msg_list[0])" class="divider d-flex flex-column align-items-center">
 								<div *ngFor="let msg of msg_list">
 									<p class="text-center mx-3 mb-0" style="color: #a2aab7;">{{msg.message_content}}</p>
 								</div>
@@ -149,5 +150,7 @@
 		<button *ngIf="is_chat_admin()" (click)="muteUser(data)" type="button" class="row btn btn-block popup-hover">Mute User</button>
 		<button *ngIf="is_chat_admin()" (click)="kickUser(data)" type="button" class="row btn btn-block popup-hover">Kick User</button>
 		<button *ngIf="is_chat_admin()" (click)="banUser(data)" type="button" class="row btn btn-block popup-hover">Ban User</button>
+		<button *ngIf="is_chat_admin()" (click)="addOp(data.author.username)" type="button" class="row btn btn-block popup-hover">Promote User</button>
+		<button *ngIf="is_chat_admin()" (click)="deOp(data.author.username)" type="button" class="row btn btn-block popup-hover">Demote User</button>
 	</div>
 </ng-template>

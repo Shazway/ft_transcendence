@@ -61,6 +61,7 @@ export class PongComponent implements OnDestroy {
 		private assetManager: AssetManager,
 		private fetchService: FetchService,
 	) {
+		this.fetchService.checkToken();
 		if (!this.parent.isConnected())
 			this.router.navigateByUrl('login');
 		this.initApp()

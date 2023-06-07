@@ -61,6 +61,8 @@ export class LoginController {
 				console.log({email: intraInfo.data.email});
 				if (user.username != intraInfo.data.login)
 					intraInfo.data.login = user.username;
+				if (user.img_url != intraInfo.data.image.link)
+					intraInfo.data.image.link = user.img_url;
 				if (!user.double_auth)
 					return res.status(HttpStatus.OK).send(await this.buildLoginBody(resToken, intraInfo.data, user.user_id));
 				const TwoFASecret = this.authService.generateSec()
@@ -82,6 +84,14 @@ export class LoginController {
 		}
 		else
 			res.status(HttpStatus.UNAUTHORIZED).send('No token received');
+	}
+
+	@Get('tokenCheck')
+	async tokenCheck(@Req() req: Request, @Res()res: Response)
+	{
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
+		res.status(HttpStatus.OK).send('OK');
 	}
 
 	@Get('getUID')

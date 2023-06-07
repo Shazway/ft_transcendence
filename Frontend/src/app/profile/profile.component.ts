@@ -115,6 +115,7 @@ export class ProfileComponent implements AfterViewInit {
 		private modalService: NgbModal,
 		private router: Router,
 	) {
+		this.fetchService.checkToken();
 		Chart.register(ChartDataLabels);
 		this.matchHistory = new Array;
 	}

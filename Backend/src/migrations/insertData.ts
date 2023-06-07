@@ -36,7 +36,7 @@ export class insertData666666666666666666 implements MigrationInterface {
 			{
 				achievement_name: 'Whale',
 				achievement_description: 'Make the money rain',
-				achievement_reward: 'The buisenessman'
+				achievement_reward: 'The businessman'
 			},
 			{
 				achievement_name: 'Oof',
@@ -155,7 +155,7 @@ export class insertData666666666666666666 implements MigrationInterface {
 				type: 'Background',
 				name: 'Billard',
 				img_url: 'assets/Skins/Background/Pool.png',
-				description: 'Nathan\'s special, limited-edition skin',
+				description: 'Balls and cues not provided',
 				price : 150,
 			},
 		]);
