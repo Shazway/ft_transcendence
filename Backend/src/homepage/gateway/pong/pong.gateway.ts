@@ -32,13 +32,15 @@ export class PongGateway {
 	DOWN = 0;
 	VELOCITY = 1;
 	private connectMutex: Mutex;
+	private disconnectMutex: Mutex;
 	constructor(
 		private tokenManager: TokenManagerService,
 		private itemsService: ItemsService,
 		private matchService: MatchsService,
-		private notificationsGateway: NotificationsGateway
+		private notificationsGateway: NotificationsGateway,
 	) {
 		this.connectMutex = new Mutex();
+		this.disconnectMutex = new Mutex();
 		this.matchs = new Map<number, Match>();
 	}
 
@@ -71,9 +73,9 @@ export class PongGateway {
 				const matchEntity = await this.itemsService.getMatch(match_id);
 				if (!matchEntity || !matchEntity.is_ongoing)
 					return client.disconnect();
-				let match = this.matchs.get(match_id);
 				if (userEntity.inMatch)
-					return client.disconnect();
+					return client.emit('onError', "Already in match");
+				let match = this.matchs.get(match_id);
 				if (!(await this.isPlayer(user.sub, match_id)) && (!match || !match.started))
 				{
 					client.emit('notStarted', 'Match is not ready, please wait before joining again');
@@ -131,31 +133,39 @@ export class PongGateway {
 		match.gameService.match = match.entity;
 	}
 
+	isSpectator(match: Match, userId: number) {
+		return match.gameService && match.gameService.spectators && match.gameService.spectators.find((spectator) => spectator.user_id == userId);
+	}
+
+	isPlayerCheck(matchEntity: MatchEntity, userId: number)
+	{
+		return matchEntity.user.find((player) => player.user_id == userId)
+	}
+
 	async handleDisconnect(client: Socket)
 	{
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'EEEE');
 		if (!user) return ;
-		const match_id = Number(client.handshake.query.match_id);
+		await this.disconnectMutex.acquire().then(async () => {
+			const match_id = Number(client.handshake.query.match_id);
 
-		if (Number.isNaN(match_id) || !match_id)
-			return ;
-		const match = this.matchs.get(match_id);
-		const matchEntitiy = await this.itemsService.getMatch(match_id);
-		if (!matchEntitiy || !match)
-			return ;
-		if (!matchEntitiy.user.find((player) => player.user_id == user.sub))
-		{
-			const userEntity = await this.itemsService.getUser(user.sub);
-
-			userEntity.inMatch = false;
-			await this.itemsService.saveUserState(userEntity);
-			return this.emitToMatch('onUnspectateMatch', {username: user.name}, match);
-		}
-		if (!matchEntitiy.is_ongoing)
-			return this.matchs.delete(match_id);
-		matchEntitiy.is_victory[this.getOtherPlayerIndex(matchEntitiy, user.sub)] = true;
-		await this.matchService.setMatchEnd(matchEntitiy);
-		if (match.gameService) match.gameService.endMatch(user.sub);
+			if (Number.isNaN(match_id) || !match_id)
+				return ;
+			const match = this.matchs.get(match_id);
+			const matchEntity = await this.itemsService.getMatch(match_id);
+			if (!matchEntity || !match || (!this.isPlayerCheck(matchEntity, user.sub) && !this.isSpectator(match, user.sub)))
+				return ;
+			if (this.isSpectator(match, user.sub) && !this.isPlayerCheck(matchEntity, user.sub))
+			{
+				match.gameService.endMatchSpectator(user.sub);
+				return this.emitToMatch('onUnspectateMatch', {username: user.name}, match);
+			}
+			if (!matchEntity.is_ongoing)
+				return this.matchs.delete(match_id);
+			matchEntity.is_victory[this.getOtherPlayerIndex(matchEntity, user.sub)] = true;
+			await this.matchService.setMatchEnd(matchEntity);
+			if (match.gameService) match.gameService.endMatch(user.sub);
+		}).finally(() => this.disconnectMutex.release());
 	}
 
 	getPlayerIndex(match: MatchEntity, userId: number): number {
@@ -167,7 +177,9 @@ export class PongGateway {
 	}
 
 	emitToMatch(event: string, content: any, match: Match) {
-		if (match && match.players)
+		if (!match)
+			return ;
+		if (match.players)
 		{
 			match.players.forEach((user) => {
 				user.client.emit(event, content);

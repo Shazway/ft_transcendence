@@ -121,9 +121,9 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		if (await this.usersService.isBlockedCheck(body.target_id, source.sub))
 			return client.emit('onError', 'User blocked you');
 		if (body.type == 'friend' && !(await this.requestService.handleFriendRequestInvite(source.sub, body.target_id)))
-			return client.emit('refusedInvite', 'Something went wrong');
+			return client.emit('onError', 'Something went wrong');
 		else if (body.type == 'match' && !target)
-			return client.emit('offline', 'Your friend is currently offline');
+			return client.emit('onError', 'Your friend is currently offline');
 		else if (body.type == 'match' && target)
 		{
 			if (await this.usersService.canInvite(source.sub, body.target_id))

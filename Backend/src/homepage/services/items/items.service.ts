@@ -524,17 +524,21 @@ export class ItemsService {
 		return (await this.userRepo.save([sourceEntity, targetEntity]));
 	}
 
-	updateWinner(player: UserEntity): UserEntity
+	updateWinner(player: UserEntity, isranked: boolean): UserEntity
 	{
-		player.rank_score += 10;
-		player.currency += 10;
+		if (isranked)
+		{
+			player.rank_score += 10;
+			player.currency += 10;
+		}
 		player.wins += 1;
 		return player;
 	}
 
-	updateLoser(player: UserEntity): UserEntity
+	updateLoser(player: UserEntity, isranked: boolean): UserEntity
 	{
-		player.rank_score -= 10;
+		if (isranked)
+			player.rank_score -= 10;
 		player.losses += 1;
 		if (player.rank_score < 0)
 			player.rank_score = 0;
@@ -545,6 +549,7 @@ export class ItemsService {
 	{
 		let userOne = await this.getUser(player1.player.user_id);
 		let userTwo = await this.getUser(player2.player.user_id);
+		const isRanked = matchSetting && matchSetting.is_ranked ? true : false;
 
 		if (!userOne || !userTwo)
 			return null;
@@ -552,11 +557,8 @@ export class ItemsService {
 		{
 			match.is_victory[0] = true;
 			match.is_victory[1] = false;
-			if (matchSetting.is_ranked)
-			{
-				userOne = this.updateWinner(userOne);
-				userTwo = this.updateLoser(userTwo);
-			}
+			userOne = this.updateWinner(userOne, isRanked);
+			userTwo = this.updateLoser(userTwo, isRanked);
 		}
 		else
 		{
@@ -564,8 +566,8 @@ export class ItemsService {
 			match.is_victory[0] = false;
 			if (matchSetting.is_ranked)
 			{
-				userOne = this.updateLoser(userOne);
-				userTwo = this.updateWinner(userTwo);
+				userOne = this.updateLoser(userOne, isRanked);
+				userTwo = this.updateWinner(userTwo, isRanked);
 			}
 		}
 		if (match.is_ongoing)
@@ -582,6 +584,7 @@ export class ItemsService {
 	{
 		let userOne = await this.getUser(player1.player.user_id);
 		let userTwo = await this.getUser(player2.player.user_id);
+		const isRanked = matchSetting && matchSetting.is_ranked ? true : false;
 
 		if (!userOne || !userTwo)
 			return null;
@@ -591,8 +594,8 @@ export class ItemsService {
 			match.is_victory[1] = false;
 			if (matchSetting.is_ranked)
 			{
-				userOne = this.updateWinner(userOne);
-				userTwo = this.updateLoser(userTwo);
+				userOne = this.updateWinner(userOne, isRanked);
+				userTwo = this.updateLoser(userTwo, isRanked);
 			}
 		}
 		else
@@ -601,8 +604,8 @@ export class ItemsService {
 			match.is_victory[1] = false;
 			if (matchSetting.is_ranked)
 			{
-				userOne = this.updateLoser(userOne);
-				userTwo = this.updateWinner(userTwo);
+				userOne = this.updateLoser(userOne, isRanked);
+				userTwo = this.updateWinner(userTwo, isRanked);
 			}
 		}
 		if (match.is_ongoing)
@@ -635,13 +638,14 @@ export class ItemsService {
 		const user = await this.getUser(player.player.user_id);
 		const achievements = await this.getAllAchievements();
 		const leaderBoard = await this.getLeaderboard();
+		const isRanked = matchSetting.is_ranked;
 
 		if (!user || !achievements || !achievements.length)
 			return null;
 
-		if (matchSetting.is_ranked && user.wins + user.losses == 1 && !this.hasAchievement(user, 'First Ranked Match'))
+		if (isRanked && user.wins + user.losses == 1 && !this.hasAchievement(user, 'First Ranked Match'))
 			await this.addAchievementToUser(achievements, user, 'First Ranked Match', notifGateway);
-		else if (!matchSetting.is_ranked && user.wins + user.losses == 1 && !this.hasAchievement(user, 'First Unranked Match'))
+		else if (!isRanked && user.wins + user.losses == 1 && !this.hasAchievement(user, 'First Unranked Match'))
 			await this.addAchievementToUser(achievements, user, 'First Unranked Match', notifGateway);
 
 		if (user.wins == 1 && !this.hasAchievement(user, 'Win a match'))
@@ -650,10 +654,10 @@ export class ItemsService {
 		if (user.losses == 1 && !this.hasAchievement(user, 'Consolation prize'))
 			await this.addAchievementToUser(achievements, user, 'Consolation prize', notifGateway);
 
-		if (leaderBoard.length && leaderBoard[0].user_id == user.user_id && !this.hasAchievement(user, 'We are number one'))
+		if (isRanked && leaderBoard.length && leaderBoard[0].user_id == user.user_id && !this.hasAchievement(user, 'We are number one'))
 			await this.addAchievementToUser(achievements, user, 'We are number one', notifGateway);
 
-		if (leaderBoard.length && leaderBoard[leaderBoard.length - 1].user_id == user.user_id && !this.hasAchievement(user, 'Oof'))
+		if (isRanked && leaderBoard.length && leaderBoard[leaderBoard.length - 1].user_id == user.user_id && !this.hasAchievement(user, 'Oof'))
 			await this.addAchievementToUser(achievements, user, 'Oof', notifGateway);
 		return true;
 	}

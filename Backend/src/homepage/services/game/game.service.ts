@@ -5,7 +5,7 @@ import { Player } from 'src/homepage/dtos/Matchmaking.dto';
 import { GameEnd, Move, ballObject, pongObject } from 'src/homepage/dtos/Pong.dto';
 import { ItemsService } from '../items/items.service';
 import { NotificationsGateway } from 'src/homepage/gateway/notifications/notifications.gateway';
-import { random } from 'mathjs';
+import { forEach, random } from 'mathjs';
 
 @Injectable()
 export class GamesService {
@@ -124,16 +124,30 @@ export class GamesService {
 			return (player.player.user_id == id ? {state: this.LOSS, reason: "you left"} : {state: this.WIN, reason: "opponent left"})
 	}
 
+	async endMatchSpectators() {
+		this.spectators.forEach(async (spectator) => {
+			const userEntity = await this.itemsService.getUser(spectator.user_id);
+
+			userEntity.inMatch = false;
+			this.itemsService.saveUserState(userEntity);
+		})
+	}
+	async endMatchSpectator(userId: number) {
+		const userEntity = await this.itemsService.getUser(userId);
+		userEntity.inMatch = false;
+		this.itemsService.saveUserState(userEntity);
+	}
+
 	endMatch(id?: number) {
 		this.match.is_ongoing = false;
 		this.itemsService.saveMatchState(this.match);
-		
+
 		this.player1.player.client.emit('onMatchEnd', this.buildEndEvent(this.player1, id));
 		this.emitToSpectators('onMatchEnd', this.buildEndEvent(this.player1, id));
 		if (this.player2.player.client)
 			this.player2.player.client.emit('onMatchEnd', this.buildEndEvent(this.player2, id));
-		if (this.matchSetting.is_ranked)
-			this.itemsService.updateRankScore(this.player1, this.player2, this.match, this.matchSetting, this.notifGateway, id);
+		this.itemsService.updateRankScore(this.player1, this.player2, this.match, this.matchSetting, this.notifGateway, id);
+		this.endMatchSpectators();
 		this.endGame();
 	}
 

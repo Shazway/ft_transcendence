@@ -52,7 +52,11 @@ export class AppComponent implements AfterViewInit, OnDestroy {
 
 	async ngOnInit() {
 		if (this.isConnected())
+		{
+			if (!this.notifService.client.connected)
+				this.notifService.initSocket();
 			this.myProfile = await this.fetchService.getMyProfile();
+		}
 	}
 
 	ngAfterViewInit(): void {
