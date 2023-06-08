@@ -203,6 +203,12 @@ export class PongComponent implements OnDestroy {
 					this.assetManager.addPanningText("You lost ! Oh well time for a drink ? ﾍ(ᗒ◡ᗕ)ﾉ c[_]");
 			}
 		}
+		else {
+			if (event.state == this.WIN)
+				this.assetManager.addPanningText(this.opponent.user.username + " gave up the game, shame !");
+			else
+				this.assetManager.addPanningText(this.player.user.username + " gave up the game, shame !");
+		}
 		this.ballLock.waitForUnlock().then(() => {
 			this.ballLock.acquire().then(() => {
 				this.ball.setPos(this.ball.position(250, 150));

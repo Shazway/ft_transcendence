@@ -20,7 +20,8 @@ export class FriendsComponent {
 		cross : "https://cdn.discordapp.com/attachments/1041104785870438521/1109161609374474271/Cross.png",
 		go_to_profile: "https://cdn.discordapp.com/attachments/1041104785870438521/1103760104278458468/user.png",
 		remove_friend: "https://cdn.discordapp.com/attachments/1041104785870438521/1103760104559493130/unfriend.png",
-		block_user: "https://cdn.discordapp.com/attachments/1041104785870438521/1103760104815349931/block.png"
+		block_user: "https://cdn.discordapp.com/attachments/1041104785870438521/1103760104815349931/block.png",
+		challenge: "https://cdn.discordapp.com/attachments/1041104785870438521/1116400343027306616/sword.png"
 	}
 
 	friendsTabElm : any;
@@ -56,6 +57,7 @@ export class FriendsComponent {
 		if (!this.parent.isConnected())
 			this.router.navigateByUrl('login');
 		this.updateFriends();
+		this.updateRequests();
 	}
 
 	async updateFriends() {
@@ -85,7 +87,6 @@ export class FriendsComponent {
 	goToProfile(user: AnyProfileUser)
 	{
 		this.router.navigateByUrl("profile?username=" + user.username);
-
 	}
 
 	async unfriendPopup(user : AnyProfileUser) {

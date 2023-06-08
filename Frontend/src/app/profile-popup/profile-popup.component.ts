@@ -68,4 +68,11 @@ export class ProfilePopupComponent implements OnInit, AfterViewInit {
 			return ;
 		}
 	}
+
+	async goToProfile() {
+		const us = await this.user;
+		if (us) {
+			this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => this.router.navigateByUrl("profile?username=" + us.username));
+		}
+	}
 }

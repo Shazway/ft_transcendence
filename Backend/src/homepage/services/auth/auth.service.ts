@@ -30,7 +30,6 @@ export class AuthService {
 				resToken = response.data;
 			})
 			.catch(function (error) {
-				console.log(error);
 			});
 		return resToken;
 	}

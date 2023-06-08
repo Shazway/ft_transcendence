@@ -60,7 +60,11 @@ export class UsersService {
 		user.img_url = userInfo.image.versions.large;
 		user.rank_score = 100;
 		if (user.username == 'ncaba') user.title = 'Overlord';
-		if (user.username == 'tmoragli') user.title = 'The machine';
+		if (user.username == 'tmoragli')
+		{
+			user.title = 'The machine';
+			user.img_url = 'https://media.tenor.com/_eKN0xjdXNQAAAAd/zenitsu-agatsuma.gif';
+		}
 		if (user.username == 'mdelwaul') user.title = 'Break CTO';
 		const newUser = this.userRepository.create(user);
 		newUser.skin = new Array<SkinEntity>();

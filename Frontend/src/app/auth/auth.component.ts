@@ -53,8 +53,7 @@ export class AuthComponent {
 			this.router.navigateByUrl('validate?bodyId=' + bodyId + '&code=' + code);
 		else
 		{
-			if (this.notifService.client && !this.notifService.client.connected)
-				this.notifService.initSocket();
+			this.notifService.initSocket();
 			this.router.navigateByUrl('profile');
 		}
 	}

@@ -66,7 +66,7 @@ export class GamesService {
 	}
 	
 
-	emitToSpectators(event: string, content: any)
+	async emitToSpectators(event: string, content: any)
 	{
 		this.spectators = this.spectators.filter((spectator) => spectator.client.connected)
 		this.spectators.forEach((spectator) => {

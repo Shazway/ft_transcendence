@@ -12,8 +12,6 @@ export class MatchsService {
 		private matchRepo: Repository<MatchEntity>,
 		@InjectRepository(MatchSettingEntity)
 		private matchSettingRepo: Repository<MatchSetting>,
-		@InjectRepository(UserEntity)
-		private usersRepo: Repository<UserEntity>,
 		private itemsService: ItemsService
 	) {}
 
@@ -49,7 +47,10 @@ export class MatchsService {
 		if (!userOne || !userTwo) return null;
 		const match = await this.createMatch(userOne, userTwo);
 		if (!match) return null;
-		if (!matchSetting) await this.createRankedMatchSetting();
+		if (!matchSetting) {
+			await this.createRankedMatchSetting();
+			match.is_ranked = true;
+		}
 		else await this.createCustomMatchSetting(matchSetting);
 
 		match.user.push(userOne, userTwo);

@@ -72,10 +72,10 @@ export class AppComponent implements AfterViewInit, OnDestroy {
 
 
 	navTo(route : string) {
-		this.router.navigateByUrl(route);
+		if (route == 'profile')
+			this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => this.router.navigateByUrl("profile"));
+		else this.router.navigateByUrl(route);
 	}
-
-
 
 	disconnect() {
 		localStorage.clear();

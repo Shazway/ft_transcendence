@@ -28,6 +28,7 @@ interface MatchHistory {
 	P2score: number;
 	P2Victory: boolean;
 	P2ID: number;
+	isRanked: boolean;
 	date: Date;
 }
 
@@ -173,9 +174,11 @@ export class ProfileComponent implements AfterViewInit {
 			const newUser = await this.fetchService.getProfile(name);
 			if (newUser)
 				this.user = newUser;
+			else this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => this.router.navigateByUrl("profile"));;
 		}
 		if (this.user && this.user.match_history) {
 			this.user.match_history.reverse().forEach(match => {
+				console.log(match);
 				const date = new Date(match.date);
 				this.matchHistory.push({
 					Player1: match.user[0].username,
@@ -188,6 +191,7 @@ export class ProfileComponent implements AfterViewInit {
 					P2score: match.current_score[1],
 					P2Victory: match.is_victory[1],
 					P2ID: match.user[1].user_id,
+					isRanked: match.is_ranked,
 					date: new Date(date.setHours(date.getHours() + 2)),
 				});
 			});
@@ -218,7 +222,7 @@ export class ProfileComponent implements AfterViewInit {
 			return true;
 		if (name == 'Mr.Connasse')
 			return false
-		if (this.user.username == localStorage.getItem('username'))
+		if (this.user && this.user.username == localStorage.getItem('username'))
 			return true;
 		return false;
 	}
@@ -304,6 +308,7 @@ export class ProfileComponent implements AfterViewInit {
 				P2score: !chooseWinner ? 10 : randScore,
 				P2Victory: !chooseWinner,
 				P2ID: 0,
+				isRanked: true,
 				date: time,
 			});
 		}
@@ -328,7 +333,8 @@ export class ProfileComponent implements AfterViewInit {
 		}
 		if (this.isMyProfile()) {
 			let elAvatar = this.elRef.nativeElement.querySelector('#avatarPic');
-			elAvatar.classList.add('my-avatar');
+			if (elAvatar)
+				elAvatar.classList.add('my-avatar');
 		}
 		this.cdr.detectChanges();
 		this.cdr.reattach();
@@ -522,6 +528,8 @@ export class ProfileComponent implements AfterViewInit {
 		let ret = new Array<Pair>();
 		let pastRank = 100;
 		this.matchHistory.reverse().forEach((match, index) => {
+			if (!match.isRanked)
+				return;
 			if (ret.length == 0 && index != 0 && match.date.getTime() >= dateRange.past.getTime())
 				ret.push({x: this.getRealTimeDiff(dateRange.past, dateRange.today), y: pastRank})
 			if (this.isVictory(match)) pastRank += 10;

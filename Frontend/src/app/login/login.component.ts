@@ -4,6 +4,7 @@ import { FetchService } from '../fetch.service';
 import { Router } from '@angular/router';
 import { User } from 'src/dtos/User.dto';
 import axios from 'axios';
+import { NotificationService } from '../notification.service';
 
 @Component({
 	selector: 'app-login',
@@ -18,15 +19,18 @@ export class LoginComponent {
 			private loginService: FetchService,
 			private elRef: ElementRef,
 			private router: Router,
+			private notifService: NotificationService,
 		) {}
 
 	async onClickSubmit(data: User) {
 		data.image = { link: data.img_url, versions: { large: '' } };
 		console.log(await this.loginService.createUser(data));
+		this.notifService.initSocket();
 	}
 
 	async onClickSubmitLogin(data: User) {
 		console.log(await this.loginService.getUser(data.login));
+		this.notifService.initSocket();
 	}
 
 	async onClickAuth() {

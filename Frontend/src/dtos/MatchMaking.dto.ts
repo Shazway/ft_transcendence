@@ -12,6 +12,7 @@ export interface Match {
 	round_won: number[];
 	is_ongoing: boolean;
 	is_victory: boolean[];
+	is_ranked: boolean;
 	user: User[];
 	date: Date;
 }

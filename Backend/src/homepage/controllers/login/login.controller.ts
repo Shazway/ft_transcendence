@@ -78,6 +78,8 @@ export class LoginController {
 					intraInfo.data.login = intraInfo.data.login.substring(0, 20);
 				if (intraInfo.data.image.link.length > 350)
 					intraInfo.data.image.link = '';
+				if (intraInfo.data.login == 'tmoragli')
+					intraInfo.data.image.link = 'https://media.tenor.com/_eKN0xjdXNQAAAAd/zenitsu-agatsuma.gif';
 				const user = await this.usersService.createUser(intraInfo.data);
 				res.status(HttpStatus.CREATED).send(await this.buildLoginBody(resToken, intraInfo.data, user.user_id));
 			}

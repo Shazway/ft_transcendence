@@ -33,6 +33,8 @@ import { cp } from 'fs';
 })
 export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	private channelList: Map<number, Map<number, Array<Socket>>>;
+	DELEGATE_OWNERSHIP = 1;
+	ADMIN_PROMOTION = 2;
 	constructor(
 		private messageService: MessagesService,
 		private tokenManager: TokenManagerService,
@@ -63,11 +65,9 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			return client.disconnect();
 		if (!channel.is_channel_private)
 		{
-			if (!isMember && channel.has_pwd && !client.handshake.query.pass)
+			if (!isMember && channel.has_pwd && !client.handshake.query.pass || (!isMember && await this.channelService.isBanned(user.sub, channel_id)))
 				return client.disconnect();
 			await this.channelService.isMuted(user.sub, channel_id);
-			if (await this.channelService.isBanned(user.sub, channel_id))
-				return client.disconnect();
 			if (!isMember)
 			{
 				if (!(await this.addUserToChannel(user.sub, channel_id, client.handshake.query.pass)))
@@ -148,10 +148,11 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		return true;
 	}
 
-	socketDisconnect(clients: Array<Socket>) {
+	async socketDisconnect(clients: Array<Socket>) {
 		if (clients && clients.length)
 		{
 			clients.forEach((client) => {
+				client.emit('onLeaveChannel');
 				client.disconnect();
 			});
 		}
@@ -214,23 +215,6 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		return true;
 	}
 
-	async getPrivilegesFromUsername(sourceId: number, username: string, channelId: number): Promise<{ ret: boolean; msg: string; }> {
-		const targetEntity = await this.itemService.getUserByUsername(username);
-		if (!targetEntity)
-			return ({ret: false, msg: 'User not found'});
-		return await this.channelService.checkPrivileges(sourceId, targetEntity.user_id, channelId);
-	}
-
-	async getPrivilegesFromBody(sourceId: number, body: Punishment, channelId: number) {
-		if (!body)
-			return {ret: false, msg: 'No body sent'}
-		if (!body.username && body.target_id)
-			return await this.channelService.checkPrivileges(sourceId, body.target_id, channelId);
-		else if (body.username)
-			return await this.getPrivilegesFromUsername(sourceId, body.username, channelId);
-		return {ret: false, msg: 'Not allowed'};
-	}
-
 	async getIdFromBody(body: Punishment)
 	{
 		if (body.target_id)
@@ -247,23 +231,20 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			throw new WsException('No body');
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		const channel_id = Number(client.handshake.query.channel_id);
-		const ret = await this.getPrivilegesFromBody(user.sub, body, channel_id);
 		const targetId = await this.getIdFromBody(body);
+		const ret = await this.channelService.checkPrivileges(user.sub, targetId, channel_id);
 		const channel = this.channelList.get(channel_id);
 
-		if (!body || !targetId)
-			throw new WsException('No body');
 		if (targetId == user.sub)
 			throw new WsException('You cannot promote yourself');
 		if (!channel)
 			throw new WsException('Channel no longer exists');
 		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
-		if (this.channelService.isUserOwner(user.sub, channel_id) && await this.channelService.isUserAdmin(targetId, channel_id))
+		if (await this.channelService.promoteUser(user.sub, targetId, channel_id) == this.DELEGATE_OWNERSHIP)
 			this.sendSystemMessageToChannel(channel_id, user.sub, '', 'onDemote');
-		await this.channelService.promoteUser(user.sub, targetId, channel_id);
 		this.sendSystemMessageToChannel(channel_id, targetId, '', 'onPromote');
 		this.sendSystemMessageToChannel(channel_id, targetId, ' was promoted by ' + user.name);
-		this.notificationGateway.sendMessage([user.sub], 'Successful promotion');
+		this.notificationGateway.sendMessage(user.sub, 'Successful promotion');
 	}
 
 	@SubscribeMessage('demote')
@@ -272,25 +253,21 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			throw new WsException('No body');
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		const channel_id = Number(client.handshake.query.channel_id);
-		const ret = await this.getPrivilegesFromBody(user.sub, body, channel_id);
 		const targetId = await this.getIdFromBody(body);
+		const ret = await this.channelService.checkPrivileges(user.sub, targetId, channel_id);
 		const channel = this.channelList.get(channel_id);
 
-		if (!body || !targetId)
-			throw new WsException('No body');
 		if (targetId == user.sub)
 			throw new WsException('You cannot unpromote yourself');
 		if (!channel)
 			throw new WsException('Channel no longer exists');
 		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
-		const targets = channel.get(targetId);
-		if (!(await this.channelService.demoteAdmin(user.sub, targetId, channel_id)))
-			throw new WsException('The user is not an admin, or you are not an owner.');
+		if (!(await this.channelService.demoteAdmin(targetId, channel_id)))
+			return client.emit('onError', 'Error demoting');
 		this.sendSystemMessageToChannel(channel_id, targetId, '', 'onDemote');
 		this.sendSystemMessageToChannel(channel_id, targetId, ' was demoted by ' + user.name);
-		this.notificationGateway.sendMessage([user.sub], 'Successful demotion');
+		this.notificationGateway.sendMessage(user.sub, 'Successful demotion');
 	}
-
 
 	@SubscribeMessage('friendInvite')
 	async handleInvite(@ConnectedSocket() client: Socket, @MessageBody() body: NotificationRequest) {
@@ -311,7 +288,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		if (body && body.target_id == user.sub)
 			throw new WsException('You cannot block yourself');
 		if ((await this.itemService.blockUser(user.sub, body.target_id)))
-			return client.emit('Success', 'User blocked success');
+			return this.notificationGateway.sendMessage(user.sub, 'User blocked successfully');
 
 		const channel_id = Number(client.handshake.query.channel_id);
 		const channel = await this.itemService.getChannel(channel_id);
@@ -334,9 +311,9 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			throw new WsException('No body');
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		const channel_id = Number(client.handshake.query.channel_id);
-		const ret = await this.getPrivilegesFromBody(user.sub, body, channel_id);
 		const channel = this.channelList.get(channel_id);
 		const targetId = await this.getIdFromBody(body);
+		const ret = await this.channelService.checkPrivileges(user.sub, targetId, channel_id);
 
 		if (targetId == user.sub)
 			throw new WsException(ret.msg);
@@ -344,16 +321,11 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			throw new WsException('Channel no longer exists');
 		if (!ret.ret)
 			return client.emit('onError', 'Lacking privileges');
-		if (!this.channelService.muteUser(user.sub, targetId, channel_id, body.time))
+		if (!(await this.channelService.hardMute(targetId, channel_id, body.time)))
 			return client.emit('onError', 'Error while muting some dude');
 
-		const users = channel.get(targetId);
-		this.socketEmit(
-			users,
-			'onMessage',
-			'You have been muted by ' + user.name + ' for reason: ' + body.message
-		);
-		this.notificationGateway.sendMessage([user.sub], 'Successful mute');
+		this.sendSystemMessageToChannel(channel_id, targetId, ' was muted by ' + user.name)
+		this.notificationGateway.sendMessage(user.sub, 'Successful mute');
 	}
 
 	@SubscribeMessage('unmute')
@@ -362,22 +334,17 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			throw new WsException('No body');
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		const channel_id = Number(client.handshake.query.channel_id);
-		const ret = await this.getPrivilegesFromBody(user.sub, body, channel_id);
 		const channel = this.channelList.get(channel_id);
 		const targetId = await this.getIdFromBody(body);
+		const ret = await this.channelService.checkPrivileges(user.sub, targetId, channel_id);
 
 		if (!channel || !targetId)
 			throw new WsException(ret.msg);
 		if (!ret.ret) return client.emit('onError', 'Lacking privileges');
-		if (!this.channelService.unMuteUser(user.sub, targetId, channel_id))
+		if (!(await this.channelService.hardUnmuteUser(targetId, channel_id)))
 			return client.emit('onError', 'Error while unmuting');
-		const users = channel.get(targetId);
-		this.socketEmit(
-			users,
-			'onMessage',
-			'You have been unmuted by ' + user.name
-		);
-		this.notificationGateway.sendMessage([user.sub], 'User unmuted successfully');
+		this.sendSystemMessageToChannel(channel_id, targetId, ' was unmuted by ' + user.name);
+		this.notificationGateway.sendMessage(user.sub, 'User unmuted successfully');
 	}
 
 	@SubscribeMessage('ban')
@@ -386,8 +353,8 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			throw new WsException('No body');
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		const channel_id = Number(client.handshake.query.channel_id);
-		const ret = await this.getPrivilegesFromBody(user.sub, body, channel_id);
 		const targetId = await this.getIdFromBody(body);
+		const ret = await this.channelService.checkPrivileges(user.sub, targetId, channel_id);
 		const channel = this.channelList.get(channel_id);
 
 		if (!targetId)
@@ -398,17 +365,12 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			throw new WsException('Channel no longer exists');
 		if (!ret.ret) return client.emit('onError', ret.msg);
 		
-		if ((await this.channelService.banUser(user.sub, targetId, channel_id, body.time)))
+		if (!(await this.channelService.hardBanUser(targetId, channel_id, body.time)))
 			throw new WsException('Something went wrong');
 		const targets = channel.get(targetId);
-		this.socketEmit(
-			targets,
-			'onMessage',
-			'You have been banned by ' + user.name + ' for reason: ' + body.message
-		);
-		this.sendSystemMessageToChannel(channel_id, targetId, ' was banned from the channel by ' + user.name)
+		this.sendSystemMessageToChannel(channel_id, targetId, ' was banned from the channel by ' + user.name + ' for ' + (body.time * 1000) + ' seconds');
 		this.socketDisconnect(targets);
-		this.notificationGateway.sendMessage([user.sub], 'Successful ban');
+		this.notificationGateway.sendMessage(user.sub, 'Successful ban');
 	}
 
 	@SubscribeMessage('unban')
@@ -417,21 +379,17 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			throw new WsException('No body');
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		const channel_id = Number(client.handshake.query.channel_id);
-		const ret = await this.getPrivilegesFromBody(user.sub, body, channel_id);
 		const channel = this.channelList.get(channel_id);
 		const targetId = await this.getIdFromBody(body);
+		const ret = await this.channelService.checkPrivileges(user.sub, targetId, channel_id);
 
 		if (!channel || !targetId)
 			throw new WsException(ret.msg);
 		if (!ret.ret) return client.emit('onError', ret.msg);
-		this.channelService.unBanUser(user.sub, targetId, channel_id);
-		const targets = channel.get(targetId);
-		this.socketEmit(
-			targets,
-			'onMessage',
-			'You have been unbanned by ' + user.name
-		);
-		this.notificationGateway.sendMessage([user.sub], 'User unbanned successfully');
+		if (!(await this.channelService.hardUnBanUser(targetId, channel_id)))
+			return client.emit('onError', 'Error unbanning');
+		this.sendSystemMessageToChannel(channel_id, targetId, ' was unbanned by ' + user.name);
+		this.notificationGateway.sendMessage(user.sub, 'User unbanned successfully');
 	}
 
 	@SubscribeMessage('kick')
@@ -440,31 +398,26 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			throw new WsException('No body');
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
 		const channel_id = Number(client.handshake.query.channel_id);
-		const ret = await this.getPrivilegesFromBody(user.sub, body, channel_id);
 		const channel = this.channelList.get(channel_id);
 		const targetId = await this.getIdFromBody(body);
+		const ret = await this.channelService.checkPrivileges(user.sub, targetId, channel_id);
 	
 		if (!channel || !targetId)
 			throw new WsException(ret.msg);
 		if (!ret.ret && user.sub != targetId) return client.emit('onError', 'Lacking privileges');
 		if (user.sub === targetId && await this.channelService.isUserOwner(user.sub, channel_id))
 			throw new WsException('Give owner permissions before leaving channel');
-		await this.channelService.kickUser(user.sub, targetId, channel_id);
+		if (!await this.channelService.hardKickUser(targetId, channel_id))
+			return client.emit('onError', 'Error kicking');
 		const targets = channel.get(targetId);
 		if (user.sub === targetId) {
 			this.sendSystemMessageToChannel(channel_id, targetId, ' left the chat');
-			return this.notificationGateway.sendMessage([user.sub], 'You have left the room');
-		}
-		if (targets) {
-			this.socketEmit(
-				targets,
-				'onMessage',
-				'You have been kicked by ' + user.name + ' for reason: ' + body.message
-			);
-			this.socketDisconnect(targets);
+			return this.notificationGateway.sendMessage(user.sub, 'You have left the room');
 		}
 		this.sendSystemMessageToChannel(channel_id, targetId, ' was kicked by ' + user.name);
-		this.notificationGateway.sendMessage([user.sub], 'Successful kick');
+		this.notificationGateway.sendMessage(user.sub, 'Successful kick');
+		if (targets)
+			this.socketDisconnect(targets);
 	}
 
 	@SubscribeMessage('message')
@@ -487,10 +440,8 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		if (Validity.message)
 			body.message_id = Validity.message.message_id;
 		if (Validity.check.ret) await this.sendMessageToChannel(user.sub, channel_id, body);
-		else {
-			client.emit('onMessage', Validity.check.msg);
+		else
 			if (Validity.check.msg === 'User is banned') this.deleteUserFromList(client, user);
-		}
 	}
 
 	@SubscribeMessage('checkPrivileges')

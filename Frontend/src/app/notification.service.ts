@@ -30,16 +30,25 @@ export class NotificationService {
 		private toastService: ToastService,
 		private router: Router
 	) {
-		if (!this.client || (this.client && !this.client.connected))
-			this.client = io('ws://localhost:3003', this.websocketService.getHeader());
-		this.setClientEvent();
-		this.updateFriendRequests();
+		if (this.isConnected()) {
+			if (!this.client || (this.client && !this.client.connected))
+				this.client = io('ws://localhost:3003', this.websocketService.getHeader());
+			this.setClientEvent();
+			this.updateFriendRequests();
+		}
 	}
 
 	initSocket() {
-		if (!this.client || (this.client && !this.client.connected))
-			this.client = io('ws://localhost:3003', this.websocketService.getHeader());
-		this.setClientEvent();
+		if (this.isConnected()) {
+			if (!this.client || (this.client && !this.client.connected))
+				this.client = io('ws://localhost:3003', this.websocketService.getHeader());
+			this.setClientEvent();
+			this.updateFriendRequests();
+		}
+	}
+
+	isConnected() {
+		return localStorage.getItem('Jwt_token') ? true : false;
 	}
 
 	emit(event: string, ...args: any []) {
@@ -69,7 +78,7 @@ export class NotificationService {
 	}
 
 	showNotificationInvite(notification: NotificationRequest) {
-		this.toastService.show(this.toastFriendRequest, { classname: 'bg-light p-0', delay: 5000, context: notification });
+		this.toastService.show(this.toastFriendRequest, { classname: 'bg-light p-0', delay: 10000, context: notification });
 	}
 
 	showNewFriend(notification: NotificationRequest) {
@@ -82,7 +91,7 @@ export class NotificationService {
 	}
 
 	showChallenge(notification: NotificationRequest) {
-		this.toastService.show(this.toastChallenge, { classname: 'bg-light p-0', delay: 5000, context: notification });
+		this.toastService.show(this.toastChallenge, { classname: 'bg-light p-0', delay: 10000, context: notification });
 	}
 
 	showFailure(notification: string) {
@@ -94,7 +103,7 @@ export class NotificationService {
 	}
 
 	showChannel(notification: NotificationRequest) {
-		this.toastService.show(this.toastChannel, { classname: 'bg-light p-0', delay: 5000, context: notification });
+		this.toastService.show(this.toastChannel, { classname: 'bg-light p-0', delay: 10000, context: notification });
 	}
 
 	initTemplates(

@@ -66,11 +66,9 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		await this.notificationService.setUserStatus(user.sub, this.OFFLINE);
 	}
 
-	sendMessage(user_tab: number[], message: any) {
-		user_tab.forEach((user) => {
-			const client = this.userList.get(user);
-			if (client) client.emit('onNotif', message);
-		});
+	async sendMessage(userId: number, message: any) {
+		const client = this.userList.get(userId);
+		if (client) client.emit('success', message);
 	}
 
 	async sendAchievement(user_id: number, achievement: AchievementsEntity) {
@@ -132,12 +130,8 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		}
 		if (target && target.connected)
 			target.emit(body.type + 'Invite', { notification: answer});
-		else
-			console.log('Pas connecte target');
 		if (client && client.connected)
 			client.emit('pendingRequest', 'Request sent and waiting for answer');
-		else
-			console.log('Pas connecte envoyeur');
 	}
 
 	buildCasualSetting(): MatchSettingEntity {
@@ -201,7 +195,5 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		else
 			client.emit('success', 'Answer sent');
 		if (target && target.connected) target.emit(body.type + 'Answer', { notification: answer });
-		else
-			console.log('target disconnected')
 	}
 }

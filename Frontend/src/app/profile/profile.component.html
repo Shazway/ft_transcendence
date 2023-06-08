@@ -211,7 +211,7 @@
 				<hr class="mb-0">
 				<div class="w-100" style="height: 98%; overflow-y: auto;">
 					<div *ngIf="matchHistory.length">
-						<div *ngFor="let match of matchHistory" class="d-flex w-100 p-1 border-bottom">
+						<div *ngFor="let match of matchHistory" class="d-flex w-100 p-1 border-bottom {{match.isRanked ? '' : 'grayed'}}">
 							<img draggable="false" class="rounded-circle versus-img player" (click)="createChatPopup(getName(match, match.Player2), getId(match, match.Player2))" src="{{ getImg(match, match.Player2) }}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 1">
 							<div class="flex-grow-1">
 								<div class="d-flex align-items-center justify-content-center px-2">
@@ -223,7 +223,7 @@
 									<div class="col d-flex align-items-center justify-content-center px-2"><p class="m-0 small">{{ getName(match, match.Player1) }}</p></div>
 								</div>
 								<div class="d-flex align-items-center justify-content-center px-2">
-									<p class="m-0 small text-muted">{{getTimeDiff(match.date)}}</p>
+									<p class="m-0 small text-muted">{{getTimeDiff(match.date)}} ({{match.isRanked ? 'Ranked' : 'Unranked'}})</p>
 								</div>
 							</div>
 							<img draggable="false" class="rounded-circle versus-img opponent" src="{{ getImg(match, match.Player1) }}" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 2">

@@ -10,6 +10,8 @@ import { ChannelUser } from 'src/entities/channel_user.entity';
 
 @Injectable()
 export class ChannelsService {
+	DELEGATE_OWNERSHIP = 1;
+	ADMIN_PROMOTION = 2;
 	constructor(
 		@InjectRepository(ChannelEntity)
 		private chan_repo: Repository<ChannelEntity>,
@@ -134,12 +136,14 @@ export class ChannelsService {
 		const chan = await this.itemsService.getChannel(chan_id);
 		if (!chan || chan.is_dm)
 			return this.error_tab[7];
-		if (!(await this.isUserMember(target_id, chan_id)))
+		const sourceChanUser = await this.itemsService.getUserChan(source_id, chan_id);
+		const targetChanUser = await this.itemsService.getUserChan(target_id, chan_id);
+
+		if (!sourceChanUser || !targetChanUser)
 			return this.error_tab[2];
-		if (!(await this.isUserAdmin(source_id, chan_id)))
+		if (!sourceChanUser.is_admin)
 			return this.error_tab[5];
-		if (((await this.isUserAdmin(target_id, chan_id))
-			&& !(await this.isUserOwner(source_id, chan_id))))
+		if (targetChanUser.is_admin && !sourceChanUser.is_creator)
 			return this.error_tab[6];
 		return {ret: true, msg: 'OK'};
 	}
@@ -160,6 +164,13 @@ export class ChannelsService {
 		return await this.removeUserFromChannel(target);
 	}
 
+	
+	async hardKickUser(target_id: number, chan_id: number) {
+		const target = await this.itemsService.getUserChan(target_id, chan_id);
+
+		return await this.removeUserFromChannel(target);
+	}
+
 	async muteUser(user_id: number, target_id: number, channel_id: number, timer: number) {
 		if (!(await (this.checkPrivileges(user_id, target_id, channel_id))).ret)
 			return false;
@@ -170,9 +181,28 @@ export class ChannelsService {
 		await this.chan_userRepo.save(target_chan);
 		return true;
 	}
+
+	async hardMute(target_id: number, channel_id: number, timer: number) {
+		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
+		if (!target_chan)
+			return false;
+		target_chan.muteUser(1000 * timer);
+		await this.chan_userRepo.save(target_chan);
+		return true;
+	}
+
 	async unMuteUser(user_id: number, target_id: number, channel_id: number) {
 		if (!(await (this.checkPrivileges(user_id, target_id, channel_id))).ret)
 			return false;
+		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
+		if (!target_chan)
+			return false;
+		target_chan.unmuteUser();
+		await this.chan_userRepo.save(target_chan);
+		return true;
+	}
+
+	async hardUnmuteUser(target_id: number, channel_id: number) {
 		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
 		if (!target_chan)
 			return false;
@@ -187,10 +217,21 @@ export class ChannelsService {
 		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
 		if (!target_chan)
 			return false;
+		target_chan.banUser(1000 * timer);
+		await this.chan_userRepo.save(target_chan);
+		return true;
+	}
+
+
+	async hardBanUser(target_id: number, channel_id: number, timer: number) {
+		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
+		if (!target_chan)
+			return false;
 		target_chan.banUser(1000 * timer); //Multiply 1000 to the number of seconds you want to mute someone todo: to be changed to a parameter given
 		await this.chan_userRepo.save(target_chan);
 		return true;
 	}
+
 	async unBanUser(user_id: number, target_id: number, channel_id: number) {
 		if (!(await (this.checkPrivileges(user_id, target_id, channel_id))).ret)
 			return false;
@@ -201,6 +242,17 @@ export class ChannelsService {
 		await this.chan_userRepo.save(target_chan);
 		return true;
 	}
+
+	
+	async hardUnBanUser(target_id: number, channel_id: number) {
+		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
+		if (!target_chan)
+			return false;
+		target_chan.unBanUser();
+		await this.chan_userRepo.save(target_chan);
+		return true;
+	}
+
 	async isUserAdmin(user_id: number, chan_id: number) {
 		const chan_user = await this.itemsService.getUserChan(user_id, chan_id);
 		if (!chan_user || chan_user.channel.is_dm)
@@ -259,23 +311,46 @@ export class ChannelsService {
 			newChanUser.is_admin = false;
 			return this.itemsService.addUserToChannel(newChanUser, chan_id, user_id);
 		}
-		if (!chan_user)
+		if (!chan_user || await this.isBanned(user_id, chan_id))
 			return false;
+		return (true);
+	}
+
+	async hardSetOwner(sourceId: number, targetId: number, chanId: number) {
+		const target = await this.itemsService.getUserChan(targetId, chanId);
+		const setter = await this.itemsService.getUserChan(sourceId, chanId);
+		if (!target || !setter)
+			return false;
+		target.is_admin = true;
+		target.is_creator = true;
+		setter.is_creator = false;
+		await this.chan_userRepo.save(target);
+		await this.chan_userRepo.save(setter);
+		return true;
+	}
+	async hardSetAdmin(targetId: number, chanId: number) {
+		const target = await this.itemsService.getUserChan(targetId, chanId);
+		if (!target)
+			return false;
+		target.is_admin = true;
+		await this.chan_userRepo.save(target);
 		return true;
 	}
 
 	async promoteUser(sourceId: number, targetId: number, channel_id: number) {
 		if ((await this.isUserAdmin(targetId, channel_id)) && (await this.isUserOwner(sourceId, channel_id)))
-			return await this.setUserOwner(sourceId, targetId, channel_id);
+		{
+			await this.hardSetOwner(sourceId, targetId, channel_id);
+			return this.DELEGATE_OWNERSHIP;
+		}
 		else
-			return await this.setUserAdmin(sourceId, targetId, channel_id);
+		{
+			await this.hardSetAdmin(targetId, channel_id);
+			return this.ADMIN_PROMOTION;
+		}
 	}
 
-	async demoteAdmin(sourceId: number, targetId: number, chanId: number) {
-		if (!(await this.isUserOwner(sourceId, chanId)))
-			return false;
-		if (!(await this.isUserMember(targetId, chanId)) || !(await this.isUserAdmin(targetId, chanId)))
-			return false;
+	async demoteAdmin(targetId: number, chanId: number) {
 		const target = await this.itemsService.getUserChan(targetId, chanId);
 		if (!target)
 			return false;

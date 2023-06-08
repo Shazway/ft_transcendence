@@ -20,6 +20,7 @@ import { NotificationsGateway } from 'src/homepage/gateway/notifications/notific
 import { UserEntity } from 'src/entities';
 import { UsersService } from 'src/homepage/services/users/users.service';
 import { plainToClass } from 'class-transformer';
+import { ChannelGateway } from 'src/homepage/gateway/channel/channel.gateway';
 
 @Controller('channels')
 export class ChannelsController {
@@ -32,7 +33,8 @@ export class ChannelsController {
 		private messageService: MessagesService,
 		private itemsService: ItemsService,
 		private notificationsGateway: NotificationsGateway,
-		private usersService: UsersService
+		private usersService: UsersService,
+		private chanGateway: ChannelGateway
 	) {}
 
 	@Get('all')
@@ -43,12 +45,11 @@ export class ChannelsController {
 		if (!channelList) return res.status(HttpStatus.OK).send(channelList);
 		const filteredList = await Promise.all(channelList.map(async (channel) => {
 				const isBanned = await this.channelService.isBanned(user.sub, channel.channel_id);
-					if (!isBanned) {
+					if (!isBanned)
 						return channel;
-				}
 			}));
 		filteredList.map((channel) => {
-			if (channel.is_dm)
+			if (channel && channel.is_dm)
 			{
 				channel.us_channel.forEach((chanUser) => {
 					if (chanUser.user.user_id != user.sub)
@@ -97,6 +98,7 @@ export class ChannelsController {
 			const channelEntity = await this.itemsService.getChannel(channelId);
 			await this.channelService.addUserToChannel(targetEntity.user_id, channelId);
 			this.notificationsGateway.onChannelInvite(user, targetEntity, channelEntity.channel_name);
+			this.chanGateway.sendSystemMessageToChannel(channelId, targetEntity.user_id, ' was added to the channel by ' + user.name);
 			return res.status(HttpStatus.ACCEPTED).send('User added to channel successfully');
 		}
 		res.status(HttpStatus.UNAUTHORIZED).send('Not allowed' + targetEntity.channelInviteAuth);

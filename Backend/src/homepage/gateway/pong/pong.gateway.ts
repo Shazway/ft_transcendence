@@ -164,7 +164,8 @@ export class PongGateway {
 				return this.matchs.delete(match_id);
 			matchEntity.is_victory[this.getOtherPlayerIndex(matchEntity, user.sub)] = true;
 			await this.matchService.setMatchEnd(matchEntity);
-			if (match.gameService) match.gameService.endMatch(user.sub);
+			if (match.gameService)
+				match.gameService.endMatch(user.sub);
 		}).finally(() => this.disconnectMutex.release());
 	}
 

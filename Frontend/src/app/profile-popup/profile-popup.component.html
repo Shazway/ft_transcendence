@@ -31,8 +31,9 @@
 			</div>
 
 			<div class="d-flex pt-1 gap-2">
-				<button  *ngIf="user | async as userConf" type="button" (click)="challenge()" class="btn btn-outline-primary flex-grow-1" [disabled]="disable">Challenge</button>
-				<button  type="button" (click)="addFriend()" class="btn btn-primary" style="flex-grow: 5;">Add Friend</button>
+				<button type="button" (click)="goToProfile()" class="btn btn-primary" style="flex-grow: 5;">Profile</button>
+				<button *ngIf="user | async as userConf" type="button" (click)="challenge()" class="btn btn-outline-primary flex-grow-1" [disabled]="disable">Challenge</button>
+				<button type="button" (click)="addFriend()" class="btn btn-primary" style="flex-grow: 5;">Add Friend</button>
 			</div>
 		</div>
 	</div>

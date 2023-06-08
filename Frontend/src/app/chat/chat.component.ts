@@ -75,6 +75,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		}, 500);
 	}
 
+	disableLeave() {
+		return (this.is_owner || (this.currentChannel?.channel_id == 1));
+	}
+
 	setClientEvent() {
 		this.client.on('onMessage', (event) => { this.sortMessage(event); this.scrollBottom(event); });
 		this.client.on('onError', (event) => { });
@@ -85,9 +89,11 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		this.client.on('isOwner', (event) => { this.is_owner = event; });
 		this.client.on('onPromote', (event) => { this.promote(event); });
 		this.client.on('onDemote', (event) => { this.demote(event); });
+		this.client.on('onLeaveChannel', (event) => { this.redirectToGlobal() });
 	}
 
 	promote(event: Message) {
+		console.log("promoting " + event);
 		const user = this.getUserFromCurrentChannel(event.message_content);
 		if (!user)
 			return;
@@ -97,6 +103,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	}
 
 	demote(event: Message) {
+		console.log("demoting " + event);
 		const user = this.getUserFromCurrentChannel(event.message_content);
 		if (!user)
 			return;
@@ -235,10 +242,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		}
 	}
 
-	is_chat_admin() {
-		return this.is_admin;
-	}
-
 	createChatPopup(msg: Message, event: MouseEvent) {
 		event.preventDefault();
 		if (event.button == 2) {
@@ -298,8 +301,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		})
 	}
 	kickUser(msg: Message) {
-		const kickUserElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-kick');
-		if (!kickUserElm.classList.contains('show'))
+		if (!this.is_admin)
 			return;
 		this.client.emit('kick', {
 			target_id: msg.author.user_id,
@@ -307,8 +309,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		})
 	}
 	async banUser(msg: Message) {
-		const banUserElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-ban');
-		if (!banUserElm.classList.contains('show'))
+		if (!this.is_admin)
 			return;
 		const banTime = await this.createPopup("Ban", "Time", 'PunishmentPopup');
 		if (!banTime)
@@ -319,8 +320,8 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		})
 	}
 	delMsg(msg: Message) {
-		const banUserElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-del');
-		if (!banUserElm.classList.contains('show'))
+		const delMsgElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-del');
+		if (!delMsgElm.classList.contains('show'))
 			return;
 		this.client.emit('delMessage', msg)
 	}
@@ -432,6 +433,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		return user;
 	}
 
+	getIsAdmin() {
+		return this.is_admin;
+	}
+
 	async createChannel(waiter?: Promise<undefined>) {
 		const offCreateChan = this.elRef.nativeElement.querySelector('.channel_create_pan');
 		const offscreenElm = this.elRef.nativeElement.querySelector('.channel_pan');
@@ -480,8 +485,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	}
 
 	sortMessage(new_msg: Message) {
-		if (new_msg.author.username == 'System')
-			console.log(new_msg);
 		if (this.test_msgs$.length && this.test_msgs$[this.test_msgs$.length - 1][0].author.user_id == new_msg.author.user_id) {
 			this.test_msgs$[this.test_msgs$.length - 1].push(new_msg);
 			return;
@@ -540,6 +543,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		this.hideAllDropdown();
 	}
 
+	goToProfile(user: string) {
+		this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => this.router.navigateByUrl("profile?username=" + user));
+	}
+
 	printHelp() {
 		this.sendSystemMessage("/help : show system help");
 		this.sendSystemMessage("/leave : leave the current channel");
@@ -565,7 +572,8 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		if (data.message_content[0] == '/') {
 			const split = data.message_content.split(' ');
 			if (split[0] == '/leave') {
-				this.leaveChannel();
+				if (!this.is_owner)
+					this.leaveChannel();
 				textRef.value = '';
 				return;
 			}
@@ -779,4 +787,5 @@ export class ChatComponent implements OnInit, AfterViewInit {
 
 		}
 	}
+
 }

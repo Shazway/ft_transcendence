@@ -19,6 +19,9 @@ export class Match {
 	@Column({ default: true })
 	is_ongoing!: boolean;
 
+	@Column({ default: false })
+	is_ranked!: boolean;
+
 	@Column("boolean", { default: () => "'{false,false}'", array: true })
 	is_victory!: boolean[];
 
