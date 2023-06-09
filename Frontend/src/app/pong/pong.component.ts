@@ -188,6 +188,8 @@ export class PongComponent implements OnDestroy {
 		if (event.reason == 'score') {
 			if (event.state == this.WIN)
 			{
+				if (!this.isSpectator && this.parent && this.parent.myProfile && this.parent.myProfile.currency)
+					this.parent.updateThunes(this.parent.myProfile?.currency + 10);
 				this.scoreP1.setText("10");
 				if (this.isSpectator)
 					this.assetManager.addPanningText(this.player.user.username + " wins");

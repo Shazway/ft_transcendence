@@ -85,8 +85,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		this.client.on('connection', () => { });
 		this.client.on('disconnect', () => { });
 		this.client.on('delMessage', (event) => { this.deleteMessage(event); });
-		this.client.on('isAdmin', (event) => { this.is_admin = event; });
-		this.client.on('isOwner', (event) => { this.is_owner = event; });
 		this.client.on('onPromote', (event) => { this.promote(event); });
 		this.client.on('onDemote', (event) => { this.demote(event); });
 		this.client.on('onLeaveChannel', (event) => { this.redirectToGlobal() });
@@ -214,7 +212,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		const delMsgElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-del');
 		if (!delMsgElm)
 			return;
-		if (msg.author.user_id == Number(localStorage.getItem('id'))) {
+		if (msg.author.user_id == Number(localStorage.getItem('id')) || this.is_admin) {
 			if (delMsgElm.classList.contains('show')) {
 				delMsgElm.classList.remove('show');
 				delMsgElm.removeAttribute('title');
@@ -223,22 +221,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
 				delMsgElm.classList.add('show');
 				delMsgElm.setAttribute('title', 'Delete message');
 			}
-		}
-		else {
-			this.client.emit('checkPrivileges', msg);
-			const sub = fromEvent(this.client, 'answerPrivileges').subscribe((data) => {
-				if (data) {
-					if (delMsgElm.classList.contains('show')) {
-						delMsgElm.classList.remove('show');
-						delMsgElm.removeAttribute('title');
-					}
-					else {
-						delMsgElm.classList.add('show');
-						delMsgElm.setAttribute('title', 'Delete message');
-					}
-				}
-				sub.unsubscribe();
-			})
 		}
 	}
 
@@ -284,11 +266,13 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	}
 
 	addFriend(msg: Message) {
-		const addFriendElm = this.elRef.nativeElement.querySelector('#img-' + msg.message_id + '-add');
-		this.client.emit('inviteFriend', this.buildNotif("friend", msg.author.username, msg.author.user_id));
+		this.client.emit('inviteRequest', this.buildNotif("friend", msg.author.username, msg.author.user_id));
 	}
 
-	blockUser(msg: Message) {}
+	blockUser(msg: Message) {
+		this.fetchService.blockUser(msg.author.user_id);
+		this.test_msgs$ = this.test_msgs$.filter(element => element[0].author.user_id != msg.author.user_id);
+	}
 
 	async muteUser(msg: Message) {
 		const muteTime = await this.createPopup("Mute", "Time", 'PunishmentPopup');
@@ -408,7 +392,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			return null;
 		let user;
 		this.currentChannel.us_channel.forEach((us_channel: any) => {
-			if (us_channel.user.username == name) {
+			if (us_channel && us_channel.user && us_channel.user.username == name) {
 				user = us_channel;
 				return;
 			}
@@ -425,7 +409,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			return null;
 		let user;
 		chan.us_channel.forEach((us_channel: any) => {
-			if (us_channel.user.username == name) {
+			if (us_channel && us_channel.user && us_channel.user.username == name) {
 				user = us_channel;
 				return;
 			}
@@ -678,11 +662,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	addMember(newMember : AnyProfileUser) {
 		this.fetchService.channelInvite(newMember, this.currentChannel.channel_id);
 		this.openAddMember('.secDropUp');
-	}
-
-	async changePotentialNewOp(value : string) {
-		this.potentialNewOp = this.currentChannel.us_channel.filter((a : any)=>{return (!a.is_admin)});
-		this.potentialNewOp = this.potentialNewOp.filter((a)=>{return (a.username.indexOf(value) != -1)})
 	}
 
 	addOp(newOp : string) {

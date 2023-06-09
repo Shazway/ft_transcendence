@@ -7,6 +7,7 @@ import { Response } from 'src/dtos/Response.dto';
 import { LogInReturn } from 'src/dtos/Auth';
 import { User } from 'src/dtos/User.dto';
 import { NotificationService } from '../notification.service';
+import { AppComponent } from '../app.component';
 
 @Component({
 	selector: 'app-auth',
@@ -18,6 +19,7 @@ export class AuthComponent {
 		private route: ActivatedRoute,
 		private router: Router,
 		private notifService: NotificationService,
+		private parent: AppComponent,
 		) {}
 
 		getHeader(authorization : string) {
@@ -40,7 +42,6 @@ export class AuthComponent {
 			loginReturn = response.data;
 			if (statusCode == 201 || statusCode == 200)
 			{
-				localStorage.setItem('42_token', loginReturn.tokenInfo.access_token);
 				localStorage.setItem('Jwt_token', loginReturn.jwt_token);
 				localStorage.setItem('id', "" + loginReturn.user_id);
 				localStorage.setItem('username', loginReturn.intraInfo.login);
@@ -53,6 +54,7 @@ export class AuthComponent {
 			this.router.navigateByUrl('validate?bodyId=' + bodyId + '&code=' + code);
 		else
 		{
+			this.parent.getUser();
 			this.notifService.initSocket();
 			this.router.navigateByUrl('profile');
 		}

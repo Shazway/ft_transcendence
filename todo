@@ -1,12 +1,6 @@
 
 @Get(':username') retirer cette route dans users controller, (i'm a dev pour creer des user ou se login comme on veut)
 
-update spectator list when spec connect
-
-favicon
-
-changer le nom du site
-
 tester challenge (il se lance pas des fois <Match/GameService aren't available>)
 
 Required: node 20.x, npm 9.6.4 to function

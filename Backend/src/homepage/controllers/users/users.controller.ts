@@ -71,7 +71,7 @@ export class UsersController {
 		newUser.id = userEntity.user_id;
 		return res.status(HttpStatus.OK).send({
 			msg: 'User created',
-			token: await this.authService.login(newUser, userEntity.user_id, ''),
+			token: await this.authService.login(newUser, userEntity.user_id),
 			user_id: userEntity.user_id,
 			username: userEntity.username
 		});
@@ -218,8 +218,7 @@ export class UsersController {
 				msg: 'User connected',
 				token: await this.authService.login(
 					plainToClass(IntraInfo, info),
-					user.user_id,
-					''
+					user.user_id
 				),
 				user_id: user.user_id,
 				username: user.username

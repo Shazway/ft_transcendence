@@ -5,7 +5,7 @@ import { Player } from 'src/homepage/dtos/Matchmaking.dto';
 import { GameEnd, Move, ballObject, pongObject } from 'src/homepage/dtos/Pong.dto';
 import { ItemsService } from '../items/items.service';
 import { NotificationsGateway } from 'src/homepage/gateway/notifications/notifications.gateway';
-import { forEach, random } from 'mathjs';
+import { random } from 'mathjs';
 
 @Injectable()
 export class GamesService {

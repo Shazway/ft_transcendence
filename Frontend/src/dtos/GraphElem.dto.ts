@@ -11,6 +11,8 @@ export class AssetManager {
 	textArray: Array<{elem: PlainText | WowText, type: string}> = new Array;
 	styles!: any;
 	async initAssets() {
+		if (this.styles)
+			return this.styles;
 		Assets.addBundle('fonts', {
 			PixeloidSans: 'assets/Fonts/PixeloidMono.ttf',
 			PixeloidMono: 'assets/Fonts/PixeloidMono.ttf',

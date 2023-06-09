@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import axios from 'axios';
 import { LogInReturn } from 'src/dtos/Auth';
 import { TwoFacAuth } from 'src/dtos/TwoFacAuth.dto';
+import { AppComponent } from '../app.component';
 
 @Component({
 	selector: 'app-validate',
@@ -16,6 +17,7 @@ export class ValidateComponent {
 		constructor(
 			private route: ActivatedRoute,
 			private router: Router,
+			private parent: AppComponent,
 		) {}
 
 	ngOnInit() {
@@ -43,8 +45,10 @@ export class ValidateComponent {
 				localStorage.setItem('img_url', loginReturn.intraInfo.image.versions.small);
 			}
 		});
-		if (statusCode == 200)
+		if (statusCode == 200) {
+			this.parent.getUser();
 			return this.router.navigateByUrl('profile');
+		}
 		if (statusCode == 401)
 			this.nbTrys--;
 		if (this.nbTrys <= 0)

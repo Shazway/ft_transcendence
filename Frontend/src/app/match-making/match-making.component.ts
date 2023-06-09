@@ -1,4 +1,4 @@
-import { Component, ElementRef } from '@angular/core';
+import { Component, ElementRef, OnDestroy } from '@angular/core';
 import { Socket, io } from 'socket.io-client';
 import { WebsocketService } from '../websocket.service';
 import { MatchMaking } from '../../dtos/MatchMaking.dto';
@@ -11,7 +11,7 @@ import { FetchService } from '../fetch.service';
 	templateUrl: './match-making.component.html',
 	styleUrls: ['./match-making.component.css']
 })
-export class MatchMakingComponent {
+export class MatchMakingComponent implements OnDestroy{
 	client: Socket;
 	constructor(
 		private websocketService: WebsocketService,
@@ -32,6 +32,9 @@ export class MatchMakingComponent {
 		this.client.on('onError', (event) => {});
 		this.client.on('connection', () => { });
 		this.client.on('disconnect', () => { });
+	}
+	ngOnDestroy(): void {
+		this.client.disconnect();
 	}
 
 	matchFound(match: MatchMaking) {

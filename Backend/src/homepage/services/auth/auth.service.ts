@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { IntraInfo, TokenInfo } from 'src/homepage/dtos/Api.dto';
@@ -29,17 +30,15 @@ export class AuthService {
 			.then(function (response) {
 				resToken = response.data;
 			})
-			.catch(function (error) {
-			});
+			.catch(function (error) {});
 		return resToken;
 	}
 
-	async login(user: IntraInfo, user_id: number, ft_key: string) {
+	async login(user: IntraInfo, user_id: number) {
 		const payload = {
 			name: user.login,
 			sub: user_id,
-			key: this.keyService.getKey(),
-			ft_key: ft_key
+			key: this.keyService.getKey()
 		};
 		return this.jwtService.sign(payload);
 	}
@@ -55,8 +54,7 @@ export class AuthService {
 			template: 'one-time-authentification-code',
 			'h:X-Mailgun-Variables': JSON.stringify({ Username: user.login, Code: code })
 		};
-		mg.messages().send(data, function (error, body) {
-		});
+		mg.messages().send(data, function (error, body) {});
 	}
 
 	generateSec() {

@@ -32,7 +32,7 @@ export class ChannelsService {
 	];
 
 	async getChannelById(channel_id: number) {
-		return this.itemsService.getChannel(channel_id);
+		return await this.itemsService.getChannel(channel_id);
 	}
 
 	async createChannel(chan: NewChan, user_id: number) {
@@ -53,11 +53,6 @@ export class ChannelsService {
 		if (!(await this.isUserOwner(user_id, chan_id)))
 			return false;
 		return this.chan_repo.delete(chan_id);
-	}
-
-	async getPubChannels() {
-		const pubChanList = await this.itemsService.getAllPbChannels();
-		return pubChanList;
 	}
 
 	async getPvChannelsFromUser(id: number) {
@@ -102,36 +97,6 @@ export class ChannelsService {
 		return true;
 	}
 
-	async setUserAdmin(setter_id: number, target_id: number, chan_id: number) {
-		if (!(await this.isUserOwner(setter_id, chan_id)))
-			return false;
-		if (!(await this.isUserMember(target_id, chan_id)))
-			return false;
-		const target = await this.itemsService.getUserChan(target_id, chan_id);
-		if (!target)
-			return false;
-		target.is_admin = true;
-		await this.chan_userRepo.save(target);
-		return true;
-	}
-
-	async setUserOwner(setter_id: number, target_id: number, chan_id: number) {
-		if (!(await this.isUserOwner(setter_id, chan_id)))
-			return true;
-		if (!(await this.isUserMember(target_id, chan_id)))
-			return true;
-		const target = await this.itemsService.getUserChan(target_id, chan_id);
-		const setter = await this.itemsService.getUserChan(setter_id, chan_id);
-		if (!target || !setter)
-			return false;
-		target.is_admin = true;
-		target.is_creator = true;
-		setter.is_creator = false;
-		await this.chan_userRepo.save(target);
-		await this.chan_userRepo.save(setter);
-		return true;
-	}
-
 	async checkPrivileges(source_id: number, target_id: number, chan_id: number) {
 		const chan = await this.itemsService.getChannel(chan_id);
 		if (!chan || chan.is_dm)
@@ -153,17 +118,6 @@ export class ChannelsService {
 			return false;
 		return await this.chan_userRepo.delete(chanUser.channel_user_id);
 	}
-
-	async kickUser(user_id: number, target_id: number, chan_id: number) {
-		const target = await this.itemsService.getUserChan(target_id, chan_id);
-
-		if ((user_id == target_id && !(await this.isUserOwner(user_id, chan_id))))
-			return await this.removeUserFromChannel(target);
-		else if (!((await this.checkPrivileges(user_id, target_id, chan_id)).ret))
-			return false;
-		return await this.removeUserFromChannel(target);
-	}
-
 	
 	async hardKickUser(target_id: number, chan_id: number) {
 		const target = await this.itemsService.getUserChan(target_id, chan_id);
@@ -171,33 +125,11 @@ export class ChannelsService {
 		return await this.removeUserFromChannel(target);
 	}
 
-	async muteUser(user_id: number, target_id: number, channel_id: number, timer: number) {
-		if (!(await (this.checkPrivileges(user_id, target_id, channel_id))).ret)
-			return false;
-		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
-		if (!target_chan)
-			return false;
-		target_chan.muteUser(1000 * timer);
-		await this.chan_userRepo.save(target_chan);
-		return true;
-	}
-
 	async hardMute(target_id: number, channel_id: number, timer: number) {
 		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
 		if (!target_chan)
 			return false;
 		target_chan.muteUser(1000 * timer);
-		await this.chan_userRepo.save(target_chan);
-		return true;
-	}
-
-	async unMuteUser(user_id: number, target_id: number, channel_id: number) {
-		if (!(await (this.checkPrivileges(user_id, target_id, channel_id))).ret)
-			return false;
-		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
-		if (!target_chan)
-			return false;
-		target_chan.unmuteUser();
 		await this.chan_userRepo.save(target_chan);
 		return true;
 	}
@@ -211,18 +143,6 @@ export class ChannelsService {
 		return true;
 	}
 
-	async banUser(user_id: number, target_id: number, channel_id: number, timer: number) {
-		if (!(await (this.checkPrivileges(user_id, target_id, channel_id))).ret)
-			return false;
-		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
-		if (!target_chan)
-			return false;
-		target_chan.banUser(1000 * timer);
-		await this.chan_userRepo.save(target_chan);
-		return true;
-	}
-
-
 	async hardBanUser(target_id: number, channel_id: number, timer: number) {
 		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
 		if (!target_chan)
@@ -231,18 +151,6 @@ export class ChannelsService {
 		await this.chan_userRepo.save(target_chan);
 		return true;
 	}
-
-	async unBanUser(user_id: number, target_id: number, channel_id: number) {
-		if (!(await (this.checkPrivileges(user_id, target_id, channel_id))).ret)
-			return false;
-		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);
-		if (!target_chan)
-			return false;
-		target_chan.unBanUser();
-		await this.chan_userRepo.save(target_chan);
-		return true;
-	}
-
 	
 	async hardUnBanUser(target_id: number, channel_id: number) {
 		const target_chan = await this.itemsService.getUserChan(target_id, channel_id);

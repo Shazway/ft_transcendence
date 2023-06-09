@@ -7,6 +7,8 @@ import { AnyProfileUser, FriendRequest, MyProfileUser } from 'src/dtos/User.dto'
 import { FetchService } from './fetch.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { Router } from '@angular/router';
+import { Title } from '@angular/platform-browser';
+import { isUndefined } from 'mathjs';
 
 
 @Component({
@@ -30,7 +32,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
 	@ViewChild('toastFailure') toastFailure!: TemplateRef<any>;
 	@ViewChild('toastSuccess') toastSuccess!: TemplateRef<any>;
 	@ViewChild('toastChannel') toastChannel!: TemplateRef<any>;
-	title = 'Frontend';
+	title = 'Transcendence';
 	isExpanded = false;
 	myProfile? : AnyProfileUser | null;
 
@@ -41,8 +43,10 @@ export class AppComponent implements AfterViewInit, OnDestroy {
 		private popover: NgbPopover,
 		public notifService: NotificationService,
 		private fetchService: FetchService,
-		private router: Router
+		private router: Router,
+		private AngularTitle: Title
 	){
+		AngularTitle.setTitle('Transcendence');
 	}
 
 	ngOnDestroy() {
@@ -143,11 +147,16 @@ export class AppComponent implements AfterViewInit, OnDestroy {
 		return localStorage.getItem('username');
 	}
 
+	async getUser() {
+		this.myProfile = await this.fetchService.getMyProfile();
+		console.log('loaded');
+	}
+
 	getBalance()
 	{
 		if (this.myProfile)
 			return (this.myProfile.currency);
-		return (1);
+		return null;
 	}
 
 	friendRequestToNotificationRequest(friend : any, bool : boolean, type : string) : NotificationRequest {

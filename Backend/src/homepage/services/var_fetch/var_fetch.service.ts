@@ -1,7 +1,4 @@
-import {
-	TypeOrmModuleAsyncOptions,
-	TypeOrmModuleOptions,
-} from '@nestjs/typeorm';
+import { TypeOrmModuleAsyncOptions, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import entities from 'src/entities/index';
 import { JwtModuleOptions } from '@nestjs/jwt';
 import { DataSourceOptions } from 'typeorm';
@@ -55,46 +52,49 @@ export class VarFetchService {
 			database: this.getValue('POSTGRES_DATABASE'),
 			entities: entities,
 			synchronize,
-			migrations: [__dirname + '/../migrations/*.ts'],
+			migrations: [__dirname + '/../migrations/*.ts']
 		};
 	}
 
 	public getDatasourceConfig(): DataSourceOptions {
+		const host = this.isProduction()
+			? this.getValue('POSTGRES_HOST')
+			: this.getValue('POSTGRES_HOST_DEV');
 		return {
 			type: 'postgres',
-			host: this.getValue('POSTGRES_HOST_DEV'),
+			host,
 			port: this.getPort(),
 			username: this.getValue('POSTGRES_USER'),
 			password: this.getValue('POSTGRES_PASSWORD'),
 			database: this.getValue('POSTGRES_DATABASE'),
 			entities: entities,
-			migrations: ['src/migrations/*.ts'],
+			migrations: ['src/migrations/*.ts']
 		};
 	}
 
 	public getJwt(): JwtModuleOptions {
 		return {
 			secret: this.getValue('JWT_SECRET'),
-			signOptions: { expiresIn: this.getValue('JWT_TIMEOUT') },
+			signOptions: { expiresIn: this.getValue('JWT_TIMEOUT') }
 		};
 	}
 	public getAPIKeys(): Api {
 		return {
 			s_key: this.getValue('SECRET_KEY'),
-			u_key: this.getValue('UID_KEY'),
+			u_key: this.getValue('UID_KEY')
 		};
 	}
-	public getMailCredentials(): {mail: string, pass: string}{
-		return ({
+	public getMailCredentials(): { mail: string; pass: string } {
+		return {
 			mail: this.getValue('MAIL_ADDR'),
-			pass: this.getValue('MAIL_PASS'),
-		});
+			pass: this.getValue('MAIL_PASS')
+		};
 	}
-	public getMailKeys(): {key: string, domain: string} {
+	public getMailKeys(): { key: string; domain: string } {
 		return {
 			key: this.getValue('MAIL_API_KEY'),
-			domain: this.getValue('MAIL_DOMAIN'),
-	};
+			domain: this.getValue('MAIL_DOMAIN')
+		};
 	}
 }
 
@@ -103,7 +103,7 @@ const varFetchService = new VarFetchService(process.env).ensureValues([
 	'POSTGRES_PORT',
 	'POSTGRES_USER',
 	'POSTGRES_PASSWORD',
-	'POSTGRES_DATABASE',
+	'POSTGRES_DATABASE'
 ]);
 
 export { varFetchService };

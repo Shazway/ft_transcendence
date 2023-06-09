@@ -42,12 +42,10 @@ export class MatchmakingGateway {
 
 	async handleConnection(client: Socket) {
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'EEEE');
-		if (!user)
-			return client.disconnect();
+		if (!user) return client.disconnect();
 		console.log({ new_player: user });
 		const player = await this.itemsService.getUser(user.sub);
-		if (!player || player.inMatch)
-			return client.disconnect();
+		if (!player || player.inMatch) return client.disconnect();
 		const rankFork = this.getRankFork(player.rank_score);
 		let bracket = this.userQueue.get(rankFork);
 		if (!bracket) {
@@ -115,7 +113,7 @@ export class MatchmakingGateway {
 			this.userQueue.forEach(async (bracket) => {
 				bracket.forEach(async (user) => {
 					this.secureMatchMaker(user);
-					if (this.matchMaker.length == 2) {
+					if (this.matchMaker.length == 2 && this.matchMaker[0] && this.matchMaker[1]) {
 						const match = await this.matchsService.createFullMatch(
 							this.matchMaker[0].user_id,
 							this.matchMaker[1].user_id

@@ -99,7 +99,7 @@ export class NotificationService {
 	}
 
 	showSuccess(notification: string) {
-		this.toastService.show(this.toastSuccess, { classname: 'bg-success p-0', delay: 2000, context: notification });
+		this.toastService.show(this.toastSuccess, { classname: 'bg-success p-0', delay: 20000, context: notification });
 	}
 
 	showChannel(notification: NotificationRequest) {

@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { SkinEntity, UserEntity } from 'src/entities';
 import { ItemsService } from '../items/items.service';
 import { HttpService } from '@nestjs/axios';
-import axios, { AxiosRequestConfig } from 'axios';
+import axios from 'axios';
 import { IntraInfo } from 'src/homepage/dtos/Api.dto';
 import { random } from 'mathjs';
 
@@ -20,24 +20,14 @@ export class UsersService {
 		private itemsService: ItemsService
 	) {}
 
-	async getIntraBody(accessToken: string) {
-		let intraHeader: AxiosRequestConfig;
-		intraHeader.headers.Authorization = 'Bearer ' + accessToken;
-		return intraHeader;
-	}
-
 	async fetchIntraInfo(token: string) {
 		return await axios.get<IntraInfo>('https://api.intra.42.fr/v2/me', {
 			headers: { Authorization: 'Bearer ' + token }
 		});
 	}
 
-	async checkUserById(intra_id: number) {
-		return this.itemsService.getUserByIntraId(intra_id);
-	}
-
 	async checkUserByName(username: string) {
-		return this.itemsService.getUserByUsername(username);
+		return await this.itemsService.getUserByUsername(username);
 	}
 
 	async changeUserName(username: string, userId: number) {
@@ -60,8 +50,7 @@ export class UsersService {
 		user.img_url = userInfo.image.versions.large;
 		user.rank_score = 100;
 		if (user.username == 'ncaba') user.title = 'Overlord';
-		if (user.username == 'tmoragli')
-		{
+		if (user.username == 'tmoragli') {
 			user.title = 'The machine';
 			user.img_url = 'https://media.tenor.com/_eKN0xjdXNQAAAAd/zenitsu-agatsuma.gif';
 		}
@@ -90,11 +79,10 @@ export class UsersService {
 	async canInvite(userId: number, target_id: number) {
 		const targetEntity = await this.itemsService.getUser(target_id);
 
-		if (!targetEntity|| targetEntity.channelInviteAuth == this.NOT_ALLOWED)
-			return false;
-		else if (targetEntity.channelInviteAuth == this.FRIENDS_ALLOWED
-				&& !targetEntity.friend.find((friend) => userId == friend.user_id))
-			return false;
+		if (!targetEntity || targetEntity.channelInviteAuth == this.NOT_ALLOWED) return false;
+		const friend = targetEntity.friend.find((friend) => userId == friend.user_id);
+		if (targetEntity.channelInviteAuth == this.FRIENDS_ALLOWED && !friend) return false;
+
 		return true;
 	}
 }

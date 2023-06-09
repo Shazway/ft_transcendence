@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { HttpStatus, Injectable, Res } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AchievementsEntity, ChannelEntity, ChannelUserRelation, FriendrequestRelation, MatchEntity, MatchSettingEntity, MessageEntity, SkinEntity, UserEntity } from 'src/entities';
 import { ChannelUser } from 'src/entities/channel_user.entity';
@@ -37,13 +37,6 @@ export class ItemsService {
 		if (entry)
 			return entry.replace(/'/g, "''");
 		return entry;
-	}
-
-	public sendOptionRes(@Res() res) {
-		res.setHeader('Access-Control-Allow-Origin', '*');
-		res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-		res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With');
-		res.status(HttpStatus.OK).send();
 	}
 
 	public async saveMatchState(match: MatchEntity) {
@@ -139,35 +132,6 @@ export class ItemsService {
 		return channel;
 	}
 
-	public async getAchievement(id: number) {
-		const achieve = await this.achieveRepo
-		.createQueryBuilder('achievement')
-		.leftJoinAndSelect('achievement.user', 'user')
-			.where('achievement.achievement_id = :id', { id })
-			.getOne();
-			return achieve;
-		}
-
-	public async getChannelUser(id: number) {
-		const chan_user = await this.chan_userRepo
-			.createQueryBuilder('channel_user')
-			.leftJoinAndSelect('channel_user.user', 'user')
-			.leftJoinAndSelect('channel_user.channel', 'channel')
-			.leftJoinAndSelect('channel_user.message', 'message')
-			.where('channel_user.channel_user_id = :id', { id })
-			.getMany();
-		return chan_user;
-	}
-
-	public async getAllChannels() {
-		const chan_list = await this.chanRepo
-			.createQueryBuilder('channel')
-			.leftJoinAndSelect('channel.us_channel', 'channel_user')
-			.leftJoinAndSelect('channel.message', 'message')
-			.getMany();
-		return chan_list;
-	}
-
 	public async getAllPbChannels() {
 		const chan_user = await this.chanRepo
 			.createQueryBuilder('channel')
@@ -197,17 +161,7 @@ export class ItemsService {
 		.getMany();
 		return pv_channels
 	}
-	
-	public async getFriendrequest(id: number) {
-		const friend_request = await this.FriendRequestRepo
-		.createQueryBuilder('friend_request')
-		.leftJoinAndSelect('friend_request.sender', 'sender')
-		.leftJoinAndSelect('friend_request.receiver', 'receiver')
-		.where('friend_request.id = :id', { id })
-		.getOne();
-		return friend_request;
-	}
-	
+
 	public async getFriendrequestFromUser(id: number) {
 		const friend_request = await this.FriendRequestRepo
 		.createQueryBuilder('friend_request')
@@ -330,7 +284,6 @@ export class ItemsService {
 	) {
 		const sourceUser = await this.getUser(sourceId);
 		const targetUser = await this.getUser(targetId);
-		const achievements = await this.getAllAchievements();
 
 		if (!sourceUser || !targetUser)
 			return null;

@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MatchEntity, MatchSettingEntity, UserEntity } from 'src/entities';
@@ -64,11 +65,6 @@ export class MatchsService {
 		if (!user || !match) return false;
 		if (!(await this.itemsService.addUserToMatch(user, match))) return false;
 		return true;
-	}
-
-	public async addUsersToMatch(player1: number, player2: number, matchId: number) {
-		await this.addUserToMatch(player1, matchId);
-		await this.addUserToMatch(player2, matchId);
 	}
 
 	public async setMatchEnd(matchEntity: MatchEntity) {

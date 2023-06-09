@@ -178,7 +178,6 @@ export class ProfileComponent implements AfterViewInit {
 		}
 		if (this.user && this.user.match_history) {
 			this.user.match_history.reverse().forEach(match => {
-				console.log(match);
 				const date = new Date(match.date);
 				this.matchHistory.push({
 					Player1: match.user[0].username,
@@ -530,7 +529,7 @@ export class ProfileComponent implements AfterViewInit {
 		this.matchHistory.reverse().forEach((match, index) => {
 			if (!match.isRanked)
 				return;
-			if (ret.length == 0 && index != 0 && match.date.getTime() >= dateRange.past.getTime())
+			if (ret.length == 0 && index != 0 && match.date.getTime() >= dateRange.past.getTime() && this.getMaxDate() == 30)
 				ret.push({x: this.getRealTimeDiff(dateRange.past, dateRange.today), y: pastRank})
 			if (this.isVictory(match)) pastRank += 10;
 			else pastRank -= 10;
@@ -541,6 +540,7 @@ export class ProfileComponent implements AfterViewInit {
 			}
 		});
 		this.matchHistory.reverse();
+		console.log(ret);
 		return ret;
 	}
 

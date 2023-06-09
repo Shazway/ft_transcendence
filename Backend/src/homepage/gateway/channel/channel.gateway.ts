@@ -23,7 +23,7 @@ import { UsersService } from 'src/homepage/services/users/users.service';
 import { WsexceptionFilter } from 'src/homepage/filters/wsexception/wsexception.filter';
 import { UseFilters } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { cp } from 'fs';
+
 
 @UseFilters(new WsexceptionFilter())
 @WebSocketGateway(3002, {
@@ -80,16 +80,6 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			this.addUserToList(client, user);
 		else
 			client.disconnect();
-	}
-
-	buildJoinChannel(user: any)
-	{
-		return {
-				message_id: 0,
-				message_content: user.name + ' is online',
-				author: { username: 'System', user_id: 0 },
-				createdAt: new Date()
-		}
 	}
 
 	async handleDisconnect(client: Socket)
@@ -444,20 +434,6 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			if (Validity.check.msg === 'User is banned') this.deleteUserFromList(client, user);
 	}
 
-	@SubscribeMessage('checkPrivileges')
-	async checkPrivileges(@ConnectedSocket() client: Socket, @MessageBody() body: Message) {
-		if (!body)
-			throw new WsException('No body');
-		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		const channel_id = Number(client.handshake.query.channel_id);
-		const rights = await this.channelService.checkPrivileges(
-			user.sub,
-			body.author.user_id,
-			channel_id
-		);
-		client.emit('answerPrivileges', rights.ret);
-	}
-
 	@SubscribeMessage('delMessage')
 	async deleteMessage(@ConnectedSocket() client: Socket, @MessageBody() body: Message) {
 		if (!body)
@@ -476,26 +452,5 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			await this.sendMessageToChannel(user.sub, channel_id, body, 'delMessage');
 		} else {
 		}
-	}
-
-	@SubscribeMessage('isAdmin')
-	async isAdmin(@ConnectedSocket() client: Socket) {
-		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		const channel_id = Number(client.handshake.query.channel_id);
-
-		if (!channel_id)
-			throw new WsException('Channel doesn\'t exist.');
-
-		client.emit('isAdmin', await this.channelService.isUserAdmin(user.sub, channel_id));
-	}
-	@SubscribeMessage('isOwner')
-	async isOwner(@ConnectedSocket() client: Socket) {
-		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'ws');
-		const channel_id = Number(client.handshake.query.channel_id);
-
-		if (!channel_id)
-			throw new WsException('Channel doesn\'t exist.');
-
-		client.emit('isOwner', await this.channelService.isUserOwner(user.sub, channel_id));
 	}
 }

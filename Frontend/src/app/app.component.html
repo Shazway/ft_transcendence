@@ -16,11 +16,11 @@
 				<a class="inox" (click)="navTo('home')" >Transcendence</a>
 			</div>
 			<div *ngIf="isConnected()" class="d-flex justify-content-between align-middle">
-	<div *ngIf="myProfile" @currencyFadeIn aria-label="wealth" class="d-flex text-muted mx-5 align-items-center" style="cursor: default; user-select: none;">
+				<div *ngIf="getBalance()" @currencyFadeIn aria-label="wealth" class="d-flex text-muted mx-5 align-items-center" style="cursor: default; user-select: none;">
 					<img src="assets/MoneyLogo/Wheat1.png" draggable="false" alt="Currency" width="30" height="24">
 					{{getBalance()}}
 				</div>
-				 <div >
+				 <div>
 					<button class="btn btn-default" type="button" (click)="openDropdown()">
 						{{getUsername()}}
 						<img src="{{getAvatar()}}" draggable="false" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp';" class="rounded-circle" alt="Avatar" width = 30>
@@ -86,7 +86,7 @@
     <div role="alert" class="d-flex flex-column" aria-live="assertive" aria-atomic="true" style="position: relative;">
         <div class="toast-header">
 			<strong class="mr-auto">Friend request</strong>
-			<button type="button" class="btn ml-2 mb-1 close" (click)="notifDismiss(toast)" aria-label="Close">
+			<button type="button" class="btn ml-2 mb-1 close p-0" (click)="notifDismiss(toast)" aria-label="Close">
 				<span aria-hidden="true">&times;</span>
 			</button>
         </div>
@@ -103,10 +103,10 @@
 </ng-template>
 
 <ng-template let-toast="toast" let-context="context" #toastNewFriend>
-    <div role="alert" aria-live="assertive" aria-atomic="true" style="position: relative; min-height: 200px;">
+    <div role="alert" aria-live="assertive" aria-atomic="true" style="position: relative;">
         <div class="toast-header">
         <strong class="mr-auto">New friend</strong>
-        <button type="button" class="btn ml-2 mb-1 close" (click)="notifDismiss(toast)" aria-label="Close">
+        <button type="button" class="btn ml-2 mb-1 close p-0" (click)="notifDismiss(toast)" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
         </div>
@@ -120,15 +120,14 @@
 </ng-template>
 
 <ng-template let-toast="toast" let-context="context" #toastChallenge>
-    <div role="alert" aria-live="assertive" aria-atomic="true" style="position: relative; min-height: 200px;">
+    <div role="alert" aria-live="assertive" aria-atomic="true" style="position: relative;">
         <div class="toast-header">
         <strong class="mr-auto">Challenge</strong>
-        <button type="button" class="btn ml-2 mb-1 close" (click)="notifDismiss(toast)" aria-label="Close">
+        <button type="button" class="btn ml-2 mb-1 close p-0" (click)="notifDismiss(toast)" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
         </div>
         <div class="toast-body m-2">
-        <!-- {{user_name}} challenges you -->
         {{context.source_name}} challenges you
         </div>
 		<div class="d-flex justify-content-around m-2">
@@ -139,10 +138,10 @@
 </ng-template>
 
 <ng-template let-toast="toast" let-context="context" #toastAchievement>
-    <div role="alert" aria-live="assertive" aria-atomic="true" style="position: relative; min-height: 200px;">
+    <div role="alert" aria-live="assertive" aria-atomic="true" style="position: relative;">
         <div class="toast-header">
         <strong class="mr-auto">New acheivement</strong>
-        <button type="button" class="btn ml-2 mb-1 close" (click)="notifDismiss(toast)" aria-label="Close">
+        <button type="button" class="btn ml-2 mb-1 close p-0" (click)="notifDismiss(toast)" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
         </div>
@@ -156,10 +155,10 @@
 </ng-template>
 
 <ng-template let-toast="toast" let-context="context" #toastFailure>
-    <div role="alert" aria-live="assertive" aria-atomic="true" style="position: relative; min-height: 200px;">
+    <div role="alert" aria-live="assertive" aria-atomic="true" style="position: relative;">
         <div class="toast-header">
         <strong class="mr-auto">Failure</strong>
-        <button type="button" class="btn ml-2 mb-1 close" (click)="notifDismiss(toast)" aria-label="Close">
+        <button type="button" class="btn ml-2 mb-1 close p-0" (click)="notifDismiss(toast)" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
         </div>
@@ -170,10 +169,10 @@
 </ng-template>
 
 <ng-template let-toast="toast" let-context="context" #toastSuccess>
-    <div role="alert" aria-live="assertive" aria-atomic="true" style="position: relative; min-height: 200px;">
+    <div role="alert" aria-live="assertive" aria-atomic="true" style="position: relative;">
         <div class="toast-header">
         <strong class="mr-auto">Success</strong>
-        <button type="button" class="btn ml-2 mb-1 close" (click)="notifDismiss(toast)" aria-label="Close">
+        <button type="button" class="btn ml-2 mb-1 close p-0" (click)="notifDismiss(toast)" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
         </div>
@@ -184,10 +183,10 @@
 </ng-template>
 
 <ng-template let-toast="toast" let-context="context" #toastChannel>
-    <div role="alert" aria-live="assertive" aria-atomic="true" style="position: relative; min-height: 200px;">
+    <div role="alert" aria-live="assertive" aria-atomic="true" style="position: relative;">
         <div class="toast-header">
         <strong class="mr-auto">New channel</strong>
-        <button type="button" class="btn ml-2 mb-1 close" (click)="notifDismiss(toast)" aria-label="Close">
+        <button type="button" class="btn ml-2 mb-1 close p-0" (click)="notifDismiss(toast)" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
         </div>

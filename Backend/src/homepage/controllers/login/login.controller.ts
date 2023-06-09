@@ -40,7 +40,7 @@ export class LoginController {
 			tokenInfo: tokenInfo,
 			intraInfo: intraInfo,
 			created: created,
-			jwt_token: await this.authService.login(intraInfo, id, tokenInfo.access_token),
+			jwt_token: await this.authService.login(intraInfo, id),
 			user_id: id,
 		}
 	}

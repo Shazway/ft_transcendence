@@ -80,10 +80,10 @@ export class ChannelsController {
 	) {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
-		if (!body || !body.channel_id || (!body.targetId && !body.username)) return res.status(HttpStatus.OK).send('No body');
+		if (!body || !body.channel_id || (!body.targetId && !body.username)) return res.status(HttpStatus.NO_CONTENT).send('');
 		else if (body.targetId == user.sub) return res.status(HttpStatus.OK).send('Unauthorized');
 		else if (await this.usersService.isBlockedCheck(body.targetId, user.sub))
-			return res.status(HttpStatus.OK).send('OK');
+			return res.status(HttpStatus.OK).send('Refused');
 
 		const userId = await this.getIdFromBody(body);
 		if (!userId) return res.status(HttpStatus.OK).send('No body');

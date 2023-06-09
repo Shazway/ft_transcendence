@@ -19,7 +19,6 @@ import { RequestService } from 'src/homepage/services/request/request.service';
 import { TokenManagerService } from 'src/homepage/services/token-manager/token-manager.service';
 import { WsexceptionFilter } from 'src/homepage/filters/wsexception/wsexception.filter';
 import { UseFilters } from '@nestjs/common';
-import { ChannelsService } from 'src/homepage/services/channels/channels.service';
 import { UsersService } from 'src/homepage/services/users/users.service';
 
 @UseFilters(new WsexceptionFilter())
@@ -124,7 +123,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 			return client.emit('onError', 'Your friend is currently offline');
 		else if (body.type == 'match' && target)
 		{
-			if (await this.usersService.canInvite(source.sub, body.target_id))
+			if (await this.usersService.canInvite(source.sub, body.target_id) && target.connected)
 				return target.emit(body.type + 'Invite', { notification: answer});
 			return client.emit('failure', 'Refused invite');
 		}

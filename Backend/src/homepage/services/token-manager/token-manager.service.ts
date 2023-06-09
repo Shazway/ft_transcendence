@@ -65,7 +65,4 @@ export class TokenManagerService {
 	public async getUsernameFromToken(request: Request, type = 'Http', res?: Response) {
 		return (await this.getToken(this.extractTokenFromHeader(request), type, res)).name;
 	}
-	public async getIdFromToken(request: Request, type = 'Http', res?: Response) {
-		return (await this.getToken(this.extractTokenFromHeader(request), type, res)).sub;
-	}
 }
