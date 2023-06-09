@@ -11,7 +11,7 @@ export class OptionInterceptor implements NestInterceptor {
 			res.setHeader('Access-Control-Allow-Origin', '*');
 			res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
 			res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With');
-			res.status(HttpStatus.NO_CONTENT).send();
+			res.status(HttpStatus.OK).send();
 			return;
 		}
 		next();
@@ -24,7 +24,7 @@ export class OptionInterceptor implements NestInterceptor {
 			response.setHeader('Access-Control-Allow-Origin', '*');
 			response.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
 			response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With');
-			response.status(HttpStatus.NO_CONTENT).send();
+			response.status(HttpStatus.OK).send();
 			return;
 		}
 		return next.handle();

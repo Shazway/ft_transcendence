@@ -39,7 +39,7 @@ export class UsersController {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
 		if (!body || !body.substring || body.substring.length > 20)
-			return res.status(HttpStatus.UNAUTHORIZED).send(null);
+			return res.status(HttpStatus.OK).send(null);
 		const prefixedUsers = await this.itemsService.getUsersBySubstring(body.substring);
 		res.status(HttpStatus.OK).send(prefixedUsers);
 	}
@@ -147,9 +147,9 @@ export class UsersController {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
 		if (!target_id)
-			return res.status(HttpStatus.UNAUTHORIZED).send('No id given')
+			return res.status(HttpStatus.OK).send('No id given')
 		if (!(await this.itemsService.deleteFriendRequest(target_id, user.sub)))
-			return res.status(HttpStatus.UNAUTHORIZED).send('Something went wrong');
+			return res.status(HttpStatus.OK).send('Something went wrong');
 		res.status(HttpStatus.OK).send('Success');
 	}
 

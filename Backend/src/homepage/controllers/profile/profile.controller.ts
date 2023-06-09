@@ -48,14 +48,14 @@ export class ProfileController {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
 		if (!body || !body.username || body.username.length > 20)
-			return res.status(HttpStatus.UNAUTHORIZED).send('Name too long');
+			return res.status(HttpStatus.OK).send('Name too long');
 		const checkUser = await this.itemsService.getUserByUsername(body.username);
 
 		if (checkUser && checkUser.user_id == user.sub)
 			return res.status(HttpStatus.NOT_MODIFIED).send('This is already your username');
 		if (checkUser && checkUser.user_id != user.sub)
 			return res
-				.status(HttpStatus.UNAUTHORIZED)
+				.status(HttpStatus.OK)
 				.send('Trying to change someone elses username ?');
 		this.usersService.changeUserName(body.username, user.sub);
 		const token = await this.authService.login(this.buildIntraInfo(body.username), user.sub, '');
@@ -68,7 +68,7 @@ export class ProfileController {
 		if (!user) return;
 
 		if (!body || !body.img_url || body.img_url.length > 350) 
-			return res.status(HttpStatus.UNAUTHORIZED).send('Error no body or url too long');
+			return res.status(HttpStatus.OK).send('Error no body or url too long');
 
 		if (await this.itemsService.changeImgUser(user.sub, body.img_url))
 			return res.status(HttpStatus.ACCEPTED).send('Success');
@@ -80,16 +80,16 @@ export class ProfileController {
 	async changeChanInvAuth(@Req() req: Request, @Res() res: Response, @Body() body: { newSetting: number }) {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
-		if (!body) return res.status(HttpStatus.UNAUTHORIZED).send('No body or parameters provided');
+		if (!body) return res.status(HttpStatus.OK).send('No body or parameters provided');
 		const userEntity = await this.itemsService.getUser(user.sub);
 		const newSetting = body.newSetting;
 
 		if (!userEntity || newSetting < 0 || newSetting > 2)
-			return res.status(HttpStatus.UNAUTHORIZED).send('Not saved');
+			return res.status(HttpStatus.OK).send('Not saved');
 		userEntity.channelInviteAuth = newSetting;
 		if (await this.itemsService.saveUserState(userEntity))
 			return res.status(HttpStatus.OK).send('Success');
-		return res.status(HttpStatus.UNAUTHORIZED).send('Not saved');
+		return res.status(HttpStatus.OK).send('Not saved');
 	}
 
 	@Post('changeTitle')
@@ -97,11 +97,11 @@ export class ProfileController {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
 		if (!body)
-			return res.status(HttpStatus.UNAUTHORIZED).send('No body or parameters provided');
+			return res.status(HttpStatus.OK).send('No body or parameters provided');
 		const userEntity = await this.itemsService.getUser(user.sub);
 
 		if (!userEntity)
-			return res.status(HttpStatus.UNAUTHORIZED).send('Not saved');
+			return res.status(HttpStatus.OK).send('Not saved');
 		if (!body.newTitle || userEntity.achievement.find((achievement) => achievement.achievement_reward == body.newTitle))
 		{
 			userEntity.title = body.newTitle;

@@ -36,7 +36,7 @@ export class FetchService {
 	}
 
 	teapotError(error: AxiosError, route: Router) {
-		if (error && error.response?.status == 418)
+		if (error && error.response?.status == 418 || error.response?.status == 401)
 		{
 			localStorage.clear();
 			route.navigateByUrl('glassdoor');

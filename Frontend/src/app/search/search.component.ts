@@ -18,6 +18,7 @@ export class SearchComponent {
 		private fetchService: FetchService,
 		private router: Router,
 	) {
+		this.fetchService.checkToken();
 		this.foundProfiles = [];
 	}
 

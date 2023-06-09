@@ -15,7 +15,7 @@ export class ShopController {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
 		const skinsList = await this.itemsService.getAvailableSkins(user.sub);
-		if (!skinsList) return res.status(HttpStatus.NO_CONTENT).send({ msg: 'Content not found' });
+		if (!skinsList) return res.status(HttpStatus.OK).send({ msg: 'Content not found' });
 		return res.status(HttpStatus.OK).send({ availableSkins: skinsList });
 	}
 
@@ -39,7 +39,7 @@ export class ShopController {
 		if (!user) return;
 		const userEntity = await this.itemsService.getUser(user.sub);
 		if (!userEntity)
-			return res.status(HttpStatus.NO_CONTENT).send({ msg: 'Content not found' });
+			return res.status(HttpStatus.OK).send({ msg: 'Content not found' });
 		return res.status(HttpStatus.OK).send({ skins: userEntity.skin });
 	}
 
@@ -48,7 +48,7 @@ export class ShopController {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
 		const skinsList = await this.itemsService.getSkins();
-		if (!skinsList) return res.status(HttpStatus.NO_CONTENT).send({ msg: 'Content not found' });
+		if (!skinsList) return res.status(HttpStatus.OK).send({ msg: 'Content not found' });
 		return res.status(HttpStatus.OK).send({ skins: skinsList });
 	}
 }

@@ -80,18 +80,18 @@ export class ChannelsController {
 	) {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
-		if (!body || !body.channel_id || (!body.targetId && !body.username)) return res.status(HttpStatus.UNAUTHORIZED).send('No body');
-		else if (body.targetId == user.sub) return res.status(HttpStatus.UNAUTHORIZED).send('Unauthorized');
+		if (!body || !body.channel_id || (!body.targetId && !body.username)) return res.status(HttpStatus.OK).send('No body');
+		else if (body.targetId == user.sub) return res.status(HttpStatus.OK).send('Unauthorized');
 		else if (await this.usersService.isBlockedCheck(body.targetId, user.sub))
-			return res.status(HttpStatus.UNAUTHORIZED).send('Unauthorized');
+			return res.status(HttpStatus.OK).send('OK');
 
 		const userId = await this.getIdFromBody(body);
-		if (!userId) return res.status(HttpStatus.UNAUTHORIZED).send('No body');
+		if (!userId) return res.status(HttpStatus.OK).send('No body');
 		const channelId = body.channel_id;
 		const targetEntity = await this.itemsService.getUser(userId);
 
 		if (!targetEntity|| targetEntity.channelInviteAuth == this.NOT_ALLOWED || await this.channelService.isUserMember(userId, channelId))
-			return res.status(HttpStatus.UNAUTHORIZED).send('Not allowed');
+			return res.status(HttpStatus.OK).send('Not allowed');
 		else if ((targetEntity.channelInviteAuth == this.ALL_ALLOWED || ((targetEntity.channelInviteAuth == this.FRIENDS_ALLOWED &&
 				targetEntity.friend.find((friend) => friend.user_id == user.sub))) && await this.channelService.canInvite(user.sub, channelId)))
 		{
@@ -101,7 +101,7 @@ export class ChannelsController {
 			this.chanGateway.sendSystemMessageToChannel(channelId, targetEntity.user_id, ' was added to the channel by ' + user.name);
 			return res.status(HttpStatus.ACCEPTED).send('User added to channel successfully');
 		}
-		res.status(HttpStatus.UNAUTHORIZED).send('Not allowed' + targetEntity.channelInviteAuth);
+		res.status(HttpStatus.OK).send('Not allowed' + targetEntity.channelInviteAuth);
 	}
 
 	@Post('delete')
@@ -112,11 +112,11 @@ export class ChannelsController {
 	{
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
-		if (!body || !body.channel_id) return res.status(HttpStatus.UNAUTHORIZED).send('No body');
+		if (!body || !body.channel_id) return res.status(HttpStatus.OK).send('No body');
 		const channelId = body.channel_id;
 		if (await this.channelService.deleteChannel(channelId, user.sub))
 			return res.status(HttpStatus.ACCEPTED).send('Success');
-		res.status(HttpStatus.UNAUTHORIZED).send('Failure');
+		res.status(HttpStatus.OK).send('Failure');
 	}
 
 	@Post('inviteBySubstring')
@@ -126,7 +126,7 @@ export class ChannelsController {
 		@Body() body: {substring: string}) {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
-		if (!body || !body.substring) return res.status(HttpStatus.UNAUTHORIZED).send('No body');
+		if (!body || !body.substring) return res.status(HttpStatus.OK).send('No body');
 		const sourceId = user.sub;
 
 		let invitableUsers: UserEntity[];
@@ -148,10 +148,10 @@ export class ChannelsController {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
 		if (!newChannel || !newChannel.channel_name || newChannel.channel_name.length > 41)
-			return res.status(HttpStatus.UNAUTHORIZED).send('Either no body or channel name too long');
+			return res.status(HttpStatus.OK).send('Either no body or channel name too long');
 		const channelEntity = await this.channelService.createChannel(newChannel, user.sub);
 		if (!channelEntity)
-			return res.status(HttpStatus.UNAUTHORIZED).send({ msg: 'Password too long' })
+			return res.status(HttpStatus.OK).send({ msg: 'Password too long' })
 		res.status(HttpStatus.OK).send({ msg: 'Channel created' });
 	}
 
@@ -163,7 +163,7 @@ export class ChannelsController {
 	{
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
-		if (!body || !body.channel_id || !body.pass) return res.status(HttpStatus.UNAUTHORIZED).send('No body');
+		if (!body || !body.channel_id || !body.pass) return res.status(HttpStatus.OK).send('No body');
 		const channelId = body.channel_id;
 		const pass = body.pass;
 		const rightPass = await this.channelService.rightPass(channelId, pass);

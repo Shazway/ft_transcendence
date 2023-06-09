@@ -85,7 +85,7 @@ export class LoginController {
 			}
 		}
 		else
-			res.status(HttpStatus.UNAUTHORIZED).send('No token received');
+			res.status(HttpStatus.OK).send('No token received');
 	}
 
 	@Get('tokenCheck')
@@ -110,7 +110,7 @@ export class LoginController {
 		const twoFA = this.twoFaMap.get(Number(body.id));
 
 		if (!twoFA || !this.authService.verifyCode(twoFA.secret, body.mail_code))
-			return res.status(HttpStatus.UNAUTHORIZED).send('Wrong code');
+			return res.status(HttpStatus.OK).send('Wrong code');
 		const intraInfo = await this.usersService.fetchIntraInfo(twoFA.intra_token.access_token);
 		res.status(HttpStatus.OK).send(await this.buildLoginBody(twoFA.intra_token, intraInfo.data, Number(body.id)));
 		this.twoFaMap.delete(Number(body.id));
