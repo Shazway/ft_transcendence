@@ -108,7 +108,7 @@ export class ChannelsService {
 			return this.error_tab[2];
 		if (!sourceChanUser.is_admin)
 			return this.error_tab[5];
-		if (targetChanUser.is_admin && !sourceChanUser.is_creator)
+		if (targetChanUser.is_admin && !sourceChanUser.is_admin)
 			return this.error_tab[6];
 		return {ret: true, msg: 'OK'};
 	}
