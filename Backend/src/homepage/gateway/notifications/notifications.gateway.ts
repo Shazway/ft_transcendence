@@ -24,7 +24,7 @@ import { UsersService } from 'src/homepage/services/users/users.service';
 @UseFilters(new WsexceptionFilter())
 @WebSocketGateway(3003, {
 	cors: {
-		origin: 'http://localhost:4200'
+		origin: 'http://10.14.3.3:4200'
 	}
 })
 
@@ -119,8 +119,8 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 			return client.emit('onError', 'User blocked you');
 		if (body.type == 'friend' && !(await this.requestService.handleFriendRequestInvite(source.sub, body.target_id)))
 			return client.emit('onError', 'You are already friends with this person, or they refused');
-		else if (body.type == 'match' && !target || !target.connected)
-			return client.emit('onError', 'Your friend is currently offline');
+		else if (body.type == 'match' && !target || !target.connected || await this.usersInMatch(source.sub, body.target_id))
+			return client.emit('onError', 'Your friend is currently offline or in a match, try again later');
 		else if (body.type == 'match')
 		{
 			if (await this.usersService.canInvite(source.sub, body.target_id) && target.connected)
@@ -175,6 +175,12 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 			{
 				if (!target || !target.connected)
 					return client.emit('onError', 'Opponent disconnected');
+				if (await this.usersInMatch(source.sub, body.target_id))
+				{
+					client.emit('onError', 'One of the users are already in match');
+					target.emit('onError', 'One of the users are already in match');
+					return ;
+				}
 				const match = await this.matchService.createFullMatch(source.sub, body.target_id, this.buildCasualSetting());
 				if (!match)
 					return client.emit('onError', 'Something went wrong');
@@ -193,5 +199,11 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		else
 			client.emit('success', 'Answer sent');
 		if (target && target.connected) target.emit(body.type + 'Answer', { notification: answer });
+	}
+
+	async usersInMatch(userId: number, targetId: number) {
+		const user = await this.itemsService.getUser(userId);
+		const target = await this.itemsService.getUser(targetId);
+		return user.inMatch || target.inMatch;
 	}
 }

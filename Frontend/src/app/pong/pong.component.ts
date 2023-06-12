@@ -115,7 +115,7 @@ export class PongComponent implements OnDestroy {
 	setMatch(match_id: number) {
 		if (this.client)
 			this.client.close();
-		this.client = io('ws://localhost:3005?match_id=' + match_id, this.websocketService.getHeader());
+		this.client = io('ws://10.14.3.3:3005?match_id=' + match_id, this.websocketService.getHeader());
 		this.client.on('onPlayerMove', (event) => { this.updatePlayer(event); });
 		this.client.on('onOpponentMove', (event) => { this.updateOpponent(event); });
 		this.client.on('onBallCollide', (event) => { this.updateBall(event); });
@@ -158,7 +158,6 @@ export class PongComponent implements OnDestroy {
 	}
 
 	async getSkin(skin_id: number, skinRepo: ShopItem[]): Promise<Texture> {
-		console.log("pass");
 		let skin_name: string = '';
 		skinRepo.forEach(skin => {
 			if (skin.skin_id == skin_id)
@@ -166,7 +165,6 @@ export class PongComponent implements OnDestroy {
 		});
 		if (skin_name.length > 0)
 			return await this.assetManager.getAsset(skin_name);
-		console.log("no skin");
 		return await this.assetManager.getAsset('SkinDefault');
 	}
 

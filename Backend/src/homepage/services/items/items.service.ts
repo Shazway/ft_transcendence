@@ -520,8 +520,7 @@ export class ItemsService {
 			userOne = this.updateLoser(userOne, isRanked);
 			userTwo = this.updateWinner(userTwo, isRanked);
 		}
-		if (match.is_ongoing)
-			match.is_ongoing = false;
+		match.is_ongoing = false;
 		userOne.match_history.push(match);
 		userTwo.match_history.push(match);
 		userOne.inMatch = false;
@@ -552,8 +551,7 @@ export class ItemsService {
 			userOne = this.updateLoser(userOne, isRanked);
 			userTwo = this.updateWinner(userTwo, isRanked);
 		}
-		if (match.is_ongoing)
-			match.is_ongoing = false;
+		match.is_ongoing = false;
 		userOne.match_history.push(match);
 		userTwo.match_history.push(match);
 		userOne.inMatch = false;

@@ -32,7 +32,7 @@ export class NotificationService {
 	) {
 		if (this.isConnected()) {
 			if (!this.client || (this.client && !this.client.connected))
-				this.client = io('ws://localhost:3003', this.websocketService.getHeader());
+				this.client = io('ws://10.14.3.3:3003', this.websocketService.getHeader());
 			this.setClientEvent();
 			this.updateFriendRequests();
 		}
@@ -41,7 +41,7 @@ export class NotificationService {
 	initSocket() {
 		if (this.isConnected()) {
 			if (!this.client || (this.client && !this.client.connected))
-				this.client = io('ws://localhost:3003', this.websocketService.getHeader());
+				this.client = io('ws://10.14.3.3:3003', this.websocketService.getHeader());
 			this.setClientEvent();
 			this.updateFriendRequests();
 		}

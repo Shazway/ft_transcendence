@@ -28,7 +28,7 @@ import * as bcrypt from 'bcrypt';
 @UseFilters(new WsexceptionFilter())
 @WebSocketGateway(3002, {
 	cors: {
-		origin: 'http://localhost:4200'
+		origin: 'http://10.14.3.3:4200'
 	}
 })
 export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect {

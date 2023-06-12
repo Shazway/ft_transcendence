@@ -55,7 +55,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		private parent: AppComponent,
 	) {
 		this.msgLock = new Mutex();
-		this.client = io('ws://localhost:3002?channel_id=' + 1, websocketService.getHeader());
+		this.client = io('ws://10.14.3.3:3002?channel_id=' + 1, websocketService.getHeader());
 		if (!this.client)
 		{
 			this.router.navigateByUrl('login');
@@ -95,8 +95,16 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		const user = this.getUserFromCurrentChannel(event.message_content);
 		if (!user)
 			return;
-		if (user.is_admin) user.is_creator = true;
-		else user.is_admin = true;
+		if (user.is_admin) {
+			user.is_creator = true;
+			if (this.isMe2(user.user_id))
+				this.is_owner = true;
+		}
+		else {
+			user.is_admin = true;
+			if (this.isMe2(user.user_id))
+				this.is_admin = true;
+		}
 		console.log(user);
 	}
 
@@ -105,8 +113,16 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		const user = this.getUserFromCurrentChannel(event.message_content);
 		if (!user)
 			return;
-		if (user.is_creator) user.is_creator = false;
-		else user.is_admin = false;
+		if (user.is_creator) {
+			user.is_creator = false;
+			if (this.isMe2(user.user_id))
+				this.is_owner = false;
+		}
+		else {
+			user.is_admin = false;
+			if (this.isMe2(user.user_id))
+				this.is_admin = false;
+		}
 	}
 
 	private prevScroll!: number;
@@ -370,7 +386,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			for (let index = this.msgs$.length; index > 0; index--)
 				this.sortMessage(this.msgs$[index - 1]);
 		}
-		this.client = io('ws://localhost:3002?channel_id=' + channel.channel_id, this.websocketService.getHeader());
+		this.client = io('ws://10.14.3.3:3002?channel_id=' + channel.channel_id, this.websocketService.getHeader());
 		this.currentChannel = channel;
 		this.setClientEvent();
 		const us_channel = this.getUserFromCurrentChannel(localStorage.getItem('username'));
@@ -485,6 +501,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
 
 	isMe(msg : Message) : boolean {
 		return (msg.author.user_id === Number(localStorage.getItem('id')));
+	};
+
+	isMe2(userId: number) : boolean {
+		return (userId === Number(localStorage.getItem('id')));
 	};
 
 	getTime(msgList: Array<Message>) {

@@ -23,7 +23,7 @@ import { NotificationsGateway } from '../notifications/notifications.gateway';
 @UseFilters(new WsexceptionFilter())
 @WebSocketGateway(3005, {
 	cors: {
-		origin: 'http://localhost:4200'
+		origin: 'http://10.14.3.3:4200'
 	}
 })
 export class PongGateway {
@@ -155,7 +155,6 @@ export class PongGateway {
 				match.gameService.endMatchSpectator(user.sub);
 				return this.emitToMatch('onUnspectateMatch', {username: user.name}, match);
 			}
-			match.players = match.players.filter((players) => players.user_id != user.sub);
 			if (!matchEntity.is_ongoing)
 				return this.matchs.delete(match_id);
 			matchEntity.is_victory[this.getOtherPlayerIndex(matchEntity, user.sub)] = true;
@@ -201,10 +200,7 @@ export class PongGateway {
 		const match_id = Number(client.handshake.query.match_id);
 		const match = this.matchs.get(match_id);
 
-		console.log('Arrow up');
-		console.log('MatchId');
-		console.log(match_id);
-		if (!match ||!match.gameService) client.emit('onError', 'The game is not ready yet');
+		if (!match ||!match.gameService) return client.emit('onError', 'The game is not ready yet');
 		match.gameService.changeInput(user.sub, 'ArrowDown', body);
 		const move = match.gameService.getMove(user.sub);
 		match.players.forEach((player) => {
@@ -223,10 +219,7 @@ export class PongGateway {
 		const match_id = Number(client.handshake.query.match_id);
 		const match = this.matchs.get(match_id);
 
-		console.log('Arrow up');
-		console.log('MatchId');
-		console.log(match_id);
-		if (!match ||!match.gameService) client.emit('onError', 'The game is not ready yet');
+		if (!match ||!match.gameService) return client.emit('onError', 'The game is not ready yet');
 		match.gameService.changeInput(user.sub, 'ArrowUp', body);
 		const move = match.gameService.getMove(user.sub);
 		match.players.forEach((player) => {
@@ -244,10 +237,7 @@ export class PongGateway {
 		const match_id = Number(client.handshake.query.match_id);
 		const match = this.matchs.get(match_id);
 
-		console.log('Arrow up');
-		console.log('MatchId');
-		console.log(match_id);
-		if (!match || !match.gameService) client.emit('onError', 'The game is not ready yet');
+		if (!match || !match.gameService) return client.emit('onError', 'The game is not ready yet');
 		match.players.forEach((player) => {
 			if (player.user_id == 0){
 			}

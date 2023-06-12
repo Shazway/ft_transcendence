@@ -191,7 +191,7 @@ export class ProfileComponent implements AfterViewInit {
 					P2Victory: match.is_victory[1],
 					P2ID: match.user[1].user_id,
 					isRanked: match.is_ranked,
-					date: new Date(date.setHours(date.getHours() + 2)),
+					date,
 				});
 			});
 			this.rank = this.user.rank_score;
@@ -540,7 +540,6 @@ export class ProfileComponent implements AfterViewInit {
 			}
 		});
 		this.matchHistory.reverse();
-		console.log(ret);
 		return ret;
 	}
 

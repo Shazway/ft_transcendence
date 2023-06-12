@@ -55,7 +55,6 @@ export class ProfilePopupComponent implements OnInit, AfterViewInit {
 	}
 
 	canChallenge(us : AnyProfileUser) {
-		console.log(us);
 		if (us.channelInviteAuth == 2)
 		{
 			this.disable = false;
