@@ -11,8 +11,4 @@ export class ToastService {
 	remove(toast: any) {
 		this.toasts = this.toasts.filter((t) => t !== toast);
 	}
-
-	clear() {
-		this.toasts.splice(0, this.toasts.length);
-	}
 }

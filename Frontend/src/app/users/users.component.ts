@@ -13,7 +13,7 @@ export class UsersComponent implements OnInit {
 	constructor(private userService: FetchService) {}
 
 	async ngOnInit() {
-		this.users$ = this.userService.getAllUsers();
+		this.users$ = this.userService.getLeaderboard();
 	}
 
 }

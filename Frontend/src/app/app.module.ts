@@ -17,7 +17,6 @@ import { ChangeAvatarPopup, ChatPopup, ConfirmBuyPopup, PasswordPopup, Punishmen
 import { NotificationService } from './notification.service';
 import { ProfileModule } from './profile/profile.module';
 import { ProfilePopupModule } from './profile-popup/profile-popup.module';
-import { ToastComponent } from './toast/toast.component';
 import { ToastsContainer } from './toast/toast.container';
 import { ShopComponent } from './shop/shop.component';
 import { FriendsModule } from './friends/friends.module';
@@ -28,7 +27,6 @@ import { HomeModule } from './home/home.module';
 import { GlassdoorModule } from './glassdoor/glassdoor.module';
 import { LeaderboardComponent } from './leaderboard/leaderboard.component';
 import { SearchComponent } from './search/search.component';
-import { PongDebugModule } from './pong-debug/pong-debug.module';
 
 @NgModule({
 declarations: [
@@ -55,9 +53,6 @@ imports: [
 	ProfileModule,
 	FriendsModule,
 	ProfilePopupModule,
-	// PongModule,
-	PongDebugModule,
-	ToastComponent,
 	ToastsContainer,
 	HomeModule,
 	GlassdoorModule,

@@ -426,10 +426,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		return user;
 	}
 
-	getIsAdmin() {
-		return this.is_admin;
-	}
-
 	async createChannel(waiter?: Promise<undefined>) {
 		const offCreateChan = this.elRef.nativeElement.querySelector('.channel_create_pan');
 		const offscreenElm = this.elRef.nativeElement.querySelector('.channel_pan');

@@ -2,7 +2,7 @@ import { Component, ElementRef, HostListener, OnDestroy, ViewChild } from '@angu
 import { Socket, io } from 'socket.io-client';
 import { WebsocketService } from '../websocket.service';
 import { Application, Graphics, Texture } from 'pixi.js';
-import { pongObject, ballObject, Move, VectorPos, ScoreChange, GameEnd, Player } from 'src/dtos/Pong.dto';
+import { pongObject, ballObject, Move, VectorPos, ScoreChange, GameEnd} from 'src/dtos/Pong.dto';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatchSetting } from 'src/dtos/MatchSetting.dto';
 import { Mutex } from 'async-mutex';
@@ -309,14 +309,6 @@ export class PongComponent implements OnDestroy {
 		});
 		this.scoreP1.setText(this.player.score.toString());
 		this.scoreP2.setText(this.opponent.score.toString());
-	}
-
-	closeEnoughPlayer() {
-		return this.ball.graphic.x <= this.player.upperRightCorner.x + (this.ball.DIAMETER)
-	}
-
-	closeEnoughOpponent() {
-		return this.ball.graphic.x >= this.opponent.upperLeftCorner.x - (this.ball.DIAMETER)
 	}
 
 	update(delta: number) {

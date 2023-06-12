@@ -29,17 +29,6 @@ export interface Move {
 	posY: number;
 }
 
-export interface Player {
-	client: Socket;
-	user_id: number;
-	username: string;
-	rounds_won?: number;
-	current_points?: number;
-	directionUp?: boolean;
-	directionDown?: boolean;
-	isReady: boolean;
-}
-
 export class ballObject {
 	DIAMETER!: number;
 	RADIUS!: number;
@@ -121,108 +110,12 @@ export class ballObject {
 		return (Math.sqrt(res));
 	}
 
-	inRange(a : number, r1: number, r2: number)
-	{
-		return (a >= r1 && a <= r2)
-	}
-
 	goingUp(pos: Position) {
 		return this.vec.y <= pos.y;
 	}
 
 	distancePos(pos1: Position, pos2: Position) { //Easier to write distance comparing
 		return Number(distance([pos1.x, pos1.y], [pos2.x, pos2.y]));
-	}
-
-	collidesWithPlayer(player: pongObject): boolean { //Check collision for player (left side player)
-		const pos: Position = {x: this.graphic.x, y: this.graphic.y};
-
-		const ret = (pos.x >= player.upperLeftCorner.x - (this.RADIUS / 2)
-					&& pos.x <= player.upperRightCorner.x + (this.RADIUS / 2)
-					&& pos.y >= player.upperRightCorner.y - (this.RADIUS / 2)
-					&& pos.y <= player.lowerCorner.y + (this.RADIUS / 2));
-		return ret;
-	}
-
-	changeDirectionOpponent(opponent: pongObject)
-	{
-		const maxSinus = -0.8;
-		const minSinus = -maxSinus;
-		const paddleSize = this.position(opponent.objDim.x / 2, opponent.objDim.y / 2);
-		const pos: Position = {x: this.graphic.x, y: this.graphic.y};
-		const upperCorner : Position = {x: opponent.graphic.x, y: opponent.graphic.y}
-		const lowerCorner : Position = {x: opponent.graphic.x, y: opponent.graphic.y + paddleSize.y}
-		const middleFace : Position = {x: opponent.graphic.x, y: opponent.graphic.y + paddleSize.y / 2}
-
-		let sinus = 1;
-		if ((pos.x >= upperCorner.x && pos.x <= upperCorner.x + paddleSize.x)) //Checking if the ball is in the range of the paddle slice
-		{
-			if ((this.goingUp(pos) && this.distancePos(pos, lowerCorner) < this.distancePos(pos, upperCorner)) ||
-			(!this.goingUp(pos)) && this.distancePos(pos, lowerCorner) > this.distancePos(pos, upperCorner)) //Checking if the ball is going towards the slice (lower or upper)
-				this.direction = -this.direction; //Applying same direction change as wall, like the original pong
-			return ;
-		}
-		if (this.inRange(pos.y, upperCorner.y - (this.RADIUS / 2), upperCorner.y)) // Upper corner direction change
-		{
-			if (this.hypothenuse(pos.x - upperCorner.x, pos.y - upperCorner.y) < (this.RADIUS / 2))
-				sinus = maxSinus;
-		}
-		else if (this.inRange(pos.y, lowerCorner.y, lowerCorner.y + (this.RADIUS / 2))) // Lower corner direction change
-		{
-			if (this.hypothenuse(pos.x - lowerCorner.x, pos.y - lowerCorner.y) < (this.RADIUS / 2))
-				sinus = minSinus;
-		}
-		else
-			sinus = (middleFace.y - pos.y) * (maxSinus * 2) / (opponent.objDim.y / 2); // The rest of the paddle (front face)
-		if (sinus >= 1 || sinus <= -1)
-			return ;
-		this.direction = Math.PI - Math.asin(sinus);
-	}
-
-	printGameState(key: string) {
-		console.error("Key: " + key);
-		console.log("dir: " + this.direction);
-		console.log("posX: " + this.graphic.x);
-		console.log("posY: " + this.graphic.y);
-		console.log("vexX: " + this.vec.x);
-		console.log("vexY: " + this.vec.y);
-	}
-
-	changeDirectionPlayer(player: pongObject)
-	{
-		const maxSinus = 0.8;
-		const minSinus = -maxSinus;
-		const paddleSize = this.position(player.objDim.x / 2, player.objDim.y / 2);
-		const pos: Position = {x: this.graphic.x, y: this.graphic.y};
-		const upperCorner : Position = {x: player.graphic.x + paddleSize.x, y: player.graphic.y}
-		const lowerCorner : Position = {x: player.graphic.x + paddleSize.x, y: player.graphic.y + paddleSize.y}
-		const middleFace : Position = {x: player.graphic.x + paddleSize.x, y: player.graphic.y + paddleSize.y / 2}
-
-		let sinus = 1;
-		if ((pos.x <= upperCorner.x && pos.x >= upperCorner.x - paddleSize.x)) //Checking if the ball is in the range of the paddle slice
-		{
-			if ((this.goingUp(pos) && this.distancePos(pos, lowerCorner) < this.distancePos(pos, upperCorner)) || //Checking if the ball is going towards the slice (lower or upper)
-			(!this.goingUp(pos)) && this.distancePos(pos, lowerCorner) > this.distancePos(pos, upperCorner))
-			{
-				this.direction = -this.direction; //Applying same direction change as wall, like the original pong
-			}
-			return ;
-		}
-		if (this.inRange(pos.y, upperCorner.y - (this.RADIUS / 2), upperCorner.y)) // Upper corner direction change
-		{
-			if (this.hypothenuse(pos.x - upperCorner.x, pos.y - upperCorner.y) < (this.RADIUS / 2))
-				sinus = maxSinus;
-		}
-		else if (this.inRange(pos.y, lowerCorner.y, lowerCorner.y + (this.RADIUS / 2))) // Lower corner direction change
-		{
-			if (this.hypothenuse(pos.x - lowerCorner.x, pos.y - lowerCorner.y) < (this.RADIUS / 2))
-					sinus = minSinus;
-		}
-		else
-			sinus = (middleFace.y - pos.y) * (maxSinus * 2) / (player.objDim.y / 2); // The rest of the paddle (front face)
-		if (sinus >= 1 || sinus <= -1)
-			return ;
-		this.direction = -Math.asin(sinus); // New angle to apply
 	}
 
 	setPos(pos: Position) {
@@ -348,10 +241,5 @@ export class pongObject {
 			this.position(width / 2, height / 2)
 		);
 		this.applyMove(pos);
-	}
-
-	inRange(a : number, r1: number, r2: number)
-	{
-		return (a >= r1 && a <= r2);
 	}
 }

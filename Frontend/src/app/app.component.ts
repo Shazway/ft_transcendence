@@ -2,7 +2,7 @@ import { AfterViewInit, Component, ElementRef, OnDestroy, TemplateRef, ViewChild
 import { AutoClose, Placement, PopoverConfig, Target } from '../dtos/Popover.dto';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { NotificationService } from './notification.service';
-import { NotificationRequest, NotificationResponse } from 'src/dtos/Notification.dto';
+import { NotificationRequest} from 'src/dtos/Notification.dto';
 import { AnyProfileUser, FriendRequest, MyProfileUser } from 'src/dtos/User.dto';
 import { FetchService } from './fetch.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
@@ -151,7 +151,6 @@ export class AppComponent implements AfterViewInit, OnDestroy {
 
 	async getUser() {
 		this.myProfile = await this.fetchService.getMyProfile();
-		console.log('loaded');
 	}
 
 	getBalance()

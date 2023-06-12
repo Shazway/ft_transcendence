@@ -158,8 +158,6 @@ export class ChangeAvatarPopup {
 				this.inputFormElm.classList.add('wrong-input');
 			return (false)
 			//input invalide
-
 		}
 	}
-
 }

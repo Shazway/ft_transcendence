@@ -26,35 +26,4 @@ export class WebsocketService {
 			return '';
 		return token;
 	}
-
-	async sendMessage(msg: LessMessage, channel_id: number) {
-		const client = this.chanList.get(channel_id);
-		if (!client)
-			return false;
-		client.emit(JSON.stringify(msg));
-		return true;
-	}
-
-	async delChatSocket(channel_id: number) {
-		const client = this.chanList.get(channel_id);
-		if (!client)
-			return false;
-		client.close();
-		this.chanList.delete(channel_id);
-		return true;
-	}
-
-	async addChatSocket(channel_id: number) {
-		if (!this.chanList.get(channel_id))
-			return (false);
-		const client = io('ws://localhost:3002?channel_id=' + channel_id, this.getHeader());
-		if (!client)
-			return false;
-		client.on('onMessage', (event) => { });
-		client.on('onError', (event) => { });
-		client.on('connection', (event) => { });
-		client.on('disconnect', (event) => { });
-		this.chanList.set(channel_id, client);
-		return (true);
-	}
 }
