@@ -7,3 +7,21 @@
 .specWindow.hide {
 	opacity: 0;
 }
+
+
+.arrow-match{
+	cursor: none;
+	text-align: center;
+	max-height: 50px;
+	transition: transform 0.3s ease-in-out;
+	opacity: 0;
+}
+
+.arrow-match.left {
+	transform: rotate(180deg);
+	opacity: 1;
+}
+.arrow-match.right {
+	opacity: 1;
+	transform: rotate(0deg);
+}
