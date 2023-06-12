@@ -32,7 +32,13 @@ export class HomeComponent {
 		return(localStorage.getItem('username'));
 	}
 
-	secret() {
+	async secret() {
+		const user = this.parent.myProfile;
+		if (!user)
+			return ;
+		if ((user.achievements.unlockedAchievements.find((achievement) => achievement.achievement_name == 'Easter Egg')))
+			return ;
+		this.parent.updateThunes(user.currency + 250);
 		this.fetchService.secret();
 	}
 }
