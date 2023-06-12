@@ -1,12 +1,4 @@
-export interface Auth {
-	resource_owner_id: number;
-	scopes: string[];
-	expires_in_seconds: number;
-	application: {
-		uid: string;
-	};
-	created_at: Date;
-}
+
 export interface LogInReturn {
 	tokenInfo: TokenInfo;
 	jwt_token: string;

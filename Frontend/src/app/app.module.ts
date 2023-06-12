@@ -17,7 +17,6 @@ import { ChangeAvatarPopup, ChatPopup, ConfirmBuyPopup, PasswordPopup, Punishmen
 import { NotificationService } from './notification.service';
 import { ProfileModule } from './profile/profile.module';
 import { ProfilePopupModule } from './profile-popup/profile-popup.module';
-import { ToastComponent } from './toast/toast.component';
 import { ToastsContainer } from './toast/toast.container';
 import { ShopComponent } from './shop/shop.component';
 import { FriendsModule } from './friends/friends.module';
@@ -54,8 +53,6 @@ imports: [
 	ProfileModule,
 	FriendsModule,
 	ProfilePopupModule,
-	// PongModule,
-	ToastComponent,
 	ToastsContainer,
 	HomeModule,
 	GlassdoorModule,

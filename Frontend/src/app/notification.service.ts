@@ -2,7 +2,7 @@ import { Injectable, TemplateRef, ViewChild } from '@angular/core';
 import { Socket, io } from 'socket.io-client';
 import { WebsocketService } from './websocket.service';
 import { ToastService } from './toast/toast.service';
-import { NotificationRequest, NotificationResponse } from '../dtos/Notification.dto';
+import { NotificationRequest} from '../dtos/Notification.dto';
 import { AppComponent } from './app.component';
 import { FriendRequest } from 'src/dtos/User.dto';
 import { FetchService } from './fetch.service';
@@ -88,8 +88,6 @@ export class NotificationService {
 
 	showAchievements(notification: string) {
 		this.toastService.show(this.toastAchievement, { classname: 'bg-light p-0', delay: 10000, context: notification });
-		//if (notification.includes('Easter Egg'))
-		//	this.parent
 	}
 
 	showChallenge(notification: NotificationRequest) {
@@ -102,10 +100,6 @@ export class NotificationService {
 
 	showSuccess(notification: string) {
 		this.toastService.show(this.toastSuccess, { classname: 'bg-success p-0', delay: 2000, context: notification });
-	}
-
-	showChannel(notification: NotificationRequest) {
-		this.toastService.show(this.toastChannel, { classname: 'bg-light p-0', delay: 10000, context: notification });
 	}
 
 	initTemplates(

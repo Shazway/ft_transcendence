@@ -6,10 +6,3 @@ export interface NotificationRequest {
 	accepted?: boolean;
 	channel_id?: number;
 }
-export interface NotificationResponse {
-	source_id: number;
-	type: string;
-	source_name: string;
-	sent_at: Date;
-	accepted: boolean;
-}

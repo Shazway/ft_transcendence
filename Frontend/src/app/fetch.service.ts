@@ -50,22 +50,6 @@ export class FetchService {
 		return token;
 	}
 
-	async getAllUsers() {
-		let res;
-		const teaFunc = this.teapotError;
-		const route = this.router;
-		console.log('Requete getAllUsers');
-		await axios.get('http://localhost:3001/leaderboard', this.getHeader())
-		.then(function (response) {
-			res = response.data;
-		})
-		.catch(function (error) {
-			teaFunc(error, route);
-		})
-		.finally(function () {});
-		return res;
-	}
-
 	async createUser(param: User) {
 		let res;
 		const teaFunc = this.teapotError;
@@ -191,7 +175,6 @@ export class FetchService {
 		let res: AnyProfileUser[] = [];
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete getLeaderboard');
 		await axios.get<Array<AnyProfileUser>>('http://localhost:3001/leaderboard', this.getHeader())
 		.then(function (response) {
 			res = response.data;
@@ -468,22 +451,6 @@ export class FetchService {
 		return res;
 	}
 
-	async opSubstring(value : string) {
-		let res: AnyProfileUser[] = [];
-		const teaFunc = this.teapotError;
-		const route = this.router;
-		console.log('Requete opSubstring');
-		await axios.post<Array<AnyProfileUser>>('http://localhost:3001/channels/opBySubstring', {substring: value}, this.getHeader()) //chemin actuellement inexistant
-		.then(function (response) {
-			res = response.data;
-		})
-		.catch(function (error) {
-			teaFunc(error, route);
-		})
-		.finally(function () {});
-		return res;
-	}
-
 	async channelInvite(user : AnyProfileUser, channel_id : number) {
 		let res: AnyProfileUser[] = [];
 		const teaFunc = this.teapotError;
@@ -645,7 +612,6 @@ export class FetchService {
 		.finally(function () {});
 		return res;
 	}
-
 
 	async checkToken() {
 		const teaFunc = this.teapotError;

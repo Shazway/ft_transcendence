@@ -2,7 +2,7 @@ import { Component, ElementRef, HostListener, OnDestroy, ViewChild } from '@angu
 import { Socket, io } from 'socket.io-client';
 import { WebsocketService } from '../websocket.service';
 import { Application, Graphics, Texture } from 'pixi.js';
-import { pongObject, ballObject, Move, VectorPos, ScoreChange, GameEnd, Player } from 'src/dtos/Pong.dto';
+import { pongObject, ballObject, Move, VectorPos, ScoreChange, GameEnd} from 'src/dtos/Pong.dto';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatchSetting } from 'src/dtos/MatchSetting.dto';
 import { Mutex } from 'async-mutex';
