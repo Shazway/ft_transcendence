@@ -155,7 +155,7 @@ export class PongGateway {
 				match.gameService.endMatchSpectator(user.sub);
 				return this.emitToMatch('onUnspectateMatch', {username: user.name}, match);
 			}
-			if (!matchEntity.is_ongoing)
+			if (!matchEntity.is_ongoing || this.itemsService.endMatchMutex.isLocked())
 				return this.matchs.delete(match_id);
 			matchEntity.is_victory[this.getOtherPlayerIndex(matchEntity, user.sub)] = true;
 			await this.matchService.setMatchEnd(matchEntity);
