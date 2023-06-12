@@ -224,6 +224,15 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		}
 	}
 
+	isAllowed(username: string) {
+		if (!this.is_owner) {
+			const target = this.getUserFromChannel(username, this.currentChannel);
+			if (target.is_admin)
+				return false;
+		}
+		return true;
+	}
+
 	createChatPopup(msg: Message, event: MouseEvent) {
 		event.preventDefault();
 		if (event.button == 2) {
@@ -232,7 +241,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 				'',
 				'outside',
 				'start',
-				msg,
+				{msg, permission: this.isAllowed(msg.author.username)},
 			));
 		}
 		else if (event.button == 0) {
