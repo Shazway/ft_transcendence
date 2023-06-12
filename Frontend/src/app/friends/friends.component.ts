@@ -79,11 +79,6 @@ export class FriendsComponent {
 		this.friendshipRequests = await this.fetchService.getFriendshipRequests();
 	}
 
-	async addSystemFriend() {
-		this.friends.splice(0);
-		this.friends = await this.fetchService.getFriends();
-	}
-
 	goToProfile(user: AnyProfileUser)
 	{
 		this.router.navigateByUrl("profile?username=" + user.username);

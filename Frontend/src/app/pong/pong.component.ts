@@ -311,14 +311,6 @@ export class PongComponent implements OnDestroy {
 		this.scoreP2.setText(this.opponent.score.toString());
 	}
 
-	closeEnoughPlayer() {
-		return this.ball.graphic.x <= this.player.upperRightCorner.x + (this.ball.DIAMETER)
-	}
-
-	closeEnoughOpponent() {
-		return this.ball.graphic.x >= this.opponent.upperLeftCorner.x - (this.ball.DIAMETER)
-	}
-
 	update(delta: number) {
 		if (!this.gameSettings)
 			return;

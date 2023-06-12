@@ -28,7 +28,6 @@ import { HomeModule } from './home/home.module';
 import { GlassdoorModule } from './glassdoor/glassdoor.module';
 import { LeaderboardComponent } from './leaderboard/leaderboard.component';
 import { SearchComponent } from './search/search.component';
-import { PongDebugModule } from './pong-debug/pong-debug.module';
 
 @NgModule({
 declarations: [
@@ -56,7 +55,6 @@ imports: [
 	FriendsModule,
 	ProfilePopupModule,
 	// PongModule,
-	PongDebugModule,
 	ToastComponent,
 	ToastsContainer,
 	HomeModule,
