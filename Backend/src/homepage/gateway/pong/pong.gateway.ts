@@ -205,6 +205,11 @@ export class PongGateway {
 		const match_id = Number(client.handshake.query.match_id);
 		const match = this.matchs.get(match_id);
 
+		console.log('Arrow up');
+		console.log('MatchId');
+		console.log(match_id);
+		console.log('Match:')
+		console.log(match);
 		if (!match ||!match.gameService) throw new WsException('Match/GameService aren\'t available');
 		match.gameService.changeInput(user.sub, 'ArrowDown', body);
 		const move = match.gameService.getMove(user.sub);
@@ -224,6 +229,11 @@ export class PongGateway {
 		const match_id = Number(client.handshake.query.match_id);
 		const match = this.matchs.get(match_id);
 
+		console.log('Arrow up');
+		console.log('MatchId');
+		console.log(match_id);
+		console.log('Match:')
+		console.log(match);
 		if (!match ||!match.gameService) throw new WsException('Match/GameService aren\'t available');
 		match.gameService.changeInput(user.sub, 'ArrowUp', body);
 		const move = match.gameService.getMove(user.sub);
@@ -242,6 +252,11 @@ export class PongGateway {
 		const match_id = Number(client.handshake.query.match_id);
 		const match = this.matchs.get(match_id);
 
+		console.log('Arrow up');
+		console.log('MatchId');
+		console.log(match_id);
+		console.log('Match:')
+		console.log(match);
 		if (!match || !match.gameService) throw new WsException('Match/GameService aren\'t available');
 		match.players.forEach((player) => {
 			if (player.user_id == 0){

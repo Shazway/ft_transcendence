@@ -55,21 +55,21 @@ export class insertData666666666666666666 implements MigrationInterface {
 		await SkinRepo.insert([
 			{
 				type: 'Paddle',
-				name: 'SkinDefault',
+				name: 'Default Paddle',
 				img_url: 'assets/Skins/Paddle/default.png',
 				description: 'The default paddle',
 				price : 0,
 			},
 			{
 				type: 'Ball',
-				name: 'balleDefault',
+				name: 'Default ball',
 				img_url: 'assets/Skins/Ball/default.png',
 				description: 'The default ball',
 				price : 0,
 			},
 			{
 				type: 'Background',
-				name: 'fieldDefault',
+				name: 'Default field',
 				img_url: 'assets/Skins/Background/default.png',
 				description: 'The default background',
 				price : 0,
