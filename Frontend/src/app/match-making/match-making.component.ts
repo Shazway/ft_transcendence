@@ -23,7 +23,7 @@ export class MatchMakingComponent implements OnDestroy{
 		this.fetchService.checkToken();
 		if (!this.parent.isConnected())
 			this.router.navigateByUrl('login');
-		this.client = io('ws://10.14.3.3:3004', websocketService.getHeader());
+		this.client = io('ws://10.14.3.1:3004', websocketService.getHeader());
 		if (!localStorage.getItem('Jwt_token'))
 			return;
 		if (!this.client)
