@@ -106,3 +106,18 @@ ul ul a {
 	position: fixed;
 	right: 16px;
 }
+
+#playBtn {
+	height: 15px;
+	width: 20px;
+	opacity: 1;
+	transition: transform 0.3s ease-in-out;
+}
+
+#playBtn.reverse {
+	transform: rotate(180deg);
+}
+
+a:hover > .playBtn {
+	filter: invert(100%);
+}

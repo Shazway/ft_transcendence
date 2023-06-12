@@ -93,12 +93,18 @@ export class AppComponent implements AfterViewInit, OnDestroy {
 
 	togglePlay() {
 		const offscreenElm = this.elRef.nativeElement.querySelector('#play');
+		const playBtn = this.elRef.nativeElement.querySelector('#playBtn');
+
 		if (!offscreenElm)
 			return;
 		if (offscreenElm.classList.contains('show')) {
 			offscreenElm.classList.remove('show');
+			if (playBtn.classList.contains('reverse'))
+				playBtn.classList.remove('reverse');
 		} else {
 			offscreenElm.classList.add('show');
+			if (!playBtn.classList.contains('reverse'))
+				playBtn.classList.add('reverse');
 		}
 	}
 
