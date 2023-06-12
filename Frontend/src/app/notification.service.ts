@@ -28,7 +28,7 @@ export class NotificationService {
 		private websocketService: WebsocketService,
 		private fetchService: FetchService,
 		private toastService: ToastService,
-		private router: Router
+		private router: Router,
 	) {
 		if (this.isConnected()) {
 			if (!this.client || (this.client && !this.client.connected))
@@ -88,6 +88,8 @@ export class NotificationService {
 
 	showAchievements(notification: string) {
 		this.toastService.show(this.toastAchievement, { classname: 'bg-light p-0', delay: 10000, context: notification });
+		//if (notification.includes('Easter Egg'))
+		//	this.parent
 	}
 
 	showChallenge(notification: NotificationRequest) {

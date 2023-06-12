@@ -246,6 +246,13 @@ export class PongComponent implements OnDestroy {
 			this.ballLock.release();
 		});
 		this.isMatchOngoing = false;
+		const arrowElm = this.elRef.nativeElement.querySelector('.arrow-match');
+		if (!arrowElm)
+			return;
+		if (arrowElm.classList.contains('right'))
+			arrowElm.classList.remove('right');
+		if (arrowElm.classList.contains('left'))
+			arrowElm.classList.remove('left');
 	}
 
 	updateScore(event: ScoreChange) {
@@ -253,6 +260,7 @@ export class PongComponent implements OnDestroy {
 		if (event.side == this.PLAYER_SCORED) {
 			this.player.score++;
 			if (this.player.score < 10) {
+				this.slide(true);
 				if (this.player.score + this.opponent.score == 1)
 					this.assetManager.addPanningText(this.player.user.username + ' took the first point of the game ! (◕‿‿◕｡)');
 				else if (this.player.score - this.opponent.score == 1)
@@ -272,6 +280,7 @@ export class PongComponent implements OnDestroy {
 		else if (event.side == this.OPPONENT_SCORED) {
 			this.opponent.score++;
 			if (this.opponent.score < 10) {
+				this.slide(false);
 				if (this.opponent.score - this.player.score == 1)
 					this.assetManager.addPanningText(this.opponent.user.username + ' takes the lead ! (～ᗒ◡ᗕ)～三二一');
 				else if (this.opponent.score - this.player.score == 0)
@@ -424,5 +433,25 @@ export class PongComponent implements OnDestroy {
 		if (specWin.classList.contains('hide'))
 			specWin.classList.remove('hide');
 		else specWin.classList.add('hide');
+	}
+
+	slide(myTurn : boolean) {
+		const arrowElm = this.elRef.nativeElement.querySelector('.arrow-match');
+		if (!arrowElm)
+			return;
+		if (myTurn)
+		{
+			if (arrowElm.classList.contains('right'))
+				arrowElm.classList.remove('right');
+			if (!arrowElm.classList.contains('left'))
+				arrowElm.classList.add('left');
+		}
+		else
+		{
+			if (arrowElm.classList.contains('left'))
+				arrowElm.classList.remove('left');
+			if (!arrowElm.classList.contains('right'))
+				arrowElm.classList.add('right');
+		}
 	}
 }
