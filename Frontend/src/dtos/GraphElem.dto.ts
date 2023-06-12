@@ -11,15 +11,15 @@ export class AssetManager {
 	textArray: Array<{elem: PlainText | WowText, type: string}> = new Array;
 	styles!: any;
 	async initAssets() {
-		if (this.styles)
-			return this.styles;
+		// if (this.styles)
+		// 	return;
 		Assets.addBundle('fonts', {
 			PixeloidSans: 'assets/Fonts/PixeloidMono.ttf',
 			PixeloidMono: 'assets/Fonts/PixeloidMono.ttf',
 			PixeloidSansBold: 'assets/Fonts/PixeloidSansBold.ttf',
 		});
 		Assets.add('Red gradient' ,'assets/Skins/Paddle/red-gradient.png');
-		Assets.add('SkinDefault' ,'assets/Skins/Paddle/default.png');
+		Assets.add('Default Paddle' ,'assets/Skins/Paddle/default.png');
 		Assets.add('Swirl' ,'assets/Skins/Paddle/Swirl.png');
 		Assets.add('Poêle' ,'assets/Skins/Paddle/poele.png');
 		Assets.add('Baguette' ,'assets/Skins/Paddle/baguette.png');
@@ -27,10 +27,10 @@ export class AssetManager {
 		Assets.add('Pasta' ,'assets/Skins/Paddle/torti.png');
 		Assets.add('Beach ball' ,'assets/Skins/Ball/ballon.png');
 		Assets.add('Lemon pie' ,'assets/Skins/Ball/tarteCitron.png');
-		Assets.add('balleDefault' ,'assets/Skins/Ball/default.png');
+		Assets.add('Default ball' ,'assets/Skins/Ball/default.png');
 		Assets.add('Strawberry pie' ,'assets/Skins/Ball/tarteFraise.png');
 		Assets.add('Cloudy sky' ,'assets/Skins/Background/cloudySky.png');
-		Assets.add('fieldDefault' ,'assets/Skins/Background/default.png');
+		Assets.add('Default field' ,'assets/Skins/Background/default.png');
 		Assets.add('Nathan' ,'assets/Skins/Background/Nathan.png');
 		Assets.add('Billard' ,'assets/Skins/Background/Pool.png');
 		this.styles = await Assets.loadBundle('fonts').then(() => {
@@ -74,7 +74,7 @@ export class AssetManager {
 			}
 			return true
 		});
-		this.textArray.push({elem: new PlainText('', this.styles.funText, this.app.renderer.width/2 - 25, 10, this.app), type: 'count'})
+		this.textArray.push({elem: new PlainText('', this.styles.funText, this.app.renderer.width/2, 10, this.app, 'center'), type: 'count'})
 	}
 
 	addPanningText(text: string) {
@@ -86,6 +86,17 @@ export class AssetManager {
 			return true
 		});
 		this.textArray.push({elem: new PlainText(text, this.styles.funText, this.app.renderer.width, 50, this.app), type: 'pan'})
+	}
+
+	addEndMessage(text: string) {
+		this.textArray = this.textArray.filter((elem) => {
+			if (elem.type == 'count') {
+				elem.elem.destroy()
+				return false
+			}
+			return true
+		});
+		this.textArray.push({elem: new PlainText(text, this.styles.funText, this.app.renderer.width/2, 10, this.app, 'center'), type: 'end'})
 	}
 
 	updateArbiter(delta: number) {
@@ -117,22 +128,40 @@ export class AssetManager {
 
 export class PlainText {
 	public text: Text;
+	public posX: number;
+	public alignment: 'left' | 'center' | 'right';
 	private app: Application;
 
-	constructor(content: string, style: TextStyle, posX: number, posY: number, app: Application) {
+	constructor(content: string, style: TextStyle, posX: number, posY: number, app: Application, alignment: 'left' | 'center' | 'right' = 'left') {
 		this.text = new Text(content, style);
-		this.text.x = posX;
+		this.posX = posX;
 		this.text.y = posY;
 		this.app = app;
 		this.app.stage.addChild(this.text);
+		this.alignment = alignment;
+		this.realign();
+	}
+
+	realign() {
+		const margin = TextMetrics.measureText(this.text.text, this.text.style).width;
+		if (this.alignment == 'left')
+			this.text.x = this.posX;
+		if (this.alignment == 'center')
+			this.text.x = this.posX - (margin / 2);
+		if (this.alignment == 'right')
+			this.text.x = this.posX - margin;
 	}
 
 	setText(newText: string) {
+		if (this.text.text == newText)
+			return;
 		this.text.text = newText;
+		this.realign();
 	}
 
 	moveText(panX: number, panY: number) {
 		this.text.x += panX;
+		this.posX += panX;
 		this.text.y += panY;
 	}
 
@@ -199,13 +228,15 @@ export class WowText {
 	}
 
 	setText(newText: string) {
+		console.log('new text: ' + newText);
 		let index = 0;
 		const newTxt = newText.split('');
 		while (this.text.length < newText.length) {
+			console.log('created char');
 			const charac = new Text('0', this.style);
 			charac.zIndex = 1;
 			this.text.push(charac);
-			this.app.stage.addChildAt(charac, 0);
+			this.app.stage.addChild(charac);
 		}
 		for (; index < this.text.length; index++) {
 			if (index < newText.length)
@@ -262,7 +293,9 @@ export class WowText {
 				len -= TextMetrics.measureText(charac.text, charac.style).width;
 				charac.x = this.startPosX + len;
 				charac.y = this.startPosY;
+				console.log('posX = ' + charac.x + ', posY = ' + charac.y, ', text = ' + charac.text);
 			})
+			this.text.reverse();
 		} else {
 			this.text.forEach((charac) => {
 				charac.x = this.startPosX + len;

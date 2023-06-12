@@ -12,6 +12,8 @@ import { FetchService } from '../fetch.service';
 import { ShopItem } from 'src/dtos/ShopItem.dto';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { AppComponent } from '../app.component';
+import { NotificationService } from '../notification.service';
+import { NotificationRequest } from 'src/dtos/Notification.dto';
 
 @Component({
 	selector: 'app-pong',
@@ -40,7 +42,7 @@ export class PongComponent implements OnDestroy {
 	private movespeed = 5;
 	private gamespeed = 13;
 	private timeoutId!: any;
-	private gameSettings!: MatchSetting;
+	public gameSettings!: MatchSetting;
 	private ballLock!: Mutex;
 	private isMatchOngoing = true;
 	public isSpectator = false;
@@ -60,6 +62,7 @@ export class PongComponent implements OnDestroy {
 		private elRef: ElementRef,
 		private assetManager: AssetManager,
 		private fetchService: FetchService,
+		private notifService: NotificationService
 	) {
 		this.fetchService.checkToken();
 		if (!this.parent.isConnected())
@@ -68,7 +71,9 @@ export class PongComponent implements OnDestroy {
 	}
 
 	ngOnDestroy(): void {
-		this.client.disconnect();
+		if (this.client.connected)
+			this.client.disconnect();
+		this.app.ticker.stop();
 	}
 
 	ngAfterViewInit(): void {
@@ -153,14 +158,15 @@ export class PongComponent implements OnDestroy {
 	}
 
 	async getSkin(skin_id: number, skinRepo: ShopItem[]): Promise<Texture> {
-		let tex: Texture = await this.assetManager.getAsset('SkinDefault');
+		console.log("pass");
 		let skin_name: string = '';
-		await skinRepo.forEach(skin => {
+		skinRepo.forEach(skin => {
 			if (skin.skin_id == skin_id)
 				skin_name = skin.name;
 		});
 		if (skin_name.length > 0)
 			return await this.assetManager.getAsset(skin_name);
+		console.log("no skin");
 		return await this.assetManager.getAsset('SkinDefault');
 	}
 
@@ -178,13 +184,35 @@ export class PongComponent implements OnDestroy {
 	}
 
 	setReady() {
-		const removeElm = this.elRef.nativeElement.querySelector('#removable');
+		const removeElm = this.elRef.nativeElement.querySelector('#removable-ready');
 		if (removeElm)
 			removeElm.remove();
 		this.client.emit('ready');
 	}
 
+	redirect(path: string) {
+		this.router.navigateByUrl(path);
+	}
+
+	buildNotif(type: string, target_name: string, target_id: number) : NotificationRequest {
+		return {type : type, target_id : target_id, target_name : target_name};
+	}
+
+	rematch() {
+		this.notifService.client.emit('inviteRequest', this.buildNotif("match", this.opponent.user.username, this.opponent.user.user_id));
+	}
+
 	endMatch(event: GameEnd) {
+		const profileElm = this.elRef.nativeElement.querySelector('#removable-profile');
+		const matchElm = this.elRef.nativeElement.querySelector('#removable-match');
+		const rematchElm = this.elRef.nativeElement.querySelector('#removable-rematch');
+		profileElm.classList.add("show");
+		if (matchElm) matchElm.classList.add("show");
+		if (rematchElm) rematchElm.classList.add("show");
+		if (event.state == this.WIN)
+			this.assetManager.addEndMessage('You Win');
+		if (event.state == this.LOSS)
+			this.assetManager.addEndMessage('You Lose');
 		if (event.reason == 'score') {
 			if (event.state == this.WIN)
 			{
@@ -218,6 +246,15 @@ export class PongComponent implements OnDestroy {
 			this.ballLock.release();
 		});
 		this.isMatchOngoing = false;
+		if (this.client.connected)
+			this.client.disconnect();
+		const arrowElm = this.elRef.nativeElement.querySelector('.arrow-match');
+		if (!arrowElm)
+			return;
+		if (arrowElm.classList.contains('right'))
+			arrowElm.classList.remove('right');
+		if (arrowElm.classList.contains('left'))
+			arrowElm.classList.remove('left');
 	}
 
 	updateScore(event: ScoreChange) {
@@ -225,6 +262,7 @@ export class PongComponent implements OnDestroy {
 		if (event.side == this.PLAYER_SCORED) {
 			this.player.score++;
 			if (this.player.score < 10) {
+				this.slide(true);
 				if (this.player.score + this.opponent.score == 1)
 					this.assetManager.addPanningText(this.player.user.username + ' took the first point of the game ! (◕‿‿◕｡)');
 				else if (this.player.score - this.opponent.score == 1)
@@ -244,6 +282,7 @@ export class PongComponent implements OnDestroy {
 		else if (event.side == this.OPPONENT_SCORED) {
 			this.opponent.score++;
 			if (this.opponent.score < 10) {
+				this.slide(false);
 				if (this.opponent.score - this.player.score == 1)
 					this.assetManager.addPanningText(this.opponent.user.username + ' takes the lead ! (～ᗒ◡ᗕ)～三二一');
 				else if (this.opponent.score - this.player.score == 0)
@@ -396,5 +435,25 @@ export class PongComponent implements OnDestroy {
 		if (specWin.classList.contains('hide'))
 			specWin.classList.remove('hide');
 		else specWin.classList.add('hide');
+	}
+
+	slide(myTurn : boolean) {
+		const arrowElm = this.elRef.nativeElement.querySelector('.arrow-match');
+		if (!arrowElm)
+			return;
+		if (myTurn)
+		{
+			if (arrowElm.classList.contains('right'))
+				arrowElm.classList.remove('right');
+			if (!arrowElm.classList.contains('left'))
+				arrowElm.classList.add('left');
+		}
+		else
+		{
+			if (arrowElm.classList.contains('left'))
+				arrowElm.classList.remove('left');
+			if (!arrowElm.classList.contains('right'))
+				arrowElm.classList.add('right');
+		}
 	}
 }
