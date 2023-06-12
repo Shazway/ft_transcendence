@@ -144,13 +144,13 @@
 
 <ng-template let-data="data" #chatInteractionTemplate>
 	<div class="d-grid">
-		<button (click)="goToProfile(data.author.username)" type="button" class="row btn btn-block popup-hover">User Profile</button>
-		<button (click)="addFriend(data)" type="button" class="row btn btn-block popup-hover">Add Friend</button>
-		<button (click)="blockUser(data)" type="button" class="row btn btn-block popup-hover">Block User</button>
-		<button *ngIf="is_admin" (click)="muteUser(data)" type="button" class="row btn btn-block popup-hover">Mute User</button>
-		<button *ngIf="is_admin" (click)="kickUser(data)" type="button" class="row btn btn-block popup-hover">Kick User</button>
-		<button *ngIf="is_admin" (click)="banUser(data)" type="button" class="row btn btn-block popup-hover">Ban User</button>
-		<button *ngIf="is_admin" (click)="addOp(data.author.username)" type="button" class="row btn btn-block popup-hover">Promote User</button>
-		<button *ngIf="is_admin" (click)="deOp(data.author.username)" type="button" class="row btn btn-block popup-hover">Demote User</button>
+		<button (click)="goToProfile(data.msg.author.username)" type="button" class="row btn btn-block popup-hover">User Profile</button>
+		<button (click)="addFriend(data.msg)" type="button" class="row btn btn-block popup-hover">Add Friend</button>
+		<button (click)="blockUser(data.msg)" type="button" class="row btn btn-block popup-hover">Block User</button>
+		<button *ngIf="data.permission" (click)="muteUser(data.msg)" type="button" class="row btn btn-block popup-hover">Mute User</button>
+		<button *ngIf="data.permission" (click)="kickUser(data.msg)" type="button" class="row btn btn-block popup-hover">Kick User</button>
+		<button *ngIf="data.permission" (click)="banUser(data.msg)" type="button" class="row btn btn-block popup-hover">Ban User</button>
+		<button *ngIf="data.permission" (click)="addOp(data.msg.author.username)" type="button" class="row btn btn-block popup-hover">Promote User</button>
+		<button *ngIf="data.permission" (click)="deOp(data.msg.author.username)" type="button" class="row btn btn-block popup-hover">Demote User</button>
 	</div>
 </ng-template>
