@@ -19,7 +19,7 @@ export class AuthService {
 			client_id: authWorker.u_key,
 			client_secret: authWorker.s_key,
 			code: code,
-			redirect_uri: 'http://10.14.3.3:4200/auth'
+			redirect_uri: 'http://10.14.3.1:4200/auth'
 		};
 	}
 

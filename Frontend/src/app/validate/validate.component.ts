@@ -28,7 +28,7 @@ export class ValidateComponent {
 	async getCode(mdp: TwoFacAuth) {
 		let statusCode = 0;
 		let loginReturn: LogInReturn;
-		await axios.post<LogInReturn>('http://10.14.3.3:3001/login/callback', {
+		await axios.post<LogInReturn>('http://10.14.3.1:3001/login/callback', {
 			mail_code: mdp.code,
 			id: this.bodyid,
 			api_code: this.code
