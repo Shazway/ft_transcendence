@@ -118,14 +118,14 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		if (await this.usersService.isBlockedCheck(body.target_id, source.sub))
 			return client.emit('onError', 'User blocked you');
 		if (body.type == 'friend' && !(await this.requestService.handleFriendRequestInvite(source.sub, body.target_id)))
-			return client.emit('onError', 'Something went wrong');
+			return client.emit('onError', 'You are already friends with this person, or they refused');
 		else if (body.type == 'match' && !target)
 			return client.emit('onError', 'Your friend is currently offline');
 		else if (body.type == 'match' && target)
 		{
 			if (await this.usersService.canInvite(source.sub, body.target_id) && target.connected)
 				return target.emit(body.type + 'Invite', { notification: answer});
-			return client.emit('failure', 'Refused invite');
+			return client.emit('failure', 'Refused invite or disconnected user');
 		}
 		if (target && target.connected)
 			target.emit(body.type + 'Invite', { notification: answer});
@@ -168,22 +168,20 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 					}
 				}
 				else
-					return client.emit('onError', 'Erreur');
+					return client.emit('onError', 'Error');
 			}
-
 			if (body.type == 'match')
 			{
-				if (!target)
+				if (!target || !target.connected)
 					return client.emit('onError', 'Opponent disconnected');
 				const match = await this.matchService.createFullMatch(source.sub, body.target_id, this.buildCasualSetting());
 				if (!match)
 					return client.emit('onError', 'Something went wrong');
 				client.emit('casualMatch', match.match_id);
 				target.emit('casualMatch', match.match_id);
-				return;
 			}
 		}
-		else
+		else if (!body.accepted && body.type == 'friend')
 			this.itemsService.deleteFriendRequest(source.sub, body.target_id);
 		if (!client || !client.connected)
 		{

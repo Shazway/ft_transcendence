@@ -115,7 +115,10 @@ export class ChannelsController {
 		if (!body || !body.channel_id) return res.status(HttpStatus.OK).send('No body');
 		const channelId = body.channel_id;
 		if (await this.channelService.deleteChannel(channelId, user.sub))
+		{
+			this.chanGateway.sendSystemMessageToChannel(channelId, user.sub, ' deleted the channel, you may now leave');
 			return res.status(HttpStatus.ACCEPTED).send('Success');
+		}
 		res.status(HttpStatus.OK).send('Failure');
 	}
 

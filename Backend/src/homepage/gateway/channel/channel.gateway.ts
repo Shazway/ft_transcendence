@@ -195,10 +195,24 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		const user = await this.itemService.getUser(targetId);
 		const channel = await this.itemService.getChannel(channel_id);
 		if (!user || !channel)
-			throw new WsException('User or Channel does not exist');
+			return false;
 		await this.sendMessageToChannel(0, channel_id, {
 			message_id: 0,
 			message_content: user.username + content,
+			author: { username: 'System', user_id: 0 },
+			createdAt: new Date()
+		}, dest);
+		return true;
+	}
+
+
+	async sendSystemMessagenoTarget(channel_id: number, content: string, dest = 'onMessage') {
+		const channel = await this.itemService.getChannel(channel_id);
+		if (!channel)
+			return false;
+		await this.sendMessageToChannel(0, channel_id, {
+			message_id: 0,
+			message_content: content,
 			author: { username: 'System', user_id: 0 },
 			createdAt: new Date()
 		}, dest);
