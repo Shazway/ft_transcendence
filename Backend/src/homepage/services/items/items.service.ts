@@ -8,6 +8,7 @@ import { ApplySkins } from 'src/homepage/dtos/User.dto';
 import { Repository } from 'typeorm';
 import { NotificationsGateway } from 'src/homepage/gateway/notifications/notifications.gateway';
 import Achievement from 'src/entities/achievements.entity';
+import { Mutex } from 'async-mutex';
 
 @Injectable()
 export class ItemsService {
@@ -29,7 +30,8 @@ export class ItemsService {
 		@InjectRepository(MessageEntity)
 		private readonly messageRepo: Repository<MessageEntity>,
 		@InjectRepository(SkinEntity)
-		private readonly skinRepo: Repository<SkinEntity>
+		private readonly skinRepo: Repository<SkinEntity>,
+		public endMatchMutex: Mutex
 	) {}
 
 	public sanitizeEntry(entry: string)
@@ -612,11 +614,16 @@ export class ItemsService {
 
 	async updateRankScore(player1: pongObject, player2: pongObject, match: MatchEntity, matchSetting: MatchSettingEntity, notifGateway: NotificationsGateway, id?: number)
 	{
-		if (id)
-			await this.updateLeftMatch(player1, player2, match, id, matchSetting);
-		else
-			await this.updateFinishedMatch(player1, player2, match, matchSetting);
-		return await this.updatePlayersAchievement(player1, player2, matchSetting, notifGateway);
+		await this.endMatchMutex.waitForUnlock().then(async () => {
+			await this.endMatchMutex.acquire().then(async () => {
+				if (id)
+					await this.updateLeftMatch(player1, player2, match, id, matchSetting);
+				else
+					await this.updateFinishedMatch(player1, player2, match, matchSetting);
+				return await this.updatePlayersAchievement(player1, player2, matchSetting, notifGateway);
+			});
+			this.endMatchMutex.release();
+		});
 	}
 
 	async toggleDoubleAuth(userId: number)
