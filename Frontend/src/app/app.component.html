@@ -45,7 +45,11 @@
 		<nav *ngIf="isConnected()" id="sidebar" class="offscreen light-gunmetal h-100 my-light2">
 			<ul class="list-group active">
 				<li class="active" aria-owns="#homeSubmenu">
-					<a data-toggle="collapse" class="dropdown-toggle cursor-pointer" (click)="togglePlay()">Play</a>
+					<a data-toggle="collapse" class="dropdown cursor-pointer d-flex" (click)="togglePlay()">
+						Play
+						<div class="flex-grow-1"></div>
+						<img src="https://cdn.discordapp.com/attachments/1041104785870438521/1117881020608426085/Chevron_down.png" id="playBtn" class="rounded-circle playBtn" draggable="false">
+					</a>
 					<ul  class="collapse list-unstyled show " id="play">
 						<li>
 							<a class="cursor-pointer" (click)="navTo('matchmaking')">Ranked match</a>
