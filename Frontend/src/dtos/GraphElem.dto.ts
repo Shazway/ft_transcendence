@@ -228,13 +228,15 @@ export class WowText {
 	}
 
 	setText(newText: string) {
+		console.log('new text: ' + newText);
 		let index = 0;
 		const newTxt = newText.split('');
 		while (this.text.length < newText.length) {
+			console.log('created char');
 			const charac = new Text('0', this.style);
 			charac.zIndex = 1;
 			this.text.push(charac);
-			this.app.stage.addChildAt(charac, 0);
+			this.app.stage.addChild(charac);
 		}
 		for (; index < this.text.length; index++) {
 			if (index < newText.length)
@@ -291,7 +293,9 @@ export class WowText {
 				len -= TextMetrics.measureText(charac.text, charac.style).width;
 				charac.x = this.startPosX + len;
 				charac.y = this.startPosY;
+				console.log('posX = ' + charac.x + ', posY = ' + charac.y, ', text = ' + charac.text);
 			})
+			this.text.reverse();
 		} else {
 			this.text.forEach((charac) => {
 				charac.x = this.startPosX + len;

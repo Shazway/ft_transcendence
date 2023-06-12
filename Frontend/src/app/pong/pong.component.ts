@@ -71,8 +71,9 @@ export class PongComponent implements OnDestroy {
 	}
 
 	ngOnDestroy(): void {
-		this.client.disconnect();
-		this.gameSettings.is_ranked
+		if (this.client.connected)
+			this.client.disconnect();
+		this.app.ticker.stop();
 	}
 
 	ngAfterViewInit(): void {
@@ -197,8 +198,7 @@ export class PongComponent implements OnDestroy {
 		return {type : type, target_id : target_id, target_name : target_name};
 	}
 
-	rematch()
-	{
+	rematch() {
 		this.notifService.client.emit('inviteRequest', this.buildNotif("match", this.opponent.user.username, this.opponent.user.user_id));
 	}
 
@@ -246,6 +246,8 @@ export class PongComponent implements OnDestroy {
 			this.ballLock.release();
 		});
 		this.isMatchOngoing = false;
+		if (this.client.connected)
+			this.client.disconnect();
 		const arrowElm = this.elRef.nativeElement.querySelector('.arrow-match');
 		if (!arrowElm)
 			return;
