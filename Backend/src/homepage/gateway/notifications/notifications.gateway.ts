@@ -75,7 +75,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 		if (!client) return ;
 		client.emit(
 			'newAchievement',
-			'Congratulations! You received the ' + achievement.achievement_name
+			'Congratulations! You received the ' + achievement.achievement_name + ' achievement'
 		);
 		return true;
 	}
@@ -119,9 +119,9 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 			return client.emit('onError', 'User blocked you');
 		if (body.type == 'friend' && !(await this.requestService.handleFriendRequestInvite(source.sub, body.target_id)))
 			return client.emit('onError', 'You are already friends with this person, or they refused');
-		else if (body.type == 'match' && !target)
+		else if (body.type == 'match' && !target || !target.connected)
 			return client.emit('onError', 'Your friend is currently offline');
-		else if (body.type == 'match' && target)
+		else if (body.type == 'match')
 		{
 			if (await this.usersService.canInvite(source.sub, body.target_id) && target.connected)
 				return target.emit(body.type + 'Invite', { notification: answer});
@@ -148,6 +148,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 			throw new WsException('No answer given is necessary');
 		const answer = this.buildAnswer(source.sub, source.name, body.type, body.accepted);
 		const target = this.userList.get(body.target_id);
+
 		if (body.accepted)
 		{
 			if (body.type == 'friend')

@@ -63,64 +63,59 @@ export class PongGateway {
 	async handleConnection(client: Socket) {
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'EEEE');
 		if (!user) return client.disconnect();
-		await this.connectMutex.waitForUnlock().then(async () => {
-			await this.connectMutex.acquire().then(async () => {
-				const userEntity = await this.itemsService.getUser(user.sub);
-				const match_id = Number(client.handshake.query.match_id);
 
-				if (Number.isNaN(match_id) || !match_id)
-					return client.disconnect();
-				const matchEntity = await this.itemsService.getMatch(match_id);
-				if (!matchEntity || !matchEntity.is_ongoing)
-					return client.disconnect();
-				if (userEntity.inMatch)
-					return client.emit('onError', "Already in match");
-				let match = this.matchs.get(match_id);
-				if (!(await this.isPlayer(user.sub, match_id)) && (!match || !match.started))
-				{
-					client.emit('notStarted', 'Match is not ready, please wait before joining again');
-					client.disconnect();
-				}
-				userEntity.inMatch = true;
-				await this.itemsService.saveUserState(userEntity);
-				if (!match) {
-					match = new Match();
-					match.players = new Array<Player>();
-					match.entity = matchEntity;
-					match.players.push(this.buildPlayer(client, user.sub, user.name));
-					this.matchs.set(match_id, match);
-				}
-				if (match.started && match.players.length >= 2)
-				{
-					match.gameService.spectators.push(this.buildPlayer(client, user.sub, user.name));
-					client.emit('spectateMatch', {
-						matchSetting: new MatchSettingEntity(),
-						ballPos: match.gameService.ball.pos,
-						ballDir: match.gameService.ball.direction,
-						playerPos: match.gameService.player1.pos,
-						playerScore: match.gameService.player1.score,
-						opponentPos: match.gameService.player2.pos,
-						opponentScore: match.gameService.player2.score,
-					});
-					this.emitToMatch('onSpectateMatch', {username: user.name, img_url: userEntity.img_url}, match);
-					return ;
-				}
-				if (match.players.length == 1 && match.players[0].user_id !== user.sub) {
-					match.players.push(this.buildPlayer(client, user.sub, user.name));
-				}
-				if (match.players.length == 2 && !match.started){
-					match.started = true;
-					this.initMatch(match, await this.itemsService.getMatchSetting(match.entity.match_id));
-				}
-				else
-					this.emitToMatch(
-						'waitMatch',
-						'Waiting for ' + match.entity.user[0] + ' to join or ' + match.entity.user[1],
-						match
-				)
-			});
-			this.connectMutex.release();
+		await this.connectMutex.acquire().then(async () => {
+			const userEntity = await this.itemsService.getUser(user.sub);
+			const match_id = Number(client.handshake.query.match_id);
+
+			if (Number.isNaN(match_id) || !match_id)
+				return client.disconnect();
+			const matchEntity = await this.itemsService.getMatch(match_id);
+			if (!matchEntity || !matchEntity.is_ongoing)
+				return client.disconnect();
+			if (userEntity.inMatch)
+				return client.emit('onError', "Already in match");
+			let match = this.matchs.get(match_id);
+			if (!(await this.isPlayer(user.sub, match_id)) && (!match || !match.started))
+			{
+				client.emit('notStarted', 'Match is not ready, please wait before joining again');
+				client.disconnect();
+			}
+			userEntity.inMatch = true;
+			await this.itemsService.saveUserState(userEntity);
+			if (!match)
+			{
+				match = new Match();
+				match.players = new Array<Player>();
+				match.entity = matchEntity;
+				match.players.push(this.buildPlayer(client, user.sub, user.name));
+				this.matchs.set(match_id, match);
+			}
+			if (match.started && match.players.length >= 2)
+			{
+				console.log('Spectating' + user.name);
+				match.gameService.spectators.push(this.buildPlayer(client, user.sub, user.name));
+				client.emit('spectateMatch', {
+					matchSetting: new MatchSettingEntity(),
+					ballPos: match.gameService.ball.pos,
+					ballDir: match.gameService.ball.direction,
+					playerPos: match.gameService.player1.pos,
+					playerScore: match.gameService.player1.score,
+					opponentPos: match.gameService.player2.pos,
+					opponentScore: match.gameService.player2.score,
+				});
+				this.emitToMatch('onSpectateMatch', {username: user.name, img_url: userEntity.img_url}, match);
+				return ;
+			}
+			if (match.players.length == 1 && match.players[0].user_id == user.sub)
+				return ;
+			match.players.push(this.buildPlayer(client, user.sub, user.name));
+			if (match.players.length == 2 && !match.started){
+				match.started = true;
+				this.initMatch(match, await this.itemsService.getMatchSetting(match.entity.match_id));
+			}
 		});
+		this.connectMutex.release();
 	}
 
 	initMatch(match: Match, setting: MatchSettingEntity) {
@@ -208,9 +203,7 @@ export class PongGateway {
 		console.log('Arrow up');
 		console.log('MatchId');
 		console.log(match_id);
-		console.log('Match:')
-		console.log(match);
-		if (!match ||!match.gameService) throw new WsException('Match/GameService aren\'t available');
+		if (!match ||!match.gameService) client.emit('onError', 'The game is not ready yet');
 		match.gameService.changeInput(user.sub, 'ArrowDown', body);
 		const move = match.gameService.getMove(user.sub);
 		match.players.forEach((player) => {
@@ -232,9 +225,7 @@ export class PongGateway {
 		console.log('Arrow up');
 		console.log('MatchId');
 		console.log(match_id);
-		console.log('Match:')
-		console.log(match);
-		if (!match ||!match.gameService) throw new WsException('Match/GameService aren\'t available');
+		if (!match ||!match.gameService) client.emit('onError', 'The game is not ready yet');
 		match.gameService.changeInput(user.sub, 'ArrowUp', body);
 		const move = match.gameService.getMove(user.sub);
 		match.players.forEach((player) => {
@@ -255,9 +246,7 @@ export class PongGateway {
 		console.log('Arrow up');
 		console.log('MatchId');
 		console.log(match_id);
-		console.log('Match:')
-		console.log(match);
-		if (!match || !match.gameService) throw new WsException('Match/GameService aren\'t available');
+		if (!match || !match.gameService) client.emit('onError', 'The game is not ready yet');
 		match.players.forEach((player) => {
 			if (player.user_id == 0){
 			}

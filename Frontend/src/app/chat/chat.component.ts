@@ -546,30 +546,30 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		this.scrollBottom();
 	}
 
+	emptyField(data: LessMessage) {
+		const textRef = this.elRef.nativeElement.querySelector('#exampleFormControlInput1');
+		textRef.value = '';
+		data.message_content = '';
+	}
+
 	async onClickChat(data: LessMessage) {
 		if (!this.client.connected)
 			this.openChannel(this.currentChannel);
 		if (!this.client || data.message_content.trim().length == 0)
 			return false;
-		const textRef = this.elRef.nativeElement.querySelector('#exampleFormControlInput1');
+		
 
 		if (data.message_content[0] == '/') {
 			const split = data.message_content.split(' ');
 			if (split[0] == '/leave') {
 				if (!this.is_owner)
 					this.leaveChannel();
-				textRef.value = '';
-				return;
 			}
 			else if (split[0] == '/obliterate') {
 				this.obliterateChannel();
-				textRef.value = '';
-				return;
 			}
 			else if (split[0] == '/help') {
 				this.printHelp();
-				textRef.value = '';
-				return;
 			}
 			else if (split.length < 2)
 				return this.checkInputChat(data.message_content, 0, 255, '#exampleFormControlInput1', false, this.chatCheckList);
@@ -578,8 +578,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
 					username: split[1],
 					message: "You have been kicked",
 				});
-				textRef.value = '';
-				return;
 			}
 			else if (split[0] == '/ban') {
 				const time = split[2] ? Number(split[2]) : 0;
@@ -588,16 +586,12 @@ export class ChatComponent implements OnInit, AfterViewInit {
 					message: "You have been banned",
 					time,
 				});
-				textRef.value = '';
-				return;
 			}
 			else if (split[0] == '/unban') {
 				this.client.emit('unban', {
 					username: split[1],
 					message: "You have been unbanned",
 				});
-				textRef.value = '';
-				return;
 			}
 			else if (split[0] == '/mute') {
 				const time = split[2] ? Number(split[2]) : 0;
@@ -606,45 +600,37 @@ export class ChatComponent implements OnInit, AfterViewInit {
 					message: "You have been muted",
 					time,
 				});
-				textRef.value = '';
-				return;
 			}
 			else if (split[0] == '/unmute') {
 				this.client.emit('unmute', {
 					username: split[1],
 					message: "You have been unmuted",
 				});
-				textRef.value = '';
-				return;
 			}
 			else if (split[0] == '/invite') {
 				let userToAdd  = await this.fetchService.getUser(split[1]);
 				if (userToAdd)
 					this.addMember(userToAdd);
-				textRef.value = '';
-				return;
 			}
 			else if (split[0] == '/op') {
 				this.addOp(split[1]);
-				textRef.value = '';
-				return;
 			}
 			else if (split[0] == '/deop') {
 				this.deOp(split[1]);
-				textRef.value = '';
-				return;
 			}
 		}
+		else {
+			const author = localStorage.getItem('username');
+			const id = localStorage.getItem('id');
+	
+			if (id && author)
+				this.client.emit('message', {
+					message_content: data.message_content,
+					author: {username: author, user_id: id, img_url: localStorage.getItem('img_url')}
+				});
+		}
 
-		textRef.value = '';
-		const author = localStorage.getItem('username');
-		const id = localStorage.getItem('id');
-
-		if (id && author)
-			this.client.emit('message', {
-				message_content: data.message_content,
-				author: {username: author, user_id: id, img_url: localStorage.getItem('img_url')}
-			});
+		this.emptyField(data);
 		return true;
 	}
 

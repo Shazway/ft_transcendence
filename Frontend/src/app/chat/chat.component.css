@@ -180,6 +180,7 @@ img{ max-width:100%;}
 
 .hidden_icon.show {
   opacity: 1;
+  cursor: pointer;
 }
 
 .chat-size {
