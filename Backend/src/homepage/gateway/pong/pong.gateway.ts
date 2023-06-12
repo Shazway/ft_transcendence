@@ -155,6 +155,7 @@ export class PongGateway {
 				match.gameService.endMatchSpectator(user.sub);
 				return this.emitToMatch('onUnspectateMatch', {username: user.name}, match);
 			}
+			match.players = match.players.filter((players) => players.user_id != user.sub);
 			if (!matchEntity.is_ongoing)
 				return this.matchs.delete(match_id);
 			matchEntity.is_victory[this.getOtherPlayerIndex(matchEntity, user.sub)] = true;

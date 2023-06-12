@@ -8,6 +8,13 @@
 	opacity: 0;
 }
 
+.endmatch {
+	display: none;
+}
+
+.endmatch.show {
+	display: block;
+}
 
 .arrow-match{
 	cursor: none;

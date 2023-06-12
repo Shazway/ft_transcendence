@@ -78,6 +78,8 @@ export class AppComponent implements AfterViewInit, OnDestroy {
 	navTo(route : string) {
 		if (route == 'profile')
 			this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => this.router.navigateByUrl("profile"));
+		else if (route == 'matchmaking')
+			this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => this.router.navigateByUrl("matchmaking"));
 		else this.router.navigateByUrl(route);
 	}
 
