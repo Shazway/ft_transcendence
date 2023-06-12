@@ -11,7 +11,6 @@ import { ItemsService } from './services/items/items.service';
 import { AuthService } from './services/auth/auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { VarFetchService, varFetchService } from './services/var_fetch/var_fetch.service';
-import { AuthVerifMiddleware } from './middleware/auth-verif/auth-verif.middleware';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import entities from 'src/entities';
 import { DataSourceOptions } from 'typeorm';

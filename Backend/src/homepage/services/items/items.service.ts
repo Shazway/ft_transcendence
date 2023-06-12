@@ -12,6 +12,7 @@ import { Mutex } from 'async-mutex';
 
 @Injectable()
 export class ItemsService {
+	endMatchMutex: Mutex;
 	constructor(
 		@InjectRepository(UserEntity)
 			private readonly userRepo: Repository<UserEntity>,
@@ -30,9 +31,10 @@ export class ItemsService {
 		@InjectRepository(MessageEntity)
 		private readonly messageRepo: Repository<MessageEntity>,
 		@InjectRepository(SkinEntity)
-		private readonly skinRepo: Repository<SkinEntity>,
-		public endMatchMutex: Mutex
-	) {}
+		private readonly skinRepo: Repository<SkinEntity>
+	) {
+		this.endMatchMutex = new Mutex();
+	}
 
 	public sanitizeEntry(entry: string)
 	{
