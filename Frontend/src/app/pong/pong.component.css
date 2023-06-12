@@ -7,3 +7,11 @@
 .specWindow.hide {
 	opacity: 0;
 }
+
+.endmatch {
+	display: none;
+}
+
+.endmatch.show {
+	display: block;
+}

@@ -1,7 +1,7 @@
 <div class="container h-100" style="max-width: 100%;">
 	<div class="d-flex row justify-content-center align-items-center h-100 w-100">
 		<div class="col-1"></div>
-		<div class="d-flex flex-column col gap-4 h-100 justify-content-center">
+		<div class="d-flex flex-column rounded-3 col gap-4 justify-content-center" style="max-width: 1024px; width: 1024px;">
 			<div id="pixiContainer" #pixiContainer></div>
 <!-- Profile Zone -->
 			<div *ngIf="player.user && opponent.user" @viewFadeIn class="d-flex">
@@ -23,6 +23,12 @@
 			</div>
 <!-- End of Profile Zone -->
 			<div id="arbiterContainer" #arbiterContainer></div>
+			<div class="d-flex align-items-center justify-content-center gap-3">
+				<button *ngIf="!isSpectator" type="button" class="btn btn-primary" id="removable-ready" (click)="setReady()">Ready</button>
+				<button type="button" (click)="redirect('profile')" class="btn btn-primary endmatch" id="removable-profile">Go to profile</button>
+				<button *ngIf="!isSpectator && gameSettings && gameSettings.is_ranked" type="button" (click)="redirect('matchmaking')" class="btn btn-primary endmatch" id="removable-match">Find a new match</button>
+				<button *ngIf="!isSpectator && gameSettings && !gameSettings.is_ranked" (click)="rematch()" type="button" class="btn btn-primary endmatch" id="removable-rematch">Rematch</button>
+			</div>
 		</div>
 		<div class="ms-5 w-100 col" style="position: relative;">
 			<div class="d-flex row scroll-small light-gunmetal my-light2 rounded-3 specWindow">
@@ -31,8 +37,9 @@
 					<h4 class="flex-grow-1 m-0">{{spec.username}}</h4>
 				</div>
 			</div>
-			<button class="btn btn-info" (click)="hideSpecWindow()">hide spectators</button>
-			<button *ngIf="!isSpectator" type="button" class="btn btn-primary" id="removable" (click)="setReady()">Ready</button>
+			<div class="d-flex align-items-center justify-content-center gap-3">
+				<button class="btn btn-info" (click)="hideSpecWindow()">hide spectators</button>
+			</div>
 		</div>
 	</div>
 </div>

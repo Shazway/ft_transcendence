@@ -174,7 +174,7 @@ export class ProfileComponent implements AfterViewInit {
 			const newUser = await this.fetchService.getProfile(name);
 			if (newUser)
 				this.user = newUser;
-			else this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => this.router.navigateByUrl("profile"));;
+			else this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => this.router.navigateByUrl("profile"));
 		}
 		if (this.user && this.user.match_history) {
 			this.user.match_history.reverse().forEach(match => {

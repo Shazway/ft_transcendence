@@ -74,7 +74,7 @@ export class NotificationService {
 
 	launchMatch(notification: number) {
 		if (notification && !Number.isNaN(notification))
-			this.router.navigateByUrl('pong?match_id=' + notification);
+			this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => this.router.navigateByUrl('pong?match_id=' + notification));
 	}
 
 	showNotificationInvite(notification: NotificationRequest) {
@@ -99,7 +99,7 @@ export class NotificationService {
 	}
 
 	showSuccess(notification: string) {
-		this.toastService.show(this.toastSuccess, { classname: 'bg-success p-0', delay: 20000, context: notification });
+		this.toastService.show(this.toastSuccess, { classname: 'bg-success p-0', delay: 2000, context: notification });
 	}
 
 	showChannel(notification: NotificationRequest) {
