@@ -93,7 +93,6 @@ export class PongGateway {
 			}
 			if (match.started && match.players.length >= 2)
 			{
-				console.log('Spectating' + user.name);
 				match.gameService.spectators.push(this.buildPlayer(client, user.sub, user.name));
 				client.emit('spectateMatch', {
 					matchSetting: new MatchSettingEntity(),
@@ -141,7 +140,6 @@ export class PongGateway {
 	{
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'EEEE');
 		if (!user) return ;
-		console.log('disconnect');
 		const match_id = Number(client.handshake.query.match_id);
 
 		if (Number.isNaN(match_id) || !match_id)
@@ -157,7 +155,6 @@ export class PongGateway {
 		}
 		if ((match.gameService && !match.gameService.match.is_ongoing) || !matchEntity.is_ongoing)
 			return this.matchs.delete(match_id);
-		console.log('Update score disconnect')
 		await this.matchService.setMatchEnd(matchEntity);
 		if (match.gameService)
 			match.gameService.endMatch(user.sub);

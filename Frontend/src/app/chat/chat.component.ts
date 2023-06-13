@@ -104,7 +104,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			if (this.isMe2(user.user_id))
 				this.is_admin = true;
 		}
-		console.log(user);
 	}
 
 	demote(event: Message) {

@@ -60,7 +60,6 @@ export class UsersController {
 
 	@Post('create')
 	async createUser(@Req() req: Request, @Res() res: Response, @Body() newUser: IntraInfo) {
-		console.log(newUser);
 		const check_username = await this.usersService.checkUserByName(newUser.login);
 
 		if (check_username && check_username.user_id === newUser.id)

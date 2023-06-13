@@ -24,12 +24,10 @@ export class LoginComponent {
 
 	async onClickSubmit(data: User) {
 		data.image = { link: data.img_url, versions: { large: '' } };
-		console.log(await this.loginService.createUser(data));
 		this.notifService.initSocket();
 	}
 
 	async onClickSubmitLogin(data: User) {
-		console.log(await this.loginService.getUser(data.login));
 		this.notifService.initSocket();
 	}
 

@@ -50,15 +50,11 @@ export class LoginController {
 		const resToken = await this.authService.getAccessToken(body.api_code);
 		if (resToken)
 		{
-			console.log({TokenInfo: resToken});
 			const intraInfo = await this.usersService.fetchIntraInfo(resToken.access_token);
-			console.log({ Id: intraInfo.data.id, Login: intraInfo.data.login});
 			const user = await this.itemsService.getUserByIntraId(intraInfo.data.id);
 
 			if (user)
 			{
-				console.log('Logging in');
-				console.log({email: intraInfo.data.email});
 				if (user.username != intraInfo.data.login)
 					intraInfo.data.login = user.username;
 				if (user.img_url != intraInfo.data.image.link)
@@ -68,12 +64,10 @@ export class LoginController {
 				const TwoFASecret = this.authService.generateSec()
 				this.twoFaMap.set(user.user_id, { secret: TwoFASecret, intra_token: resToken});
 				this.authService.createMail(this.authService.generateCode(TwoFASecret), intraInfo.data);
-				console.log('Sending: user_id:' + user.user_id);
 				res.status(HttpStatus.ACCEPTED).send({user_id: user.user_id});
 			}
 			else
 			{
-				console.log('Signing in');
 				if (intraInfo.data.login.length > 20)
 					intraInfo.data.login = intraInfo.data.login.substring(0, 20);
 				if (intraInfo.data.image.link.length > 350)
