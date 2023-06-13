@@ -238,6 +238,8 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	}
 
 	isAllowed(username: string) {
+		if (!this.is_admin)
+			return false;
 		if (!this.is_owner) {
 			const target = this.getUserFromChannel(username, this.currentChannel);
 			if (target.is_admin)
@@ -288,7 +290,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	}
 
 	addFriend(msg: Message) {
-		this.client.emit('inviteRequest', this.buildNotif("friend", msg.author.username, msg.author.user_id));
+		this.parent.notifService.client.emit('inviteRequest', this.buildNotif("friend", msg.author.username, msg.author.user_id));
 	}
 
 	blockUser(msg: Message) {
@@ -322,6 +324,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			return;
 		this.client.emit('ban', {
 			target_id: msg.author.user_id,
+			time: banTime,
 			message: "You have been banned",
 		})
 	}

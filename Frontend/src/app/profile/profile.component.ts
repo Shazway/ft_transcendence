@@ -758,6 +758,8 @@ export class ProfileComponent implements AfterViewInit {
 			}
 			ret[1] = (this.matchHistory.length - ret[0]);
 		}
+		if (ret[0] + ret[1] < this.matchHistory.length)
+			ret[0] += 1;
 		return ret;
 	}
 

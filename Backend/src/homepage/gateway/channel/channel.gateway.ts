@@ -372,7 +372,7 @@ export class ChannelGateway implements OnGatewayConnection, OnGatewayDisconnect 
 		if (!(await this.channelService.hardBanUser(targetId, channel_id, body.time)))
 			throw new WsException('Something went wrong');
 		const targets = channel.get(targetId);
-		this.sendSystemMessageToChannel(channel_id, targetId, ' was banned from the channel by ' + user.name + ' for ' + (body.time * 1000) + ' seconds');
+		this.sendSystemMessageToChannel(channel_id, targetId, ' was banned from the channel by ' + user.name + ' for ' + (body.time) + ' seconds');
 		this.socketDisconnect(targets);
 		this.notificationGateway.sendMessage(user.sub, 'Successful ban');
 	}
