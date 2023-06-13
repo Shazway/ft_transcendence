@@ -4,6 +4,9 @@
 		<div class="d-flex flex-column rounded-3 col gap-4 justify-content-center" style="max-width: 1024px; width: 1024px;">
 			<div id="pixiContainer" #pixiContainer></div>
 <!-- Profile Zone -->
+			<div class="align-self-center" style="margin-top: -30px; margin-bottom: -10px; height: 10px;">
+				<img src="https://cdn.discordapp.com/attachments/1041104785870438521/1117835046187970570/Double_chevron_right.png" id="arrow" class="arrow-match">
+			</div>
 			<div *ngIf="player.user && opponent.user" @viewFadeIn class="d-flex">
 				<div class="d-flex col my-light2 light-gunmetal p-2 gap-3">
 					<img draggable="false" class="col" src="{{player.user.img_url}}" class="rounded-circle" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp';" alt="avatar 3" style="width: 40px; height: 100%;">
@@ -12,7 +15,7 @@
 						<p class="text-muted m-0">{{player.user.rank_score}}</p>
 					</div>
 				</div>
-				<div class="col flex-grow-2 align-items-center text-center"><h1 style="font-family: 'Pixeloid', sans-serif;">VS</h1></div>
+				<div class="col flex-grow-2 align-items-center text-center"><h3 class="mt-4" style="font-family: 'Pixeloid', sans-serif;">VS</h3></div>
 				<div class="d-flex col text-end my-light2 light-gunmetal p-2 gap-3">
 					<div class="col d-flex gap-3 align-items-center justify-content-around">
 						<p class="flex-grow-1 text-muted m-0">{{opponent.user.rank_score}}</p>
@@ -20,9 +23,6 @@
 					</div>
 					<img draggable="false" class="col" src="{{opponent.user.img_url}}" class="rounded-circle" onerror="this.src='https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp';" alt="avatar 3" style="width: 40px; height: 100%;">
 				</div>
-			</div>
-			<div class="align-self-center">
-				<img src="https://cdn.discordapp.com/attachments/1041104785870438521/1117835046187970570/Double_chevron_right.png" id="arrow" class="arrow-match">
 			</div>
 <!-- End of Profile Zone -->
 			<div id="arbiterContainer" #arbiterContainer></div>
