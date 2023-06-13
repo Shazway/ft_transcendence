@@ -23,7 +23,7 @@ import { NotificationsGateway } from '../notifications/notifications.gateway';
 @UseFilters(new WsexceptionFilter())
 @WebSocketGateway(3005, {
 	cors: {
-		origin: 'http://10.14.3.1:4200'
+		origin: 'http://localhost:4200'
 	}
 })
 export class PongGateway {
@@ -141,27 +141,27 @@ export class PongGateway {
 	{
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'EEEE');
 		if (!user) return ;
-		await this.disconnectMutex.acquire().then(async () => {
-			const match_id = Number(client.handshake.query.match_id);
+		console.log('disconnect');
+		const match_id = Number(client.handshake.query.match_id);
 
-			if (Number.isNaN(match_id) || !match_id)
-				return ;
-			const match = this.matchs.get(match_id);
-			const matchEntity = await this.itemsService.getMatch(match_id);
-			if (!matchEntity || !match || (!this.isPlayerCheck(matchEntity, user.sub) && !this.isSpectator(match, user.sub)))
-				return ;
-			if (this.isSpectator(match, user.sub) && !this.isPlayerCheck(matchEntity, user.sub))
-			{
-				match.gameService.endMatchSpectator(user.sub);
-				return this.emitToMatch('onUnspectateMatch', {username: user.name}, match);
-			}
-			if (!matchEntity.is_ongoing || this.itemsService.endMatchMutex.isLocked())
-				return this.matchs.delete(match_id);
-			matchEntity.is_victory[this.getOtherPlayerIndex(matchEntity, user.sub)] = true;
-			await this.matchService.setMatchEnd(matchEntity);
-			if (match.gameService)
-				match.gameService.endMatch(user.sub);
-		}).finally(() => this.disconnectMutex.release());
+		if (Number.isNaN(match_id) || !match_id)
+			return ;
+		const match = this.matchs.get(match_id);
+		const matchEntity = await this.itemsService.getMatch(match_id);
+		if (!matchEntity || !match || (!this.isPlayerCheck(matchEntity, user.sub) && !this.isSpectator(match, user.sub)))
+			return ;
+		if (this.isSpectator(match, user.sub) && !this.isPlayerCheck(matchEntity, user.sub))
+		{
+			match.gameService.endMatchSpectator(user.sub);
+			return this.emitToMatch('onUnspectateMatch', {username: user.name}, match);
+		}
+		if ((match.gameService && !match.gameService.match.is_ongoing) || !matchEntity.is_ongoing)
+			return this.matchs.delete(match_id);
+		console.log('Update score disconnect')
+		matchEntity.is_victory[this.getOtherPlayerIndex(matchEntity, user.sub)] = true;
+		await this.matchService.setMatchEnd(matchEntity);
+		if (match.gameService)
+			match.gameService.endMatch(user.sub);
 	}
 
 	getPlayerIndex(match: MatchEntity, userId: number): number {

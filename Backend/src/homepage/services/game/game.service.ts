@@ -139,6 +139,7 @@ export class GamesService {
 	}
 
 	endMatch(id?: number) {
+		console.log('End Match');
 		this.match.is_ongoing = false;
 		this.itemsService.saveMatchState(this.match);
 
@@ -171,7 +172,14 @@ export class GamesService {
 				this.sendScoreChange(pointChecker);
 			}
 			if (this.player1.score >= this.matchSetting.score_to_win || this.player2.score >= this.matchSetting.score_to_win)
-				this.endMatch();
+			{
+				console.log('Ending match');
+				if (this.match.is_ongoing)
+				{
+					this.match.is_ongoing = false;
+					this.endMatch();
+				}
+			}
 		}
 	}
 

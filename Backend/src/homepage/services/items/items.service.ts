@@ -507,6 +507,10 @@ export class ItemsService {
 		let userOne = await this.getUser(player1.player.user_id);
 		let userTwo = await this.getUser(player2.player.user_id);
 		const isRanked = matchSetting && matchSetting.is_ranked ? true : false;
+		const checkMatch = await this.getMatch(match.match_id);
+
+		if (!checkMatch)
+			return false;
 
 		if (!userOne || !userTwo)
 			return null;
@@ -530,6 +534,8 @@ export class ItemsService {
 		userOne.inMatch = false;
 		userTwo.inMatch = false;
 		await this.matchRepo.save(match);
+		console.log('Left match match result');
+		console.log(match);
 		return await this.userRepo.save([userOne, userTwo]);
 	}
 
@@ -538,9 +544,12 @@ export class ItemsService {
 		let userOne = await this.getUser(player1.player.user_id);
 		let userTwo = await this.getUser(player2.player.user_id);
 		const isRanked = matchSetting && matchSetting.is_ranked ? true : false;
+		const checkMatch = await this.getMatch(match.match_id);
 
 		if (!userOne || !userTwo)
 			return null;
+		if (!checkMatch)
+			return false;
 		if (player1.score == matchSetting.score_to_win)
 		{
 			match.is_victory[0] = true;
@@ -560,6 +569,8 @@ export class ItemsService {
 		userTwo.match_history.push(match);
 		userOne.inMatch = false;
 		userTwo.inMatch = false;
+		console.log('Finished match match result');
+		console.log(match);
 		await this.matchRepo.save(match);
 		return await this.userRepo.save([userOne, userTwo]);
 	}
@@ -616,16 +627,12 @@ export class ItemsService {
 
 	async updateRankScore(player1: pongObject, player2: pongObject, match: MatchEntity, matchSetting: MatchSettingEntity, notifGateway: NotificationsGateway, id?: number)
 	{
-		await this.endMatchMutex.waitForUnlock().then(async () => {
-			await this.endMatchMutex.acquire().then(async () => {
-				if (id)
-					await this.updateLeftMatch(player1, player2, match, id, matchSetting);
-				else
-					await this.updateFinishedMatch(player1, player2, match, matchSetting);
-				return await this.updatePlayersAchievement(player1, player2, matchSetting, notifGateway);
-			});
-			this.endMatchMutex.release();
-		});
+		console.log('Updating score');
+		if (id)
+			await this.updateLeftMatch(player1, player2, match, id, matchSetting);
+		else
+			await this.updateFinishedMatch(player1, player2, match, matchSetting);
+		return await this.updatePlayersAchievement(player1, player2, matchSetting, notifGateway);
 	}
 
 	async toggleDoubleAuth(userId: number)
