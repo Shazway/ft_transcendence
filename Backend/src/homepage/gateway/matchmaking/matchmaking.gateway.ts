@@ -43,12 +43,8 @@ export class MatchmakingGateway {
 	async handleConnection(client: Socket) {
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'EEEE');
 		if (!user) return client.disconnect();
-		console.log({ new_player: user });
 		const player = await this.itemsService.getUser(user.sub);
-		if (!player || player.inMatch) {
-			client.emit('inMatch');
-			return client.disconnect();
-		}
+		if (!player || player.inMatch) return client.disconnect();
 		const rankFork = this.getRankFork(player.rank_score);
 		let bracket = this.userQueue.get(rankFork);
 		if (!bracket) {
@@ -57,7 +53,6 @@ export class MatchmakingGateway {
 		}
 		const newPlayer = this.buildPlayer(client, user.sub, user.name);
 		bracket.set(user.sub, newPlayer);
-
 		if (!this.interval) await this.handleStartTimer();
 	}
 
@@ -117,6 +112,13 @@ export class MatchmakingGateway {
 				bracket.forEach(async (user) => {
 					this.secureMatchMaker(user);
 					if (this.matchMaker.length == 2 && this.matchMaker[0] && this.matchMaker[1]) {
+						if (
+							!this.matchMaker[0].client.connected ||
+							!this.matchMaker[1].client.connected
+						) {
+							this.matchMaker[0].client.disconnect();
+							this.matchMaker[1].client.disconnect();
+						}
 						const match = await this.matchsService.createFullMatch(
 							this.matchMaker[0].user_id,
 							this.matchMaker[1].user_id
@@ -129,15 +131,13 @@ export class MatchmakingGateway {
 							'foundMatch',
 							this.buildMatch(this.matchMaker[0].username, match.match_id)
 						);
-						console.log(
-							this.matchMaker[0].username + ' + ' + this.matchMaker[1].username
-						);
 						this.matchMaker.splice(0, this.matchMaker.length);
 					}
 				});
 				bracket.clear();
 			});
-			if (this.matchMaker.length == 1) this.matchMaker[0].client.emit('onError', 'Pending');
+			if (this.matchMaker.length == 1 && this.matchMaker[0])
+				this.matchMaker[0].client.emit('onError', 'Pending');
 		}, 2000);
 	}
 

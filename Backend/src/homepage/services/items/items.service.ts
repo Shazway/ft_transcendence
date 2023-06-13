@@ -610,7 +610,6 @@ export class ItemsService {
 
 	async updateRankScore(player1: pongObject, player2: pongObject, match: MatchEntity, matchSetting: MatchSettingEntity, notifGateway: NotificationsGateway, id?: number)
 	{
-		console.log('Updating score');
 		if (id)
 			await this.updateLeftMatch(player1, player2, match, id);
 		else

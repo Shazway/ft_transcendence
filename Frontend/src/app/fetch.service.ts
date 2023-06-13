@@ -54,7 +54,6 @@ export class FetchService {
 		let res;
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete createUser');
 		await axios.post<Response>('http://localhost:3001/users/create', param, this.getHeader())
 		.then(function (response) {
 			res = response.data;
@@ -73,7 +72,6 @@ export class FetchService {
 		let res;
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete getUser');
 		await axios.get<Response>('http://localhost:3001/users/' + login, this.getHeader())
 		.then(function (response) {
 			res = response.data;
@@ -94,7 +92,6 @@ export class FetchService {
 		const route = this.router;
 		if (!login)
 			return null;
-		console.log('Requete getProfile');
 		await axios.get<AnyProfileUser>('http://localhost:3001/profile/' + login, this.getHeader())
 		.then(function (response) {
 			res = response.data;
@@ -112,7 +109,6 @@ export class FetchService {
 		let res: AnyProfileUser | undefined;
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete getMyProfile');
 		if (localStorage.getItem('username') == null)
 			return null;
 		await axios.get<AnyProfileUser>('http://localhost:3001/profile/' + localStorage.getItem('username'), this.getHeader())
@@ -140,7 +136,6 @@ export class FetchService {
 		let res : ShopItem[] = [];
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete getBuyableSkins');
 		await axios.get<{availableSkins: ShopItem[]}>('http://localhost:3001/shop/availableItems', this.getHeader())
 		.then(function (response) {
 			if (response && response.data)
@@ -157,7 +152,6 @@ export class FetchService {
 		let res : {newBalance : number, availableSkins : ShopItem[]} | undefined;
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete buy');
 		await axios.get<{newBalance : number, availableSkins : ShopItem[]}>('http://localhost:3001/shop/buy/' + item.skin_id, this.getHeader())
 		.then(function (response) {
 			res = response.data;
@@ -190,7 +184,6 @@ export class FetchService {
 		let matchId = 0;
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete getCurrentMatchId');
 		await axios.post<{match_id : number}>('http://localhost:3001/users/getCurrentMatch', {user_id : user_id}, this.getHeader())
 		.then(function (response) {
 			if (response.data)
@@ -209,7 +202,6 @@ export class FetchService {
 		const route = this.router;
 		if (!this.isConnected())
 			return res;
-		console.log('Requete getFriends');
 		await axios.get<Array<AnyProfileUser>>('http://localhost:3001/users/friends', this.getHeader())
 		.then(function (response) {
 			if (response && response.data)
@@ -228,7 +220,6 @@ export class FetchService {
 		const route = this.router;
 		if (!this.isConnected())
 			return res;
-		console.log('Requete getFriendshipRequests');
 		await axios.get<{received: Array<FriendRequest>, sent: Array<FriendRequest>}>('http://localhost:3001/users/friendRequests', this.getHeader())
 		.then(function (response) {
 			res = response.data;
@@ -246,7 +237,6 @@ export class FetchService {
 		const route = this.router;
 		if (!this.isConnected())
 			return res;
-		console.log('Requete getBlockedUsers');
 		await axios.get<Array<AnyProfileUser>>('http://localhost:3001/users/getBlockedUsers', this.getHeader())
 		.then(function (response) {
 			res = response.data;
@@ -262,7 +252,6 @@ export class FetchService {
 		let res;
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete blockUser');
 		await axios.get('http://localhost:3001/users/block/' + block_id, this.getHeader())
 		.then(function (response) {
 			res = response.data;
@@ -278,7 +267,6 @@ export class FetchService {
 		let res;
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete unblockUser');
 		await axios.get('http://localhost:3001/users/unblock/' + block_id, this.getHeader())
 		.then(function (response) {
 			res = response.data;
@@ -294,7 +282,6 @@ export class FetchService {
 		let res;
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete removeFriends');
 		await axios.get('http://localhost:3001/users/removeFriend/' + friend_id, this.getHeader())
 		.then(function (response) {
 			res = response.data;
@@ -310,7 +297,6 @@ export class FetchService {
 		let res;
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete cancelFriendRequest');
 		await axios.get('http://localhost:3001/users/removeFriendRequest/' + friend_id, this.getHeader())
 		.then(function (response) {
 			res = response.data;
@@ -327,7 +313,6 @@ export class FetchService {
 		let res: Message[] = [];
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete getMessages');
 		await axios.get('http://localhost:3001/channels/' + channel_id + '/messages/' + page, this.getHeader())
 		.then(function (response) {
 			res = response.data;
@@ -343,7 +328,6 @@ export class FetchService {
 		let res;
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete isRightPass');
 		await axios.post('http://localhost:3001/channels/rightPass', param, this.getHeader())
 		.then(function (response) {
 			res = response.data.rightPass;
@@ -359,7 +343,6 @@ export class FetchService {
 		let res;
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete createChannel');
 		await axios.post('http://localhost:3001/channels/create', param, this.getHeader())
 		.then(function (response) {
 			res = response.data;
@@ -375,7 +358,6 @@ export class FetchService {
 		let res: Channel[] = [];
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete getChannels');
 		await axios.get('http://localhost:3001/channels/all', this.getHeader())
 		.then(function (response) {
 			res = response.data;
@@ -391,7 +373,6 @@ export class FetchService {
 		let res: Channel | undefined;
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete getChannel');
 		await axios.get('http://localhost:3001/channels/' + id, this.getHeader())
 		.then(function (response) {
 			res = response.data;
@@ -407,7 +388,6 @@ export class FetchService {
 		let res: any;
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete obliterateChannel');
 		await axios.post<Array<AnyProfileUser>>('http://localhost:3001/channels/delete', {channel_id: chan.channel_id}, this.getHeader())
 		.then(function (response) {
 			res = response.data;
@@ -423,7 +403,6 @@ export class FetchService {
 		let res: AnyProfileUser[] = [];
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete searchingSubstring');
 		await axios.post<Array<AnyProfileUser>>('http://localhost:3001/users/userBySubstring', {substring: value}, this.getHeader())
 		.then(function (response) {
 			res = response.data;
@@ -439,7 +418,6 @@ export class FetchService {
 		let res: AnyProfileUser[] = [];
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete inviteSubstring');
 		await axios.post<Array<AnyProfileUser>>('http://localhost:3001/channels/inviteBySubstring', {substring: value}, this.getHeader())
 		.then(function (response) {
 			res = response.data;
@@ -455,7 +433,6 @@ export class FetchService {
 		let res: AnyProfileUser[] = [];
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete channelInvite');
 		await axios.post<Array<AnyProfileUser>>('http://localhost:3001/channels/invite', {channel_id : channel_id, username : user.username, targetId : user.user_id}, this.getHeader())
 		.then(function (response) {
 			res = response.data;
@@ -471,7 +448,6 @@ export class FetchService {
 		let res : ShopItem[] = [];
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete getAllSkins');
 		await axios.get<{skins: ShopItem[]}>('http://localhost:3001/shop/all', this.getHeader())
 		.then(function (response) {
 			if (response && response.data)
@@ -488,7 +464,6 @@ export class FetchService {
 		let res : ShopItem[] = [];
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete getUserSkins');
 		await axios.get<{skins: ShopItem[]}>('http://localhost:3001/shop/allUserSkins', this.getHeader())
 		.then(function (response) {
 			if (response && response.data)
@@ -505,7 +480,6 @@ export class FetchService {
 		let res: any;
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete apply skins');
 		await axios.post<any>('http://localhost:3001/profile/ApplySkins', { skins : skins }, this.getHeader())
 		.then(function (response) {
 			res = response.data;
@@ -521,7 +495,6 @@ export class FetchService {
 		let res: any;
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete changeInvite');
 		await axios.post<any>('http://localhost:3001/profile/changeChannelInviteAuth',{ newSetting : param }, this.getHeader())
 		.then(function (response) {
 			res = response.data;
@@ -537,7 +510,6 @@ export class FetchService {
 		let res: any;
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete changeDoubleAuth');
 		await axios.get<any>('http://localhost:3001/login/toggleDoubleAuth', this.getHeader())
 		.then(function (response) {
 			res = response.data;
@@ -553,7 +525,6 @@ export class FetchService {
 		let res: any;
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete changeAvatar');
 		await axios.post<any>('http://localhost:3001/profile/changeImg',{ img_url : newAvatar }, this.getHeader())
 		.then(function (response) {
 			res = response.status;
@@ -569,7 +540,6 @@ export class FetchService {
 		let res: any;
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete changeUsername');
 		await axios.post<any>('http://localhost:3001/profile/changeName',{ username : newUsername }, this.getHeader())
 		.then(function (response) {
 			res = response;
@@ -585,7 +555,6 @@ export class FetchService {
 		let res: any;
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete changetitle');
 		await axios.post<any>('http://localhost:3001/profile/changeTitle',{ newTitle : newTitle }, this.getHeader())
 		.then(function (response) {
 			res = response;
@@ -601,7 +570,6 @@ export class FetchService {
 		let res: any;
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete secret');
 		await axios.get<any>('http://localhost:3001/users/secretPath', this.getHeader())
 		.then(function (response) {
 			res = response.data;
@@ -616,7 +584,6 @@ export class FetchService {
 	async checkToken() {
 		const teaFunc = this.teapotError;
 		const route = this.router;
-		console.log('Requete checkToken');
 		await axios.get<any>('http://localhost:3001/login/tokenCheck', this.getHeader())
 		.then(function () {
 		})
