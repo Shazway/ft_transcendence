@@ -138,8 +138,6 @@ export class MatchmakingGateway {
 				bracket.clear();
 			});
 			if (this.matchMaker.length == 1) this.matchMaker[0].client.emit('onError', 'Pending');
-			console.log(this.userQueue);
-			console.log(this.matchMaker);
 		}, 2000);
 	}
 

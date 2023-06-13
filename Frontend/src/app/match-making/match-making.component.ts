@@ -28,13 +28,17 @@ export class MatchMakingComponent implements OnDestroy{
 			return;
 		if (!this.client)
 			return;
+		this.initEvent();
+	}
+	ngOnDestroy(): void {
+		this.client.disconnect();
+	}
+
+	initEvent() {
 		this.client.on('foundMatch', (event) => { this.matchFound(event); });
 		this.client.on('onError', (event) => {});
 		this.client.on('connection', () => { });
 		this.client.on('disconnect', () => { });
-	}
-	ngOnDestroy(): void {
-		this.client.disconnect();
 	}
 
 	matchFound(match: MatchMaking) {
