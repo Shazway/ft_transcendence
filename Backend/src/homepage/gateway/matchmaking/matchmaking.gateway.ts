@@ -118,6 +118,7 @@ export class MatchmakingGateway {
 						) {
 							this.matchMaker[0].client.disconnect();
 							this.matchMaker[1].client.disconnect();
+							return;
 						}
 						const match = await this.matchsService.createFullMatch(
 							this.matchMaker[0].user_id,
