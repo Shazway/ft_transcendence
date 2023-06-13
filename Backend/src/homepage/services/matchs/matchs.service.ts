@@ -36,7 +36,8 @@ export class MatchsService {
 		match.current_score = scores;
 		match.round_won = scores;
 		match.user = users;
-		match.is_victory = [false, false];
+		match.loser = 0;
+		match.winner = 0;
 		match.match_timer = 300;
 		const newMatch = this.matchRepo.create(match);
 		return await this.matchRepo.save(newMatch);

@@ -158,7 +158,6 @@ export class PongGateway {
 		if ((match.gameService && !match.gameService.match.is_ongoing) || !matchEntity.is_ongoing)
 			return this.matchs.delete(match_id);
 		console.log('Update score disconnect')
-		matchEntity.is_victory[this.getOtherPlayerIndex(matchEntity, user.sub)] = true;
 		await this.matchService.setMatchEnd(matchEntity);
 		if (match.gameService)
 			match.gameService.endMatch(user.sub);

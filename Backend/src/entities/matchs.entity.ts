@@ -22,8 +22,11 @@ export class Match {
 	@Column({ default: false })
 	is_ranked!: boolean;
 
-	@Column("boolean", { default: () => "'{false,false}'", array: true })
-	is_victory!: boolean[];
+	@Column({ default: 0, unsigned: true })
+	winner!: number;
+
+	@Column({ default: 0, unsigned: true })
+	loser!: number;
 
 	@CreateDateColumn()
 	date!: Date;

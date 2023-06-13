@@ -12,9 +12,8 @@ import { AchievementList } from 'src/dtos/Achievement.dto';
 import { ShopItem } from 'src/dtos/ShopItem.dto';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ChangeAvatarPopup } from '../popup-component/popup-component.component';
-import { NotificationService } from '../notification.service';
 import { NotificationRequest } from 'src/dtos/Notification.dto';
-import { ChatComponent } from '../chat/chat.component';
+import { Match } from 'src/dtos/MatchMaking.dto';
 
 
 interface MatchHistory {
@@ -159,6 +158,21 @@ export class ProfileComponent implements AfterViewInit {
 			})
 	}
 
+
+	getP2Victory(match: Match)
+	{
+		if (match.user[1].user_id == match.winner)
+			return true;
+		return false;
+	}
+
+	getP1Victory(match: Match)
+	{
+		if (match.user[0].user_id == match.winner)
+			return true;
+		return false;
+	}
+
 	async customOnInit() {
 		if (!this.parent.isConnected())
 			this.router.navigateByUrl('login');
@@ -183,12 +197,12 @@ export class ProfileComponent implements AfterViewInit {
 					Player1: match.user[0].username,
 					P1URL: match.user[0].img_url,
 					P1score: match.current_score[0],
-					P1Victory: match.is_victory[0],
+					P1Victory: this.getP1Victory(match),
 					P1ID: match.user[0].user_id,
 					Player2: match.user[1].username,
 					P2URL: match.user[1].img_url,
 					P2score: match.current_score[1],
-					P2Victory: match.is_victory[1],
+					P2Victory: this.getP2Victory(match),
 					P2ID: match.user[1].user_id,
 					isRanked: match.is_ranked,
 					date,

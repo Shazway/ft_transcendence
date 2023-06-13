@@ -481,98 +481,81 @@ export class ItemsService {
 		return (await this.userRepo.save([sourceEntity, targetEntity]));
 	}
 
-	updateWinner(player: UserEntity, isranked: boolean): UserEntity
+	async updateResults(winnerId: number, loserId: number, matchEntity: MatchEntity)
 	{
-		if (isranked)
-		{
-			player.rank_score += 10;
-			player.currency += 10;
-		}
-		player.wins += 1;
-		return player;
-	}
+		const isRanked = matchEntity.is_ranked;
+		const winner = await this.getUser(winnerId);
+		const loser = await this.getUser(loserId);
 
-	updateLoser(player: UserEntity, isranked: boolean): UserEntity
-	{
-		if (isranked)
-			player.rank_score -= 10;
-		player.losses += 1;
-		if (player.rank_score < 0)
-			player.rank_score = 0;
-		return player;
-	}
-
-	async updateLeftMatch(player1: pongObject, player2: pongObject, match: MatchEntity, id: number, matchSetting: MatchSettingEntity)
-	{
-		let userOne = await this.getUser(player1.player.user_id);
-		let userTwo = await this.getUser(player2.player.user_id);
-		const isRanked = matchSetting && matchSetting.is_ranked ? true : false;
-		const checkMatch = await this.getMatch(match.match_id);
-
-		if (!checkMatch)
+		if (!winner || !loser)
 			return false;
-
-		if (!userOne || !userTwo)
-			return null;
-		if (player1.player.user_id != id)
+		if (isRanked)
 		{
-			match.is_victory[0] = true;
-			match.is_victory[1] = false;
-			userOne = this.updateWinner(userOne, isRanked);
-			userTwo = this.updateLoser(userTwo, isRanked);
+			winner.rank_score += 10;
+			winner.currency += 10;
+			loser.rank_score -= 10;
+			if (loser.rank_score < 0)
+				loser.rank_score = 0;
+		}
+		winner.wins += 1;
+		loser.losses += 1;
+		matchEntity.is_ongoing = false;
+		winner.match_history.push(matchEntity);
+		loser.match_history.push(matchEntity);
+		winner.inMatch = false;
+		loser.inMatch = false;
+		await this.matchRepo.save(matchEntity);
+		return await this.userRepo.save([winner, loser]);
+	}
+
+
+	getOtherIndex(matchEntity: MatchEntity, userId: number): number
+	{
+		if (matchEntity.user[0].user_id != userId)
+			return 0;
+		return 1;
+	}
+	getPlayerIndex(matchEntity: MatchEntity, userId: number): number
+	{
+		if (matchEntity.user[0].user_id == userId)
+			return 0;
+		return 1;
+	}
+
+	async updateLeftMatch(player1: pongObject, player2: pongObject, match: MatchEntity, id: number)
+	{
+		if (id == player1.player.user_id)
+		{
+			match.loser = player1.player.user_id;
+			match.winner = player2.player.user_id;
 		}
 		else
 		{
-			match.is_victory[1] = true;
-			match.is_victory[0] = false;
-			userOne = this.updateLoser(userOne, isRanked);
-			userTwo = this.updateWinner(userTwo, isRanked);
+			match.loser = player2.player.user_id;
+			match.winner = player1.player.user_id;
 		}
-		match.is_ongoing = false;
-		userOne.match_history.push(match);
-		userTwo.match_history.push(match);
-		userOne.inMatch = false;
-		userTwo.inMatch = false;
-		await this.matchRepo.save(match);
-		console.log('Left match match result');
-		console.log(match);
-		return await this.userRepo.save([userOne, userTwo]);
+		const loserIndex = this.getPlayerIndex(match, id);
+		const winnerIndex = this.getOtherIndex(match, id);
+
+		match.loser = match.user[loserIndex].user_id;
+		match.winner = match.user[winnerIndex].user_id;
+		return await this.updateResults(match.winner, match.loser, match);
 	}
 
 	async updateFinishedMatch(player1: pongObject, player2: pongObject, match: MatchEntity, matchSetting: MatchSettingEntity)
 	{
-		let userOne = await this.getUser(player1.player.user_id);
-		let userTwo = await this.getUser(player2.player.user_id);
-		const isRanked = matchSetting && matchSetting.is_ranked ? true : false;
-		const checkMatch = await this.getMatch(match.match_id);
-
-		if (!userOne || !userTwo)
-			return null;
-		if (!checkMatch)
-			return false;
 		if (player1.score == matchSetting.score_to_win)
 		{
-			match.is_victory[0] = true;
-			match.is_victory[1] = false;
-			userOne = this.updateWinner(userOne, isRanked);
-			userTwo = this.updateLoser(userTwo, isRanked);
+			match.winner = player1.player.user_id;
+			match.loser = player2.player.user_id;
 		}
 		else
 		{
-			match.is_victory[0] = true;
-			match.is_victory[1] = false;
-			userOne = this.updateLoser(userOne, isRanked);
-			userTwo = this.updateWinner(userTwo, isRanked);
+			match.loser = player1.player.user_id;
+			match.winner = player2.player.user_id;
+
 		}
-		match.is_ongoing = false;
-		userOne.match_history.push(match);
-		userTwo.match_history.push(match);
-		userOne.inMatch = false;
-		userTwo.inMatch = false;
-		console.log('Finished match match result');
-		console.log(match);
-		await this.matchRepo.save(match);
-		return await this.userRepo.save([userOne, userTwo]);
+		return await this.updateResults(match.winner, match.loser, match);
 	}
 
 	hasAchievement(user: UserEntity, achievementName: string)
@@ -629,7 +612,7 @@ export class ItemsService {
 	{
 		console.log('Updating score');
 		if (id)
-			await this.updateLeftMatch(player1, player2, match, id, matchSetting);
+			await this.updateLeftMatch(player1, player2, match, id);
 		else
 			await this.updateFinishedMatch(player1, player2, match, matchSetting);
 		return await this.updatePlayersAchievement(player1, player2, matchSetting, notifGateway);
