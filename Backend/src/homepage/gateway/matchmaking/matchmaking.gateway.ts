@@ -44,6 +44,10 @@ export class MatchmakingGateway {
 		const user = await this.tokenManager.getToken(client.request.headers.authorization, 'EEEE');
 		if (!user) return client.disconnect();
 		const player = await this.itemsService.getUser(user.sub);
+		if (!player || player.inMatch) {
+			client.emit('inMatch');
+			return client.disconnect();
+		}
 		if (!player || player.inMatch) return client.disconnect();
 		const rankFork = this.getRankFork(player.rank_score);
 		let bracket = this.userQueue.get(rankFork);

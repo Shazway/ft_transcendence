@@ -39,6 +39,7 @@ export class MatchMakingComponent implements OnDestroy{
 		this.client.on('onError', (event) => {});
 		this.client.on('connection', () => { });
 		this.client.on('disconnect', () => { });
+		this.client.on('inMatch', () => this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => this.router.navigateByUrl("matchmaking")));
 	}
 
 	matchFound(match: MatchMaking) {
