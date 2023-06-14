@@ -202,26 +202,4 @@ export class UsersController {
 		if (!match) return res.status(HttpStatus.NOT_FOUND).send('Match not found');
 		return res.status(HttpStatus.OK).send(match.match_id);
 	}
-
-	@Get(':username')
-	async getUser(@Param('username') us: string, @Req() req: Request, @Res() res: Response) {
-		const user = await this.itemsService.getUserByUsername(us);
-		if (!user)
-			return res.status(HttpStatus.BAD_REQUEST);
-		const info = {
-			id: user.intra_id,
-			login: user.username
-		};
-		if (user)
-			res.status(HttpStatus.OK).send({
-				msg: 'User connected',
-				token: await this.authService.login(
-					plainToClass(IntraInfo, info),
-					user.user_id
-				),
-				user_id: user.user_id,
-				username: user.username
-			});
-		else res.status(HttpStatus.NOT_FOUND).send({ msg: 'User not found' });
-	}
 }

@@ -469,9 +469,11 @@ export class ChatComponent implements OnInit, AfterViewInit {
 	}
 
 	async onClickCreateChannel(data: any) {
-		if (data.is_channel_private == '')
+		if (data.channel_name == '' || data.channel_name == null)
+			return;
+		if (data.is_channel_private == '' || data.is_channel_private == null)
 			data.is_channel_private = false;
-		if (data.channel_password == '')
+		if (data.channel_password == '' || data.is_channel_private)
 			data.channel_password = null;
 		const waiter = await this.fetchService.createChannel({
 			channel_name: data.channel_name,
@@ -480,7 +482,8 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		});
 		this.elRef.nativeElement.querySelector('#exampleFormControlInput2').value = '';
 		this.elRef.nativeElement.querySelector('#exampleFormControlInput3').value = '';
-		this.elRef.nativeElement.querySelector('#exampleFormControlInput4').checked= false;
+		const check = this.elRef.nativeElement.querySelector('#exampleFormControlInput4');
+		check.checked = false;
 		this.togglePrivate({target: {checked: false}});
 		this.createChannel(waiter);
 	}
@@ -722,6 +725,15 @@ export class ChatComponent implements OnInit, AfterViewInit {
 
 	async openChangePwd() {
 		const pwd = await this.createPopup(this.currentChannel.channel_name, 'New Password', 'PasswordPopup');
+		this.fetchService.changeChanPassword(this.currentChannel.channel_id, pwd);
+		this.hideAllDropdown();
+	}
+
+	async openDelPwd() {
+		const del = await this.createPopup(this.currentChannel.channel_name, 'Remove password', 'ConfirmPopup');
+		if (del)
+			this.fetchService.removeChanPassword(this.currentChannel.channel_id);
+		this.hideAllDropdown();
 	}
 
 	async obliterateChannel() {

@@ -10,9 +10,10 @@
 					<div class="dropdown-menu mondropup premDropUp p-0 rounded-3 my-light2">
 						<div class="btn-group-vertical w-100">
 							<button (click)="leaveChannel()" type="button" class="btn btn-secondary w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="user-select: none; cursor : pointer;" [disabled]="disableLeave()">Leave Channel</button>
-							<button *ngIf="is_admin && currentChannel.has_pwd" (click)="openChangePwd()" type="button" class="btn btn-secondary w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="user-select: none; cursor : pointer;">Change Password</button>
+							<button *ngIf="is_owner && currentChannel.has_pwd" (click)="openChangePwd()" type="button" class="btn btn-secondary w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="user-select: none; cursor : pointer;">Change Password</button>
+							<button *ngIf="is_owner && currentChannel.has_pwd" (click)="openDelPwd()" type="button" class="btn btn-secondary w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="user-select: none; cursor : pointer;">Remove Password</button>
 							<button *ngIf="is_admin" (click)="openAddMember('.secDropUp')" type="button" class="btn btn-secondary w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="user-select: none; cursor : pointer;">Add member</button>
-							<button *ngIf="is_admin" (click)="obliterateChannel()" type="button" class="btn btn-danger w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="user-select: none; cursor : pointer;">Destroy Channel</button>
+							<button *ngIf="is_owner" (click)="obliterateChannel()" type="button" class="btn btn-danger w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="user-select: none; cursor : pointer;">Destroy Channel</button>
 						</div>
 						<div id="addMemberdiv" class="dropdown-menu mondropright secDropUp p-0 my-light2">
 							<div class="w-100 btn btn-sm text-muted text-end" (click)="openAddMember('.secDropUp')"><span aria-hidden="true">&times;</span></div>
@@ -115,7 +116,7 @@
 					<div class="w-100 d-flex mb-2">
 						<button type="button" (click)="createChannel()" class="btn btn-primary btn-sm m-auto">back</button>
 					</div>
-					<form #createChannelBox="ngForm" class="form-check p-0" (ngSubmit)="onClickCreateChannel(createChannelBox.value)">
+					<form #createChannelBox="ngForm" class="form-check p-0" (ngSubmit)="onClickCreateChannel(createChannelBox.value); createChannelBox.reset();">
 						<input type="text" class="form-control form-control-lg text-input" name="channel_name" autocomplete="off" (input)="checkInputChat(createChannelBox.value.channel_name, 0, 41, '#exampleFormControlInput2', true, channelNameCheckList)" placeholder="Channel name" id="exampleFormControlInput2" ngModel>
 						<div class="col-12 text-muted small w-100 text-center" [hidden]="channelNameCheckList.tooLong">41 characters maximum</div><br>
 						<input type="password" name="channel_password" class="chanPass show form-control form-control-lg text-input" (input)="checkInputChat(createChannelBox.value.channel_password, 0, 15, '#exampleFormControlInput3', true, channelPwdCheckList)" autocomplete="off" placeholder="Password" id="exampleFormControlInput3" ngModel>

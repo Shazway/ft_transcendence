@@ -187,7 +187,7 @@ export class ChannelsController {
 	async createChannel(@Req() req: Request, @Res() res: Response, @Body() newChannel: NewChan) {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
-		if (!newChannel || !newChannel.channel_name || newChannel.channel_name.length > 41)
+		if (!newChannel || !newChannel.channel_name || newChannel.is_channel_private == null || newChannel.channel_name.length > 41)
 			return res.status(HttpStatus.OK).send('Either no body or channel name too long');
 		const channelEntity = await this.channelService.createChannel(newChannel, user.sub);
 		if (!channelEntity)

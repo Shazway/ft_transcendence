@@ -324,6 +324,44 @@ export class FetchService {
 		return res;
 	}
 
+	async changeChanPassword(channel_id: number, pass: string | null): Promise<string | null> {
+		let res: string | undefined;
+		const teaFunc = this.teapotError;
+		const route = this.router;
+		if (!channel_id)
+			return null;
+		await axios.post<string>('http://localhost:3001/channels/changePass', {channel_id, newPass: pass}, this.getHeader())
+		.then(function (response) {
+			res = response.data;
+		})
+		.catch(function (error) {
+			teaFunc(error, route);
+		})
+		.finally(function () {});
+		if (res)
+			return res;
+		return null;
+	}
+
+	async removeChanPassword(channel_id: number): Promise<string | null> {
+		let res: string | undefined;
+		const teaFunc = this.teapotError;
+		const route = this.router;
+		if (!channel_id)
+			return null;
+		await axios.post<string>('http://localhost:3001/channels/removePass', {channel_id}, this.getHeader())
+		.then(function (response) {
+			res = response.data;
+		})
+		.catch(function (error) {
+			teaFunc(error, route);
+		})
+		.finally(function () {});
+		if (res)
+			return res;
+		return null;
+	}
+
 	async isRightPass(param: {channel_id: number, pass: string}) {
 		let res;
 		const teaFunc = this.teapotError;

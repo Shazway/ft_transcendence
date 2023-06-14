@@ -44,6 +44,8 @@ export class ChannelsService {
 				return null;
 			newChan.channel_password = await bcrypt.hash(newChan.channel_password, 10);
 		}
+		else
+			newChan.has_pwd = false;
 		const ret = await this.chan_repo.save(newChan);
 		await this.addUserToChannel(user_id, newChan.channel_id, chan.channel_password, true, true);
 		return ret;
@@ -236,6 +238,7 @@ export class ChannelsService {
 		await this.chan_userRepo.save(setter);
 		return true;
 	}
+
 	async hardSetAdmin(targetId: number, chanId: number) {
 		const target = await this.itemsService.getUserChan(targetId, chanId);
 		if (!target)
@@ -265,7 +268,6 @@ export class ChannelsService {
 		target.is_admin = false;
 		return await this.chan_userRepo.save(target);
 	}
-
 
 	async rightPass(channelId: number, pass: string): Promise<boolean> {
 		if (!channelId || !pass)
