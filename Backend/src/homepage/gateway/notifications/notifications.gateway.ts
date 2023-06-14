@@ -24,7 +24,7 @@ import { UsersService } from 'src/homepage/services/users/users.service';
 @UseFilters(new WsexceptionFilter())
 @WebSocketGateway(3003, {
 	cors: {
-		origin: 'http://localhost:4200'
+		origin: 'http://10.24.104.8:4200'
 	}
 })
 

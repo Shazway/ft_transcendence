@@ -23,7 +23,7 @@ import { NotificationsGateway } from '../notifications/notifications.gateway';
 @UseFilters(new WsexceptionFilter())
 @WebSocketGateway(3005, {
 	cors: {
-		origin: 'http://localhost:4200'
+		origin: 'http://10.24.104.8:4200'
 	}
 })
 export class PongGateway {

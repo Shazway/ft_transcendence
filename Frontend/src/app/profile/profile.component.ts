@@ -14,6 +14,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ChangeAvatarPopup } from '../popup-component/popup-component.component';
 import { NotificationRequest } from 'src/dtos/Notification.dto';
 import { Match } from 'src/dtos/MatchMaking.dto';
+import { NotificationService } from '../notification.service';
 
 
 interface MatchHistory {
@@ -210,7 +211,7 @@ export class ProfileComponent implements AfterViewInit {
 			});
 			this.rank = this.user.rank_score;
 		}
-		if (this.isMyProfile()) {
+		if (this.user && this.isMyProfile()) {
 			this.initToggles();
 			this.getSkins();
 			this.getTitles();
@@ -290,9 +291,12 @@ export class ProfileComponent implements AfterViewInit {
 			let res = await this.fetchService.changeUsername(newUsername);
 			if (res.status == 202)
 			{
+
 				this.user.username = newUsername;
 				localStorage.setItem('username', newUsername);
 				localStorage.setItem('Jwt_token', res.data.newToken);
+				this.parent.notifService.client.disconnect();
+				this.parent.notifService.initSocket();
 				this.router.navigateByUrl('profile');
 			}
 		}

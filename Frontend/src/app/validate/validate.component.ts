@@ -28,7 +28,7 @@ export class ValidateComponent {
 	async getCode(mdp: TwoFacAuth) {
 		let statusCode = 0;
 		let loginReturn: LogInReturn;
-		await axios.post<LogInReturn>('http://localhost:3001/login/callback', {
+		await axios.post<LogInReturn>('http://10.24.104.8:3001/login/callback', {
 			mail_code: mdp.code,
 			id: this.bodyid,
 			api_code: this.code
@@ -49,7 +49,7 @@ export class ValidateComponent {
 			this.parent.getUser();
 			return this.router.navigateByUrl('profile');
 		}
-		if (statusCode == 401)
+		if (statusCode == 204)
 			this.nbTrys--;
 		if (this.nbTrys <= 0)
 			return this.router.navigateByUrl('login');

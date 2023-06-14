@@ -31,7 +31,7 @@ export class LoginController {
 			client_id: authWorker.u_key,
 			client_secret: authWorker.s_key,
 			code: code,
-			redirect_uri: 'http://localhost:4200/auth'
+			redirect_uri: 'http://10.24.104.8:4200/auth'
 		};
 	}
 
@@ -104,7 +104,7 @@ export class LoginController {
 		const twoFA = this.twoFaMap.get(Number(body.id));
 		const userEntity = await this.itemsService.getUser(Number(body.id));
 		if (!twoFA || !this.authService.verifyCode(twoFA.secret, body.mail_code))
-			return res.status(HttpStatus.OK).send('Wrong code');
+			return res.status(HttpStatus.NO_CONTENT).send('Wrong code');
 		const intraInfo = await this.usersService.fetchIntraInfo(twoFA.intra_token.access_token);
 		if (intraInfo && intraInfo.data)
 		{
@@ -122,7 +122,7 @@ export class LoginController {
 		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
 		if (!user) return;
 		if (!(await this.itemsService.toggleDoubleAuth(user.sub)))
-			return res.status(HttpStatus.BAD_REQUEST).send('Error');
+			return res.status(HttpStatus.OK).send('Error');
 		return res.status(HttpStatus.ACCEPTED).send('Success');
 	}
 }

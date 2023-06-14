@@ -3,7 +3,7 @@ version: "3.9"
 services:
   postgres:
     container_name: postgresql
-    build: ./requirements/postgresql
+    build: ./Postgresql
     ports:
       - 5432:5432
     networks:
@@ -15,7 +15,7 @@ services:
   backend:
     container_name: backend
     build:
-      context: ../../Backend
+      context: ./Backend
       dockerfile: ./dockerfile/Dockerfile
     ports:
       - 3001:3001
@@ -32,7 +32,7 @@ services:
   frontend:
     container_name: frontend
     build:
-      context: ../../Frontend
+      context: ./Frontend
       dockerfile: ./dockerfile/Dockerfile
     ports:
       - 4200:80
