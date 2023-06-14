@@ -1,10 +1,5 @@
-import { Component, ElementRef } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { FetchService } from '../fetch.service';
-import { Router } from '@angular/router';
-import { User } from 'src/dtos/User.dto';
+import { Component } from '@angular/core';
 import axios from 'axios';
-import { NotificationService } from '../notification.service';
 
 @Component({
 	selector: 'app-login',
@@ -12,26 +7,7 @@ import { NotificationService } from '../notification.service';
 	styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-
-	devModeElm : any;
-
-	constructor(
-			private loginService: FetchService,
-			private elRef: ElementRef,
-			private router: Router,
-			private notifService: NotificationService,
-		) {}
-
-	async onClickSubmit(data: User) {
-		data.image = { link: data.img_url, versions: { large: '' } };
-		await this.loginService.createUser(data);
-		this.notifService.initSocket();
-	}
-
-	async onClickSubmitLogin(data: User) {
-		await this.loginService.getUser(data.login);
-		this.notifService.initSocket();
-	}
+	constructor() {}
 
 	async onClickAuth() {
 		let uid;
@@ -42,13 +18,5 @@ export class LoginComponent {
 		if (!uid)
 			return;
 		window.location.href = 'https://api.intra.42.fr/oauth/authorize?client_id=' + uid + '&redirect_uri=http%3A%2F%2Flocalhost%3A4200%2Fauth&response_type=code';
-	}
-
-	showDevDoor() {
-		this.devModeElm = this.elRef.nativeElement.querySelector("#modeDev");
-		if (this.devModeElm.classList.contains('fade'))
-			this.devModeElm.classList.remove('fade');
-		else
-			this.devModeElm.classList.add('fade');
 	}
 }
