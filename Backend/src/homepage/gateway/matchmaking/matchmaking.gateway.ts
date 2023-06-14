@@ -12,7 +12,7 @@ import { UseFilters } from '@nestjs/common';
 @UseFilters(new WsexceptionFilter())
 @WebSocketGateway(3004, {
 	cors: {
-		origin: 'http://10.24.104.8:4200'
+		origin: 'http://localhost:4200'
 	}
 })
 export class MatchmakingGateway {

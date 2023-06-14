@@ -55,7 +55,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		private parent: AppComponent,
 	) {
 		this.msgLock = new Mutex();
-		this.client = io('ws://10.24.104.8:3002?channel_id=' + 1, websocketService.getHeader());
+		this.client = io('ws://localhost:3002?channel_id=' + 1, websocketService.getHeader());
 		if (!this.client)
 		{
 			this.router.navigateByUrl('login');
@@ -386,7 +386,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 			for (let index = this.msgs$.length; index > 0; index--)
 				this.sortMessage(this.msgs$[index - 1]);
 		}
-		this.client = io('ws://10.24.104.8:3002?channel_id=' + channel.channel_id, this.websocketService.getHeader());
+		this.client = io('ws://localhost:3002?channel_id=' + channel.channel_id, this.websocketService.getHeader());
 		this.currentChannel = channel;
 		this.setClientEvent();
 		const us_channel = this.getUserFromCurrentChannel(localStorage.getItem('username'));
