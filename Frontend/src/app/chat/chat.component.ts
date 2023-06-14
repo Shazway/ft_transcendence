@@ -725,6 +725,8 @@ export class ChatComponent implements OnInit, AfterViewInit {
 
 	async openChangePwd() {
 		const pwd = await this.createPopup(this.currentChannel.channel_name, 'New Password', 'PasswordPopup');
+		if (!pwd)
+			return;
 		this.fetchService.changeChanPassword(this.currentChannel.channel_id, pwd);
 		this.hideAllDropdown();
 	}

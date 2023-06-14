@@ -58,7 +58,9 @@ export class PasswordPopup {
 
 	constructor(public activeModal: NgbActiveModal) {}
 
-	onSubmit(pun: any) {
+	onSubmit(pun?: any) {
+		if (!pun)
+			this.activeModal.close();
 		this.activeModal.close(pun);
 	}
 }
