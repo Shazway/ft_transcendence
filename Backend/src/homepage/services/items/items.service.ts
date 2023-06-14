@@ -104,6 +104,10 @@ export class ItemsService {
 		.leftJoinAndSelect('user.channel', 'channel')
 		.leftJoinAndSelect('user.match_history', 'match_history')
 		.leftJoinAndSelect('match_history.user', 'users')
+		.leftJoinAndSelect('user.sentFriendRequests', 'sentFriendRequests')
+		.leftJoinAndSelect('sentFriendRequests.receiver', 'receiver')
+		.leftJoinAndSelect('user.receivedFriendRequests', 'receivedFriendRequests')
+		.leftJoinAndSelect('receivedFriendRequests.sender', 'sender')
 		.leftJoinAndSelect('user.skin', 'skin')
 		.where('user.username = :username', { username })
 		.getOne();
@@ -111,7 +115,7 @@ export class ItemsService {
 		return user;
 	}
 
-	public async getUserByIntraId(intra_id: number) {
+	public async getUserByIntraId(intra_id: number): Promise<UserEntity> {
 		const user = await this.userRepo
 			.createQueryBuilder('user')
 			.leftJoinAndSelect('user.achievement', 'achievement')
@@ -119,6 +123,11 @@ export class ItemsService {
 			.leftJoinAndSelect('user.blacklistEntry', 'blacklistEntry')
 			.leftJoinAndSelect('user.channel', 'channel')
 			.leftJoinAndSelect('user.match_history', 'match_history')
+			.leftJoinAndSelect('match_history.user', 'users')
+			.leftJoinAndSelect('user.sentFriendRequests', 'sentFriendRequests')
+			.leftJoinAndSelect('sentFriendRequests.receiver', 'receiver')
+			.leftJoinAndSelect('user.receivedFriendRequests', 'receivedFriendRequests')
+			.leftJoinAndSelect('receivedFriendRequests.sender', 'sender')
 			.leftJoinAndSelect('user.skin', 'skin')
 			.where('user.intra_id = :intra_id', { intra_id })
 			.getOne();
