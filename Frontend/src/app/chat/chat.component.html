@@ -10,6 +10,7 @@
 					<div class="dropdown-menu mondropup premDropUp p-0 rounded-3 my-light2">
 						<div class="btn-group-vertical w-100">
 							<button (click)="leaveChannel()" type="button" class="btn btn-secondary w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="user-select: none; cursor : pointer;" [disabled]="disableLeave()">Leave Channel</button>
+							<button *ngIf="is_admin && currentChannel.has_pwd" (click)="openChangePwd()" type="button" class="btn btn-secondary w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="user-select: none; cursor : pointer;">Change Password</button>
 							<button *ngIf="is_admin" (click)="openAddMember('.secDropUp')" type="button" class="btn btn-secondary w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="user-select: none; cursor : pointer;">Add member</button>
 							<button *ngIf="is_admin" (click)="obliterateChannel()" type="button" class="btn btn-danger w-100" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="user-select: none; cursor : pointer;">Destroy Channel</button>
 						</div>

@@ -720,6 +720,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
 		return found;
 	}
 
+	async openChangePwd() {
+		const pwd = await this.createPopup(this.currentChannel.channel_name, 'New Password', 'PasswordPopup');
+	}
+
 	async obliterateChannel() {
 		if (this.is_owner) {
 			const confirm = await this.createPopup("Obliterate channel", "", 'ConfirmPopup');
