@@ -11,6 +11,8 @@ import { FetchService } from '../fetch.service';
 })
 export class HomeComponent {
 
+	secretBool : boolean = false;
+
 	constructor(
 		private router: Router,
 		private fetchService: FetchService,
@@ -36,8 +38,9 @@ export class HomeComponent {
 		const user = this.parent.myProfile;
 		if (!user)
 			return ;
-		if ((user.achievements.unlockedAchievements.find((achievement) => achievement.achievement_name == 'Easter Egg')))
+		if (this.secretBool || (user.achievements.unlockedAchievements.find((achievement) => achievement.achievement_name == 'Easter Egg')))
 			return ;
+		this.secretBool = true;
 		this.parent.updateThunes(user.currency + 250);
 		this.fetchService.secret();
 	}
