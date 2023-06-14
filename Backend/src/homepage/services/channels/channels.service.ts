@@ -275,4 +275,19 @@ export class ChannelsService {
 			return false;
 		return await bcrypt.compare(pass, channel.channel_password)
 	}
+
+	async removePassword(channelId: number) {
+		const channel = await this.itemsService.getChannel(channelId);
+
+		channel.has_pwd = false;
+		channel.channel_password = null;
+		await this.chan_repo.save(channel);
+	}
+
+	async changePassword(channelId: number, newPass: string) {
+		const channel = await this.itemsService.getChannel(channelId);
+
+		channel.channel_password = await bcrypt.hash(newPass, 10);
+		await this.chan_repo.save(channel);
+	}
 }

@@ -122,6 +122,43 @@ export class ChannelsController {
 		res.status(HttpStatus.OK).send('Failure');
 	}
 
+
+	@Post('removePass')
+	async removePassword(
+		@Req() req: Request,
+		@Res() res: Response,
+		@Body() body: { channel_id: number })
+	{
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
+		if (!body || !body.channel_id) return res.status(HttpStatus.OK).send('No body');
+		const channelId = body.channel_id;
+		if (await this.channelService.isUserOwner(user.sub, channelId))
+		{
+			this.channelService.removePassword(channelId);
+			return res.status(HttpStatus.OK).send('Success');
+		}
+		res.status(HttpStatus.OK).send('Failure');
+	}
+
+	@Post('changePass')
+	async changePassword(
+		@Req() req: Request,
+		@Res() res: Response,
+		@Body() body: { channel_id: number, newPass: string })
+	{
+		const user = await this.tokenManager.getUserFromToken(req, 'Http', res);
+		if (!user) return;
+		if (!body || !body.channel_id || !body.newPass || body.newPass.length > 20) return res.status(HttpStatus.OK).send('Error with body');
+		const channelId = body.channel_id;
+		if (await this.channelService.isUserOwner(user.sub, channelId))
+		{
+			this.channelService.changePassword(channelId, body.newPass);
+			return res.status(HttpStatus.OK).send('Success');
+		}
+		res.status(HttpStatus.OK).send('Failure');
+	}
+
 	@Post('inviteBySubstring')
 	async getAllowedInviteBySub(
 		@Req() req: Request,
