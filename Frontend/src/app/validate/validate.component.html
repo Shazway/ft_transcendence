@@ -1,6 +1,10 @@
-<form #validateCode="ngForm" (ngSubmit)="getCode(validateCode.value)" >
-	<div class="card-footer text-muted d-flex justify-content-start align-items-center p-3 gap-3">
-		<input type="text" name = "code" class="form-control form-control-lg" id="exampleFormControlInput1" placeholder="Type message" ngModel>
+<form #validateCode="ngForm" (ngSubmit)="getCode(validateCode.value)" class="mt-5">
+	<div class="d-flex flex-column align-items-center justify-content-center gap-1">
+		<h1>Double authentication code</h1>
+		<h5 class="muted">Your code has been sent to your 42 email address</h5>
+	</div>
+	<div class="card-footer text-muted d-flex flex-column justify-content-start align-items-center p-3 gap-4">
+		<input type="text" autocomplete="off" name = "code" class="form-control form-control-lg" id="exampleFormControlInput1" placeholder="Type message" ngModel>
 		<input type = "submit" class="btn btn-outline-secondary btn-sm rounded-5" value = "submit">
 	</div>
 </form>
