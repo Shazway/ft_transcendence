@@ -102,10 +102,17 @@ export class LoginController {
 	@Post('callback')
 	async callback2FA(@Res() res: Response, @Body() body: AuthCode) {
 		const twoFA = this.twoFaMap.get(Number(body.id));
-
+		const userEntity = await this.itemsService.getUser(Number(body.id));
 		if (!twoFA || !this.authService.verifyCode(twoFA.secret, body.mail_code))
 			return res.status(HttpStatus.OK).send('Wrong code');
 		const intraInfo = await this.usersService.fetchIntraInfo(twoFA.intra_token.access_token);
+		if (intraInfo && intraInfo.data)
+		{
+			if (userEntity.username != intraInfo.data.login)
+				intraInfo.data.login = userEntity.username;
+			if (userEntity.img_url != intraInfo.data.image.link)
+				intraInfo.data.image.link = userEntity.img_url;
+		}
 		res.status(HttpStatus.OK).send(await this.buildLoginBody(twoFA.intra_token, intraInfo.data, Number(body.id)));
 		this.twoFaMap.delete(Number(body.id));
 	}

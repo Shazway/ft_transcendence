@@ -50,42 +50,6 @@ export class FetchService {
 		return token;
 	}
 
-	async createUser(param: User) {
-		let res;
-		const teaFunc = this.teapotError;
-		const route = this.router;
-		await axios.post<Response>('http://localhost:3001/users/create', param, this.getHeader())
-		.then(function (response) {
-			res = response.data;
-			localStorage.setItem('Jwt_token', res.token);
-			localStorage.setItem('id', res.user_id);
-			localStorage.setItem('username', res.username);
-		})
-		.catch(function (error) {
-			teaFunc(error, route);
-		})
-		.finally(function () {});
-		return res;
-	}
-
-	async getUser(login: string) {
-		let res;
-		const teaFunc = this.teapotError;
-		const route = this.router;
-		await axios.get<Response>('http://localhost:3001/users/' + login, this.getHeader())
-		.then(function (response) {
-			res = response.data;
-			localStorage.setItem('Jwt_token', res.token);
-			localStorage.setItem('id', res.user_id);
-			localStorage.setItem('username', res.username);
-		})
-		.catch(function (error) {
-			teaFunc(error, route);
-		})
-		.finally(function () {});
-		return res;
-	}
-
 	async getProfile(login: string | null): Promise<AnyProfileUser | null> {
 		let res: AnyProfileUser | undefined;
 		const teaFunc = this.teapotError;

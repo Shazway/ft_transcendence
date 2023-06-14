@@ -636,7 +636,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 				});
 			}
 			else if (split[0] == '/invite') {
-				let userToAdd  = await this.fetchService.getUser(split[1]);
+				let userToAdd  = await this.fetchService.getProfile(split[1]);
 				if (userToAdd)
 					this.addMember(userToAdd);
 			}

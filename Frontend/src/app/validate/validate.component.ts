@@ -42,7 +42,7 @@ export class ValidateComponent {
 				localStorage.setItem('Jwt_token', loginReturn.jwt_token);
 				localStorage.setItem('id', "" + loginReturn.user_id);
 				localStorage.setItem('username', loginReturn.intraInfo.login);
-				localStorage.setItem('img_url', loginReturn.intraInfo.image.versions.small);
+				localStorage.setItem('img_url', loginReturn.intraInfo.image.link);
 			}
 		});
 		if (statusCode == 200) {
