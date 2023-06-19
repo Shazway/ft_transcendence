@@ -7,16 +7,14 @@ This project cannot be used by anyone, because you would need a specific env tha
 
 # However, here are some images:
 
-<img src="Frontend/src/assets/glassdoor.png">
+![glassdoor](Frontend/src/assets/screenshots/glassdoor.png)
 
-![](Frontend/src/assets/glassdoor.png)
+![homepage](Frontend/src/assets/screenshots/homepage.png)
 
-![](Frontend/src/assets/homepage.png)
+![leaderboard](Frontend/src/assets/screenshots/leaderboard.png)
 
-![](Frontend/src/assets/leaderboard.png)
+![otherProfile](Frontend/src/assets/screenshots/otherProfile.png)
 
-![](Frontend/src/assets/otherProfile.png)
+![pongbegin](Frontend/src/assets/screenshots/pongbegin.png)
 
-![](Frontend/src/assets/pongbegin.png)
-
-![](Frontend/src/assets/profilewithchat.png)
+![profilewithchat](Frontend/src/assets/screenshots/profilewithchat.png)
