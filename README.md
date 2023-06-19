@@ -7,14 +7,14 @@ This project cannot be used by anyone, because you would need a specific env tha
 
 # However, here are some images:
 
-![glassdoor](Frontend/src/assets/[glassdoor.jpg]?raw=true)
+![glassdoor](Frontend/src/assets/glassdoor.jpg?raw=true)
 
-![homepage](Frontend/src/assets/[homepage.jpg]?raw=true)
+![homepage](Frontend/src/assets/homepage.jpg?raw=true)
 
-![leaderboard](Frontend/src/assets/[leaderboard.jpg]?raw=true)
+![leaderboard](Frontend/src/assets/leaderboard.jpg?raw=true)
 
-![otherProfile](Frontend/src/assets/[otherProfile.jpg]?raw=true)
+![otherProfile](Frontend/src/assets/otherProfile.jpg?raw=true)
 
-![pongbegin](Frontend/src/assets/[pongbegin.jpg]?raw=true)
+![pongbegin](Frontend/src/assets/pongbegin.jpg?raw=true)
 
-![profilewithchat](Frontend/src/assets/[profilewithchat.jpg]?raw=true)
+![profilewithchat](Frontend/src/assets/profilewithchat.jpg?raw=true)
