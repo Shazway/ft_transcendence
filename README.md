@@ -7,6 +7,8 @@ This project cannot be used by anyone, because you would need a specific env tha
 
 # However, here are some images:
 
+<img src="Frontend/src/assets/glassdoor.png">
+
 ![](Frontend/src/assets/glassdoor.png)
 
 ![](Frontend/src/assets/homepage.png)
