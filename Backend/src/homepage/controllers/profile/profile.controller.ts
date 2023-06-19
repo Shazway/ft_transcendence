@@ -57,7 +57,7 @@ export class ProfileController {
 			return res
 				.status(HttpStatus.OK)
 				.send('Trying to change someone elses username ?');
-		this.usersService.changeUserName(body.username, user.sub);
+		await this.usersService.changeUserName(body.username, user.sub);
 		const token = await this.authService.login(this.buildIntraInfo(body.username), user.sub);
 		return res.status(HttpStatus.ACCEPTED).send({newToken: token});
 	}
