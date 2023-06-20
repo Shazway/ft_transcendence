@@ -19,3 +19,8 @@ If you do have all the above consider adding an .env file at the root of the Bac
 ![pongbegin](Frontend/src/assets/screenshots/pongbegin.png)
 
 ![profilewithchat](Frontend/src/assets/screenshots/profilewithchat.png)
+
+# Contributors:
+![Shazway](https://github.com/Shazway)
+![Nathan Caba](https://github.com/NeoWaffleSpy)
+![Mdelwaul]()
