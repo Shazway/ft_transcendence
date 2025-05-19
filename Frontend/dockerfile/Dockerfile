@@ -3,7 +3,7 @@ WORKDIR /front
 COPY ./package*.json /front/
 RUN npm ci
 COPY ./ /front/
-
+ENV DEBIAN_FRONTEND=noninteractive
 RUN npm run build -- --output-path=./dist/out --output-hashing=all
 
 # Stage 2: Serve it using Ngnix

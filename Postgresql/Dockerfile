@@ -1,8 +1,10 @@
 FROM postgres:15.2
 
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get update && \
-	apt-get install postgresql && \
+	apt-get install -y postgresql && \
 	apt-get clean
 
 RUN mkdir inoxdb
